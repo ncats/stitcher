@@ -1,4 +1,22 @@
-This is your new Play application
-=================================
+InXight Curator
+===============
 
-This file will be packaged with your application, when using `activator dist`.
+This codebase is based on the latest version of the Play framework
+and as such it needs Java 8 to build. Modules are defined under
+```modules```. The main Play app is defined in ```app```. To build the
+main app, type
+
+```
+./activator {target}
+```
+
+where ```{target}``` can be one of
+{```compile```,```run```,```test```, ```dist```}. Building modules is
+similar:
+
+```
+./activator {module}/{target}
+```
+
+where ```{module}``` is the module name as it appears under ```modules/```
+and ```{target}``` can be {```compile```, ```test```}.

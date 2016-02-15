@@ -1,7 +1,7 @@
 
-lazy val branch = "master" //"git rev-parse --abbrev-ref HEAD".!!.trim
-lazy val commit = "adfasd" //"git rev-parse --short HEAD".!!.trim
-lazy val author = "author"//s"git show --format=%an -s $commit".!!.trim
+lazy val branch = "git rev-parse --abbrev-ref HEAD".!!.trim
+lazy val commit = "git rev-parse --short HEAD".!!.trim
+lazy val author = s"git show --format=%an -s $commit".!!.trim
 lazy val buildDate = (new java.text.SimpleDateFormat("yyyyMMdd"))
   .format(new java.util.Date())
 lazy val appVersion = "%s-%s-%s".format(branch, buildDate, commit)
@@ -27,6 +27,7 @@ lazy val commonDependencies = Seq(
   "com.novocode"      % "junit-interface" % "0.11"  % "test",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.6.3",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.3",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.6.3",
   "log4j" % "log4j" % "1.2.17"
 )
 
