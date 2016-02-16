@@ -42,11 +42,21 @@ public class GraphDb {
     protected final GraphDatabaseService gdb;
     protected final AtomicLong refs = new AtomicLong (1l);
     protected final CacheFactory cache;
-    
+
     protected GraphDb (File dir) throws IOException {
+        this (dir, null);
+    }
+    
+    protected GraphDb (File dir, CacheFactory cache) throws IOException {
         this.gdb = new GraphDatabaseFactory().newEmbeddedDatabase(dir);
+        
         // this must be initialized after graph initialization
-        this.cache = CacheFactory.getInstance(new File (dir, "_cache.ix"));
+        if (cache == null) {
+            this.cache = CacheFactory.getInstance(new File (dir, "_cache.ix"));
+        }
+        else {
+            this.cache = cache;
+        }
         this.dir = dir;
     }
 
@@ -92,14 +102,24 @@ public class GraphDb {
     }
 
     public static GraphDb getInstance (String dir) throws IOException {
-        return getInstance (new File (dir));
+        return getInstance (dir);
     }
     
-    public static synchronized GraphDb getInstance (File dir)
+    public static GraphDb getInstance (String dir, CacheFactory cache)
         throws IOException {
+        return getInstance (new File (dir), cache);
+    }
+
+    public static synchronized GraphDb getInstance
+        (File dir) throws IOException {
+        return getInstance (dir, null);
+    }
+    
+    public static synchronized GraphDb getInstance
+        (File dir, CacheFactory cache) throws IOException {
         GraphDb gdb = INSTANCES.get(dir);
         if (gdb == null) {
-            INSTANCES.put(dir, gdb = new GraphDb (dir));
+            INSTANCES.put(dir, gdb = new GraphDb (dir, cache));
         }
         else {
             gdb.refs.incrementAndGet();
