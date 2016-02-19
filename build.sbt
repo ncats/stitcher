@@ -28,7 +28,13 @@ lazy val commonDependencies = Seq(
   "com.fasterxml.jackson.core" % "jackson-core" % "2.6.3",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.3",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.6.3",
-  "log4j" % "log4j" % "1.2.17"
+  "log4j" % "log4j" % "1.2.17",
+  "org.webjars" %% "webjars-play" % "2.4.0",
+  "org.webjars" % "bootstrap" % "3.3.6",
+  "org.webjars" % "typeaheadjs" % "0.11.1",
+  "org.webjars" % "handlebars" % "4.0.2",
+  "org.webjars" % "jquery" % "2.2.0",
+  "org.webjars" % "font-awesome" % "4.5.0"
 )
 
 lazy val root = (project in file("."))

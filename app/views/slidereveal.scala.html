@@ -1,0 +1,412 @@
+
+@(title: String)
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@title</title>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))'>
+    <link href='@routes.Assets.versioned("stylesheets/prettify.css")' rel="stylesheet">
+    <link href='@routes.Assets.versioned("stylesheets/slidereveal.css")' rel="stylesheet">
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))'>
+  </head>
+  <body>
+    <div id="download-bar">
+      <a href="https://github.com/nnattawat/slideReveal/zipball/master" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download"></span> Download .zip</a>
+      <a href="https://github.com/nnattawat/slideReveal/tarball/master" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download"></span> Download .tar</a>
+      <a href="https://github.com/nnattawat/slideReveal" class="btn btn-default "><span class="glyphicon glyphicon-eye-open"></span> View on Github</a>
+      <div class="well"><h5>SlideReveal is maintained by <a href="https://github.com/nnattawat">nnattawat</a></h5></div>
+    </div>
+    <div id="menu-bar">
+      <div class="handle">
+	<i id="handle-trigger" class="fa fa-bars fa-lg fa-fw"></i>
+	<a href="#"><i class="fa fa-upload fa-fw"></i></a>
+      </div>
+      <h3>
+        SlideReveal<br/>
+        <small><span class="glyphicon glyphicon-info-sign"></span> Press <kbd>ESC</kbd> to close</small>
+      </h3>
+      <div id="menu-bar-item">
+	<a id="menu-bar-item-1" href="#include">How to include</a>
+	<a id="menu-bar-item-2" href="#use">How to use</a>
+	<a id="menu-bar-item-3" href="#method">Methods</a>
+	<a id="menu-bar-item-4" href="#option">Options</a>
+      </div>
+    </div>
+    <div class="jumbotron">
+      <div class="container">
+        <h2>SlideReveal</h2>
+        <p>
+          A jQuery plugin to show a side panel by sliding from the left or right of the page.<br/><strong><span class="text-info">To see an example, click the download button below or the floating button on the top right.</span></strong>
+        </p>
+        <button id="download-btn" class="btn btn-primary navbar-btn navbar-left"><span class="glyphicon glyphicon-cloud-download"></span> Download</button>
+      </div>
+    </div>
+    <div class="container">
+      <section id="include">
+        <h3>How to include</h3>
+        <p>Download <a href="https://raw.githubusercontent.com/nnattawat/slidereveal/master/dist/jquery.slidereveal.min.js">compressed</a> or <a href="https://raw.githubusercontent.com/nnattawat/slidereveal/master/dist/jquery.slidereveal.js">uncompressed</a> version of SlideReveal.
+        Then, simply include <code>jquery.js</code> and <code>jquery.slidereveal.min.js</code> you have downloaded.</p>
+        <pre class="prettyprint">&lt;script src="http://code.jquery.com/jquery-[latest].min.js"&gt;<br/>&lt;script src="jquery.slidereveal.min.js"&gt;</pre>
+        <p>Or install using bower</p>
+        <pre class="prettyprint">bower install slidereveal</pre>
+      </section>
+
+      <section id="use">
+        <h3>How to use</h3>
+        <p>In your HTML, create a <code>&lt;div&gt;</code> element for the side panel and the triggering element such as <code>&lt;button&gt;</code> or <code>&lt;a&gt;</code>.</p>
+        <pre class="prettyprint">&lt;div id='slider'&gt;Hello World!!&lt;/div&gt;
+&lt;button id='trigger'&gt;Trigger&lt;/button&gt;
+</pre>
+        <p>Then, call the jQuery <code>slideReveal()</code> method in JS.</p>
+        <pre class="prettyprint">$('#slider').slideReveal({
+  trigger: $("#trigger")
+});</pre>
+        <p>Here we go! You can get result as:</p>
+        <div id="sample-1" class="side-panel side-panel-left">
+          <span class="lead">Hello World!!</span>
+        </div>
+        <button class="btn btn-info " id="sample-1-btn">Trigger</button>
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">With the default settings</h3>
+          </div>
+          <div class="panel-body">
+            <ul>
+              <li>Panel slides from the left.</li>
+              <li>It pushes the main content away.</li>
+              <li>You can press <kbd>ESC</kbd> to close.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="alert alert-info"><strong>Head's up!</strong> The plugin <strong>does not</strong> add any fancy CSS to your side panel. So, you need to style it yourself to get a nice shadowing panel or a beautiful navigation like in the example from the top right.</div>
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+            <h3 class="panel-title">Warning!</h3>
+          </div>
+          <div class="panel-body">
+            If you add <code>padding</code> to a side panel and you use <strong>Bootstrap</strong>, the plugin <strong>won't work</strong> properly. The hot fix for now is to add the following CSS.</p>
+          <pre class="prettyprint">* {
+  box-sizing: content-box; 
+}</pre>
+          </div>
+        </div>
+      </section>
+      <section id="method">
+        <h3>Methods</h3>
+        <p>After you execute <code>slideReveal()</code> especially without specifying the trigger option, you can show or hide the side panel programmatically.</p>
+        <p>HTML code:</p>
+        <pre class="prettyprint">&lt;div id='slider'&gt;Hello World!!&lt;/div&gt;
+</pre>
+        <p>JS code:</p>
+        <pre class="prettyprint">var slider = $('#slider').slideReveal(); // slideReveal return $('#slider')
+
+// To show the panel
+slider.slideReveal("show") // which is equal to $('#slider').slideReveal("show");
+
+// To hide the panel
+slider.slideReveal("hide") // which is equal to $('#slider').slideReveal("hide");
+
+// To toggle the panel
+slider.slideReveal("toggle") // which is equal to $('#slider').slideReveal("toggle");
+</pre>
+        <div>
+          <button id="show-manually" class="btn btn-default">Click to call<br/> <code>$('#slider').slideReveal("show")</code></button>
+          <button id="hide-manually" class="btn btn-default">Click to call<br/> <code>$('#slider').slideReveal("hide")</code></button>
+          <button id="toggle-manually" class="btn btn-default">Click to call<br/> <code>$('#slider').slideReveal("toggle")</code></button>
+        </div>
+        <br/>
+        <p>
+          If you want to skip the callback functions: <code>show(), shown(), hide() and hidden()</code> mentioned in the next section, you can send <code>false</code> as the second parameter as,
+          <pre class="prettyprint">slider.slideReveal("show", false);
+slider.slideReveal("hide", false);
+slider.slideReveal("toggle", false);</pre>
+        </p>
+      </section>
+      <section id="option">
+        <h3>Options</h3>
+        <table class="table table-bordered">
+          <thead>
+            <th>Attribute</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>width</td>
+              <td><code>integer || String</code></td>
+              <td><code>250</code></td>
+              <td>Width of a side panel. <code>Integer</code> value will be evaluated as <code>px</code>. <code>String</code> value will be assigned directly e.g. <code>'100px'</code>, <code>'50%'</code></td>
+            </tr>
+            <tr>
+              <td>push</td>
+              <td><code>boolean</code></td>
+              <td><code>true</code></td>
+              <td>Whether you want a panel to push the main content. Set it to <code>false</code> results to the menu on the right, for example.</td>
+            </tr>
+            <tr>
+              <td>overlay</td>
+              <td><code>boolean</code></td>
+              <td><code>false</code></td>
+              <td>Whether you want to add the overlay to the main content.</td>
+            </tr>
+            <tr>
+              <td>overlayColor</td>
+              <td><code>String</code></td>
+              <td><code>rgba(0,0,0,0.5)</code></td>
+              <td>Valid <code>css</code> color value.</td>
+            </tr>
+            <tr>
+              <td>zIndex</td>
+              <td><code>integer</code></td>
+              <td><code>1049</code></td>
+              <td><code>z-index</code> of your side panel. In case you use <code>overlay</code>, the overlay's <code>z-index</code> will be set to the given value - 1.</td>
+            </tr>
+            <tr>
+              <td>position</td>
+              <td><code>String</code></td>
+              <td><code>left</code></td>
+              <td>Where you want to show a side panel from. You can only set it to either <code>left</code> or <code>right</code>.</td>
+            </tr>
+            <tr>
+              <td>speed</td>
+              <td><code>integer</code></td>
+              <td><code>300</code></td>
+              <td>Animating time for showing a side panel. The unit is millisecond.</td>
+            </tr>
+            <tr>
+              <td>trigger</td>
+              <td>jQuery DOM Selection</td>
+              <td><code>undefined</code></td>
+              <td>DOM element that you want to use as a trigger to show and hide a panel. If you don't specify, please see <a href="#method">the method section</a>.</td>
+            </tr>
+            <tr>
+              <td>autoEscape</td>
+              <td><code>boolean</code></td>
+              <td><code>true</code></td>
+              <td>Whether you want to enable users to use <kbd>ESC</kbd> to hide a panel.</td>
+            </tr>
+            <tr>
+              <td>top</td>
+              <td><code>integer</code></td>
+              <td>0</td>
+              <td>Starting position from the top of the window. This option may be useful if you have a fixed topbar, for instance.</td>
+            </tr>
+            <tr>
+              <td>show</td>
+              <td><code>function</code></td>
+              <td>-</td>
+              <td>Function that you want to trigger before a panel starts revealing. It passes two parameters, jQuery side panel and trigger objects respectively.</td>
+            </tr>
+            <tr>
+              <td>shown</td>
+              <td><code>function</code></td>
+              <td>-</td>
+              <td>Function that you want to trigger once a panel is fully shown. It passes two parameters, jQuery side panel and trigger objects respectively</td>
+            </tr>
+            <tr>
+              <td>hide</td>
+              <td><code>function</code></td>
+              <td>-</td>
+              <td>Function that you want to trigger before a panel starts hiding. It passes two parameters, jQuery side panel and trigger objects respectively</td>
+            </tr>
+            <tr>
+              <td>hidden</td>
+              <td><code>function</code></td>
+              <td>-</td>
+              <td>Function that you want to trigger once a panel is fully hidden. It passes two parameters, jQuery side panel and trigger objects respectively</td>
+            </tr>
+          </tbody>
+          </tbody>
+        </table>
+        <h4>Examples with options</h4>
+        <p>With the same HTML code:</p>
+        <pre class="prettyprint">&lt;div id='slider'&gt;Hello World!!&lt;/div&gt;
+&lt;button id='trigger'&gt;Trigger&lt;/button&gt;
+</pre>
+        <p>We can change options to create:</p>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Right Panel</h3>
+          </div>
+          <div class="panel-body">
+            <pre class="prettyprint">
+$("slider").slideReveal({
+  trigger: $("#trigger"),
+  position: "right"
+});
+</pre>
+         <div id="sample-2" class="side-panel side-panel-right">
+          <span class="lead">Hello World!!</span><br/>
+          <span class="text-muted">Press <kbd>ESC</kbd> to close</span>
+        </div>
+        <button class="btn btn-info " id="sample-2-btn">Trigger</button>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Overlay Panel</h3>
+          </div>
+          <div class="panel-body">
+            <pre class="prettyprint">
+$("slider").slideReveal({
+  trigger: $("#trigger"),
+  push: false,
+  overlay: true
+});
+</pre>
+         <div id="sample-3" class="side-panel ">
+          <span class="lead">Hello World!!</span><br/>
+          <span class="text-muted">Press <kbd>ESC</kbd> to close</span>
+        </div>
+        <button class="btn btn-info " id="sample-3-btn">Trigger</button>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Wide panel <span class="text-muted">without auto escape</span></h3>
+          </div>
+          <div class="panel-body">
+            <pre class="prettyprint">
+$("slider").slideReveal({
+  trigger: $("#trigger"),
+  autoEscape: false,
+  width: 500,
+  speed: 700
+});
+</pre>
+         <div id="sample-4" class="side-panel side-panel-left">
+          <span class="lead">Hello World!!</span>
+        </div>
+        <button class="btn btn-info " id="sample-4-btn">Trigger</button>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Attach events to a panel</h3>
+          </div>
+          <div class="panel-body">
+            <pre class="prettyprint">
+$("slider").slideReveal({
+  trigger: $("#trigger"),
+  shown: function(slider, trigger){
+    alert("After opened!");
+  },
+  hidden: function(slider, trigger){
+    alert("After closed!");
+  },
+  show: function(slider, trigger){
+    alert("Before open!");
+  },
+  hide: function(slider, trigger){
+    alert("Before close!");
+  }
+});
+</pre>
+         <div id="sample-5" class="side-panel side-panel-left">
+          <span class="lead">Hello World!!</span>
+        </div>
+        <button class="btn btn-info " id="sample-5-btn">Trigger</button>
+          </div>
+        </div>
+    </section>
+    </div>
+    <footer>
+      <div class="container">
+        <h5><a href="https://github.com/nnattawat/slideReveal">SlideReveal</a> is maintained by <a href="https://github.com/nnattawat">nnattawat</a></h5>
+      </div>
+    </footer>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+    <script type="text/javascript" src='@routes.Assets.versioned("javascripts/jquery.slidereveal.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.versioned("javascripts/prettify.js")'></script>    
+    <script type="text/javascript">
+      $(function(){
+        prettyPrint();
+
+        $("#menu-bar-item-*").click(function(){
+          var id = $(this).attr("href").substring(1);
+          $("html, body").animate({ scrollTop: $("#"+id).offset().top }, 1000, function(){
+            $("#menu-bar").slideReveal("hide");
+          });
+        });
+
+        var slider = $("#menu-bar").slideReveal({
+          // width: 100,
+          push: false,
+          position: "right",
+          // speed: 600,
+          trigger: $("#handle-trigger"),
+          // autoEscape: false,
+          shown: function(obj){
+            //obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-right"></span>');
+            obj.addClass("left-shadow-overlay");
+          },
+          hidden: function(obj){
+            //obj.find(".handle").html('<span class="glyphicon glyphicon-chevron-left"></span>');
+            obj.removeClass("left-shadow-overlay");
+          }
+        });
+
+        $("#download-bar").slideReveal({
+          position: "left",
+          trigger: $("#download-btn")
+        });
+
+        var sample1 = $("#sample-1").slideReveal({
+          trigger: $("#sample-1-btn")
+        })
+        $("#show-manually").click(function(){
+          sample1.slideReveal("show");
+        });
+        $("#hide-manually").click(function(){
+          sample1.slideReveal("hide");
+        });
+        $("#toggle-manually").click(function(){
+          sample1.slideReveal("toggle");
+        });
+
+        $("#sample-2").slideReveal({
+          trigger: $("#sample-2-btn"),
+          position: "right"
+        });
+
+        $("#sample-3").slideReveal({
+          trigger: $("#sample-3-btn"),
+          push: false,
+          overlay: true
+        });
+
+        $("#sample-4").slideReveal({
+          trigger: $("#sample-4-btn"),
+          autoEscape: false,
+          width: 500,
+          // speed: 700
+        });
+        $("#sample-5").slideReveal({
+          trigger: $("#sample-5-btn"),
+          shown: function(slider){
+            alert("After opened!");
+          },
+          hidden: function(slider){
+            alert("After closed!");
+          },
+          show: function(slider){
+            alert("Before open!");
+          },
+          hide: function(slider){
+            alert("Before close!");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

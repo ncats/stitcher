@@ -19,8 +19,12 @@ public class Application extends Controller {
         this.graphDb = service.getGraphDb();
     }
     
-    public Result index() {
-        return ok(index.render("Your new application is ready..."
-                               +graphDb+" ws="+ws));
+    public Result welcome () {
+        return ok(welcome.render("Your new application is ready..."
+                                 +graphDb+" ws="+ws));
+    }
+
+    public Result slidereveal () {
+        return ok (slidereveal.render("IxCurator"));
     }
 }
