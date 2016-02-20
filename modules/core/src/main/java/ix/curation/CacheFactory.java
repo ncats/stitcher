@@ -45,6 +45,7 @@ public class CacheFactory
     static final Map<File, CacheFactory> CACHES =
         new ConcurrentHashMap<File, CacheFactory>();
 
+    /*
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
                 // do shutdown work here
@@ -59,7 +60,8 @@ public class CacheFactory
                 }
             });
     }
-
+    */
+    
     protected final File dir;
     protected final Ehcache cache;
     protected final AtomicLong refs = new AtomicLong (1l);
@@ -94,7 +96,7 @@ public class CacheFactory
     public File getCachePath () { return dir; }
 
     public static CacheFactory getInstance (String dir) throws IOException {
-        return getInstance (dir);
+        return getInstance (new File (dir));
     }
     
     public static synchronized CacheFactory getInstance (File dir)

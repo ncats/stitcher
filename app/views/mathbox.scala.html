@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MathAjex Renderer</title>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
+    <style>
+      .matharea { width: 100%; height: 200px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">    
+      <div class="jumbotron">
+	<h2>MathAjax Renderer</h2>
+      </div>
+      <div class="row">
+	<div class="col-md-8">
+	  <div class="panel">
+	    <div class="panel-heading">
+	      <h4>Enter TeX/LaTeX equation:</h4>
+	    </div>
+	    <div class="panel-body">
+	      <form role="search" method="POST"
+		    action="@routes.MathJax.mathjax"
+		    id="matharea-form">
+		<div class="form-group">
+                  <textarea class="matharea" name="matharea"
+			    style="font-family: monospace">
+When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
+$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</textarea>
+		</div>
+		<p><button type="submit" class="btn btn-default">Render</button>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+  </body>
+</html>

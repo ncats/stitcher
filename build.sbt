@@ -23,6 +23,7 @@ lazy val commonDependencies = Seq(
   javaWs,
   "org.neo4j" % "neo4j" % "2.3.2",
   "net.sf.ehcache" % "ehcache" % "2.10.1",
+  "org.quartz-scheduler" % "quartz" % "2.2.2",  
   "junit"             % "junit"           % "4.12"  % "test",
   "com.novocode"      % "junit-interface" % "0.11"  % "test",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.6.3",

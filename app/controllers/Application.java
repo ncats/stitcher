@@ -7,21 +7,24 @@ import play.libs.ws.*;
 
 import views.html.*;
 import services.GraphDbService;
+import services.SchedulerService;
 
 import ix.curation.GraphDb;
 
 public class Application extends Controller {
     final GraphDb graphDb;
     @Inject WSClient ws;
+    @Inject SchedulerService scheduler;
 
     @Inject
     public Application (GraphDbService service) {
         this.graphDb = service.getGraphDb();
     }
     
-    public Result welcome () {
-        return ok(welcome.render("Your new application is ready..."
-                                 +graphDb+" ws="+ws));
+    public Result build () {
+        return ok(welcome.render("Build: "+ix.BuildInfo.TIME+" ("
+                                 +ix.BuildInfo.BRANCH+"-"
+                                 +ix.BuildInfo.COMMIT+")"));
     }
 
     public Result slidereveal () {

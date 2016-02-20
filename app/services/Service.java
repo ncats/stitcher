@@ -61,7 +61,7 @@ public class Service {
     public File dataDir () { return data; }
 
     public void shutdown () {
-        Logger.debug("Shutting down "+getClass());
+        Logger.debug("Shutting down "+getClass()+"..."+this);
         cacheFactory.shutdown();
     }
     

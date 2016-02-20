@@ -1,0 +1,26 @@
+@(content: String)
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>MathJax TeX Test Page</title>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  tex2jax: {
+     inlineMath: [['$','$'], ['\\(','\\)']]
+  },
+  SVG: {  scale: 120 },
+  jax: ["input/TeX","output/SVG"],
+  TeX: {
+     extensions: ["mhchem.js","AMSmath.js", "AMSsymbols.js"]
+  }
+  });
+</script>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_SVG">
+</script>
+</head>
+<body>
+  @content
+</body>
+</html>

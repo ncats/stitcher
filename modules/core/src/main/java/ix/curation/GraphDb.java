@@ -23,6 +23,7 @@ public class GraphDb {
     static final Map<File, GraphDb> INSTANCES =
         new ConcurrentHashMap<File, GraphDb>();
 
+    /*
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
                 // do shutdown work here
@@ -37,7 +38,8 @@ public class GraphDb {
                 }
             });
     }
-
+    */
+    
     protected final File dir;
     protected final GraphDatabaseService gdb;
     protected final AtomicLong refs = new AtomicLong (1l);
@@ -102,7 +104,7 @@ public class GraphDb {
     }
 
     public static GraphDb getInstance (String dir) throws IOException {
-        return getInstance (dir);
+        return getInstance (new File (dir));
     }
     
     public static GraphDb getInstance (String dir, CacheFactory cache)
