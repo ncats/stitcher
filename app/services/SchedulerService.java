@@ -3,14 +3,15 @@ package services;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.net.URL;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.inject.Inject;
 
 import org.h2.tools.RunScript;
-
 import play.Application;
 import play.Logger;
+import play.inject.Injector;
 import play.db.*;
 import play.libs.F;
 import play.inject.ApplicationLifecycle;
@@ -27,12 +28,13 @@ import static org.quartz.CalendarIntervalScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.*; 
 import static org.quartz.DateBuilder.*;
 
+import services.jobs.*;
+
 @Singleton
 public class SchedulerService {
     static final String QUARTZ = "quartz";
     static final String QUARTZ_INIT = "ix.quartz.init";
     static final String QUARTZ_THREADS = "ix.quartz.threads";
-    static final String JOB_GROUP = SchedulerService.class.getName();
 
     static public class QuartzConnectionProvider
         implements ConnectionProvider {
@@ -54,7 +56,17 @@ public class SchedulerService {
             initDb (app);
             scheduler = createScheduler (app);
             scheduler.start(); // now start the scheduler
-            Logger.debug(getJobCount()+" job(s) waiting in queue!");
+            Logger.debug(getJobCount()+" job(s) in queue!");
+
+            submit (SRSJsonRegistrationJob.class, null,
+                    app.getFile("../inxight-planning/files/public2015-11-30.gsrs"));
+            submit (IntegrityMoleculeRegistrationJob.class, null,
+                    app.getFile("../inxight-planning/files/integr.sdf.gz"));
+            /*
+            registerJob (app.getFile("../inxight-planning/files/drugbank-full-annotated.sdf"));
+
+            registerJob (app.getFile("../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
+            */
             
             lifecycle.addStopHook(() -> {
                     shutdown ();
@@ -65,13 +77,107 @@ public class SchedulerService {
             ex.printStackTrace();
         }
     }
+    
+    void deleteJobs () throws Exception {
+        for (JobKey job : getJobs ()) {
+            scheduler.deleteJob(job);
+        }
+    }
 
-    public Set<String> getJobs () {
-        Set<String> jobs = new TreeSet<String>();
+    void addJob () throws Exception {
+        JobDetail job = JobBuilder
+            .newJob(MoleculeRegistrationJob.class)
+            //.withIdentity(MoleculeRegistrationJob.class.getName())
+            //.storeDurably(true)
+            .requestRecovery(true)
+            .build();
+        Trigger trigger = TriggerBuilder.
+            newTrigger()
+            .startNow()
+            //.startAt(new java.util.Date (System.currentTimeMillis()+5*60*60))
+            .build();
+        scheduler.scheduleJob(job, trigger);
+    }
+
+    void triggerJobs () throws Exception {
+        for (JobKey jk : getJobs ()) {
+            Trigger trigger = TriggerBuilder
+                .newTrigger()
+                .forJob(jk)
+                .startNow()
+                .build();
+            scheduler.scheduleJob(trigger);
+        }
+    }
+
+    public String submit (Class<? extends RegistrationJob> jobClass,
+                          Map<String, Object> params,
+                          File file) throws SchedulerException {
+        JobDetail job = JobBuilder
+            .newJob(jobClass)
+            .requestRecovery(true)
+            .build();
+        if (params != null) {
+            for (Map.Entry<String, Object> me : params.entrySet()) {
+                Object value = me.getValue();
+                if (value instanceof Serializable) {
+                    job.getJobDataMap().put(me.getKey(), value);
+                }
+                else {
+                    Logger.warn("Job "+jobClass+"; ignoring parameter \""
+                                +me.getKey()
+                                +"\" because value is not serializable!");
+                }
+            }
+        }
+        job.getJobDataMap().put(RegistrationJob.FILE, file);
+        
+        Trigger trigger = TriggerBuilder
+            .newTrigger()
+            .startNow()
+            .build();
+        
+        scheduler.scheduleJob(job, trigger);
+        return job.getKey().getName();
+    }
+
+    public String submit (Class<? extends RegistrationJob> jobClass,
+                          Map<String, Object> params,
+                          URL url) throws SchedulerException {
+        JobDetail job = JobBuilder
+            .newJob(jobClass)
+            .requestRecovery(true)
+            .build();
+        if (params != null) {
+            for (Map.Entry<String, Object> me : params.entrySet()) {
+                Object value = me.getValue();
+                if (value instanceof Serializable) {
+                    job.getJobDataMap().put(me.getKey(), value);
+                }
+                else {
+                    Logger.warn("Job "+jobClass+"; ignoring parameter \""
+                                +me.getKey()
+                                +"\" because value is not serializable!");
+                }
+            }
+        }
+        job.getJobDataMap().put(RegistrationJob.URL, url);
+        
+        Trigger trigger = TriggerBuilder
+            .newTrigger()
+            .startNow()
+            .build();
+        
+        scheduler.scheduleJob(job, trigger);
+        return job.getKey().getName();
+    }
+
+    public Set<JobKey> getJobs () {
+        Set<JobKey> jobs = new TreeSet<JobKey>();
         try {
-            for (JobKey jk : scheduler.getJobKeys
-                     (GroupMatcher.groupEquals(JOB_GROUP))) {
-                jobs.add(jk.getName());
+            for (JobKey jk :
+                     scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
+                jobs.add(jk);
             }
         }
         catch (Exception ex) {
@@ -134,15 +240,18 @@ public class SchedulerService {
         props.put("org.quartz.jobStore.driverDelegateClass",
                   "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
         props.put("org.quartz.dataSource.quartzDS.connectionProvider.class",
-                  "services.SchedulerService$QuartzConnectionProvider");
+                  QuartzConnectionProvider.class.getName());
         props.put("org.quartz.jobStore.dataSource", "quartzDS");
         return props;
     }
 
-    static Scheduler createScheduler (Application app) throws Exception {
+    static Scheduler createScheduler (Application app)
+        throws Exception {
         SchedulerFactory schedulerFactory =
             new StdSchedulerFactory (createSchedulerConfig (app));
         Scheduler scheduler = schedulerFactory.getScheduler();
+        scheduler.setJobFactory(new InjectorJobFactory (app.injector()));
+        
         Logger.debug("Scheduler initialized..."+scheduler);
         return scheduler;
     }

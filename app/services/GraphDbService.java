@@ -11,6 +11,7 @@ import play.inject.ApplicationLifecycle;
 import play.libs.F;
 
 import ix.curation.GraphDb;
+import ix.curation.EntityFactory;
 
 @Singleton
 public class GraphDbService {
@@ -44,4 +45,8 @@ public class GraphDbService {
     public GraphDb getGraphDb () { return graphDb; }
     public Service getService () { return service; }
     public CacheApi getCache () { return service.getCache(); }
+
+    public EntityFactory getEntityFactory () {
+        return new EntityFactory (graphDb);
+    }
 }
