@@ -29,10 +29,11 @@ public class CNode implements Props, Comparable<CNode> {
     
     protected final Node _node;
     protected GraphDatabaseService gdb;
-    protected Long created;
-    protected Long lastUpdated;
     protected TimelineIndex timeline;
     protected DataSourceFactory dsf;
+    
+    protected Long created;
+    protected Long lastUpdated;
 
     protected CNode (Node node) {
         if (node == null)

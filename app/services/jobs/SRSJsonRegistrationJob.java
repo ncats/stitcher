@@ -1,8 +1,6 @@
 package services.jobs;
 
 import java.io.IOException;
-import play.Logger;
-
 import ix.curation.impl.MoleculeEntityFactory;
 import ix.curation.impl.SRSJsonEntityFactory;
 import ix.curation.GraphDb;

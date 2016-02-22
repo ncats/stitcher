@@ -1,5 +1,9 @@
 package ix.curation;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+
 import java.net.URL;
 import java.io.*;
 import java.util.logging.Logger;
@@ -14,6 +18,9 @@ public abstract class EntityRegistry<T> extends EntityFactory {
     static final Logger logger =
         Logger.getLogger(EntityRegistry.class.getName());
 
+    protected final PropertyChangeSupport pcs =
+        new PropertyChangeSupport (this);
+    
     protected DataSource source;
     protected DataSourceFactory dsf;
     
@@ -33,6 +40,19 @@ public abstract class EntityRegistry<T> extends EntityFactory {
         init ();
     }
 
+    public void addPropertyChangeListener (PropertyChangeListener l) {
+        pcs.addPropertyChangeListener(l);
+    }
+    
+    public void removePropertyChangeListener (PropertyChangeListener l) {
+        pcs.removePropertyChangeListener(l);
+    }
+
+    protected void firePropertyChange (String property,
+                                       Object oldVal, Object newVal) {
+        pcs.firePropertyChange(property, oldVal, newVal);
+    }
+    
     // to be overriden by subclass
     protected void init () {
     }

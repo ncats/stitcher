@@ -4,6 +4,7 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.net.URL;
+import java.security.MessageDigest;
 
 import javax.inject.Singleton;
 import javax.inject.Inject;
@@ -48,25 +49,18 @@ public class SchedulerService {
     }
 
     Scheduler scheduler;
+    MessageDigest digest;
 
     @Inject
     public SchedulerService (Application app,
                              ApplicationLifecycle lifecycle) {
         try {
+            digest = MessageDigest.getInstance("SHA1");
             initDb (app);
+            
             scheduler = createScheduler (app);
             scheduler.start(); // now start the scheduler
             Logger.debug(getJobCount()+" job(s) in queue!");
-
-            submit (SRSJsonRegistrationJob.class, null,
-                    app.getFile("../inxight-planning/files/public2015-11-30.gsrs"));
-            submit (IntegrityMoleculeRegistrationJob.class, null,
-                    app.getFile("../inxight-planning/files/integr.sdf.gz"));
-            /*
-            registerJob (app.getFile("../inxight-planning/files/drugbank-full-annotated.sdf"));
-
-            registerJob (app.getFile("../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
-            */
             
             lifecycle.addStopHook(() -> {
                     shutdown ();
@@ -77,102 +71,85 @@ public class SchedulerService {
             ex.printStackTrace();
         }
     }
-    
-    void deleteJobs () throws Exception {
-        for (JobKey job : getJobs ()) {
-            scheduler.deleteJob(job);
+
+    protected synchronized JobKey getJob
+        (Class<? extends RegistrationJob> jobClass, Set<String> params)
+        throws SchedulerException {
+        // calculate a unique job key based on the parameters keys
+        digest.reset();
+        for (String k : params) {
+            digest.update(k.getBytes());
         }
-    }
+        
+        byte[] sig = digest.digest();
+        StringBuilder sha = new StringBuilder ();
+        for (int i = 0; i < sig.length; ++i)
+            sha.append(String.format("%1$02x", sig[i] & 0xff));
 
-    void addJob () throws Exception {
-        JobDetail job = JobBuilder
-            .newJob(MoleculeRegistrationJob.class)
-            //.withIdentity(MoleculeRegistrationJob.class.getName())
-            //.storeDurably(true)
-            .requestRecovery(true)
-            .build();
-        Trigger trigger = TriggerBuilder.
-            newTrigger()
-            .startNow()
-            //.startAt(new java.util.Date (System.currentTimeMillis()+5*60*60))
-            .build();
-        scheduler.scheduleJob(job, trigger);
-    }
-
-    void triggerJobs () throws Exception {
-        for (JobKey jk : getJobs ()) {
-            Trigger trigger = TriggerBuilder
-                .newTrigger()
-                .forJob(jk)
-                .startNow()
+        JobKey jobid = new JobKey (jobClass.getName()+"/"+sha);
+        JobDetail job = scheduler.getJobDetail(jobid);
+        if (job == null) {
+            job = JobBuilder
+                .newJob(jobClass)
+                .storeDurably(true)
+                .requestRecovery(true)
+                .withIdentity(jobid)
                 .build();
-            scheduler.scheduleJob(trigger);
+            scheduler.addJob(job, true);
         }
+        return jobid;
+    }
+
+    protected Trigger setupJob (Class<? extends RegistrationJob> jobClass,
+                                Map<String, Object> params)
+        throws SchedulerException {
+        Map<String, Object> sorted = new TreeMap<String, Object>();
+        if (params != null) {
+            for (Map.Entry<String, Object> me : params.entrySet()) {
+                Object value = me.getValue();
+                if (value instanceof Serializable) {
+                    sorted.put(me.getKey(), value);
+                }
+                else {
+                    Logger.warn("Job "+jobClass+"; ignoring parameter \""
+                                +me.getKey()
+                                +"\" because value is not serializable!");
+                }
+            }
+        }
+        
+        JobKey job = getJob (jobClass, sorted.keySet());
+        Trigger trigger = TriggerBuilder
+            .newTrigger()
+            .startNow()
+            .forJob(job)
+            .build();
+        trigger.getJobDataMap().putAll(sorted);
+
+        return trigger;
     }
 
     public String submit (Class<? extends RegistrationJob> jobClass,
                           Map<String, Object> params,
                           File file) throws SchedulerException {
-        JobDetail job = JobBuilder
-            .newJob(jobClass)
-            .requestRecovery(true)
-            .build();
-        if (params != null) {
-            for (Map.Entry<String, Object> me : params.entrySet()) {
-                Object value = me.getValue();
-                if (value instanceof Serializable) {
-                    job.getJobDataMap().put(me.getKey(), value);
-                }
-                else {
-                    Logger.warn("Job "+jobClass+"; ignoring parameter \""
-                                +me.getKey()
-                                +"\" because value is not serializable!");
-                }
-            }
-        }
-        job.getJobDataMap().put(RegistrationJob.FILE, file);
+        Trigger trigger = setupJob (jobClass, params);
+        trigger.getJobDataMap().put(RegistrationJob.FILE, file);        
+        scheduler.scheduleJob(trigger);
         
-        Trigger trigger = TriggerBuilder
-            .newTrigger()
-            .startNow()
-            .build();
-        
-        scheduler.scheduleJob(job, trigger);
-        return job.getKey().getName();
+        return trigger.getKey().getName();
     }
 
     public String submit (Class<? extends RegistrationJob> jobClass,
                           Map<String, Object> params,
                           URL url) throws SchedulerException {
-        JobDetail job = JobBuilder
-            .newJob(jobClass)
-            .requestRecovery(true)
-            .build();
-        if (params != null) {
-            for (Map.Entry<String, Object> me : params.entrySet()) {
-                Object value = me.getValue();
-                if (value instanceof Serializable) {
-                    job.getJobDataMap().put(me.getKey(), value);
-                }
-                else {
-                    Logger.warn("Job "+jobClass+"; ignoring parameter \""
-                                +me.getKey()
-                                +"\" because value is not serializable!");
-                }
-            }
-        }
-        job.getJobDataMap().put(RegistrationJob.URL, url);
+        Trigger trigger = setupJob (jobClass, params);
+        trigger.getJobDataMap().put(RegistrationJob.URL, url);
+        scheduler.scheduleJob(trigger);
         
-        Trigger trigger = TriggerBuilder
-            .newTrigger()
-            .startNow()
-            .build();
-        
-        scheduler.scheduleJob(job, trigger);
-        return job.getKey().getName();
+        return trigger.getKey().getName();
     }
 
-    public Set<JobKey> getJobs () {
+    Set<JobKey> getJobs () {
         Set<JobKey> jobs = new TreeSet<JobKey>();
         try {
             for (JobKey jk :
@@ -187,7 +164,28 @@ public class SchedulerService {
         return jobs;
     }
 
-    public int getJobCount () { return getJobs().size(); }
+    int getJobCount () { return getJobs().size(); }
+    
+    public List<Map> getRunningJobs () throws SchedulerException {
+        List<Map> jobs = new ArrayList<Map>();
+        for (JobExecutionContext ctx : scheduler.getCurrentlyExecutingJobs()) {
+            String id = ctx.getTrigger().getKey().getName();
+            Map map = new HashMap ();
+            map.put("id", id);
+            map.put("start", ctx.getFireTime());
+            //map.put("elapsed", ctx.getJobRunTime());
+            //map.put("result", ctx.getResult());
+            map.putAll(ctx.getMergedJobDataMap());
+            map.put("kind", ctx.getJobDetail().getJobClass().getName());
+            Job job = ctx.getJobInstance();
+            if (job instanceof RegistrationJob) {
+                map.put("count", ((RegistrationJob)job).getCount());
+                map.put("error", ((RegistrationJob)job).getError());
+            }
+            jobs.add(map);
+        }
+        return jobs;
+    }
 
     public void shutdown () {
         if (scheduler != null) {

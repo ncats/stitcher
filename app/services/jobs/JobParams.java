@@ -9,4 +9,8 @@ public interface JobParams {
     String FILE = "FILE";
     String ID = "ID";
     String NAME = "NAME";
+    String CLASS = "CLASS";
+    String COUNT = "COUNT";
+    String ERROR = "ERROR";
+    String TOTAL = "TOTAL";
 }

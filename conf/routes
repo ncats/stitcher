@@ -3,9 +3,17 @@
 # ~~~~
 
 # Home page
-GET	/build	    controllers.Application.build()
-GET	/test/slidereveal	controllers.Application.slidereveal()
-POST	/math	    controllers.MathJax.mathjax()
+GET	/build	    controllers.Application.build
+
+GET	/jobs	    controllers.Application.getRunningJobs
+GET	/datasources	controllers.Application.getDataSources
+GET	/test/slidereveal	controllers.Application.slidereveal
+GET	/test/drugbank		controllers.Application.testDrugBank
+GET	/test/npc		controllers.Application.testNPC
+GET	/test/srs		controllers.Application.testSRS
+GET	/test/integrity		controllers.Application.testIntegrity
+
+POST	/math	    controllers.MathJax.mathjax
 GET	/math	    controllers.MathJax.render(id: String ?= null)
 
 # Map static resources from the /public folder to the /assets URL path

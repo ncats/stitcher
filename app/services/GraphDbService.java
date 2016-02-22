@@ -12,11 +12,14 @@ import play.libs.F;
 
 import ix.curation.GraphDb;
 import ix.curation.EntityFactory;
+import ix.curation.DataSourceFactory;
 
 @Singleton
 public class GraphDbService {
-    GraphDb graphDb;
-    Service service;
+    protected GraphDb graphDb;
+    protected Service service;
+    protected EntityFactory efac;
+    protected DataSourceFactory dsfac;
 
     @Inject
     public GraphDbService (Service service,
@@ -25,6 +28,8 @@ public class GraphDbService {
         try {
             graphDb = GraphDb.getInstance(service.dataDir(),
                                           service.getCacheFactory());
+            efac = new EntityFactory (graphDb);
+            dsfac = new DataSourceFactory (graphDb);
         }
         catch (IOException ex) {
             ex.printStackTrace();
@@ -45,8 +50,6 @@ public class GraphDbService {
     public GraphDb getGraphDb () { return graphDb; }
     public Service getService () { return service; }
     public CacheApi getCache () { return service.getCache(); }
-
-    public EntityFactory getEntityFactory () {
-        return new EntityFactory (graphDb);
-    }
+    public EntityFactory getEntityFactory () { return efac; }
+    public DataSourceFactory getDataSourceFactory () { return dsfac; }
 }

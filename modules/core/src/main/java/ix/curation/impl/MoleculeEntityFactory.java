@@ -87,11 +87,13 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
     @Override
     public Entity register (final Molecule mol) {
         // execute in transaction context
-        return execute (new Callable<Entity> () {
-                public Entity call () throws Exception {
-                    return _register (mol);
-                }
-            });
+        try (Transaction tx = gdb.beginTx()) {
+            Entity e = _register (mol);
+            tx.success();
+            firePropertyChange ("entity", mol, e);
+            
+            return e;
+        }
     }
 
     public Entity _register (final Molecule mol) {
@@ -315,6 +317,7 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't generate LyChI hash for entity "
                        +ent.getId(), ex);
+            firePropertyChange ("error", mol, ex);
         }
     }
 
