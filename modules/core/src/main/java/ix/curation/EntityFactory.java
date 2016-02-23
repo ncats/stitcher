@@ -24,6 +24,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.RelationshipIndex;
+import org.neo4j.index.lucene.LuceneTimeline;
+import org.neo4j.index.lucene.TimelineIndex;
+
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.File;
@@ -411,7 +414,8 @@ public class EntityFactory implements Props {
     protected final GraphDb graphDb;
     protected final GraphDatabaseService gdb;
     protected final GlobalGraphOperations gop;
-
+    protected final TimelineIndex<Node> timeline;
+    
     public EntityFactory (String dir) throws IOException {
         this (GraphDb.getInstance(dir));
     }
@@ -431,10 +435,15 @@ public class EntityFactory implements Props {
         this.graphDb = graphDb;
         this.gdb = graphDb.graphDb();
         this.gop = GlobalGraphOperations.at(gdb);
+        try (Transaction tx = gdb.beginTx()) {
+            this.timeline = new LuceneTimeline
+                (gdb, gdb.index().forNodes(CNode.NODE_TIMELINE));
+        }
     }
 
     public GraphDb getGraphDb () { return graphDb; }
     public CacheFactory getCache () { return graphDb.getCache(); }
+    public long getLastUpdated () { return graphDb.getLastUpdated(); }
     
     public CurationMetrics calcCurationMetrics() {
         return calcCurationMetrics (gdb, AuxNodeType.ENTITY,
@@ -886,5 +895,41 @@ public class EntityFactory implements Props {
         for (int i = 0; i < children.length; ++i)
             entities[i] = _entity (children[i]);
         return _createStitch (source, entities);
+    }
+
+    // return the last k updated entities
+    public Entity[] getLastUpdatedEntities (int k) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _getLastUpdatedEntities (k);
+        }
+    }
+    
+    public Entity[] _getLastUpdatedEntities (int k) {
+        IndexHits<Node> hits = timeline.getBetween
+            (null, System.currentTimeMillis(), true);
+        try {
+            int max = Math.min(k, hits.size());
+            Entity[] entities = new Entity[max];
+            k = 0;
+            for (Node n : hits) {
+                try {
+                    entities[k] = Entity._getEntity(n);
+                    if (++k == entities.length)
+                        break;
+                }
+                catch (IllegalArgumentException ex) {
+                    // not an Entity node
+                }
+            }
+            return entities;
+        }
+        finally {
+            hits.close();
+        }
+    }
+
+    public Entity getLastUpdatedEntity () {
+        Entity[] ent = getLastUpdatedEntities (1);
+        return ent != null && ent.length > 0 ? ent[0] : null;
     }
 }

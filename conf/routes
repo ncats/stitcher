@@ -5,17 +5,24 @@
 # Home page
 GET	/build	    controllers.Application.build
 
-GET	/jobs	    controllers.Application.getRunningJobs
-GET	/datasources	controllers.Application.getDataSources
+########## API
+GET	/api/jobs	    controllers.Api.getRunningJobs
+GET	/api/datasources	controllers.Api.getDataSources
+GET	/api/metrics		controllers.Api.getMetrics(label: String ?= null)
+GET	/api/object/:id		controllers.Api.getResult(id: String)
+
+########## TEST
 GET	/test/slidereveal	controllers.Application.slidereveal
 GET	/test/drugbank		controllers.Application.testDrugBank
 GET	/test/npc		controllers.Application.testNPC
 GET	/test/srs		controllers.Application.testSRS
 GET	/test/integrity		controllers.Application.testIntegrity
 
+## 
 POST	/math	    controllers.MathJax.mathjax
 GET	/math	    controllers.MathJax.render(id: String ?= null)
 
+########### ASSETS
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 GET	/webjars/*file		    controllers.WebJarAssets.at(file)

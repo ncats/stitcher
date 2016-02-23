@@ -22,7 +22,7 @@ public class MathJax extends Controller {
         this.config = config;
         try {
             cache = CacheFactory.getInstance
-                (config.getString("ix.cache", "cache.db"));
+                (config.getString("ix.repo", "repo.db"));
             workDir = new File (config.getString("ix.work", "work"));
             workDir.mkdirs();
         }

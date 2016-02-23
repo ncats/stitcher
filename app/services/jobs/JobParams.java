@@ -13,4 +13,6 @@ public interface JobParams {
     String COUNT = "COUNT";
     String ERROR = "ERROR";
     String TOTAL = "TOTAL";
+    String LABEL = "LABEL";
+    String KEY = "KEY";
 }

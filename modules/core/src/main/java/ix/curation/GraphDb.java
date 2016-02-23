@@ -13,11 +13,12 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.neo4j.graphdb.event.*;
 
 /**
  * wrapper around GraphDatabaseService instance
  */
-public class GraphDb {
+public class GraphDb extends TransactionEventHandler.Adapter {
     static final Logger logger = Logger.getLogger(GraphDb.class.getName());
 
     static final Map<File, GraphDb> INSTANCES =
@@ -44,13 +45,15 @@ public class GraphDb {
     protected final GraphDatabaseService gdb;
     protected final AtomicLong refs = new AtomicLong (1l);
     protected final CacheFactory cache;
+    protected final AtomicLong lastUpdated = new AtomicLong ();
 
     protected GraphDb (File dir) throws IOException {
         this (dir, null);
     }
     
     protected GraphDb (File dir, CacheFactory cache) throws IOException {
-        this.gdb = new GraphDatabaseFactory().newEmbeddedDatabase(dir);
+        gdb = new GraphDatabaseFactory().newEmbeddedDatabase(dir);
+        gdb.registerTransactionEventHandler(this);
         
         // this must be initialized after graph initialization
         if (cache == null) {
@@ -62,6 +65,11 @@ public class GraphDb {
         this.dir = dir;
     }
 
+    @Override
+    public void afterCommit (TransactionData data, Object state) {
+        lastUpdated.set(System.currentTimeMillis());
+    }
+    public long getLastUpdated () { return lastUpdated.get(); }
     public GraphDatabaseService graphDb () { return gdb; }
     public CacheFactory getCache () { return cache; }
     public File getPath () { return dir; }

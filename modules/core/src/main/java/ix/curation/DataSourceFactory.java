@@ -84,6 +84,7 @@ public class DataSourceFactory implements Props {
         try (Transaction tx = gdb.beginTx()) {
             DataSource ds = _register (key, file.getName());
             ds.set(SHA1, stats.sha1);
+            ds.set(SIZE, stats.size);
             ds.set(URI, file.getCanonicalFile().toURI().toString());
             tx.success();
             return ds;
@@ -102,6 +103,8 @@ public class DataSourceFactory implements Props {
             try (Transaction tx = gdb.beginTx()) {
                 DataSource ds = _register (key, url.toString());
                 ds.set(URI, url.toURI().toString());
+                ds.set(SHA1, stats.sha1);
+                ds.set(SIZE, stats.size);
                 tx.success();
                 return ds;
             }

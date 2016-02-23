@@ -30,7 +30,7 @@ public class MoleculeRegistrationJob extends RegistrationJob {
         String jobid = job.getKey().getName();
             
         Logger.debug(Thread.currentThread().getName()
-                     +": job "+jobid+" triggered...");
+                     +": ctx="+ctx+" job "+jobid+" triggered...");
 
         JobDataMap map = ctx.getMergedJobDataMap();        
         for (Map.Entry<String, Object> me : map.entrySet()) {
@@ -54,18 +54,25 @@ public class MoleculeRegistrationJob extends RegistrationJob {
         
         File file = (File)map.get(FILE);
         if (file != null) {
+            long start = System.currentTimeMillis();
             DataSource ds = mef.register(file);
+            String elapsed = String.format
+                ("%1$.3fs", 1e-3*(System.currentTimeMillis()-start));
+            
             Logger.debug(Thread.currentThread().getName()
-                         +": job "+jobid+" registered "+ds);
+                         +": job "+jobid+" registered "+ds+" in "+elapsed);
             ctx.setResult(ds);
         }
         else {
             // now try URL
             URL url = (URL)map.get(URL);
             if (url != null) {
+                long start = System.currentTimeMillis();
                 DataSource ds = mef.register(url);
+                String elapsed = String.format
+                    ("%1$.3fs", 1e-3*(System.currentTimeMillis()-start));
                 Logger.debug(Thread.currentThread().getName()+": job "
-                             +jobid +" registered "+ds);
+                             +jobid +" registered "+ds+" in "+elapsed);
                 ctx.setResult(ds);
             }
             else {

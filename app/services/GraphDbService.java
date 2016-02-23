@@ -49,7 +49,6 @@ public class GraphDbService {
 
     public GraphDb getGraphDb () { return graphDb; }
     public Service getService () { return service; }
-    public CacheApi getCache () { return service.getCache(); }
     public EntityFactory getEntityFactory () { return efac; }
     public DataSourceFactory getDataSourceFactory () { return dsfac; }
 }

@@ -346,6 +346,7 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                            +" entities!");
         }
         else {
+            setStitches (ds);
             int count = register (ds.openStream());
             ds.set(INSTANCES, count);
             logger.info("$$$ "+count+" entities registered for "
@@ -363,12 +364,25 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                            +" entities!");
         }
         else {
+            setStitches (ds);
             int count = register (ds.openStream());
             ds.set(INSTANCES, count);
             logger.info("$$$ "+count+" entities registered for "+url);
         }
         return ds;
-    }   
+    }
+
+    protected void setStitches (DataSource ds) {
+        StitchKey[] keys = stitches.keySet().toArray(new StitchKey[0]);
+        String[] sk = new String[keys.length];
+        for (int i = 0; i < sk.length; ++i)
+            sk[i] = keys[i].name();
+        ds.set(STITCHES, sk, true);
+        for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
+            ds.set(me.getKey().name(),
+                   me.getValue().toArray(new String[0]), true);
+        }
+    }
     
     public static void main(String[] argv) throws Exception {
         if (argv.length < 3) {

@@ -26,10 +26,11 @@ public class CNode implements Props, Comparable<CNode> {
 
     public static final String NODE_INDEX = ".node_index";
     public static final String RELATIONSHIP_INDEX = ".relationship_index";
+    public static final String NODE_TIMELINE = "node.timeline";
     
     protected final Node _node;
     protected GraphDatabaseService gdb;
-    protected TimelineIndex timeline;
+    protected TimelineIndex<Node> timeline;
     protected DataSourceFactory dsf;
     
     protected Long created;
@@ -43,7 +44,7 @@ public class CNode implements Props, Comparable<CNode> {
         gdb = node.getGraphDatabase();
         dsf = new DataSourceFactory (GraphDb.getInstance(gdb));
         
-        Index<Node> index = gdb.index().forNodes("node.timeline");
+        Index<Node> index = gdb.index().forNodes(NODE_TIMELINE);
         timeline = new LuceneTimeline (gdb, index);
         
         if (node.hasProperty(CREATED)) {
@@ -74,6 +75,9 @@ public class CNode implements Props, Comparable<CNode> {
         
         return d < 0l ? -1 : 1;
     }
+
+    public Long lastUpdated () { return lastUpdated; }
+    public Long created () { return created; }
 
     public void _addLabel (String... labels) {
         for (String l : labels) {
@@ -282,5 +286,16 @@ public class CNode implements Props, Comparable<CNode> {
     @Override
     public boolean equals (Object obj) {
         return obj instanceof CNode && _node.equals(((CNode)obj)._node);
+    }
+
+    public CNode _getLastUpdatedNode () {
+        Node node = timeline.getLast();
+        return node != null ?  new CNode (node) : null;
+    }
+    
+    public CNode getLastUpdatedNode () {
+        try (Transaction tx = gdb.beginTx()) {
+            return _getLastUpdatedNode ();
+        }
     }
 }

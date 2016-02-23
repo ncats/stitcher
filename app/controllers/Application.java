@@ -9,11 +9,6 @@ import play.*;
 import play.mvc.*;
 import play.libs.ws.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import views.html.*;
 
 import services.GraphDbService;
@@ -87,34 +82,5 @@ public class Application extends Controller {
         catch (Exception ex) {
             return internalServerError (ex.getMessage());
         }
-    }
-
-    public Result getRunningJobs () {
-        try {
-            List<Map> jobs = scheduler.getRunningJobs();
-            ObjectMapper mapper = new ObjectMapper ();
-            return ok ((JsonNode)mapper.valueToTree(jobs));
-        }
-        catch (Exception ex) {
-            return internalServerError (ex.getMessage());
-        }
-    }
-
-    public Result getDataSources () {
-        ObjectMapper mapper = new ObjectMapper ();
-        ArrayNode sources = mapper.createArrayNode();
-        for (DataSource ds : graphDb.getDataSourceFactory().datasources()) {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("name", ds.getName());
-            node.put("key", ds.getKey());
-            if (null != ds.toURI()) {
-                node.put("uri", ds.toURI().toString());
-            }
-            node.put("created", (Long)ds.get(Props.CREATED));
-            node.put("count", (Integer)ds.get(Props.INSTANCES));
-            node.put("sha1", (String)ds.get(Props.SHA1));
-            sources.add(node);
-        }
-        return ok (sources);
     }
 }

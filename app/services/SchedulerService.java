@@ -10,17 +10,23 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import org.h2.tools.RunScript;
+
 import play.Application;
 import play.Logger;
 import play.inject.Injector;
-import play.db.*;
-import play.libs.F;
 import play.inject.ApplicationLifecycle;
+
+import play.db.*;
+import play.cache.CacheApi;
+import play.libs.F;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.utils.ConnectionProvider;
+import org.quartz.listeners.TriggerListenerSupport;
+import org.quartz.listeners.JobListenerSupport;
+import org.quartz.Trigger.CompletedExecutionInstruction;
 
 import static org.quartz.JobBuilder.*; 
 import static org.quartz.SimpleScheduleBuilder.*; 
@@ -48,8 +54,33 @@ public class SchedulerService {
         public void shutdown () throws SQLException {}
     }
 
+    class SchedulerJobListener extends JobListenerSupport {
+        SchedulerJobListener () {
+        }
+        
+        @Override
+        public String getName () { return getClass().getName(); }
+    }
+
+    class SchedulerTriggerListener extends TriggerListenerSupport {
+        SchedulerTriggerListener () {}
+        
+        @Override
+        public String getName () { return getClass().getName(); }
+        
+        @Override
+        public void triggerComplete (Trigger trigger, JobExecutionContext ctx,
+                                     CompletedExecutionInstruction execInst) {
+            Logger.debug("Trigger "+trigger.getKey().getName()
+                         +" complete; result="+ctx.getResult());
+            cache.set(trigger.getKey().getName(), ctx.getResult());
+        }
+    }
+
     Scheduler scheduler;
     MessageDigest digest;
+    
+    @Inject CacheApi cache;
 
     @Inject
     public SchedulerService (Application app,
@@ -59,8 +90,12 @@ public class SchedulerService {
             initDb (app);
             
             scheduler = createScheduler (app);
+            scheduler.getListenerManager().addJobListener
+                (new SchedulerJobListener ());
+            scheduler.getListenerManager().addTriggerListener
+                (new SchedulerTriggerListener ());
             scheduler.start(); // now start the scheduler
-            Logger.debug(getJobCount()+" job(s) in queue!");
+            Logger.debug(getJobCount()+" job(s) stored in queue!");
             
             lifecycle.addStopHook(() -> {
                     shutdown ();
@@ -73,7 +108,7 @@ public class SchedulerService {
     }
 
     protected synchronized JobKey getJob
-        (Class<? extends RegistrationJob> jobClass, Set<String> params)
+        (Class<? extends Job> jobClass, Set<String> params)
         throws SchedulerException {
         // calculate a unique job key based on the parameters keys
         digest.reset();
@@ -100,7 +135,7 @@ public class SchedulerService {
         return jobid;
     }
 
-    protected Trigger setupJob (Class<? extends RegistrationJob> jobClass,
+    protected Trigger setupJob (Class<? extends Job> jobClass,
                                 Map<String, Object> params)
         throws SchedulerException {
         Map<String, Object> sorted = new TreeMap<String, Object>();
@@ -146,6 +181,14 @@ public class SchedulerService {
         trigger.getJobDataMap().put(RegistrationJob.URL, url);
         scheduler.scheduleJob(trigger);
         
+        return trigger.getKey().getName();
+    }
+
+    public String submit (Class<? extends Job> jobClass,
+                          Map<String, Object> params)
+        throws SchedulerException {
+        Trigger trigger = setupJob (jobClass, params);
+        scheduler.scheduleJob(trigger);
         return trigger.getKey().getName();
     }
 
