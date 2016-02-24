@@ -1,0 +1,122 @@
+@(key: String)
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Job Console</title>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
+    <style>
+      .console-area {
+          width: 100%;
+	  height: 200px;
+	  font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">    
+      <div class="jumbotron">
+	<h2>Job Console</h2>
+	<p><code>@key</code>
+      </div>
+      <div class="row">
+	<div class="col-md-12">
+	  <div class="panel">
+	    <div class="panel-body" >
+ 	      <button class="btn btn-default"
+			 onclick="toggle()" id="button">Stop</button>
+ 	      <button class="btn btn-default"
+			 onclick="onClear()">Clear</button>
+	      <p><div id="console-area"
+	      	      style="max-height: 300px; overflow-y: auto;"></div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+    <script language="javascript" type="text/javascript">
+  var wsUri = "ws://@{request.host}@{routes.Api.console(key)}";
+  var output;
+  var websocket;
+
+  function init()
+  {
+    output = document.getElementById("console-area");
+    loadWebSocket();
+  }
+
+  function loadWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onClear () {
+     //console.log('clear area...');
+     output.innerHTML = '';
+  }
+  
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+    // doSend("WebSocket rocks");
+  }
+
+  function toggle () {
+     var b = document.getElementById("button");
+     if (b.innerHTML == 'Stop') {
+        b.innerHTML = 'Start';
+	websocket.close();
+     } else {
+        b.innerHTML = 'Stop';
+        loadWebSocket ();
+     }
+  }
+  
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    if (evt.data)
+       writeToScreen(evt.data);
+  }
+
+  function onError(evt)
+  {
+    writeToScreen(evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message);
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.style.marginBottom = "2px";
+    pre.style.fontFamily = "monospace";
+    pre.style.fontSize = "10px";
+    pre.style.color = "blue";
+    pre.innerHTML = message;
+    //output.appendChild(pre);
+    output.insertBefore(pre, output.childNodes[0]);
+  }
+
+  window.addEventListener("load", init, false);
+  </script>
+  </body>
+</html>

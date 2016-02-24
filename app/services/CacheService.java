@@ -161,7 +161,12 @@ public class CacheService implements CacheApi {
     }
 
     public void remove (String key) {
-        cache.remove(key);
+        try {
+            cache.remove(key);
+        }
+        catch (Exception ex) {
+            Logger.warn("Removing key "+key, ex);
+        }
     }
     
     public Statistics getStatistics () {

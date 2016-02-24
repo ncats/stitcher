@@ -41,7 +41,7 @@ public class Application extends Controller {
             String key = scheduler.submit
                 (DrugBankMoleculeRegistrationJob.class, null,
                  app.getFile("../inxight-planning/files/drugbank-full-annotated.sdf"));
-            return ok (key);
+            return redirect (routes.Application.console(key));
         }
         catch (Exception ex) {
             return internalServerError (ex.getMessage());
@@ -53,7 +53,7 @@ public class Application extends Controller {
             String key = scheduler.submit
                 (NPCMoleculeRegistrationJob.class, null,
                  app.getFile("../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
-            return ok (key);
+            return redirect (routes.Application.console(key));
         }
         catch (Exception ex) {
             return internalServerError (ex.getMessage());
@@ -65,7 +65,7 @@ public class Application extends Controller {
             String key = scheduler.submit
                 (SRSJsonRegistrationJob.class, null,
                  app.getFile("../inxight-planning/files/public2015-11-30.gsrs"));
-            return ok (key);
+            return redirect (routes.Application.console(key));
         }
         catch (Exception ex) {
             return internalServerError (ex.getMessage());
@@ -77,10 +77,14 @@ public class Application extends Controller {
             String key = scheduler.submit
                 (IntegrityMoleculeRegistrationJob.class, null,
                  app.getFile("../inxight-planning/files/integr.sdf.gz"));
-            return ok (key);
+            return redirect (routes.Application.console(key));
         }
         catch (Exception ex) {
             return internalServerError (ex.getMessage());
         }
+    }
+
+    public Result console (String key) {
+        return ok (console.render(key));
     }
 }

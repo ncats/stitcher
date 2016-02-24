@@ -31,6 +31,9 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
     protected String id; // property id
     protected boolean useName; // use mol's name
     protected Map<String, StitchKeyMapper> mappers;
+    // stitch key due to mappers
+    protected EnumMap<StitchKey, Set<String>> stitchMappers;
+    protected Set<String> properties;
 
     public MoleculeEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -48,6 +51,8 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
     protected void init () {
         stitches = new EnumMap<>(StitchKey.class);
         mappers = new HashMap<String, StitchKeyMapper>();
+        stitchMappers = new EnumMap<>(StitchKey.class);
+        properties = new TreeSet<String>();
         useName = true;
     }
 
@@ -203,6 +208,7 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
         }
 
         // now add any mapper
+        stitchMappers.putAll(stitches);
         for (Map.Entry<String, StitchKeyMapper> me : mappers.entrySet()) {
             String value = mol.getProperty(me.getKey());
             if (value != null) {
@@ -227,6 +233,13 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                         ent._add(m.getKey(),
                                  new StitchValue (me.getKey(), val));
                     }
+                    
+                    Set<String> props = stitchMappers.get(m.getKey());
+                    if (props == null) {
+                        stitchMappers.put(m.getKey(),
+                                          props = new TreeSet<String>());
+                    }
+                    props.add(me.getKey());
                 }
                 payload.put(me.getKey(), value);
             }
@@ -254,7 +267,9 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                 if (!values.isEmpty())
                     payload.put(prop, values.toArray(new String[0]), max < 100);
             }
+            properties.add(prop);
         }
+        
         payload.put(MOLFILE, mol.toFormat("mol"), false);
         try {
             payload.put(SMILES, mol.toFormat("smiles"), false);
@@ -317,7 +332,7 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't generate LyChI hash for entity "
                        +ent.getId(), ex);
-            firePropertyChange ("error", mol, ex);
+            firePropertyChange ("error", ent, ex);
         }
     }
 
@@ -346,9 +361,9 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                            +" entities!");
         }
         else {
-            setStitches (ds);
             int count = register (ds.openStream());
             ds.set(INSTANCES, count);
+            updateMeta (ds);
             logger.info("$$$ "+count+" entities registered for "
                         +file.getName());
         }
@@ -364,24 +379,24 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                            +" entities!");
         }
         else {
-            setStitches (ds);
             int count = register (ds.openStream());
             ds.set(INSTANCES, count);
+            updateMeta (ds);        
             logger.info("$$$ "+count+" entities registered for "+url);
         }
         return ds;
     }
 
-    protected void setStitches (DataSource ds) {
-        StitchKey[] keys = stitches.keySet().toArray(new StitchKey[0]);
+    protected void updateMeta (DataSource ds) {
+        StitchKey[] keys = stitchMappers.keySet().toArray(new StitchKey[0]);
         String[] sk = new String[keys.length];
         for (int i = 0; i < sk.length; ++i)
             sk[i] = keys[i].name();
         ds.set(STITCHES, sk, true);
-        for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
-            ds.set(me.getKey().name(),
-                   me.getValue().toArray(new String[0]), true);
+        for (Map.Entry<StitchKey, Set<String>> me : stitchMappers.entrySet()) {
+            ds.set(me.getKey().name(), me.getValue().toArray(new String[0]));
         }
+        ds.set(PROPERTIES, properties.toArray(new String[0]));
     }
     
     public static void main(String[] argv) throws Exception {

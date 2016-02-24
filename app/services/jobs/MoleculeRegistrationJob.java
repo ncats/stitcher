@@ -1,9 +1,16 @@
 package services.jobs;
 
+import javax.inject.Inject;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+
+import akka.actor.ActorRef;
+import akka.actor.PoisonPill;
 
 import play.Logger;
 import org.quartz.JobDetail;
@@ -16,10 +23,16 @@ import ix.curation.impl.MoleculeEntityFactory;
 import ix.curation.GraphDb;
 import ix.curation.StitchKey;
 import ix.curation.DataSource;
+import ix.curation.Entity;
 
 import services.GraphDbService;
+import services.CacheService;
+import services.WebSocketConsoleActor;
 
 public class MoleculeRegistrationJob extends RegistrationJob {
+
+    @Inject CacheService cache;
+    String key; // current executing context key
     
     public MoleculeRegistrationJob () {
     }
@@ -54,25 +67,14 @@ public class MoleculeRegistrationJob extends RegistrationJob {
         
         File file = (File)map.get(FILE);
         if (file != null) {
-            long start = System.currentTimeMillis();
             DataSource ds = mef.register(file);
-            String elapsed = String.format
-                ("%1$.3fs", 1e-3*(System.currentTimeMillis()-start));
-            
-            Logger.debug(Thread.currentThread().getName()
-                         +": job "+jobid+" registered "+ds+" in "+elapsed);
             ctx.setResult(ds);
         }
         else {
             // now try URL
             URL url = (URL)map.get(URL);
             if (url != null) {
-                long start = System.currentTimeMillis();
                 DataSource ds = mef.register(url);
-                String elapsed = String.format
-                    ("%1$.3fs", 1e-3*(System.currentTimeMillis()-start));
-                Logger.debug(Thread.currentThread().getName()+": job "
-                             +jobid +" registered "+ds+" in "+elapsed);
                 ctx.setResult(ds);
             }
             else {
@@ -89,13 +91,49 @@ public class MoleculeRegistrationJob extends RegistrationJob {
     
     public void execute (JobExecutionContext ctx)
         throws JobExecutionException {
+        this.key = ctx.getTrigger().getKey().getName();
         try {
             MoleculeEntityFactory mef = getEntityFactory ();
             mef.addPropertyChangeListener(this);
+            long start = System.currentTimeMillis();        
             execute (mef, ctx);
+            String elapsed = String.format
+                ("%1$.3fs", 1e-3*(System.currentTimeMillis()-start));
+            Logger.debug(Thread.currentThread().getName()+": job "
+                         +key +" registered "+ctx.getResult()+" in "+elapsed);
+            mef.removePropertyChangeListener(this);
+            ActorRef actor = (ActorRef)cache.get(key);
+            if (actor != null) {
+                actor.tell("finished processing \""
+                           +ctx.getResult()+"\" in "+elapsed,
+                           ActorRef.noSender());
+                actor.tell(PoisonPill.getInstance(), ActorRef.noSender());
+            }
         }
         catch (Exception ex) {
             throw new JobExecutionException (ex);
+        }
+    }
+
+    @Override
+    public void propertyChange (PropertyChangeEvent ev) {
+        super.propertyChange(ev);
+        ActorRef actor = (ActorRef)cache.get(key);
+
+        if (actor != null) {
+            String prop = ev.getPropertyName();
+            if (prop.equalsIgnoreCase("entity")) {
+                Entity e = (Entity)ev.getNewValue();
+                actor.tell(String.format("%1$ 5d: entity %2$d added...",
+                                         getCount(), e.getId()),
+                           ActorRef.noSender());
+            }
+            else if (prop.equalsIgnoreCase("error")) {
+                Entity e = (Entity)ev.getOldValue();
+                actor.tell("ERROR: processing entity "
+                           +e.getId()+": "+ev.getNewValue(),
+                           ActorRef.noSender());
+            }
         }
     }
 }

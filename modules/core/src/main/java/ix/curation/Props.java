@@ -19,6 +19,7 @@ public interface Props {
     public static final String URI = "_uri";
     public static final String INSTANCES = "_instances";
     public static final String STITCHES = "_stitches";
+    public static final String PROPERTIES = "_properties";
 
     public static final String OLDVAL = "_oldval";
     public static final String NEWVAL = "_newval";

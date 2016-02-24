@@ -11,6 +11,8 @@ import play.mvc.*;
 import play.cache.*;
 import play.libs.ws.*;
 
+import akka.actor.ActorRef;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,12 +21,36 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import services.GraphDbService;
 import services.SchedulerService;
 import services.CacheService;
+import services.WebSocketConsoleActor;
+import services.WebSocketEchoActor;
 import services.jobs.*;
 import utils.JsonUtil;
 
 import ix.curation.*;
 
 public class Api extends Controller {
+
+    class ConsoleWebSocket extends WebSocket<String> {
+        final String key;
+        ConsoleWebSocket (String key) {
+            this.key = key;
+        }
+
+        public void onReady (In<String> in, Out<String> out) {
+        }
+        
+        public boolean isActor () { return true; }
+        public akka.actor.Props actorProps (ActorRef out) {
+            try {
+                return akka.actor.Props.create
+                    (WebSocketConsoleActor.class, out, key, cache);
+            }
+            catch (Exception ex) {
+                throw new RuntimeException (ex);
+            }
+        }
+    }
+    
     @Inject SchedulerService scheduler;
     @Inject play.Application app;
     @Inject GraphDbService graphDb;
@@ -51,9 +77,11 @@ public class Api extends Controller {
             ObjectNode node = mapper.createObjectNode();
             node.put("key", ds.getKey());
             node.put("name", ds.getName());
+            /*
             if (null != ds.toURI()) {
                 node.put("uri", ds.toURI().toString());
             }
+            */
             node.put("created", (Long)ds.get(Props.CREATED));
             node.put("count", (Integer)ds.get(Props.INSTANCES));
             node.put("sha1", (String)ds.get(Props.SHA1));
@@ -68,6 +96,9 @@ public class Api extends Controller {
                 }
                 node.put("stitches", sn);
             }
+            String[] props = (String[])ds.get(Props.PROPERTIES);
+            if (props != null)
+                node.put("properties", JsonUtil.toJsonNode(props));
             sources.add(node);
         }
         return ok (sources);
@@ -108,5 +139,13 @@ public class Api extends Controller {
             return ok ((JsonNode)mapper.valueToTree(result));
         }
         return notFound ("Unknown result key "+id);
+    }
+
+    public WebSocket<String> console (final String key) {
+        return new ConsoleWebSocket (key);
+    }
+
+    public WebSocket<String> echo () {
+        return WebSocket.withActor(WebSocketEchoActor::props);
     }
 }

@@ -16,12 +16,12 @@ import ix.curation.CacheFactory;
 public class Service {
     final public String BASE = "ix.base";
     final public String DATA = "ix.data";
-    final public String REPO = "ix.repo";
+    final public String HASH = "ix.hash";
 
     final Configuration config;
     
     final File base;
-    final File repo;
+    final File hash;
     final File data;
     CacheFactory cacheFactory;
 
@@ -38,10 +38,11 @@ public class Service {
         base = new File (param);
         base.mkdirs();
 
-        repo = new File (base, config.getString(REPO, "repo.db"));
-        repo.mkdirs();
+        hash = new File (base, config.getString(HASH, "hash.db"));
+        hash.mkdirs();
         try {
-            cacheFactory = CacheFactory.getInstance(repo);
+            cacheFactory = CacheFactory.getInstance(hash);
+            Logger.debug("Cache "+hash+" initialized..."+cacheFactory.size());
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -57,7 +58,7 @@ public class Service {
     }
 
     public File baseDir () { return base; }
-    public File repoDir () { return repo; }
+    public File hashDir () { return hash; }
     public File dataDir () { return data; }
 
     public void shutdown () {

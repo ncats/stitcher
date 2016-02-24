@@ -17,6 +17,7 @@ public abstract class RegistrationJob
     implements Job, JobParams, PropertyChangeListener {
     
     @Inject protected GraphDbService service;
+    
     protected int count;
     protected int error;
     
@@ -35,9 +36,11 @@ public abstract class RegistrationJob
         else if ("error".equals(prop)) {
             ++error;
         }
+        /*
         Logger.debug(Thread.currentThread().getName()
                      +": "+String.format("%1$ 5d", count)+" "
                      +ev.getPropertyName()+" old="+ev.getOldValue()
                      +" new="+ev.getNewValue());
+        */
     }
 }

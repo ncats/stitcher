@@ -20,6 +20,10 @@ import play.db.*;
 import play.cache.CacheApi;
 import play.libs.F;
 
+import static akka.pattern.Patterns.ask;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -71,15 +75,15 @@ public class SchedulerService {
         @Override
         public void triggerComplete (Trigger trigger, JobExecutionContext ctx,
                                      CompletedExecutionInstruction execInst) {
-            Logger.debug("Trigger "+trigger.getKey().getName()
-                         +" complete; result="+ctx.getResult());
+            String key = trigger.getKey().getName();
+            Logger.debug("Trigger "+key +" complete; result="+ctx.getResult());
             cache.set(trigger.getKey().getName(), ctx.getResult());
         }
     }
 
     Scheduler scheduler;
     MessageDigest digest;
-    
+        
     @Inject CacheApi cache;
 
     @Inject
@@ -96,7 +100,7 @@ public class SchedulerService {
                 (new SchedulerTriggerListener ());
             scheduler.start(); // now start the scheduler
             Logger.debug(getJobCount()+" job(s) stored in queue!");
-            
+
             lifecycle.addStopHook(() -> {
                     shutdown ();
                     return F.Promise.pure(null);
