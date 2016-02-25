@@ -20,13 +20,21 @@ public class MakeABigDump {
 
     public static void main (String[] argv) throws Exception {
 
-        String neoDB = "neo4j.db";
+        String neoDB = "curator.ix/data.db";
         String ginas = "ginas";
-        String ginasfile = "public2015-11-30.gsrs";
+        String ginasfile = "../inxight-planning/files/public2015-11-30.gsrs";
         String npc = "npc-dump";
-        String npcFile = "npc-dump-1.2-04-25-2012_annot.sdf";
+        String npcFile = "../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz";
         String integr = "integr";
-        String integrFile = "integr.sdf";
+        String integrFile = "../inxight-planning/files/integr.sdf.gz";
+        String iuphar = "iuphar";
+        String iupharFile = "../inxight-planning/files/iuphar_lig_targets.sdf";
+        String drugbank = "drugbank";
+        String drugbankFile = "../inxight-planning/files/DrugBank_targets.sdf";
+        String chembl = "chembl20";
+        String chemblURL = "jdbc:mysql://pauli.ncats.nih.gov/chembl_20?user=chembl_20&password=chembl_20";
+        String ncgc = "ncgc";
+        String ncgcFile = "../inxight-planning/files/NCGC_lib.txt.gz";
 
         if (argv.length != 0) {
             logger.info("Usage: "+MakeABigDump.class.getName()+" Whoa! Do this by hand you dummy!");
@@ -55,7 +63,7 @@ public class MakeABigDump {
             logger.info("CurationMetric: " + Util.toJson(metrics));
         }
         finally {
-            gdb.shutdown();
+            //gdb.shutdown();
         }
 
         gdb = new GraphDatabaseFactory()
@@ -69,7 +77,7 @@ public class MakeABigDump {
 
         }
         finally {
-            gdb.shutdown();
+            //gdb.shutdown();
         }
 
         String[] main2 = {neoDB, npc, npcFile, "I_CAS:CAS", "N_Name:Synonyms", "I_UNII:CompoundUNII", "T_Keyword:DATASET", "id:ID"};
@@ -77,6 +85,15 @@ public class MakeABigDump {
 
         String[] main3 = {neoDB, integr, integrFile, "I_CAS:CAS", "N_Name:Drug_Name", "T_Keyword:Highest_Phase", "id:Prous_Science_Entry_Number"};
         MoleculeEntityFactory.main(main3);
+
+        String[] main4 = {neoDB, iuphar, iupharFile, "N_Name:ligand", "N_Name:INN", "I_UniProt:I_UniProt", "id:ligand_id"};
+        MoleculeEntityFactory.main(main4);
+
+        String[] main5 = {neoDB, drugbank, drugbankFile, "N_Name:GENERIC_NAME", "I_UniProt:I_UniProt", "id:DATABASE_ID"};
+        MoleculeEntityFactory.main(main5);
+
+        String[] main6 = {neoDB, chembl, chemblURL, "I_UniProt:I_UniProt", "I_ChEMBL:I_ChEMBL", "N_Name:GENERIC_NAME", "id:chembl_id"};
+        MoleculeEntityFactory.main(main6);
 
         gdb = new GraphDatabaseFactory().newEmbeddedDatabase(neoDB);
         try {
@@ -92,8 +109,11 @@ public class MakeABigDump {
 
         }
         finally {
-            gdb.shutdown();
+            //gdb.shutdown();
         }
+
+        String[] main7 = {neoDB, ncgc, ncgcFile};
+        NCGCLoader.main(main7);
 
     }
 

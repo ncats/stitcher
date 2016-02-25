@@ -276,6 +276,7 @@ public class GinasLoader extends MoleculeEntityFactory {
                             nodeId = ent._node().getId();
                             loaded.put(unii, nodeId);
                             count++;
+                            tx.success();
                             for (RelationshipType type: relatedSubstances.keySet()) {
                                 if (mol.getProperty(type.name()) != null
                                     && mol.getProperty(type.name()).length() > 0) {
@@ -335,7 +336,7 @@ public class GinasLoader extends MoleculeEntityFactory {
 
         }
         finally {
-            gl.gdb.shutdown();
+            //gl.gdb.shutdown();
         }
     }
 

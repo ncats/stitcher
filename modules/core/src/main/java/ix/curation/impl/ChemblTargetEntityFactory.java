@@ -204,7 +204,7 @@ public class ChemblTargetEntityFactory extends EntityRegistry<Target> {
             }
             tx.success();
         } finally {
-            gdb.shutdown();
+            //gdb.shutdown();
 
             pst.close();
             rset.close();
