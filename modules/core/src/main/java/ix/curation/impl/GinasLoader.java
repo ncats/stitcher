@@ -303,7 +303,7 @@ public class GinasLoader extends MoleculeEntityFactory {
                             }
                         }
                     } catch (Exception ex) {ex.printStackTrace();}
-                    if (count > 42000) break; // TODO
+                    if (count > 40) break; // TODO
                     line = br.readLine();
                 }
                 System.out.println("records loaded: "+count);
@@ -332,11 +332,9 @@ public class GinasLoader extends MoleculeEntityFactory {
                 e.printStackTrace();
             }
 
-            tx.success();
-
         }
         finally {
-            //gl.gdb.shutdown();
+            gl.shutdown();
         }
     }
 

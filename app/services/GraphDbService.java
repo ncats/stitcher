@@ -51,4 +51,5 @@ public class GraphDbService {
     public Service getService () { return service; }
     public EntityFactory getEntityFactory () { return efac; }
     public DataSourceFactory getDataSourceFactory () { return dsfac; }
+    public long getLastUpdated () { return graphDb.getLastUpdated(); }
 }
