@@ -17,7 +17,6 @@ import play.inject.Injector;
 import play.inject.ApplicationLifecycle;
 
 import play.db.*;
-import play.cache.CacheApi;
 import play.libs.F;
 
 import static akka.pattern.Patterns.ask;
@@ -39,6 +38,7 @@ import static org.quartz.CalendarIntervalScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.*; 
 import static org.quartz.DateBuilder.*;
 
+import org.reflections.Reflections;
 import services.jobs.*;
 
 @Singleton
@@ -83,8 +83,7 @@ public class SchedulerService {
 
     Scheduler scheduler;
     MessageDigest digest;
-        
-    @Inject CacheApi cache;
+    @Inject CacheService cache;
 
     @Inject
     public SchedulerService (Application app,
@@ -99,7 +98,15 @@ public class SchedulerService {
             scheduler.getListenerManager().addTriggerListener
                 (new SchedulerTriggerListener ());
             scheduler.start(); // now start the scheduler
+
+            // setup startup jobs
+            startupJobs ();
+
             Logger.debug(getJobCount()+" job(s) stored in queue!");
+            for (JobKey job :
+                     scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
+                Logger.debug("++ "+job.getName());
+            }
 
             lifecycle.addStopHook(() -> {
                     shutdown ();
@@ -111,21 +118,59 @@ public class SchedulerService {
         }
     }
 
+    void startupJobs () throws Exception {
+        Reflections reflections = new Reflections ("services.jobs");
+        for (Class c : reflections.getTypesAnnotatedWith(StartUpJob.class)) {
+            StartUpJob startup = (StartUpJob)c.getAnnotation(StartUpJob.class);
+            if (Job.class.isAssignableFrom(c)) {
+                Logger.debug("Starting job "+c.getName()
+                             +" with priority "+startup.priority()+"...");
+                
+                JobKey job = getJob (c);
+                Trigger trigger = TriggerBuilder
+                    .newTrigger()
+                    .startNow()
+                    .forJob(job)
+                    .withPriority(startup.priority())
+                    .build();
+                // start this job..
+                scheduler.scheduleJob(trigger);
+            }
+            else {
+                Logger.warn("Can't use "+StartUpJob.class.getName()
+                            +" annotation for class "+c.getName()+" because "
+                            +" it's not an instance of "+Job.class.getName());
+            }
+        }
+    }
+    
+    protected synchronized JobKey getJob
+        (Class<? extends Job> jobClass) throws SchedulerException {
+        return getJob (jobClass, null);
+    }
+
     protected synchronized JobKey getJob
         (Class<? extends Job> jobClass, Set<String> params)
         throws SchedulerException {
+        
         // calculate a unique job key based on the parameters keys
-        digest.reset();
-        for (String k : params) {
-            digest.update(k.getBytes());
+        JobKey jobid;
+        if (params != null && !params.isEmpty()) {
+            digest.reset();
+            for (String k : params) {
+                digest.update(k.getBytes());
+            }
+            
+            byte[] sig = digest.digest();
+            StringBuilder sha = new StringBuilder ();
+            for (int i = 0; i < sig.length; ++i)
+                sha.append(String.format("%1$02x", sig[i] & 0xff));
+            jobid = new JobKey (jobClass.getName()+"/"+sha);
+        }
+        else {
+            jobid = new JobKey (jobClass.getName());
         }
         
-        byte[] sig = digest.digest();
-        StringBuilder sha = new StringBuilder ();
-        for (int i = 0; i < sig.length; ++i)
-            sha.append(String.format("%1$02x", sig[i] & 0xff));
-
-        JobKey jobid = new JobKey (jobClass.getName()+"/"+sha);
         JobDetail job = scheduler.getJobDetail(jobid);
         if (job == null) {
             job = JobBuilder

@@ -8,6 +8,20 @@ public class WebSocketConsoleActor extends UntypedActor {
     final String key;
     final CacheService cache;
 
+    public static class Message {
+        final String text;
+        public Message (String text) {
+            this.text = text;
+        }
+        public String toString () {
+            return text;
+        }
+    }
+
+    public static Message message (String text) {
+        return new Message (text);
+    }
+
     public WebSocketConsoleActor
         (ActorRef out, String key, CacheService cache) {
         this.out = out;
@@ -19,7 +33,7 @@ public class WebSocketConsoleActor extends UntypedActor {
     }
 
     public void onReceive (Object message) throws Exception {
-        if (message instanceof String) {
+        if (message instanceof Message) {
             out.tell(new java.util.Date()+": "+message, self ());
         }
         else {

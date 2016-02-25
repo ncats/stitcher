@@ -13,11 +13,17 @@ import akka.actor.ActorRef;
 import akka.actor.PoisonPill;
 
 import play.Logger;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.JobDetail;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionException;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
+import org.quartz.JobBuilder;
+import org.quartz.TriggerBuilder;
+import org.quartz.Trigger;
+import org.quartz.DateBuilder;
 
 import ix.curation.impl.MoleculeEntityFactory;
 import ix.curation.GraphDb;
@@ -88,6 +94,21 @@ public class MoleculeRegistrationJob extends RegistrationJob {
     protected MoleculeEntityFactory getEntityFactory () throws IOException {
         return new MoleculeEntityFactory (getGraphDb ());
     }
+
+    void submitMetricsJob (Scheduler scheduler) throws SchedulerException {
+        JobDetail job = JobBuilder
+            .newJob(CalcMetricsJob.class)
+            .build();
+
+        Trigger trigger = TriggerBuilder
+            .newTrigger()
+            .usingJobData(KEY, METRICS)
+            .startAt(DateBuilder.futureDate
+                     (10, DateBuilder.IntervalUnit.SECOND))
+            .build();
+        
+        scheduler.scheduleJob(job, trigger);
+    }
     
     public void execute (JobExecutionContext ctx)
         throws JobExecutionException {
@@ -104,11 +125,15 @@ public class MoleculeRegistrationJob extends RegistrationJob {
             mef.removePropertyChangeListener(this);
             ActorRef actor = (ActorRef)cache.get(key);
             if (actor != null) {
-                actor.tell("finished processing \""
-                           +ctx.getResult()+"\" in "+elapsed,
+                actor.tell(WebSocketConsoleActor.message
+                           ("finished processing \""
+                            +ctx.getResult()+"\" in "+elapsed),
                            ActorRef.noSender());
                 actor.tell(PoisonPill.getInstance(), ActorRef.noSender());
             }
+
+            // now schedule the CaclMetricsJob
+            submitMetricsJob (ctx.getScheduler());
         }
         catch (Exception ex) {
             throw new JobExecutionException (ex);
@@ -124,14 +149,16 @@ public class MoleculeRegistrationJob extends RegistrationJob {
             String prop = ev.getPropertyName();
             if (prop.equalsIgnoreCase("entity")) {
                 Entity e = (Entity)ev.getNewValue();
-                actor.tell(String.format("%1$ 5d: entity %2$d added...",
-                                         getCount(), e.getId()),
+                actor.tell(WebSocketConsoleActor.message
+                           (String.format("%1$ 5d: entity %2$d added...",
+                                          getCount(), e.getId())),
                            ActorRef.noSender());
             }
             else if (prop.equalsIgnoreCase("error")) {
                 Entity e = (Entity)ev.getOldValue();
-                actor.tell("ERROR: processing entity "
-                           +e.getId()+": "+ev.getNewValue(),
+                actor.tell(WebSocketConsoleActor.message
+                           ("ERROR: processing entity "
+                            +e.getId()+": "+ev.getNewValue()),
                            ActorRef.noSender());
             }
         }

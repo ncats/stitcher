@@ -105,32 +105,29 @@ public class Api extends Controller {
     }
 
     public Result getMetrics (final String label) {
-        final String key = routes.Api.getMetrics(label).toString();
-        try {
-            Object value = cache.getOrElse
-                (graphDb.getEntityFactory().getLastUpdated(), key,
-                 new Callable () {
-                     public Object call () throws Exception {
-                         Map<String, Object> params =
-                             new HashMap<String, Object>();
-                         if (label != null)
-                             params.put(JobParams.LABEL, label);
-                         params.put(JobParams.KEY, key);
-                         return scheduler.submit(CalcMetricsJob.class, params);
-                     }
-                 });
-            if (value instanceof CurationMetrics) {
-                return ok ((JsonNode)mapper.valueToTree(value));
+        Object metrics = cache.get(JobParams.METRICS);
+        if (metrics != null) {
+            if (label != null) {
+                try {
+                    final String key = routes.Api.getMetrics(label).toString();
+                    return cache.getOrElse
+                        (graphDb.getLastUpdated(), key,new Callable<Result> () {
+                                public Result call () throws Exception {
+                                    Logger.debug("Cache missed: "+key);
+                                    return ok ((JsonNode)mapper.valueToTree
+                                               (graphDb.getEntityFactory()
+                                                .calcCurationMetrics(label)));
+                                }
+                            });
+                }
+                catch (Exception ex) {
+                    return internalServerError (ex.getMessage());
+                }
             }
-            ObjectNode node = mapper.createObjectNode();
-            node.put("id", mapper.valueToTree(value));
-            node.put("uri", request().uri());
-            node.put("status", "Calculating metrics...");
-            return ok (node);
+            return ok ((JsonNode)mapper.valueToTree(metrics));
         }
-        catch (Exception ex) {
-            return internalServerError (ex.getMessage());
-        }
+        
+        return notFound ("Metrics are not yet available!");
     }
 
     public Result getResult (String id) {

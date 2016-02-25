@@ -22,11 +22,11 @@ public class MakeABigDump {
 
         String neoDB = "neo4j.db";
         String ginas = "ginas";
-        String ginasfile = "public2015-11-30.gsrs";
+        String ginasfile = "../inxight-planning/files/public2015-11-30.gsrs";
         String npc = "npc-dump";
-        String npcFile = "npc-dump-1.2-04-25-2012_annot.sdf";
+        String npcFile = "../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz";
         String integr = "integr";
-        String integrFile = "integr.sdf";
+        String integrFile = "../inxight-planning/files/integr.sdf.gz";
 
         if (argv.length != 0) {
             logger.info("Usage: "+MakeABigDump.class.getName()+" Whoa! Do this by hand you dummy!");

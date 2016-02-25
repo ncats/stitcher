@@ -2,9 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET	/build	    controllers.Application.build
-GET	/console/:key	controllers.Application.console(key: String)
+########## APP
+GET	/app/build	    controllers.Application.build
+GET	/app/console/:key	controllers.Application.console(key: String)
 
 ########## API
 GET	/api/jobs	    controllers.Api.getRunningJobs
@@ -21,9 +21,9 @@ GET	/test/npc		controllers.Application.testNPC
 GET	/test/srs		controllers.Application.testSRS
 GET	/test/integrity		controllers.Application.testIntegrity
 
-## 
-POST	/math	    controllers.MathJax.mathjax
-GET	/math	    controllers.MathJax.render(id: String ?= null)
+########## MISC
+POST	/misc/math	    controllers.MathJax.mathjax
+GET	/misc/math	    controllers.MathJax.render(id: String ?= null)
 
 ########### ASSETS
 # Map static resources from the /public folder to the /assets URL path

@@ -66,8 +66,8 @@
   
   function onOpen(evt)
   {
-    writeToScreen("CONNECTED");
-    // doSend("WebSocket rocks");
+    writeToScreen("CONNECTED", "blue");
+    //doSend("WebSocket rocks");
   }
 
   function toggle () {
@@ -83,7 +83,7 @@
   
   function onClose(evt)
   {
-    writeToScreen("DISCONNECTED");
+    writeToScreen("DISCONNECTED", "red");
   }
 
   function onMessage(evt)
@@ -103,14 +103,14 @@
     websocket.send(message);
   }
 
-  function writeToScreen(message)
+  function writeToScreen(message, color)
   {
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
     pre.style.marginBottom = "2px";
     pre.style.fontFamily = "monospace";
     pre.style.fontSize = "10px";
-    pre.style.color = "blue";
+    pre.style.color = message.indexOf('ERROR') >= 0 ? "red" : color;
     pre.innerHTML = message;
     //output.appendChild(pre);
     output.insertBefore(pre, output.childNodes[0]);

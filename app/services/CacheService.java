@@ -94,7 +94,7 @@ public class CacheService implements CacheApi {
         Element elm = cache.get(key);
         if (elm == null || elm.getCreationTime() < epoch) {
             T v = generator.call();
-            elm = new Element (key, v);
+            elm = new Element (key, v, true /* eternal*/, null, null);
             cache.put(elm);
         }
         return (T)elm.getObjectValue();
@@ -117,8 +117,7 @@ public class CacheService implements CacheApi {
     }
 
     // mimic play.Cache 
-    public <T> T getOrElse (String key, Callable<T> generator,
-                            int seconds) {
+    public <T> T getOrElse (String key, Callable<T> generator, int seconds) {
         Object value = get (key);
         if (value == null) {
             try {
