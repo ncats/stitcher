@@ -63,7 +63,7 @@ public class MakeABigDump {
             logger.info("CurationMetric: " + Util.toJson(metrics));
         }
         finally {
-            //gdb.shutdown();
+            gdb.shutdown();
         }
 
         gdb = new GraphDatabaseFactory()
@@ -77,7 +77,7 @@ public class MakeABigDump {
 
         }
         finally {
-            //gdb.shutdown();
+            gdb.shutdown();
         }
 
         String[] main2 = {neoDB, npc, npcFile, "I_CAS:CAS", "N_Name:Synonyms", "I_UNII:CompoundUNII", "T_Keyword:DATASET", "id:ID"};
