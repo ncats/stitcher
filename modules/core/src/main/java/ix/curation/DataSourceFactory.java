@@ -152,6 +152,13 @@ public class DataSourceFactory implements Props {
         }
     }
 
+    public DataSource getDataSource (String name) {
+        DataSource ds = getDataSourceByKey (name);
+        if (ds == null)
+            ds = getDataSourceByName (name);
+        return ds;
+    }
+
     public static String sourceKey (String source) {
         return Util.sha1hex(source).substring(0, 9);
     }

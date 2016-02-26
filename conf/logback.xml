@@ -14,6 +14,7 @@
   -->
   <logger name="play" level="INFO" />
   <logger name="application" level="DEBUG" />
+  <logger name="net.sf.ehcache" level="OFF"/>
 
   <root level="ERROR">
     <appender-ref ref="STDOUT" />

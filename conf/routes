@@ -10,7 +10,7 @@ GET	/app/console/:key	controllers.Application.console(key: String)
 GET	/api/jobs	    controllers.Api.getRunningJobs
 GET	/api/datasources	controllers.Api.getDataSources
 GET	/api/metrics		controllers.Api.getMetrics(label: String ?= null)
-GET	/api/object/:id		controllers.Api.getResult(id: String)
+GET	/api/node/:id		controllers.Api.getNode(id: Long)
 GET	/api/console/:key	    controllers.Api.console(key: String)
 GET	/api/echo	controllers.Api.echo
 

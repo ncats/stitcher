@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -57,7 +58,7 @@ public class GraphDb extends TransactionEventHandler.Adapter {
         
         // this must be initialized after graph initialization
         if (cache == null) {
-            this.cache = CacheFactory.getInstance(new File (dir, "_cache.ix"));
+            this.cache = CacheFactory.getInstance(new File (dir, "cache.db"));
         }
         else {
             this.cache = cache;
@@ -79,6 +80,20 @@ public class GraphDb extends TransactionEventHandler.Adapter {
             cache.shutdown();
             gdb.shutdown();
         }
+    }
+
+    public CNode getNode (long id) {
+        try (Transaction tx = gdb.beginTx()) {
+            Node node = gdb.getNodeById(id);
+            if (node != null) {
+                for (EntityType t : EnumSet.allOf(EntityType.class)) {
+                    if (node.hasLabel(t))
+                        return Entity._getEntity(node);
+                }
+                return new CNode (node);
+            }
+        }
+        return null;
     }
 
     public static GraphDb createTempDb () throws IOException {

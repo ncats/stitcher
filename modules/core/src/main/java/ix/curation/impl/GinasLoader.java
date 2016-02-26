@@ -199,7 +199,7 @@ public class GinasLoader extends MoleculeEntityFactory {
         return cmpd;
     }
 
-    static public void main (String[] argv) {
+    static GinasLoader load (String[] argv) throws Exception {
         // argv = neo4j.db ginas filename
         String filename = argv[2];
         File file = new File (argv[2]);
@@ -216,126 +216,135 @@ public class GinasLoader extends MoleculeEntityFactory {
             gl.setDataSource(ds);
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
 
+        gl.add(StitchKey.I_UNII, StitchKey.I_UNII.name());
+        gl.add(StitchKey.N_Name, StitchKey.N_Name.name());
+        gl.add(StitchKey.I_CAS, StitchKey.I_CAS.name());
+        gl.add(StitchKey.T_Keyword, StitchKey.T_Keyword.name());
+        gl.setId(StitchKey.I_UNII.name());
+        RelationshipType[] types = {PredicateType.ActiveMoiety, PredicateType.HasComponent, PredicateType.ConceptOf};
+        
+        HashMap<String, Long> loaded = new HashMap<>();
         try (Transaction tx = gl.gdb.beginTx()) {
-            gl.add(StitchKey.I_UNII, StitchKey.I_UNII.name());
-            gl.add(StitchKey.N_Name, StitchKey.N_Name.name());
-            gl.add(StitchKey.I_CAS, StitchKey.I_CAS.name());
-            gl.add(StitchKey.T_Keyword, StitchKey.T_Keyword.name());
-            gl.setId(StitchKey.I_UNII.name());
-            RelationshipType[] types = {PredicateType.ActiveMoiety, PredicateType.HasComponent, PredicateType.ConceptOf};
+            ResourceIterator<Node> i = gl.gdb.findNodes
+                (DynamicLabel.label(gl.getDataSource().getName()));
+            while (i.hasNext()) {
+                Node n = i.next();
+                String unii = (String)n.getProperty(Entity.ID);
+                loaded.put(unii, n.getId());
+            }
+        }
 
+        Map<RelationshipType, Map<Long, String>> relatedSubstances = new HashMap<>();
+        for (RelationshipType type: types)
+            relatedSubstances.put(type, new HashMap<Long, String>());
+
+        String baseUrl = "http://tripod.nih.gov/ginas/app/api/v1/substances";
+
+        BufferedReader br = new BufferedReader(new InputStreamReader
+                                               (new GZIPInputStream(new FileInputStream(filename)), "UTF-8"));
+        String line = br.readLine();
+        int count = 0;
+        while (line != null) { // WORKED: 18MXK3D6DB      ab2eaaa2-c135-4c8d-b525-c3e8ea370eda    {"st
+            String unii = line.substring(8, line.indexOf('\t'));
+            line = line.substring(line.indexOf('\t')+1);
+            String uuid = line.substring(0, line.indexOf('\t'));
+            String fullUrl = baseUrl+"("+uuid+")?view=full";
+            line = line.substring(line.indexOf('\t')+1);
+
+            JsonNode json = _mapper.readTree(line);
             try {
-                HashMap<String, Long> loaded = new HashMap<>();
-                ResourceIterator<Node> i = gl.gdb.findNodes
-                    (DynamicLabel.label(gl.getDataSource().getName()));
-                while (i.hasNext()) {
-                    Node n = i.next();
-                    String unii = (String)n.getProperty(Entity.ID);
-                    loaded.put(unii, n.getId());
-                }
-
-                Map<RelationshipType, Map<Long, String>> relatedSubstances = new HashMap<>();
-                for (RelationshipType type: types)
-                    relatedSubstances.put(type, new HashMap<Long, String>());
-
-                String baseUrl = "http://tripod.nih.gov/ginas/app/api/v1/substances";
-
-                BufferedReader br = new BufferedReader(new InputStreamReader
-                        (new GZIPInputStream(new FileInputStream(filename)), "UTF-8"));
-                String line = br.readLine();
-                int count = 0;
-                while (line != null) { // WORKED: 18MXK3D6DB      ab2eaaa2-c135-4c8d-b525-c3e8ea370eda    {"st
-                    String unii = line.substring(8, line.indexOf('\t'));
-                    line = line.substring(line.indexOf('\t')+1);
-                    String uuid = line.substring(0, line.indexOf('\t'));
-                    String fullUrl = baseUrl+"("+uuid+")?view=full";
-                    line = line.substring(line.indexOf('\t')+1);
-
-                    JsonNode json = _mapper.readTree(line);
-                    try {
-                        Molecule mol = readJsonRecord(json, unii, fullUrl);
-                        System.out.println("+++++ " + (count + 1) + " +++++");
-                        Long nodeId;
-                        if (loaded.containsKey(unii)) {
-                            System.out.println("Already loaded: "+unii);
-                            nodeId = loaded.get(unii);
-                            for (RelationshipType type: relatedSubstances.keySet()) {
-                                if (mol.getProperty(type.name()) != null
-                                        && mol.getProperty(type.name()).length() > 0) {
-                                    for (String nodeName: mol.getProperty(type.name()).split("\n")) {
-                                        if (!loaded.containsKey(nodeName)) {
-                                            relatedSubstances.get(type).put(nodeId, nodeName);
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            Entity ent = gl._register(mol);
-                            nodeId = ent._node().getId();
-                            loaded.put(unii, nodeId);
-                            count++;
-                            tx.success();
-                            for (RelationshipType type: relatedSubstances.keySet()) {
-                                if (mol.getProperty(type.name()) != null
-                                    && mol.getProperty(type.name()).length() > 0) {
-                                    for (String nodeName: mol.getProperty(type.name()).split("\n")) {
-                                        if (loaded.containsKey(nodeName)) {
-                                            ent._node().createRelationshipTo(
-                                                    gl.gdb.getNodeById(loaded.get(nodeName)), type);
-                                        } else {
-                                           relatedSubstances.get(type).put(nodeId, nodeName);
-                                        }
-                                    }
-                                }
-                                if (relatedSubstances.get(type).containsValue(unii)) {
-                                    Set<Long> keysToDrop = new HashSet<>();
-                                    for (Long oNodeId : relatedSubstances.get(type).keySet())
-                                        if (relatedSubstances.get(type).get(oNodeId).equals(unii)) {
-                                            Node oNode = gl.gdb.getNodeById(oNodeId);
-                                            oNode.createRelationshipTo(ent._node(), type);
-                                            keysToDrop.add(oNodeId);
-                                        }
-                                    for (Long oNodeId : keysToDrop)
-                                        relatedSubstances.get(type).remove(oNodeId);
+                Molecule mol = readJsonRecord(json, unii, fullUrl);
+                System.out.println("+++++ " + (count + 1) + " +++++");
+                Long nodeId;
+                if (loaded.containsKey(unii)) {
+                    System.out.println("Already loaded: "+unii);
+                    nodeId = loaded.get(unii);
+                    for (RelationshipType type: relatedSubstances.keySet()) {
+                        if (mol.getProperty(type.name()) != null
+                            && mol.getProperty(type.name()).length() > 0) {
+                            for (String nodeName: mol.getProperty(type.name()).split("\n")) {
+                                if (!loaded.containsKey(nodeName)) {
+                                    relatedSubstances.get(type).put(nodeId, nodeName);
                                 }
                             }
                         }
-                    } catch (Exception ex) {ex.printStackTrace();}
-                    if (count > 40) break; // TODO
-                    line = br.readLine();
-                }
-                System.out.println("records loaded: "+count);
-
-                // link cmpds to active moieties
-                count = 0;
-                for (RelationshipType type: relatedSubstances.keySet()) {
-                    for (Long nodeId : relatedSubstances.get(type).keySet()) {
-                        Node node = gl.gdb.getNodeById(nodeId);
-                        String unii = relatedSubstances.get(type).get(nodeId);
-                        Node oNode = gl.gdb.findNode(DynamicLabel.label(gl.getDataSource().getName()), Entity.ID, unii);
-                        if (oNode != null) {
-                            node.createRelationshipTo(oNode, type);
-                            System.out.println("Entry " + count + " Stitched together active moiety: " + nodeId + ":" + unii + ":" + oNode.toString());
-                        } else {
-                            System.out.println("Entry " + count + " Failed to stitch together active moiety: " + nodeId + ":" + unii);
-                        }
+                    }
+                } else {
+                    try (Transaction tx = gl.gdb.beginTx()) {
+                        Entity ent = gl.register(mol);
+                        nodeId = ent.getId();
+                        loaded.put(unii, nodeId);
                         count++;
+                    
+                        for (RelationshipType type: relatedSubstances.keySet()) {
+                            if (mol.getProperty(type.name()) != null
+                                && mol.getProperty(type.name()).length() > 0) {
+                                for (String nodeName: mol.getProperty(type.name()).split("\n")) {
+                                    if (loaded.containsKey(nodeName)) {
+                                        ent._node().createRelationshipTo(
+                                                                         gl.gdb.getNodeById(loaded.get(nodeName)), type);
+                                    } else {
+                                        relatedSubstances.get(type).put(nodeId, nodeName);
+                                    }
+                                }
+                            }
+                            if (relatedSubstances.get(type).containsValue(unii)) {
+                                Set<Long> keysToDrop = new HashSet<>();
+                                for (Long oNodeId : relatedSubstances.get(type).keySet())
+                                    if (relatedSubstances.get(type).get(oNodeId).equals(unii)) {
+                                        Node oNode = gl.gdb.getNodeById(oNodeId);
+                                        oNode.createRelationshipTo(ent._node(), type);
+                                        keysToDrop.add(oNodeId);
+                                    }
+                                for (Long oNodeId : keysToDrop)
+                                    relatedSubstances.get(type).remove(oNodeId);
+                            }
+                        }
+                        tx.success();
                     }
                 }
-                System.out.println("stitches attempted: "+count);
+            } catch (Exception ex) {ex.printStackTrace();}
+            //if (count > 40) break; // TODO
+            line = br.readLine();
+        }
+        System.out.println("records loaded: "+count);
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        // link cmpds to active moieties
+        count = 0;
+        for (RelationshipType type: relatedSubstances.keySet()) {
+            for (Long nodeId : relatedSubstances.get(type).keySet()) {
+                try (Transaction tx = gl.gdb.beginTx()) {
+                    Node node = gl.gdb.getNodeById(nodeId);
+                    String unii = relatedSubstances.get(type).get(nodeId);
+                    Node oNode = gl.gdb.findNode(DynamicLabel.label(gl.getDataSource().getName()), Entity.ID, unii);
+                    if (oNode != null) {
+                        node.createRelationshipTo(oNode, type);
+                        System.out.println("Entry " + count + " Stitched together active moiety: " + nodeId + ":" + unii + ":" + oNode.toString());
+                    } else {
+                        System.out.println("Entry " + count + " Failed to stitch together active moiety: " + nodeId + ":" + unii);
+                    }
+                    count++;
+                }
             }
-
         }
-        finally {
-            gl.shutdown();
-        }
+        System.out.println("stitches attempted: "+count);
+        return gl;
     }
 
+    static public void main (String[] argv) {
+        GinasLoader loader = null;
+        try {
+            loader = load (argv);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        finally {
+            if (loader != null)
+                loader.shutdown();
+        }
+    }
 }

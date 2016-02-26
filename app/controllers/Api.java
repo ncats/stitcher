@@ -130,12 +130,17 @@ public class Api extends Controller {
         return notFound ("Metrics are not yet available!");
     }
 
-    public Result getResult (String id) {
-        Object result = cache.get(id);
-        if (result != null) {
-            return ok ((JsonNode)mapper.valueToTree(result));
+    public Result getNode (Long id) {
+        try {
+            CNode n = graphDb.getNode(id);
+            if (n != null) {
+                return ok (n.toJson());
+            }
         }
-        return notFound ("Unknown result key "+id);
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return notFound ("Unknown node "+id);
     }
 
     public WebSocket<String> console (final String key) {

@@ -13,6 +13,8 @@ import play.libs.F;
 import ix.curation.GraphDb;
 import ix.curation.EntityFactory;
 import ix.curation.DataSourceFactory;
+import ix.curation.Entity;
+import ix.curation.CNode;
 
 @Singleton
 public class GraphDbService {
@@ -52,4 +54,5 @@ public class GraphDbService {
     public EntityFactory getEntityFactory () { return efac; }
     public DataSourceFactory getDataSourceFactory () { return dsfac; }
     public long getLastUpdated () { return graphDb.getLastUpdated(); }
+    public CNode getNode (long id) { return graphDb.getNode(id); }
 }
