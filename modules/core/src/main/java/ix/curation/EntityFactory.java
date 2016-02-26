@@ -51,8 +51,8 @@ public class EntityFactory implements Props {
         Map<Integer, Integer> entitySizeDistribution =
             new TreeMap<Integer, Integer>();
         int stitchCount;
-        Map<StitchKey, Integer> stitchHistogram =
-            new EnumMap<StitchKey, Integer>(StitchKey.class);
+        Map<String, Integer> stitchHistogram =
+            new TreeMap<String, Integer>();
         int connectedComponentCount;
         Map<Integer, Integer> connectedComponentHistogram =
             new TreeMap<Integer, Integer>();
@@ -68,7 +68,7 @@ public class EntityFactory implements Props {
             return entitySizeDistribution;
         }
         public int getStitchCount () { return stitchCount; }
-        public Map<StitchKey, Integer> getStitchHistogram () {
+        public Map<String, Integer> getStitchHistogram () {
             return stitchHistogram;
         }
         public int getConnectedComponentCount () {
@@ -490,7 +490,7 @@ public class EntityFactory implements Props {
                             eqv.union(node.getId(), xn.getId());
                             ++metrics.stitchCount;
                         }
-                        StitchKey key = StitchKey.valueOf(rel.getType().name());
+                        String key = rel.getType().name();
                         Integer c = metrics.stitchHistogram.get(key);
                         metrics.stitchHistogram.put(key, c != null ? c+1:1);
                         ++nrel;
@@ -504,7 +504,7 @@ public class EntityFactory implements Props {
 
             // we're double counting, so now we correct the counts
             metrics.stitchCount /= 2;
-            for (StitchKey k : metrics.stitchHistogram.keySet()) {
+            for (String k : metrics.stitchHistogram.keySet()) {
                 metrics.stitchHistogram.put
                     (k, metrics.stitchHistogram.get(k)/2);
             }

@@ -16,7 +16,7 @@ public interface CurationMetrics {
     int getStitchCount ();
 
     // histogram of stitch keys; sum equals to stitch count
-    Map<StitchKey, Integer> getStitchHistogram ();
+    Map<String, Integer> getStitchHistogram ();
 
     // total number of connected components; this includes singletons
     int getConnectedComponentCount ();
