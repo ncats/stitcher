@@ -60,10 +60,7 @@ public class CNode implements Props, Comparable<CNode> {
         
         if (node.hasProperty(CREATED)) {
             created = (Long)node.getProperty(CREATED);
-            if (node.hasProperty(UPDATED))
-                lastUpdated = (Long)node.getProperty(UPDATED);
-            else
-                lastUpdated = created;
+            lastUpdated = (Long)node.getProperty(UPDATED);
         }
         else {
             // new node..
@@ -174,6 +171,7 @@ public class CNode implements Props, Comparable<CNode> {
         _node.setProperty(UPDATED, lastUpdated);
         Node snapshot = gdb.createNode(AuxNodeType.SNAPSHOT);
         snapshot.setProperty(CREATED, lastUpdated);
+        snapshot.setProperty(UPDATED, lastUpdated);
         if (oldVal != null)
             snapshot.setProperty(OLDVAL, oldVal);
         if (newVal != null) {
@@ -317,9 +315,14 @@ public class CNode implements Props, Comparable<CNode> {
         ObjectNode node = mapper.createObjectNode();
         node.put("id", _node.getId());
         try (Transaction tx = gdb.beginTx()) {
-            if (_node.hasProperty(KIND)) {
+            if (_node.hasProperty(KIND))
                 node.put("kind", (String)_node.getProperty(KIND));
-            }
+
+            if (_node.hasProperty(NAME))
+                node.put("name", (String)_node.getProperty(NAME));
+
+            if (_node.hasProperty(KEY))
+                node.put("key", (String)_node.getProperty(KEY));
             
             node.put("created", (Long)_node.getProperty(CREATED));
             if (_node.hasProperty(UPDATED))

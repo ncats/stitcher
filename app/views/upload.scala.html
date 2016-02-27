@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upload payload</title>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
+    <style>
+      .matharea { width: 100%; height: 200px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">    
+      <div class="jumbotron">
+	<h2>Upload payload</h2>
+      </div>
+      <div class="row">
+	<div class="col-md-8">
+	  <div class="panel">
+	    <div class="panel-body">
+	      <form role="" method="POST"
+		    action="@routes.Api.upload"
+		    enctype="multipart/form-data"
+		    id="upload-form">
+		<div class="form-group">
+                  <input type="file"  name="File" multiple>
+		</div>
+		<p><button type="submit" class="btn btn-default">Upload</button>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+  </body>
+</html>

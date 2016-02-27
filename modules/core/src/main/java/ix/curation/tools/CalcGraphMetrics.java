@@ -8,15 +8,15 @@ import java.util.logging.Level;
 import ix.curation.GraphDb;
 import ix.curation.Util;
 import ix.curation.EntityFactory;
-import ix.curation.CurationMetrics;
+import ix.curation.GraphMetrics;
 
-public class CalcCurationMetrics {
+public class CalcGraphMetrics {
     static final Logger logger = Logger.getLogger
-        (CalcCurationMetrics.class.getName());
+        (CalcGraphMetrics.class.getName());
     
     public static void main (String[] argv) throws Exception {
         if (argv.length == 0) {
-            System.err.println("Usage: "+CalcCurationMetrics.class.getName()
+            System.err.println("Usage: "+CalcGraphMetrics.class.getName()
                                +" DB [TAG]");
             System.exit(1);
         }
@@ -24,14 +24,14 @@ public class CalcCurationMetrics {
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
         try {
             EntityFactory ef = new EntityFactory (graphDb);
-            CurationMetrics metrics;
+            GraphMetrics metrics;
             if (argv.length == 1) {
                 logger.info("Calculating graph metrics...");
-                metrics = ef.calcCurationMetrics();
+                metrics = ef.calcGraphMetrics();
             }
             else {
                 logger.info("Calculating graph metrics for "+argv[1]+"...");
-                metrics = ef.calcCurationMetrics(argv[1]);
+                metrics = ef.calcGraphMetrics(argv[1]);
             }
             System.out.println(Util.toJson(metrics));
         }

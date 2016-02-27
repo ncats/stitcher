@@ -2,7 +2,7 @@ package ix.curation;
 
 import java.util.Map;
 
-public interface CurationMetrics {
+public interface GraphMetrics {
     // total number of entities
     int getEntityCount ();
 

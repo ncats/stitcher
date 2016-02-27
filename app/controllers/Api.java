@@ -10,6 +10,7 @@ import play.*;
 import play.mvc.*;
 import play.cache.*;
 import play.libs.ws.*;
+import static play.mvc.Http.MultipartFormData.*;
 
 import akka.actor.ActorRef;
 
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import services.GraphDbService;
 import services.SchedulerService;
 import services.CacheService;
+import services.CoreService;
 import services.WebSocketConsoleActor;
 import services.WebSocketEchoActor;
 import services.jobs.*;
@@ -55,6 +57,7 @@ public class Api extends Controller {
     @Inject play.Application app;
     @Inject GraphDbService graphDb;
     @Inject CacheService cache;
+    @Inject CoreService service;
     
     ObjectMapper mapper = new ObjectMapper ();
     
@@ -116,7 +119,7 @@ public class Api extends Controller {
                                     Logger.debug("Cache missed: "+key);
                                     return ok ((JsonNode)mapper.valueToTree
                                                (graphDb.getEntityFactory()
-                                                .calcCurationMetrics(label)));
+                                                .calcGraphMetrics(label)));
                                 }
                             });
                 }
@@ -149,5 +152,53 @@ public class Api extends Controller {
 
     public WebSocket<String> echo () {
         return WebSocket.withActor(WebSocketEchoActor::props);
+    }
+
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, 
+                   maxLength = 1024*1024*1000000)
+    public Result upload () {
+        if (request().body().isMaxSizeExceeded()) {
+            return badRequest ("File too large!");
+        }
+
+        ArrayNode loaded = mapper.createArrayNode();
+
+        Http.MultipartFormData body = request().body().asMultipartFormData();
+        List<FilePart> parts = body.getFiles();
+        if (parts != null && !parts.isEmpty()) {
+            for (FilePart part : parts) {
+                String name = part.getFilename();
+                String content = part.getContentType();
+                
+                try {
+                    File file = part.getFile();
+                    Logger.debug("file="+name+" content="+content);
+
+                    ObjectNode props = mapper.createObjectNode();
+                    props.put("name", name);
+                    props.put("mime", content);
+                    for (Map.Entry<String, String[]> me :
+                             body.asFormUrlEncoded().entrySet()) {
+                        props.put(me.getKey(),
+                                  mapper.valueToTree(me.getValue()));
+                    }
+
+                    CoreService.Payload payload = service.upload
+                        (new FileInputStream (file), props);
+                    
+                    Logger.debug("File uploaded: uuid="
+                                 +props.get("uuid").asText()
+                                 +" size="+props.get("size").asLong()
+                                 +" sha1="+props.get("sha1").asText());
+                    loaded.add(props);
+                }
+                catch (Exception ex) {
+                    Logger.trace("Can't load file \""+name+"\"; "+content, ex);
+                    return internalServerError (ex.getMessage());
+                }
+            }
+        }
+        
+        return ok (loaded);
     }
 }

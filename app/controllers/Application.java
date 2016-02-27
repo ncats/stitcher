@@ -87,4 +87,8 @@ public class Application extends Controller {
     public Result console (String key) {
         return ok (console.render(key));
     }
+
+    public Result upload () {
+        return ok (upload.render());
+    }
 }

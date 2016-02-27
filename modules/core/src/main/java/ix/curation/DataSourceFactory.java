@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.security.SecureRandom;
 
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -26,6 +27,7 @@ public class DataSourceFactory implements Props {
 
     protected final GraphDatabaseService gdb;
     protected final GraphDb graphDb;
+    SecureRandom rand = new SecureRandom ();
 
     public static Set<DataSource> getDataSources (GraphDb graphDb) {
         return new DataSourceFactory(graphDb).datasources();
@@ -58,11 +60,24 @@ public class DataSourceFactory implements Props {
         return DataSource._getDataSource(n);
     }
 
+    /*
+     * create unique datasource independent of its name
+     */
+    public DataSource createDataSource (String name) {
+        byte[] data = new byte[16];
+        rand.nextBytes(data);
+        try (Transaction tx = gdb.beginTx()) {
+            DataSource ds = _register (sourceKey (Util.hex(data)), name);
+            tx.success();
+            return ds;
+        }
+    }
+
     public Set<DataSource> datasources () {
         try (Transaction tx = gdb.beginTx()) {
             Set<DataSource> sources = new TreeSet<DataSource>();
             for (Iterator<Node> it = gdb.findNodes(AuxNodeType.DATASOURCE);
-                 it.hasNext(); ) {
+                 it.hasNext();) {
                 Node node = it.next();
                 sources.add(DataSource._getDataSource(node));
             }
@@ -122,6 +137,12 @@ public class DataSourceFactory implements Props {
             
             IndexHits<Node> hits = index.get(NAME, source);
             try {
+                if (hits.size() > 1) {
+                    logger.warning("Data source name \""
+                                   +source+"\" matches "+hits.size()
+                                   +"multiple node!");
+                }
+                
                 // simply return the first one
                 DataSource ds = null;
                 for (Node n : hits) {

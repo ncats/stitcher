@@ -59,8 +59,8 @@ public class MakeABigDump {
             RelationshipType[] keys = {StitchKey.I_UNII, StitchKey.I_CAS, StitchKey.N_Name,
                     StitchKey.H_LyChI_L4, StitchKey.H_LyChI_L5, PredicateType.ActiveMoiety, PredicateType.ConceptOf};
             EntityType[] types = {EntityType.Agent};
-            CurationMetrics metrics = MoleculeEntityFactory.calcCurationMetrics(gdb, types, keys);
-            logger.info("CurationMetric: " + Util.toJson(metrics));
+            GraphMetrics metrics = MoleculeEntityFactory.calcGraphMetrics(gdb, types, keys);
+            logger.info("GraphMetric: " + Util.toJson(metrics));
         }
         finally {
             gdb.shutdown();

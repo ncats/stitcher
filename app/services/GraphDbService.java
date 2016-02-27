@@ -15,16 +15,22 @@ import ix.curation.EntityFactory;
 import ix.curation.DataSourceFactory;
 import ix.curation.Entity;
 import ix.curation.CNode;
+import ix.curation.DataSource;
 
 @Singleton
 public class GraphDbService {
+    static public final String DATASOURCE = "IX Data Source";
+        
+    // unique data source associated with this instance
+    protected DataSource datasource;
+    
     protected GraphDb graphDb;
-    protected Service service;
+    protected CoreService service;
     protected EntityFactory efac;
     protected DataSourceFactory dsfac;
 
     @Inject
-    public GraphDbService (Service service,
+    public GraphDbService (CoreService service,
                            ApplicationLifecycle lifecycle) {
         this.service = service;
         try {
@@ -32,6 +38,14 @@ public class GraphDbService {
                                           service.getCacheFactory());
             efac = new EntityFactory (graphDb);
             dsfac = new DataSourceFactory (graphDb);
+            datasource = dsfac.getDataSourceByName(DATASOURCE);
+            if (datasource == null) {
+                // no data source ..
+                datasource = dsfac.createDataSource(DATASOURCE);
+                Logger.debug
+                    ("Data source "+datasource
+                     +" ("+datasource.getId()+") registered...");
+            }
         }
         catch (IOException ex) {
             ex.printStackTrace();
@@ -50,7 +64,6 @@ public class GraphDbService {
     }
 
     public GraphDb getGraphDb () { return graphDb; }
-    public Service getService () { return service; }
     public EntityFactory getEntityFactory () { return efac; }
     public DataSourceFactory getDataSourceFactory () { return dsfac; }
     public long getLastUpdated () { return graphDb.getLastUpdated(); }

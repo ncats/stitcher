@@ -14,7 +14,7 @@ import org.quartz.DisallowConcurrentExecution;
 
 import ix.curation.EntityFactory;
 import ix.curation.GraphDb;
-import ix.curation.CurationMetrics;
+import ix.curation.GraphMetrics;
 
 import services.GraphDbService;
 import services.CacheService;
@@ -41,7 +41,7 @@ public class CalcMetricsJob implements Job, JobParams {
 
             if (lastRun.get() < service.getLastUpdated()) {
                 Object metrics = service.getEntityFactory()
-                    .calcCurationMetrics();
+                    .calcGraphMetrics();
                 ctx.setResult(metrics);
                 cache.set(METRICS, metrics, 0);
                 lastRun.set(System.currentTimeMillis());
@@ -50,7 +50,7 @@ public class CalcMetricsJob implements Job, JobParams {
                 Object metrics = cache.get(METRICS);
                 if (metrics == null) {
                     metrics = service.getEntityFactory()
-                        .calcCurationMetrics();
+                        .calcGraphMetrics();
                     cache.set(METRICS, metrics, 0);
                     lastRun.set(System.currentTimeMillis());
                 }

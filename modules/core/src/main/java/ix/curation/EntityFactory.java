@@ -44,7 +44,7 @@ public class EntityFactory implements Props {
     static final Logger logger = Logger.getLogger
         (EntityFactory.class.getName());
 
-    static class DefaultCurationMetrics implements CurationMetrics {
+    static class DefaultGraphMetrics implements GraphMetrics {
         int entityCount;
         Map<EntityType, Integer> entityHistogram =
             new EnumMap<EntityType, Integer>(EntityType.class);
@@ -58,7 +58,7 @@ public class EntityFactory implements Props {
             new TreeMap<Integer, Integer>();
         int singletonCount;
 
-        DefaultCurationMetrics () {}
+        DefaultGraphMetrics () {}
 
         public int getEntityCount () { return entityCount; }
         public Map<EntityType, Integer> getEntityHistogram () {
@@ -445,30 +445,30 @@ public class EntityFactory implements Props {
     public CacheFactory getCache () { return graphDb.getCache(); }
     public long getLastUpdated () { return graphDb.getLastUpdated(); }
     
-    public CurationMetrics calcCurationMetrics() {
-        return calcCurationMetrics (gdb, AuxNodeType.ENTITY,
+    public GraphMetrics calcGraphMetrics() {
+        return calcGraphMetrics (gdb, AuxNodeType.ENTITY,
                                     Entity.TYPES, Entity.KEYS);
     }
 
-    public CurationMetrics calcCurationMetrics (String label) {
-        return calcCurationMetrics (DynamicLabel.label(label));
+    public GraphMetrics calcGraphMetrics (String label) {
+        return calcGraphMetrics (DynamicLabel.label(label));
     }
     
-    public CurationMetrics calcCurationMetrics (Label label) {
-        return calcCurationMetrics (gdb, label, Entity.TYPES, Entity.KEYS);
+    public GraphMetrics calcGraphMetrics (Label label) {
+        return calcGraphMetrics (gdb, label, Entity.TYPES, Entity.KEYS);
     }
 
-    public static CurationMetrics calcCurationMetrics
+    public static GraphMetrics calcGraphMetrics
         (GraphDatabaseService gdb, EntityType[] types,
          RelationshipType[] keys) {
-        return calcCurationMetrics (gdb, AuxNodeType.ENTITY, types, keys);
+        return calcGraphMetrics (gdb, AuxNodeType.ENTITY, types, keys);
     }
     
-    public static CurationMetrics calcCurationMetrics
+    public static GraphMetrics calcGraphMetrics
         (GraphDatabaseService gdb, Label label,
          EntityType[] types, RelationshipType[] keys) {
         
-        DefaultCurationMetrics metrics = new DefaultCurationMetrics ();
+        DefaultGraphMetrics metrics = new DefaultGraphMetrics ();
         UnionFind eqv = new UnionFind ();
         
         try (Transaction tx = gdb.beginTx()) {
