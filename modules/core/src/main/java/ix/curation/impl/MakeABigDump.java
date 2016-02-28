@@ -20,7 +20,7 @@ public class MakeABigDump {
 
     public static void main (String[] argv) throws Exception {
 
-        String neoDB = "curator.ix/data.db";
+        String neoDB = "neo4j.db";
         String ginas = "ginas";
         String ginasfile = "../inxight-planning/files/public2015-11-30.gsrs";
         String npc = "npc-dump";
@@ -48,7 +48,7 @@ public class MakeABigDump {
 
         String[] main = {neoDB, ginas, ginasfile};
         GinasLoader.main(main); // load first set of compounds -- if we try to load too much we run out of memory
-        GinasLoader.main(main); // load rest of SRS compounds
+        //GinasLoader.main(main); // load rest of SRS compounds
 
         GraphDatabaseService gdb;
 

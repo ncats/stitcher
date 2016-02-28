@@ -58,7 +58,7 @@ public class GraphDb extends TransactionEventHandler.Adapter {
         
         // this must be initialized after graph initialization
         if (cache == null) {
-            this.cache = CacheFactory.getInstance(new File (dir, "cache.db"));
+            this.cache = CacheFactory.getInstance(new File (/*dir,*/ "cache.db"));
         }
         else {
             this.cache = cache;

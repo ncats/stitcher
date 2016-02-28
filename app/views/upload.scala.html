@@ -4,29 +4,49 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Upload payload</title>
+    <title>Payload upload</title>
     <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
-    <style>
-      .matharea { width: 100%; height: 200px; }
-    </style>
   </head>
   <body>
     <div class="container">    
       <div class="jumbotron">
-	<h2>Upload payload</h2>
+	<h1>Payload upload</h1>
+	@defining(flash().remove("error")) { error =>
+	   @if(error != null) {
+	      <p><code>@error</code>
+	   }
+	}
       </div>
       <div class="row">
 	<div class="col-md-8">
 	  <div class="panel">
 	    <div class="panel-body">
 	      <form role="" method="POST"
-		    action="@routes.Api.upload"
+		    action="@routes.Application.upload"
 		    enctype="multipart/form-data"
 		    id="upload-form">
+		@**
 		<div class="form-group">
-                  <input type="file"  name="File" multiple>
+		  <label for="file">Title</label>
+                  <input class="form-control" type="text"
+			 id="title" name="title">
 		</div>
-		<p><button type="submit" class="btn btn-default">Upload</button>
+		**@
+		<div class="form-group">
+		  <label for="file">File</label>
+                  <input class="form-control" type="file" id="file" name="file">
+		</div>
+		<div class="form-group">
+		  <input type="checkbox" name="shared"> This payload is public accessible
+		</div>
+		<div class="form-group">
+		  <label for="description">Description</label>
+		  <textarea id="description" class="form-control"
+			    rows="5"
+			    name="description"
+			    style="font-family: monospace"></textarea>
+		</div>
+		<p><button type="submit" class="btn btn-primary">Upload</button>
 	      </form>
 	    </div>
 	  </div>

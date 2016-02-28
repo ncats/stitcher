@@ -11,6 +11,7 @@ import play.mvc.*;
 import play.cache.*;
 import play.libs.ws.*;
 import static play.mvc.Http.MultipartFormData.*;
+import play.db.ebean.Transactional;
 
 import akka.actor.ActorRef;
 
@@ -29,6 +30,7 @@ import services.jobs.*;
 import utils.JsonUtil;
 
 import ix.curation.*;
+import models.*;
 
 public class Api extends Controller {
 
@@ -154,51 +156,66 @@ public class Api extends Controller {
         return WebSocket.withActor(WebSocketEchoActor::props);
     }
 
+    @Transactional
     @BodyParser.Of(value = BodyParser.MultipartFormData.class, 
                    maxLength = 1024*1024*1000000)
-    public Result upload () {
+    public Result uploader () {
         if (request().body().isMaxSizeExceeded()) {
             return badRequest ("File too large!");
         }
 
-        ArrayNode loaded = mapper.createArrayNode();
-
         Http.MultipartFormData body = request().body().asMultipartFormData();
-        List<FilePart> parts = body.getFiles();
-        if (parts != null && !parts.isEmpty()) {
-            for (FilePart part : parts) {
-                String name = part.getFilename();
-                String content = part.getContentType();
+        FilePart part = body.getFile("file");
+        if (part != null) {
+            try {
+                models.Payload payload = service.upload
+                    (part, body.asFormUrlEncoded());
                 
-                try {
-                    File file = part.getFile();
-                    Logger.debug("file="+name+" content="+content);
-
-                    ObjectNode props = mapper.createObjectNode();
-                    props.put("name", name);
-                    props.put("mime", content);
-                    for (Map.Entry<String, String[]> me :
-                             body.asFormUrlEncoded().entrySet()) {
-                        props.put(me.getKey(),
-                                  mapper.valueToTree(me.getValue()));
-                    }
-
-                    CoreService.Payload payload = service.upload
-                        (new FileInputStream (file), props);
-                    
-                    Logger.debug("File uploaded: uuid="
-                                 +props.get("uuid").asText()
-                                 +" size="+props.get("size").asLong()
-                                 +" sha1="+props.get("sha1").asText());
-                    loaded.add(props);
-                }
-                catch (Exception ex) {
-                    Logger.trace("Can't load file \""+name+"\"; "+content, ex);
-                    return internalServerError (ex.getMessage());
-                }
+                return ok ((JsonNode)mapper.valueToTree(payload));
+            }
+            catch (RuntimeException ex) {
+                return badRequest (ex.getMessage());
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                return internalServerError ("Can't fulfill request; "
+                                            +"internal server error!");
             }
         }
         
-        return ok (loaded);
+        return noContent ();
+    }
+
+    public Result payloads () {
+        List<models.Payload> payloads = models.Payload.find.all();
+        return ok ((JsonNode)mapper.valueToTree(payloads));
+    }
+
+    public Result payload (Long id) {
+        List<models.Payload> payloads   
+            = models.Payload.find.where().eq("id", id).findList();
+        if (payloads.isEmpty())
+            return notFound ("No payload id "+id+" found!");
+        
+        return ok ((JsonNode)mapper.valueToTree
+                   (payloads.iterator().next()));
+    }
+
+    public Result download (Long id) {
+        List<models.Payload> payloads   
+            = models.Payload.find.where().eq("id", id).findList();
+        if (payloads.isEmpty())
+            return notFound ("No payload id "+id+" found!");
+        
+        models.Payload payload = payloads.iterator().next();
+        File f = service.getFile(payload);
+        if (f != null) {
+            response().setContentType(payload.mimeType);
+            response().setHeader("Content-Disposition",
+                                 "attachment; filename="+payload.filename);
+            return ok (f);
+        }
+        
+        return internalServerError ("Unable to locate payload "+id);
     }
 }

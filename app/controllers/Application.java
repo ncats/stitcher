@@ -8,20 +8,25 @@ import java.net.URI;
 import play.*;
 import play.mvc.*;
 import play.libs.ws.*;
+import static play.mvc.Http.MultipartFormData.*;
+import play.db.ebean.Transactional;
 
 import views.html.*;
 
 import services.GraphDbService;
 import services.SchedulerService;
+import services.CoreService;
 import services.jobs.*;
 
 import ix.curation.*;
+import models.*;
 
 public class Application extends Controller {
     //@Inject WSClient ws;
     @Inject SchedulerService scheduler;
     @Inject play.Application app;
     @Inject GraphDbService graphDb;
+    @Inject CoreService service;
 
     public Application () {
     }
@@ -88,7 +93,38 @@ public class Application extends Controller {
         return ok (console.render(key));
     }
 
-    public Result upload () {
+    public Result uploadForm () {
         return ok (upload.render());
+    }
+
+    @Transactional
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class, 
+                   maxLength = 1024*1024*1000000)
+    public Result upload () {
+        if (request().body().isMaxSizeExceeded()) {
+            return badRequest (error.render("File too large!"));
+        }
+
+        Http.MultipartFormData body = request().body().asMultipartFormData();
+        FilePart part = body.getFile("file");
+        if (part != null) {
+            try {
+                models.Payload payload = service.upload
+                    (part, body.asFormUrlEncoded());
+            }
+            catch (Exception ex) {
+                flash ("error", ex.getMessage());
+                return redirect (routes.Application.uploadForm());
+            }
+        }
+        
+        return redirect (routes.Application.payload());
+    }
+
+    public Result payload () {
+        List<models.Payload> payloads = models.Payload
+            .find.order().desc("id").findList();
+        
+        return ok (payload.render(payloads));
     }
 }

@@ -40,7 +40,7 @@ lazy val commonDependencies = Seq(
 )
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayJava)
+  .enablePlugins(PlayJava, PlayEbean)
   .settings(commonSettings: _*)
   .settings(name := """ixcurator""")
   .settings(
