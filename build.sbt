@@ -36,7 +36,11 @@ lazy val commonDependencies = Seq(
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "handlebars" % "4.0.2",
   "org.webjars" % "jquery" % "2.2.0",
-  "org.webjars" % "font-awesome" % "4.5.0"
+  "org.webjars" % "font-awesome" % "4.5.0",
+  "org.webjars" % "html5shiv" % "3.7.2",
+  "org.webjars" % "requirejs" % "2.1.15",
+  "org.webjars" % "respond" % "1.4.2",
+  "org.webjars" % "morrisjs" % "0.5.1"
 )
 
 lazy val root = (project in file("."))

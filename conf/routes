@@ -8,6 +8,9 @@ GET	/app/console/:key	controllers.Application.console(key: String)
 GET	/app/upload		controllers.Application.uploadForm
 POST	/app/upload		controllers.Application.upload
 GET	/app/payload		controllers.Application.payload
+GET	/app/payload/:key	controllers.Application.getPayload(key: String)
+GET	/app/setup		controllers.Application.setup
+GET	/app/index		controllers.Application.dashboard
 
 ########## API
 GET	/api/jobs	    controllers.Api.getRunningJobs
@@ -18,8 +21,8 @@ GET	/api/console/:key	    controllers.Api.console(key: String)
 GET	/api/echo	controllers.Api.echo
 POST	/api/upload	controllers.Api.uploader
 GET	/api/payload	controllers.Api.payloads
-GET	/api/payload/:id	controllers.Api.payload(id: Long)
-GET	/api/download/:id	controllers.Api.download(id: Long)
+GET	/api/payload/:key	controllers.Api.payload(key: String)
+GET	/api/download/:key	controllers.Api.download(key: String)
 
 ########## TEST
 GET	/test/slidereveal	controllers.Application.slidereveal

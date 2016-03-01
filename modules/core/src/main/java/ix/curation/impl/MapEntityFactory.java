@@ -134,7 +134,13 @@ public class MapEntityFactory extends EntityRegistry<Map<String, Object>> {
                 }
                 int len = Math.min(header.length, toks.length);
                 for (int i = 0; i < len; ++i) {
-                    row.put(header[i], toks[i]);
+                    String[] values = toks[i].split("\\|");
+                    if (values.length > 1) {
+                        row.put(header[i], values);
+                    }
+                    else {
+                        row.put(header[i], toks[i]);
+                    }
                 }
                 
                 Entity ent = register (row);

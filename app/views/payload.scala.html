@@ -1,53 +1,32 @@
 @import models._
 
-@(payload: List[Payload])
+@(app: controllers.Application, payload: List[Payload])
 
-@row(p: Payload) = {
-<tr>
-  <td>
-    <i class="fa fa-@if(p.shared){unlock}else{lock}"></i>
-  </td>
-  <td>@p.filename</td>
-  <td>@p.size</td>
-  <td>@{new java.util.Date(p.timestamp)}</td>
-  <td>@p.description</td>
-  <td><code>@p.sha1.substring(0,7)</code></td>
-</tr>
+@shell(app){
+	 <div class="row">
+           <div class="col-lg-12">
+               <h1 class="page-header">Payload (@payload.size)
+	       <a href="@routes.Application.upload" role="button"
+		  class="btn btn-primary pull-right">Add</a></h1>
+            </div>
+            <!-- /.col-lg-12 -->
+          </div>
+
+	  <div class="panel panel-default">
+	    <div class="panel-body">
+	      <table class="table">
+		<tr>
+		  <th></th>
+		  <th>Filename</th>
+		  <th>Size</th>
+		  <th>Date</th>
+		  <th>Description</th>
+		  <th>SHA1</th>
+		</tr>
+		@for(p <- payload) {
+		  @payloadrow(p)
+	        }
+	      </table>
+	    </div>
+	  </div>
 }
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Payload</title>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))'>    
-  </head>
-  <body>
-    <div class="container">    
-      <div class="jumbotron">    
-	<h1>Payload</h1>
-      </div>
-
-      <div class="row">
-	<div class="col-md-12">
-	  <table class="table">
-	    <tr>
-	      <th></th>
-	      <th>Filename</th>
-	      <th>Size</th>
-	      <th>Date</th>
-	      <th>Description</th>
-	      <th>SHA1</th>
-	    </tr>
-	      @for(p <- payload) {
-		@row(p)
-	      }
-	  </table>
-	</div>
-      </div>
-    </div>
-  </body>
-</html>

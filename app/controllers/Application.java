@@ -23,10 +23,10 @@ import models.*;
 
 public class Application extends Controller {
     //@Inject WSClient ws;
-    @Inject SchedulerService scheduler;
+    @Inject public SchedulerService scheduler;
     @Inject play.Application app;
-    @Inject GraphDbService graphDb;
-    @Inject CoreService service;
+    @Inject public GraphDbService graphDb;
+    @Inject public CoreService service;
 
     public Application () {
     }
@@ -94,7 +94,7 @@ public class Application extends Controller {
     }
 
     public Result uploadForm () {
-        return ok (upload.render());
+        return ok (upload.render(this));
     }
 
     @Transactional
@@ -122,9 +122,21 @@ public class Application extends Controller {
     }
 
     public Result payload () {
-        List<models.Payload> payloads = models.Payload
-            .find.order().desc("id").findList();
-        
-        return ok (payload.render(payloads));
+        List<models.Payload> payloads = service.getPayloads();
+        return ok (payload.render(this, payloads));
+    }
+
+    public Result getPayload (String key) {
+        models.Payload payload = service.getPayload(key);
+        return ok (payload != null ? payloaddetails.render(this, payload)
+                   : error.render("Invalid payload: "+key));
+    }
+
+    public Result setup () {
+        return ok (payloadsetup.render());
+    }
+
+    public Result dashboard () {
+        return ok (dashboard.render(this));
     }
 }

@@ -187,27 +187,22 @@ public class Api extends Controller {
     }
 
     public Result payloads () {
-        List<models.Payload> payloads = models.Payload.find.all();
+        List<models.Payload> payloads = service.getPayloads();  
         return ok ((JsonNode)mapper.valueToTree(payloads));
     }
 
-    public Result payload (Long id) {
-        List<models.Payload> payloads   
-            = models.Payload.find.where().eq("id", id).findList();
-        if (payloads.isEmpty())
-            return notFound ("No payload id "+id+" found!");
-        
-        return ok ((JsonNode)mapper.valueToTree
-                   (payloads.iterator().next()));
+    public Result payload (String key) {
+        models.Payload payload = service.getPayload(key);
+        return payload != null ?
+            ok ((JsonNode)mapper.valueToTree(payload))
+            : notFound ("No payload "+key+" found!");
     }
 
-    public Result download (Long id) {
-        List<models.Payload> payloads   
-            = models.Payload.find.where().eq("id", id).findList();
-        if (payloads.isEmpty())
-            return notFound ("No payload id "+id+" found!");
+    public Result download (String key) {
+        models.Payload payload = service.getPayload(key);
+        if (payload == null)
+            return notFound ("No payload "+key+" found!");
         
-        models.Payload payload = payloads.iterator().next();
         File f = service.getFile(payload);
         if (f != null) {
             response().setContentType(payload.mimeType);
@@ -216,6 +211,6 @@ public class Api extends Controller {
             return ok (f);
         }
         
-        return internalServerError ("Unable to locate payload "+id);
+        return internalServerError ("Unable to locate payload "+key);
     }
 }

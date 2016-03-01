@@ -143,7 +143,7 @@ public class CoreService {
                      +" sha1="+payload.sha1);
         if (payload.id != null) { // already seen this file
             throw new RuntimeException
-                ("File \""+name+"\" has already been loaded!");
+                ("File \""+name+"\" has already been uploaded!");
         }
         else {
             if (params.containsKey("title"))
@@ -167,8 +167,23 @@ public class CoreService {
 
     public File getFile (Payload payload) {
         File f = new File (work, payload.uuid);
-        if (f.exists())
-            return f;
-        return null;
+        return f.exists() ? f : null;
+    }
+
+    public List<models.Payload> getPayloads () {
+        return models.Payload.find.order().desc("id").findList();       
+    }
+
+    public models.Payload getPayload (String key) {
+        List<models.Payload> payloads;  
+        try {
+            long id = Long.parseLong(key);
+            payloads = models.Payload.find.where().eq("id", id).findList();
+        }
+        catch (NumberFormatException ex) {
+            payloads = models.Payload.find
+                .where().ilike("sha1", key+"%").findList();
+        }
+        return payloads.isEmpty() ? null : payloads.iterator().next();
     }
 }

@@ -1,0 +1,13 @@
+
+@(p: models.Payload)
+
+<tr>
+  <td>
+    <i class="fa fa-@if(p.shared){unlock}else{lock}"></i>
+  </td>
+  <td><a href='@routes.Application.getPayload(p.sha1.substring(0,7))'>@p.filename</a></td>
+  <td>@p.size</td>
+  <td>@{new java.util.Date(p.timestamp)}</td>
+  <td>@p.description</td>
+  <td><code>@p.sha1.substring(0,7)</code></td>
+</tr>
