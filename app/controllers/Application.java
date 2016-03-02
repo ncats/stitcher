@@ -90,7 +90,7 @@ public class Application extends Controller {
     }
 
     public Result console (String key) {
-        return ok (console.render(key));
+        return ok (console.render(this, key));
     }
 
     public Result uploadForm () {
@@ -106,15 +106,34 @@ public class Application extends Controller {
         }
 
         Http.MultipartFormData body = request().body().asMultipartFormData();
+        Map<String, String[]> params = body.asFormUrlEncoded();
         FilePart part = body.getFile("file");
+        //Logger.debug("part="+part+" uri="+params.get("uri"));
         if (part != null) {
             try {
-                models.Payload payload = service.upload
-                    (part, body.asFormUrlEncoded());
+                models.Payload payload = service.upload(part, params);
             }
             catch (Exception ex) {
+                ex.printStackTrace();
                 flash ("error", ex.getMessage());
                 return redirect (routes.Application.uploadForm());
+            }
+        }
+        else {
+            String[] uri = params.get("uri");
+            if (uri == null || uri.length == 0 || uri[0].equals("")) {
+                flash ("error", "Either File and/or URI must be specified!");
+                return redirect (routes.Application.uploadForm());
+            }
+            try {
+                models.Payload payload = service.upload
+                    (new URI (uri[0]), params);
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                
+                flash ("error", ex.getMessage());
+                return redirect (routes.Application.uploadForm());              
             }
         }
         
@@ -138,5 +157,13 @@ public class Application extends Controller {
 
     public Result dashboard () {
         return ok (dashboard.render(this));
+    }
+
+    public Result delete (String key) {
+        models.Payload payload = service.deletePayload(key);
+        if (payload != null) {
+            flash ("message", "Successfully deleted payload "+payload.sha1());
+        }
+        return redirect (routes.Application.payload());
     }
 }

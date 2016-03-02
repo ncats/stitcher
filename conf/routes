@@ -11,6 +11,7 @@ GET	/app/payload		controllers.Application.payload
 GET	/app/payload/:key	controllers.Application.getPayload(key: String)
 GET	/app/setup		controllers.Application.setup
 GET	/app/index		controllers.Application.dashboard
+DELETE	/app/payload		controllers.Application.delete(key: String)
 
 ########## API
 GET	/api/jobs	    controllers.Api.getRunningJobs
@@ -23,6 +24,7 @@ POST	/api/upload	controllers.Api.uploader
 GET	/api/payload	controllers.Api.payloads
 GET	/api/payload/:key	controllers.Api.payload(key: String)
 GET	/api/download/:key	controllers.Api.download(key: String)
+DELETE	/api/payload/:key	controllers.Api.delete(key: String)
 
 ########## TEST
 GET	/test/slidereveal	controllers.Application.slidereveal

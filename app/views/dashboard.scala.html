@@ -14,49 +14,104 @@
               <div class="panel panel-primary">
                 <div class="panel-heading">
                   <div class="row">
-                    <div class="col-xs-3">
-                      <i class="fa fa-archive fa-5x"></i>
+                    <div class="col-xs-6">
+                      <h1>Entities</h1>
                     </div>
-                    <div class="col-xs-9 text-right">
-                      <div class="huge">@app.service.getPayloads.size</div>
-                      <div>Payload</div>
+                    <div class="col-xs-6 text-right">
+                      <h1 id="entity-count"></h1>
                     </div>
                   </div>
                 </div>
-                <a href="@routes.Application.payload">
-                  <div class="panel-footer">
-                    <span class="pull-left">View Details</span>
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
-                  </div>
-                </a>
               </div>
             </div>
             <div class="col-lg-3 col-md-6">
               <div class="panel panel-green">
                 <div class="panel-heading">
                   <div class="row">
-                    <div class="col-xs-3">
-                      <i class="fa fa-tasks fa-5x"></i>
+                    <div class="col-xs-6">
+		      <h1>Singletons</h1>
                     </div>
-                    <div class="col-xs-9 text-right">
-                      <div class="huge">12</div>
-                      <div>New Tasks!</div>
+                    <div class="col-xs-6 text-right">
+                      <h1 id="singleton-count"></h1>
                     </div>
                   </div>
                 </div>
-                <a href="#">
-                  <div class="panel-footer">
-                    <span class="pull-left">View Details</span>
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
+              </div>
+            </div>
+          </div>
+	  <!-- /.row -->
+          <div class="row">
+            <div class="col-lg-3 col-md-6">
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <h1>Components</h1>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                      <h1 id="component-count"></h1>
+                    </div>
                   </div>
-                </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="panel panel-warning">
+                <div class="panel-heading">
+                  <div class="row">
+                    <div class="col-xs-6">
+		      <h1>Stitches</h1>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                      <h1 id="stitch-count"></h1>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
           <!-- /.row -->
-          <div class="row">
+
+	  <div class="row">
+            <div class="col-lg-8">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <i class="fa fa-bar-chart-o fa-fw"></i> Entity Degree Distribution
+                </div> <!-- /.panel-heading -->
+                <div class="panel-body">
+		  <div id="entity-dist-plot"></div>
+                </div>  <!-- /.panel-body -->
+              </div> <!-- panel -->
+	    </div> <!-- col -->
+	  </div> <!-- row -->
+
+	  <div class="row">
+            <div class="col-lg-8">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <i class="fa fa-bar-chart-o fa-fw"></i> Stitch Distribution
+                </div> <!-- /.panel-heading -->
+                <div class="panel-body">
+		  <div id="stitch-dist-plot"></div>
+                </div>  <!-- /.panel-body -->
+              </div> <!-- panel -->
+	    </div> <!-- col -->
+	  </div> <!-- row -->
+
+	  <div class="row">
+            <div class="col-lg-8">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <i class="fa fa-bar-chart-o fa-fw"></i> Component Size Distribution
+                </div> <!-- /.panel-heading -->
+                <div class="panel-body">
+		  <div id="component-dist-plot"></div>
+                </div>  <!-- /.panel-body -->
+              </div> <!-- panel -->
+	    </div> <!-- col -->
+	  </div> <!-- row -->
+
+	  <div class="row">
             <div class="col-lg-8">
               <div class="panel panel-default">
                 <div class="panel-heading">
@@ -71,19 +126,17 @@
 		          <tr>
 		            <th></th>
 		            <th>Name</th>
-		            <th>File</th>
+		            <th>File <i class="fa fa-download"></i></th>
 			    <th>Date</th>
-			    <th></th>
 		       	  </tr>
 		        </thead>
 		        <tbody>
                      	@for(p <- payload.subList(0,Math.min(5,payload.size))) {
  		           <tr>
 			     <td><i class="fa fa-@if(p.shared){unlock}else{lock}"></i></td>
-			     <td>@p.title</td>
-			     <td><a href='@{routes.Application.getPayload(p.sha1.substring(0,7))}'>@p.filename</a></td>
+			     <td><a href='@{routes.Application.getPayload(p.sha1())}' title='View payload details'>@p.title</td>
+			     <td><a href='@{routes.Api.download(p.sha1())}' title='Download payload'>@p.filename</a></td>
 			     <td>@{new java.util.Date(p.timestamp)}</td>
-			     <td><a href='@routes.Api.download(p.sha1.substring(0,7))'><i class="fa fa-download"></i></a>
 			   </tr>
 			}
 		        </tbody>
@@ -97,3 +150,77 @@
 	    </div> <!-- col -->
 	  </div> <!-- row -->
 }
+
+<script>
+
+function toArray(x, y, obj) {
+   var data = [];
+   for (var f in obj) {
+      data.push({x: f, y: obj[f]});
+   }
+   console.log(data);
+   return data;
+}
+
+$(document).ready(function () {
+   $.ajax({
+      url: '@routes.Api.getMetrics(null)',
+      retryLimit: 5,
+      tries: 0,
+      success: function(d) {
+         console.log('metrics: count='+d.entityCount+' singletons='+d.singletonCount);
+	 $('#entity-count').append(''+d.entityCount);
+	 $('#singleton-count').append(''+d.singletonCount);
+	 $('#component-count').append(''+d.connectedComponentCount);
+	 $('#stitch-count').append(''+d.stitchCount);
+
+	 Morris.Bar({
+	   element: 'entity-dist-plot',
+	   data: toArray('x', 'y', d.entitySizeDistribution),
+	   xkey: 'x',
+	   ykeys: ['y'],
+	   labels: ['Count']
+	 });
+
+	 Morris.Bar({
+	   element: 'stitch-dist-plot',
+	   data: toArray('x', 'y', d.stitchHistogram),
+	   xkey: 'x',
+	   ykeys: ['y'],
+	   axes: true,
+	   hideHover: 'auto',
+	   pointSize: 2,
+	   barRatio: 0.4,
+	   xLabelAngle: 35,
+	   labels: ['Count']
+	 });
+
+	 Morris.Bar({
+	   element: 'component-dist-plot',
+	   data: toArray('x', 'y', d.connectedComponentHistogram),
+	   xkey: 'x',
+	   ykeys: ['y'],
+	   axes: true,
+	   hideHover: 'auto',
+	   pointSize: 2,
+	   labels: ['Count']
+	 });
+
+      },
+      error: function(xhr, status, err) {
+         console.log('error: '+err);
+         if (xhr.status == 404) { // not ready
+	    this.tries++;
+	    if (this.tries <= this.retryLimit) {
+	       var x = this;
+	       setTimeout(function() {
+                  console.log('retry..'+x.tries);
+	          $.ajax(x);
+	       }, 2000);
+	    }
+	 }
+      }
+   }).done(function(d) {
+   });
+});
+</script>

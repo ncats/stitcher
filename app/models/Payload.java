@@ -4,6 +4,7 @@ import java.util.*;
 import javax.persistence.*;
 
 import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Payload extends Model {
@@ -29,10 +30,17 @@ public class Payload extends Model {
 
     @Column(length=128)
     public String mimeType;
+    public String format;
+
+    @Lob
+    public String uri;
     
     @Lob
-    public String description;
+    public String comments;
 
     public Payload () {
     }
+
+    @JsonIgnore
+    public String sha1 () { return sha1.substring(0,7); }
 }

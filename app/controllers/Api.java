@@ -213,4 +213,12 @@ public class Api extends Controller {
         
         return internalServerError ("Unable to locate payload "+key);
     }
+
+    public Result delete (String key) {
+        models.Payload payload = service.deletePayload(key);
+        if (payload != null) {
+            return ok ("Payload "+payload.sha1()+" deleted!");
+        }
+        return internalServerError ("Unable to delete payload "+key);
+    }
 }

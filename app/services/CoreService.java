@@ -2,6 +2,7 @@ package services;
 
 import java.io.*;
 import java.util.*;
+import java.net.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -142,23 +143,66 @@ public class CoreService {
                      +" size="+payload.size
                      +" sha1="+payload.sha1);
         if (payload.id != null) { // already seen this file
+            File f = new File (work, payload.uuid);
+            f.delete();
+            
             throw new RuntimeException
                 ("File \""+name+"\" has already been uploaded!");
         }
         else {
-            if (params.containsKey("title"))
-                payload.title = params.get("title")[0];
-            if (params.containsKey("description"))
-                payload.description = params.get("description")[0];
+            payload.title = params.get("title")[0];
+            payload.comments = params.get("comments")[0];
+            if (params.containsKey("uri"))
+                payload.uri = params.get("uri")[0];
             payload.filename = name;
             payload.mimeType = content;
-            if (params.containsKey("shared")) {
-                payload.shared = "on"
-                    .equalsIgnoreCase(params.get("shared")[0]);
-            }
-            else
-                payload.shared = false;
+            payload.format = params.get("format")[0];
+            payload.shared = params.containsKey("shared")
+                ? "on".equalsIgnoreCase(params.get("shared")[0])
+                : false;
             
+            payload.save();
+        }
+        
+        return payload;
+    }
+
+    public Payload upload (URI uri, Map<String, String[]> params)
+        throws Exception {
+        Payload payload = null;
+        String scheme = uri.getScheme();
+        if (scheme != null && scheme.equals("jdbc")) {
+            // we'll deal with jdbc schema at a latter time
+            Logger.warn("Scheme \""+scheme+"\" is currently not supported!");
+            throw new RuntimeException
+                ("Scheme \""+scheme+"\" currently not supported!");
+        }
+        else { // assume relative path for file
+            URLConnection con = uri.toURL().openConnection();
+            payload = upload (con.getInputStream());
+            payload.title = params.get("title")[0];
+            payload.comments = params.get("comments")[0];
+            payload.uri = params.get("uri")[0];
+            payload.mimeType = con.getContentType();
+            payload.format = params.get("format")[0];
+            String[] path = uri.toURL().getFile().split("/");
+            if (path.length > 0)
+                payload.filename = path[path.length-1];
+            payload.shared = params.containsKey("shared")
+                ? "on".equalsIgnoreCase(params.get("shared")[0])
+                : false;
+
+            Logger.debug("URI uploaded: uuid="
+                         +payload.uuid
+                         +" size="+payload.size
+                         +" sha1="+payload.sha1);
+
+            if (payload.id != null) {
+                File f = new File (work, payload.uuid);
+                f.delete();
+                throw new RuntimeException
+                    ("URI \""+uri+"\" has already been uploaded!");
+            }
             payload.save();
         }
         
@@ -185,5 +229,29 @@ public class CoreService {
                 .where().ilike("sha1", key+"%").findList();
         }
         return payloads.isEmpty() ? null : payloads.iterator().next();
+    }
+
+    public models.Payload deletePayload (String key) {
+        models.Payload payload = getPayload (key);
+        if (payload != null) {
+            try {
+                File f = getFile (payload);
+                if (f != null) {
+                    payload.delete();
+                    f.delete();
+                    Logger.debug("Successfully deleted payload "+key);
+                }
+                else {
+                    payload = null;
+                }
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                Logger.trace("Delete failed for payload "
+                             +payload.id+"... ", ex);
+                payload = null;
+            }
+        }
+        return payload;
     }
 }

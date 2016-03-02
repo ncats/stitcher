@@ -2,6 +2,24 @@
 
 @(app: controllers.Application, payload: List[Payload])
 
+@payloadrow(p: models.Payload) = {
+<tr>
+  <td>
+    <i class="fa fa-@if(p.shared){unlock}else{lock}"></i>
+  </td>
+  <td><a href='@routes.Application.getPayload(p.sha1())'
+  	 title='View payload details'>@p.title</a></td>
+  <td><a href='@routes.Application.getPayload(p.sha1())'
+  	 title='Download payload'>@p.filename</a></td>
+  <td>@p.size</td>
+  <td>@{new java.util.Date(p.timestamp)}</td>
+  <td><code>@p.sha1()</code></td>
+  <td><button class="btn btn-danger btn-xs"
+  	      title="Delete payload"
+  	      onclick="onDelete('@p.sha1()','@p.filename')"><i class="fa fa-trash"></i></button></td>
+</tr>
+}
+
 @shell(app){
 	 <div class="row">
            <div class="col-lg-12">
@@ -14,14 +32,15 @@
 
 	  <div class="panel panel-default">
 	    <div class="panel-body">
-	      <table class="table">
+	      <table class="table table-striped">
 		<tr>
 		  <th></th>
-		  <th>Filename</th>
+		  <th>Name</th>
+		  <th>File <i class="fa fa-download"></i></th>
 		  <th>Size</th>
 		  <th>Date</th>
-		  <th>Description</th>
 		  <th>SHA1</th>
+		  <th></th>
 		</tr>
 		@for(p <- payload) {
 		  @payloadrow(p)
@@ -30,3 +49,55 @@
 	    </div>
 	  </div>
 }
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modal-title"></h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button"
+	      class="btn btn-primary" onclick="reallyDelete()">Delete</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+var payload;
+
+$(document).ready(function() {
+   $('#modal-dialog').on('hidden.bs.modal', function (e) {
+      $('#modal-title').empty();
+   });
+});
+
+function onDelete(key, name) {
+  payload = key;
+  console.log("deleting "+key+"..."+name);
+  $('#modal-title')
+     .append('Do you really want to delete payload <code>'
+     	     +name+'</code> (<code>'+key+'</code>)?');
+  $('#modal-dialog').modal('show');
+}
+
+function reallyDelete () {
+   console.log("Now really deleting payload "+payload+"...");
+   $.ajax({
+      url: '@routes.Api.delete("")'+payload,
+      method: 'DELETE',
+      success: function(d) {
+         console.log('success: '+d);
+      },
+      error: function (d) {
+         console.log('error: '+d);
+      }
+   }).done(function(d) {
+      $('#modal-dialog').modal('hide');
+      location.reload();
+   });
+}
+</script>

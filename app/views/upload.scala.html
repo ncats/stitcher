@@ -16,37 +16,61 @@
    </div>
  </div>
  <!-- /.col-lg-12 -->
- <div class="panel panel-default">
-   <div class="panel-body">
-     <div class="panel">
-        <div class="panel-body">
+ <div class="row">
+   <div class="col-lg-8">
+      <div class="panel panel-default">
+      	 <div class="panel-body">
 	   <form role="" method="POST"
 		    action="@routes.Application.upload"
 		    enctype="multipart/form-data"
 		    id="upload-form">
 		<div class="form-group">
-		  <label for="file">Name</label>
+		  <label for="file">Name (required)</label>
                   <input class="form-control" type="text"
-			 id="title" name="title">
+			 id="title" name="title" required>
 		</div>
 		<div class="form-group">
 		  <label for="file">File</label>
                   <input class="form-control" type="file" id="file" name="file">
 		</div>
 		<div class="form-group">
+		  <label for="uri">URI</label>
+                  <input class="form-control" type="text" id="uri" name="uri">
+		</div>
+		<div class="form-group">
+		   <label for="format">Format</label>		
+		   <select name="format" id="format" class="form-control">
+		      <option value="CSV">CSV</option>
+		      <option value="TXT">Text</option>
+		      <option value="MOL">MDL/MOL/SMILES</option>
+		      <option value="ChEBML">ChEMBL</option>
+		      <option value="SRS">FDA SRS</option>
+		      <option value="NPC">NPC Dump</option>
+		      <option value="DrugBank">DrugBank</option>
+		      <option value="Integrity">Integrity</option>
+		      <option value="Other">Other</option>
+		   </select>
+		</div>
+		<div class="form-group">
 		  <input type="checkbox" name="shared"> This payload is public accessible
 		</div>
 		<div class="form-group">
-		  <label for="description">Description</label>
-		  <textarea id="description" class="form-control"
+		  <label for="comments">Comment</label>
+		  <textarea id="comments" class="form-control"
 			    rows="5"
-			    name="description"
+			    name="comments"
 			    style="font-family: monospace"></textarea>
 		</div>
-		<p><button type="submit" class="btn btn-primary">Upload</button> <a href='@routes.Application.dashboard' class="btn btn-default" role="button">Cancel</a>
-	    </form>
-    	 </div>
-      </div>
-   </div>
+		<div class="pull-right">
+		     <p><a href='@routes.Application.dashboard' class="btn btn-default" role="button">Cancel</a> <button type="submit" class="btn btn-primary">Load</button> 
+		</div>
+	     </form>
+	  </div>
+       </div>
+    </div>
  </div>
 }
+
+<script>
+//$('#upload-form').validate();
+</script>

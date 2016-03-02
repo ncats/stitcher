@@ -233,7 +233,21 @@
                <!-- /.nav-second-level -->
              </li>
              <li>
-               <a href="#"><i class="fa fa-link fa-fw"></i> Stitching</a>
+               <a href="#"><i class="fa fa-link fa-fw"></i> Stitching<span class="fa arrow"></span></a>
+	       <ul class="nav nav-second-level">
+		 <li>
+		   <a href="@routes.Application.testIntegrity">Integrity</a>
+		 </li>
+		 <li>
+		   <a href="@routes.Application.testNPC">NPC</a>
+		 </li>
+		 <li>
+		   <a href="@routes.Application.testSRS">SRS</a>
+		 </li>
+		 <li>
+		   <a href="@routes.Application.testDrugBank">DrugBank</a>
+		 </li>
+	       </ul>
              </li>
              <li>
 	       <a href="forms.html"><i class="fa fa-edit fa-fw"></i> Forms</a>
@@ -317,6 +331,8 @@
       
     <!-- jQuery -->
     <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    
+    <script type="text/javascript" src='@routes.Assets.versioned("javascripts/jquery.validate.min.js")'></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
