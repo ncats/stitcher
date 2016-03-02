@@ -76,6 +76,19 @@
             <div class="col-lg-8">
               <div class="panel panel-default">
                 <div class="panel-heading">
+                  <i class="fa fa-bar-chart-o fa-fw"></i> Stitched Data Sources
+                </div> <!-- /.panel-heading -->
+                <div class="panel-body">
+		  <div id="stitched-sources-plot"></div>
+                </div>  <!-- /.panel-body -->
+              </div> <!-- panel -->
+	    </div> <!-- col -->
+	  </div> <!-- row -->
+
+	  <div class="row">
+            <div class="col-lg-8">
+              <div class="panel panel-default">
+                <div class="panel-heading">
                   <i class="fa fa-bar-chart-o fa-fw"></i> Entity Degree Distribution
                 </div> <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -151,76 +164,11 @@
 	  </div> <!-- row -->
 }
 
+<script type="text/javascript" src='@routes.Assets.versioned("javascripts/dashboard.js")'></script>
 <script>
 
-function toArray(x, y, obj) {
-   var data = [];
-   for (var f in obj) {
-      data.push({x: f, y: obj[f]});
-   }
-   console.log(data);
-   return data;
-}
-
 $(document).ready(function () {
-   $.ajax({
-      url: '@routes.Api.getMetrics(null)',
-      retryLimit: 5,
-      tries: 0,
-      success: function(d) {
-         console.log('metrics: count='+d.entityCount+' singletons='+d.singletonCount);
-	 $('#entity-count').append(''+d.entityCount);
-	 $('#singleton-count').append(''+d.singletonCount);
-	 $('#component-count').append(''+d.connectedComponentCount);
-	 $('#stitch-count').append(''+d.stitchCount);
-
-	 Morris.Bar({
-	   element: 'entity-dist-plot',
-	   data: toArray('x', 'y', d.entitySizeDistribution),
-	   xkey: 'x',
-	   ykeys: ['y'],
-	   labels: ['Count']
-	 });
-
-	 Morris.Bar({
-	   element: 'stitch-dist-plot',
-	   data: toArray('x', 'y', d.stitchHistogram),
-	   xkey: 'x',
-	   ykeys: ['y'],
-	   axes: true,
-	   hideHover: 'auto',
-	   pointSize: 2,
-	   barRatio: 0.4,
-	   xLabelAngle: 35,
-	   labels: ['Count']
-	 });
-
-	 Morris.Bar({
-	   element: 'component-dist-plot',
-	   data: toArray('x', 'y', d.connectedComponentHistogram),
-	   xkey: 'x',
-	   ykeys: ['y'],
-	   axes: true,
-	   hideHover: 'auto',
-	   pointSize: 2,
-	   labels: ['Count']
-	 });
-
-      },
-      error: function(xhr, status, err) {
-         console.log('error: '+err);
-         if (xhr.status == 404) { // not ready
-	    this.tries++;
-	    if (this.tries <= this.retryLimit) {
-	       var x = this;
-	       setTimeout(function() {
-                  console.log('retry..'+x.tries);
-	          $.ajax(x);
-	       }, 2000);
-	    }
-	 }
-      }
-   }).done(function(d) {
-   });
+   loadMetricsPlots ('@routes.Api.getMetrics(null)');
+   loadDataSourcePlot ('@routes.Api.getDataSources()', 'stitched-sources-plot');
 });
 </script>

@@ -30,7 +30,8 @@ public class Payload extends Model {
 
     @Column(length=128)
     public String mimeType;
-    public String format;
+    public String format; // parsing format.. not same as storage format
+    public Integer magic; // magic number associated with storage format
 
     @Lob
     public String uri;

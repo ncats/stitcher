@@ -3,6 +3,8 @@ package services;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.zip.*;
+import java.util.concurrent.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,6 +43,7 @@ public class CoreService {
     final File data;
     final File work;
     CacheFactory cacheFactory;
+    ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Inject
     public CoreService (Configuration config, ApplicationLifecycle lifecycle) {
@@ -82,9 +85,10 @@ public class CoreService {
     public File dataDir () { return data; }
     public File workDir () { return work; }
 
-    public void shutdown () {
+    protected void shutdown () {
         Logger.debug("Shutting down "+getClass()+"..."+this);
         cacheFactory.shutdown();
+        threadPool.shutdown();
     }
     
     public CacheFactory getCacheFactory () { return cacheFactory; }
@@ -93,10 +97,23 @@ public class CoreService {
         String uuid = UUID.randomUUID().toString();             
         File file = new File (work, uuid);
         FileOutputStream fos = new FileOutputStream (file);
+
         byte[] buf = new byte[1024];
         DigestInputStream dis = new DigestInputStream (is, Util.sha1());
+
         long size = 0l;
+        Integer magic = null;
         for (int nb; (nb = dis.read(buf, 0, buf.length)) != -1; ) {
+            if (size == 0) {
+                int m = ((buf[1] & 0xff) << 8) | (buf[0] & 0xff);
+                // right now we only recognize this magic
+                if (m == GZIPInputStream.GZIP_MAGIC) {
+                    // check for gzip ..
+                    Logger.debug("*** STREAM IS GZIP COMPRESSED ***");
+                    magic = m;
+                }
+            }
+
             fos.write(buf, 0, nb);
             size += nb;
         }
@@ -113,6 +130,7 @@ public class CoreService {
             payload.uuid = uuid;
             payload.sha1 = sha1;
             payload.size = size;
+            payload.magic = magic;
         }
         else {
             payload = results.iterator().next();

@@ -9,7 +9,7 @@
   </td>
   <td><a href='@routes.Application.getPayload(p.sha1())'
   	 title='View payload details'>@p.title</a></td>
-  <td><a href='@routes.Application.getPayload(p.sha1())'
+  <td><a href='@routes.Api.download(p.sha1())'
   	 title='Download payload'>@p.filename</a></td>
   <td>@p.size</td>
   <td>@{new java.util.Date(p.timestamp)}</td>
