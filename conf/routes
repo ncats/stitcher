@@ -2,36 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-########## APP
-GET	/app/build	    controllers.Application.build
-GET	/app/console/:key	controllers.Application.console(key: String)
-GET	/app/upload		controllers.Application.uploadForm
-POST	/app/upload		controllers.Application.upload
-GET	/app/payload		controllers.Application.payload
-GET	/app/payload/:key	controllers.Application.getPayload(key: String)
-GET	/app/setup		controllers.Application.setup
-GET	/app/index		controllers.Application.dashboard
-DELETE	/app/payload		controllers.Application.delete(key: String)
-
-########## API
-GET	/api/jobs	    controllers.Api.getRunningJobs
-GET	/api/datasources	controllers.Api.getDataSources
-GET	/api/metrics		controllers.Api.getMetrics(label: String ?= null)
-GET	/api/node/:id		controllers.Api.getNode(id: Long)
-GET	/api/console/:key	    controllers.Api.console(key: String)
-GET	/api/echo	controllers.Api.echo
-POST	/api/upload	controllers.Api.uploader
-GET	/api/payload	controllers.Api.payloads
-GET	/api/payload/:key	controllers.Api.payload(key: String)
-GET	/api/download/:key	controllers.Api.download(key: String)
-DELETE	/api/payload/:key	controllers.Api.delete(key: String)
-
-########## TEST
-GET	/test/slidereveal	controllers.Application.slidereveal
-GET	/test/drugbank		controllers.Application.testDrugBank
-GET	/test/npc		controllers.Application.testNPC
-GET	/test/srs		controllers.Application.testSRS
-GET	/test/integrity		controllers.Application.testIntegrity
+->	/api	api.Routes
+->	/app	app.Routes
+->	/test	test.Routes
 
 ########## MISC
 POST	/misc/math	    controllers.MathJax.mathjax
@@ -41,3 +14,4 @@ GET	/misc/math	    controllers.MathJax.render(id: String ?= null)
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 GET	/webjars/*file		    controllers.WebJarAssets.at(file)
+

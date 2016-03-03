@@ -1,5 +1,5 @@
 
-@(app: controllers.Application)
+@(app: controllers.app.App)
 
 @shell(app){
  <div class="row">
@@ -21,7 +21,7 @@
       <div class="panel panel-default">
       	 <div class="panel-body">
 	   <form role="" method="POST"
-		    action="@routes.Application.upload"
+		    action="@controllers.app.routes.App.upload"
 		    enctype="multipart/form-data"
 		    id="upload-form">
 		<div class="form-group">
@@ -62,7 +62,7 @@
 			    style="font-family: monospace"></textarea>
 		</div>
 		<div class="pull-right">
-		     <p><a href='@routes.Application.dashboard' class="btn btn-default" role="button">Cancel</a> <button type="submit" class="btn btn-primary">Load</button> 
+		     <p><a href='@controllers.app.routes.App.dashboard' class="btn btn-default" role="button">Cancel</a> <button type="submit" class="btn btn-primary">Load</button> 
 		</div>
 	     </form>
 	  </div>

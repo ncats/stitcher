@@ -1,0 +1,7 @@
+
+########## TEST
+GET	/slidereveal	controllers.test.Test.slidereveal
+GET	/drugbank		controllers.test.Test.drugbank
+GET	/npc		controllers.test.Test.npc
+GET	/srs		controllers.test.Test.srs
+GET	/integrity		controllers.test.Test.integrity

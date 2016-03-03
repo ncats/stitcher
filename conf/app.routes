@@ -1,0 +1,12 @@
+
+########## APP
+GET	/build	    controllers.app.App.build
+GET	/console/:key	controllers.app.App.console(key: String)
+GET	/upload		controllers.app.App.uploadForm
+POST	/upload		controllers.app.App.upload
+GET	/payload	controllers.app.App.payload
+GET	/payload/:key	controllers.app.App.getPayload(key: String)
+GET	/setup		controllers.app.App.setup
+GET	/index		controllers.app.App.dashboard
+DELETE	/payload		controllers.app.App.delete(key: String)
+

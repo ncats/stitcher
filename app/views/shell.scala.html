@@ -1,5 +1,5 @@
 
-@(app: controllers.Application)(content: Html)
+@(app: controllers.app.App)(content: Html)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +47,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="@routes.Application.dashboard">InXight Curator</a>
+        <a class="navbar-brand" href="@controllers.app.routes.App.dashboard">InXight Curator</a>
       </div>
       <!-- /.navbar-header -->
       
@@ -226,26 +226,26 @@
               <!-- /input-group -->
             </li>
             <li>
-              <a href="@routes.Application.dashboard"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+              <a href="@controllers.app.routes.App.dashboard"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
             </li>
             <li>
-              <a href="@routes.Application.payload"><i class="fa fa-archive fa-fw"></i> Payload</a>
+              <a href="@controllers.app.routes.App.payload"><i class="fa fa-archive fa-fw"></i> Payload</a>
                <!-- /.nav-second-level -->
              </li>
              <li>
                <a href="#"><i class="fa fa-link fa-fw"></i> Stitching<span class="fa arrow"></span></a>
 	       <ul class="nav nav-second-level">
 		 <li>
-		   <a href="@routes.Application.testIntegrity">Integrity</a>
+		   <a href="@controllers.test.routes.Test.integrity">Integrity</a>
 		 </li>
 		 <li>
-		   <a href="@routes.Application.testNPC">NPC</a>
+		   <a href="@controllers.test.routes.Test.npc">NPC</a>
 		 </li>
 		 <li>
-		   <a href="@routes.Application.testSRS">SRS</a>
+		   <a href="@controllers.test.routes.Test.srs">SRS</a>
 		 </li>
 		 <li>
-		   <a href="@routes.Application.testDrugBank">DrugBank</a>
+		   <a href="@controllers.test.routes.Test.drugbank">DrugBank</a>
 		 </li>
 	       </ul>
              </li>

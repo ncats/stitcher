@@ -1,0 +1,14 @@
+
+########## API
+#GET	/api/jobs	    controllers.Api.getRunningJobs
+GET	/datasources	controllers.api.Api.getDataSources
+GET	/metrics		controllers.api.Api.getMetrics(label: String ?= null)
+GET	/node/:id		controllers.api.Api.getNode(id: Long)
+GET	/console/:key	    controllers.api.Api.console(key: String)
+GET	/echo	controllers.api.Api.echo
+POST	/upload	controllers.api.Api.uploader
+GET	/payload	controllers.api.Api.payloads
+GET	/jobs	controllers.api.Api.jobs
+GET	/payload/:key	controllers.api.Api.payload(key: String)
+GET	/download/:key	controllers.api.Api.download(key: String)
+DELETE	/payload/:key	controllers.api.Api.delete(key: String)

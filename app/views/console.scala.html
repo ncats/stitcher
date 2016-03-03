@@ -1,4 +1,4 @@
-@(app: controllers.Application, key: String)
+@(app: controllers.app.App, key: String)
 
 @shell(app){
  <div class="row">
@@ -24,7 +24,7 @@
  }
  
  <script language="javascript" type="text/javascript">
-  var wsUri = "ws://@{request.host}@{routes.Api.console(key)}";
+  var wsUri = "ws://@{request.host}@{controllers.api.routes.Api.console(key)}";
   var output;
   var websocket;
 

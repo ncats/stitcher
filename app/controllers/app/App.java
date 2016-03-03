@@ -1,4 +1,4 @@
-package controllers;
+package controllers.app;
 
 import java.util.*;
 import java.io.*;
@@ -21,72 +21,20 @@ import services.jobs.*;
 import ix.curation.*;
 import models.*;
 
-public class Application extends Controller {
+public class App extends Controller {
     //@Inject WSClient ws;
     @Inject public SchedulerService scheduler;
     @Inject play.Application app;
     @Inject public GraphDbService graphDb;
     @Inject public CoreService service;
 
-    public Application () {
+    public App () {
     }
     
     public Result build () {
         return ok(welcome.render("Build: "+ix.BuildInfo.TIME+" ("
                                  +ix.BuildInfo.BRANCH+"-"
                                  +ix.BuildInfo.COMMIT+")"));
-    }
-
-    public Result slidereveal () {
-        return ok (slidereveal.render("IxCurator"));
-    }
-
-    public Result testDrugBank () {
-        try {
-            String key = scheduler.submit
-                (DrugBankMoleculeRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/drugbank-full-annotated.sdf"));
-            return redirect (routes.Application.console(key));
-        }
-        catch (Exception ex) {
-            return internalServerError (ex.getMessage());
-        }
-    }
-
-    public Result testNPC () {
-        try {
-            String key = scheduler.submit
-                (NPCMoleculeRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
-            return redirect (routes.Application.console(key));
-        }
-        catch (Exception ex) {
-            return internalServerError (ex.getMessage());
-        }
-    }
-
-    public Result testSRS () {
-        try {
-            String key = scheduler.submit
-                (SRSJsonRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/public2015-11-30.gsrs"));
-            return redirect (routes.Application.console(key));
-        }
-        catch (Exception ex) {
-            return internalServerError (ex.getMessage());
-        }
-    }
-
-    public Result testIntegrity () {
-        try {
-            String key = scheduler.submit
-                (IntegrityMoleculeRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/integr.sdf.gz"));
-            return redirect (routes.Application.console(key));
-        }
-        catch (Exception ex) {
-            return internalServerError (ex.getMessage());
-        }
     }
 
     public Result console (String key) {
@@ -116,14 +64,14 @@ public class Application extends Controller {
             catch (Exception ex) {
                 ex.printStackTrace();
                 flash ("error", ex.getMessage());
-                return redirect (routes.Application.uploadForm());
+                return redirect (routes.App.uploadForm());
             }
         }
         else {
             String[] uri = params.get("uri");
             if (uri == null || uri.length == 0 || uri[0].equals("")) {
                 flash ("error", "Either File and/or URI must be specified!");
-                return redirect (routes.Application.uploadForm());
+                return redirect (routes.App.uploadForm());
             }
             try {
                 models.Payload payload = service.upload
@@ -133,11 +81,11 @@ public class Application extends Controller {
                 ex.printStackTrace();
                 
                 flash ("error", ex.getMessage());
-                return redirect (routes.Application.uploadForm());              
+                return redirect (routes.App.uploadForm());              
             }
         }
         
-        return redirect (routes.Application.payload());
+        return redirect (routes.App.payload());
     }
 
     public Result payload () {
@@ -164,6 +112,6 @@ public class Application extends Controller {
         if (payload != null) {
             flash ("message", "Successfully deleted payload "+payload.sha1());
         }
-        return redirect (routes.Application.payload());
+        return redirect (routes.App.payload());
     }
 }

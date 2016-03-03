@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import org.h2.tools.RunScript;
+import com.avaje.ebean.Ebean;
 
 import play.Application;
 import play.Logger;
@@ -75,9 +76,47 @@ public class SchedulerService {
         @Override
         public void triggerComplete (Trigger trigger, JobExecutionContext ctx,
                                      CompletedExecutionInstruction execInst) {
-            String key = trigger.getKey().getName();
+            
+            final String key = trigger.getKey().getName();
+            Ebean.execute(() -> {
+                    List<models.Job> jobs = models.Job.find
+                        .where().eq("key", key).findList();
+                    Logger.debug("get job for "+key+"..."+jobs.size());
+                    if (jobs.isEmpty()) {
+                        Logger.error("Can't retrieve job "+key);
+                    }
+                    else {
+                        models.Job job = jobs.iterator().next();
+                        switch (execInst) {
+                        case SET_TRIGGER_ERROR:
+                        case SET_ALL_JOB_TRIGGERS_ERROR:
+                            job.setStatus(models.Job.Status.FAILED);
+                            break;
+                        default:
+                            job.setStatus(models.Job.Status.DONE);
+                        }
+                        
+                        job.setFinished(System.currentTimeMillis());
+                        job.save();
+                    }
+                });
+
             Logger.debug("Trigger "+key +" complete; result="+ctx.getResult());
-            cache.set(trigger.getKey().getName(), ctx.getResult());
+            cache.set(key, ctx.getResult());
+        }
+
+        @Override
+        public void triggerFired (Trigger trigger, JobExecutionContext ctx) {
+            Ebean.execute(() -> {
+                    models.Job job = new models.Job();
+                    job.key = trigger.getKey().getName();
+                    job.status = models.Job.Status.FIRED;
+                    job.name = ctx.getJobInstance().getClass().getName();
+                    job.started = ctx.getFireTime().getTime();
+                    job.save();
+                    
+                    Logger.debug("-- Job "+job.id+" created.. "+job.key);
+                });
         }
     }
 

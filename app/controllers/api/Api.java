@@ -1,4 +1,4 @@
-package controllers;
+package controllers.api;
 
 import java.util.*;
 import java.io.*;
@@ -189,6 +189,11 @@ public class Api extends Controller {
     public Result payloads () {
         List<models.Payload> payloads = service.getPayloads();  
         return ok ((JsonNode)mapper.valueToTree(payloads));
+    }
+
+    public Result jobs () {
+        List<models.Job> jobs = service.getJobs();  
+        return ok ((JsonNode)mapper.valueToTree(jobs));
     }
 
     public Result payload (String key) {

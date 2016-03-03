@@ -16,4 +16,5 @@ public interface JobParams {
     String LABEL = "LABEL";
     String KEY = "KEY";
     String METRICS = "METRICS";
+    String PAYLOAD = "PAYLOAD";
 }

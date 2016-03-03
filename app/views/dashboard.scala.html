@@ -1,5 +1,5 @@
 
-@(app: controllers.Application)
+@(app: controllers.app.App)
 
 @shell(app){
 	 <div class="row">
@@ -129,7 +129,7 @@
               <div class="panel panel-default">
                 <div class="panel-heading">
                   <i class="fa fa-archive fa-fw"></i> Payload (@app.service.getPayloads.size)
-                  <a href='@routes.Application.upload' role="button"
+                  <a href='@controllers.app.routes.App.upload' role="button"
 	      	     class="btn btn-primary btn-xs pull-right">Add</a>
                 </div> <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -147,15 +147,15 @@
                      	@for(p <- payload.subList(0,Math.min(5,payload.size))) {
  		           <tr>
 			     <td><i class="fa fa-@if(p.shared){unlock}else{lock}"></i></td>
-			     <td><a href='@{routes.Application.getPayload(p.sha1())}' title='View payload details'>@p.title</td>
-			     <td><a href='@{routes.Api.download(p.sha1())}' title='Download payload'>@p.filename</a></td>
+			     <td><a href='@{controllers.app.routes.App.getPayload(p.sha1())}' title='View payload details'>@p.title</td>
+			     <td><a href='@{controllers.api.routes.Api.download(p.sha1())}' title='Download payload'>@p.filename</a></td>
 			     <td>@{new java.util.Date(p.timestamp)}</td>
 			   </tr>
 			}
 		        </tbody>
 	              </table>
 		      @if(payload.size > 5) {
-		         <a href='@routes.Application.payload'>See all...</a>
+		         <a href='@controllers.app.routes.App.payload'>See all...</a>
 		      }
 		      }
                 </div>  <!-- /.panel-body -->
@@ -168,7 +168,7 @@
 <script>
 
 $(document).ready(function () {
-   loadMetricsPlots ('@routes.Api.getMetrics(null)');
-   loadDataSourcePlot ('@routes.Api.getDataSources()', 'stitched-sources-plot');
+   loadMetricsPlots ('@controllers.api.routes.Api.getMetrics(null)');
+   loadDataSourcePlot ('@controllers.api.routes.Api.getDataSources()', 'stitched-sources-plot');
 });
 </script>

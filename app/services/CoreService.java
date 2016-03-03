@@ -272,4 +272,8 @@ public class CoreService {
         }
         return payload;
     }
+
+    public List<models.Job> getJobs () {
+        return models.Job.find.order().desc("id").findList();
+    }
 }
