@@ -27,7 +27,6 @@ import services.CoreService;
 import services.WebSocketConsoleActor;
 import services.WebSocketEchoActor;
 import services.jobs.*;
-import utils.JsonUtil;
 
 import ix.curation.*;
 import models.*;
@@ -97,13 +96,13 @@ public class Api extends Controller {
                 for (String s : stitches) {
                     String[] props = (String[])ds.get(s);
                     if (props != null)
-                        sn.put(s, JsonUtil.toJsonNode(props));
+                        sn.put(s, mapper.valueToTree(props));
                 }
                 node.put("stitches", sn);
             }
             String[] props = (String[])ds.get(Props.PROPERTIES);
             if (props != null)
-                node.put("properties", JsonUtil.toJsonNode(props));
+                node.put("properties", mapper.valueToTree(props));
             sources.add(node);
         }
         return ok (sources);

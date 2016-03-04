@@ -351,9 +351,8 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
     public DataSource register (String file) throws IOException {
         return register (new File (file));
     }
-    
-    public DataSource register (File file) throws IOException {
-        DataSource ds = super.register(file);
+
+    public int register (DataSource ds) throws IOException {
         Integer instances = (Integer)ds.get(INSTANCES);
         if (instances != null) {
             logger.warning("### Data source "+ds.getName()
@@ -361,29 +360,23 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
                            +" entities!");
         }
         else {
-            int count = register (ds.openStream());
-            ds.set(INSTANCES, count);
+            instances = register (ds.openStream());
+            ds.set(INSTANCES, instances);
             updateMeta (ds);
-            logger.info("$$$ "+count+" entities registered for "
-                        +file.getName());
+            logger.info("$$$ "+instances+" entities registered for "+ds);
         }
+        return instances;
+    }
+    
+    public DataSource register (File file) throws IOException {
+        DataSource ds = super.register(file);
+        register (ds);
         return ds;
     }
 
     public DataSource register (URL url) throws IOException {
         DataSource ds = super.register(url);
-        Integer instances = (Integer)ds.get(INSTANCES);
-        if (instances != null) {
-            logger.warning("### Data source "+ds.getName()
-                           +" has already been registered with "+instances
-                           +" entities!");
-        }
-        else {
-            int count = register (ds.openStream());
-            ds.set(INSTANCES, count);
-            updateMeta (ds);        
-            logger.info("$$$ "+count+" entities registered for "+url);
-        }
+        register (ds);
         return ds;
     }
 

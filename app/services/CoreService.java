@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import play.inject.ApplicationLifecycle;
+import play.Application;
 import play.Logger;
 import play.Configuration;
 import play.libs.F;
@@ -24,10 +25,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
+
 import ix.curation.CacheFactory;
+import ix.curation.DataSourceFactory;
+import ix.curation.DataSource;
 import ix.curation.Util;
 
 import models.Payload;
+import services.jobs.JobParams;
+import services.jobs.PayloadScannerJob;
 
 @Singleton
 public class CoreService {
@@ -36,7 +44,7 @@ public class CoreService {
     final public String HASH = "ix.hash";
     final public String WORK = "ix.work";
 
-    final Configuration config;
+    final Application app;
     
     final File base;
     final File hash;
@@ -46,9 +54,10 @@ public class CoreService {
     ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Inject
-    public CoreService (Configuration config, ApplicationLifecycle lifecycle) {
-        this.config = config;
-        
+    public CoreService (Application app, ApplicationLifecycle lifecycle) {
+        this.app = app;
+
+        Configuration config = app.configuration();
         String param = config.getString(BASE);
         if (param == null) {
             throw new IllegalStateException
@@ -102,7 +111,6 @@ public class CoreService {
         DigestInputStream dis = new DigestInputStream (is, Util.sha1());
 
         long size = 0l;
-        Integer magic = null;
         for (int nb; (nb = dis.read(buf, 0, buf.length)) != -1; ) {
             if (size == 0) {
                 int m = ((buf[1] & 0xff) << 8) | (buf[0] & 0xff);
@@ -110,7 +118,6 @@ public class CoreService {
                 if (m == GZIPInputStream.GZIP_MAGIC) {
                     // check for gzip ..
                     Logger.debug("*** STREAM IS GZIP COMPRESSED ***");
-                    magic = m;
                 }
             }
 
@@ -123,14 +130,20 @@ public class CoreService {
         Payload payload;
         String sha1 = Util.hex(dis.getMessageDigest().digest());
         List<Payload> results = Payload.find
-            .where().eq("sha1", sha1).findList();
+            .where().and(Expr.eq("sha1", sha1),
+                         Expr.isNull("deleted"))
+            .findList();
         if (results.isEmpty()) {
             payload = new Payload ();
-            payload.timestamp = System.currentTimeMillis();
             payload.uuid = uuid;
             payload.sha1 = sha1;
             payload.size = size;
-            payload.magic = magic;
+            
+            // also register this as a curation datasource
+            GraphDbService gdb = app.injector()
+                .instanceOf(GraphDbService.class);
+            DataSource ds = gdb.getDataSourceFactory().register(file);
+            payload.key = ds.getKey();
         }
         else {
             payload = results.iterator().next();
@@ -161,26 +174,30 @@ public class CoreService {
                      +" size="+payload.size
                      +" sha1="+payload.sha1);
         if (payload.id != null) { // already seen this file
-            File f = new File (work, payload.uuid);
-            f.delete();
-            
             throw new RuntimeException
                 ("File \""+name+"\" has already been uploaded!");
         }
-        else {
-            payload.title = params.get("title")[0];
-            payload.comments = params.get("comments")[0];
-            if (params.containsKey("uri"))
-                payload.uri = params.get("uri")[0];
-            payload.filename = name;
-            payload.mimeType = content;
-            payload.format = params.get("format")[0];
-            payload.shared = params.containsKey("shared")
-                ? "on".equalsIgnoreCase(params.get("shared")[0])
-                : false;
-            
-            payload.save();
-        }
+
+        payload.title = params.get("title")[0];
+        payload.comments = params.get("comments")[0];
+        if (params.containsKey("uri"))
+            payload.uri = params.get("uri")[0];
+        payload.filename = name;
+        payload.mimeType = content;
+        payload.format = params.get("format")[0];
+        payload.shared = params.containsKey("shared")
+            ? "on".equalsIgnoreCase(params.get("shared")[0])
+            : false;
+        
+        payload.save();
+        
+        Map<String, Object> param = new HashMap<String, Object>();
+        if (params.containsKey("delimiter"))
+            param.put(JobParams.DELIMITER, params.get("delimiter")[0]);
+        
+        SchedulerService scheduler = app.injector()
+            .instanceOf(SchedulerService.class);
+        scheduler.submit(PayloadScannerJob.class, param, payload);
         
         return payload;
     }
@@ -198,6 +215,11 @@ public class CoreService {
         else { // assume relative path for file
             URLConnection con = uri.toURL().openConnection();
             payload = upload (con.getInputStream());
+            if (payload.id != null) {
+                throw new RuntimeException
+                    ("URI \""+uri+"\" has already been uploaded!");
+            }
+            
             payload.title = params.get("title")[0];
             payload.comments = params.get("comments")[0];
             payload.uri = params.get("uri")[0];
@@ -215,12 +237,6 @@ public class CoreService {
                          +" size="+payload.size
                          +" sha1="+payload.sha1);
 
-            if (payload.id != null) {
-                File f = new File (work, payload.uuid);
-                f.delete();
-                throw new RuntimeException
-                    ("URI \""+uri+"\" has already been uploaded!");
-            }
             payload.save();
         }
         
@@ -233,44 +249,42 @@ public class CoreService {
     }
 
     public List<models.Payload> getPayloads () {
-        return models.Payload.find.order().desc("id").findList();       
+        return models.Payload.find
+            .where().isNull("deleted")
+            .order().desc("id").findList();
     }
 
     public models.Payload getPayload (String key) {
         List<models.Payload> payloads;  
         try {
             long id = Long.parseLong(key);
-            payloads = models.Payload.find.where().eq("id", id).findList();
+            payloads = models.Payload.find
+                .where().and(Expr.eq("id", id),
+                             Expr.isNull("deleted"))
+                .findList();
         }
         catch (NumberFormatException ex) {
             payloads = models.Payload.find
-                .where().ilike("sha1", key+"%").findList();
+                .where().and(Expr.ilike("sha1", key+"%"),
+                             Expr.isNull("deleted"))
+                .findList();
         }
         return payloads.isEmpty() ? null : payloads.iterator().next();
     }
 
     public models.Payload deletePayload (String key) {
-        models.Payload payload = getPayload (key);
-        if (payload != null) {
-            try {
-                File f = getFile (payload);
-                if (f != null) {
-                    payload.delete();
-                    f.delete();
-                    Logger.debug("Successfully deleted payload "+key);
+        models.Payload p = Ebean.execute(() -> {
+                models.Payload payload = getPayload (key);
+                if (payload != null) {
+                    payload.setDeleted(true);
+                    payload.save();
+                    Logger.debug("payload "+payload.id+" deleted!");
                 }
-                else {
-                    payload = null;
-                }
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-                Logger.trace("Delete failed for payload "
-                             +payload.id+"... ", ex);
-                payload = null;
-            }
-        }
-        return payload;
+                return payload;
+            });
+        File f = new File (work, p.uuid);
+        f.delete();
+        return p;
     }
 
     public List<models.Job> getJobs () {

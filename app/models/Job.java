@@ -21,9 +21,12 @@ public class Job extends Model {
     }
     
     @Id public Long id;
-    @Version Long version;
+    @Version public Long version;
     @CreatedTimestamp Timestamp created;
     @UpdatedTimestamp Timestamp updated;
+
+    @OneToOne(cascade=CascadeType.ALL)
+    public Principal owner;
     
     @Column(nullable=false)
     public String key; // job key
@@ -39,15 +42,39 @@ public class Job extends Model {
     public Job () {
     }
 
-    public void setStatus (Status status) {
+    public Job setKey (String key) {
+        this.key = key;
+        return this;
+    }
+    public String getKey () { return key; }
+    
+    public Job setStatus (Status status) {
         this.status = status;
+        return this;
     }
+    public Status getStatus () { return status; }
 
-    public void setFinished (Long finished) {
+    public Job setOwner (Principal owner) {
+        this.owner = owner;
+        return this;
+    }
+    public Principal getOwner () { return owner; }
+
+    public Job setFinished (Long finished) {
         this.finished = finished;
+        return this;
     }
+    public Long getFinished () { return finished; }
 
-    public void setPayload (Payload payload) {
-        this.payload = payload;
+    public Job setStarted (Long started) {
+        this.started = started;
+        return this;
     }
+    public Long getStarted () { return started; }
+
+    public Job setPayload (Payload payload) {
+        this.payload = payload;
+        return this;
+    }
+    public Payload getPayload () { return payload; }
 }

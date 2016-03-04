@@ -12,7 +12,7 @@
   <td><a href='@controllers.api.routes.Api.download(p.sha1())'
   	 title='Download payload'>@p.filename</a></td>
   <td>@p.size</td>
-  <td>@{new java.util.Date(p.timestamp)}</td>
+  <td>@p.updated</td>
   <td><code>@p.sha1()</code></td>
   <td><button class="btn btn-danger btn-xs"
   	      title="Delete payload"

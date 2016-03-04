@@ -33,11 +33,13 @@ import ix.curation.Entity;
 
 import services.GraphDbService;
 import services.CacheService;
+import services.CoreService;
 import services.WebSocketConsoleActor;
 
 public class MoleculeRegistrationJob extends RegistrationJob {
 
     @Inject CacheService cache;
+    @Inject CoreService service;
     String key; // current executing context key
     
     public MoleculeRegistrationJob () {
@@ -83,10 +85,29 @@ public class MoleculeRegistrationJob extends RegistrationJob {
                 DataSource ds = mef.register(url);
                 ctx.setResult(ds);
             }
+            else if (map.containsKey(PAYLOAD)) {
+                long id = map.getLong(PAYLOAD);
+                models.Payload payload = models.Payload.find.byId(id);
+                if (payload != null) {
+                    file = service.getFile(payload);
+                    if (file != null) {
+                        DataSource ds = mef.register(file);
+                        ctx.setResult(ds);
+                    }
+                    else
+                        throw new JobExecutionException
+                            ("Payload "+id+" has no file!");
+                }
+                else {
+                    throw new JobExecutionException
+                        ("Invalid payload "+id+" specified!");
+                }
+            }
             else {
                 // what should we do now?
                 throw new JobExecutionException
-                    ("Neither \""+FILE+"\" nor \""+URL+"\" parameter set!");
+                    ("Neither \""+FILE+"\" nor \""+URL+"\" nor \""
+                     +PAYLOAD+"\" parameter is set!");
             }
         }
     }

@@ -34,22 +34,27 @@
                   <input class="form-control" type="file" id="file" name="file">
 		</div>
 		<div class="form-group">
-		  <label for="uri">URI</label>
+		  <label for="uri">Source URI</label>
                   <input class="form-control" type="text" id="uri" name="uri">
 		</div>
 		<div class="form-group">
 		   <label for="format">Format</label>		
-		   <select name="format" id="format" class="form-control">
-		      <option value="CSV">CSV</option>
+		   <select name="format" id="format" class="form-control"
+		   	   onchange="onSelection(this)">
+		      <option value="CSV">CSV (Comma-delimited)</option>
+		      <option value="TSV">TSV (Tab-delimited)</option>
 		      <option value="TXT">Text</option>
-		      <option value="MOL">MDL/MOL/SMILES</option>
-		      <option value="ChEBML">ChEMBL</option>
-		      <option value="SRS">FDA SRS</option>
-		      <option value="NPC">NPC Dump</option>
-		      <option value="DrugBank">DrugBank</option>
-		      <option value="Integrity">Integrity</option>
+		      <option value="XLS">Excel</option>
+		      <option value="MOL">Molecular format (e.g., .mol, .sdf, .smiles)</option>
 		      <option value="Other">Other</option>
 		   </select>
+		</div>
+		<div class="form-group">
+		   <div class="input-group">
+		      <div class="input-group-addon">Delimiter</div>
+		      <input type="text" class="form-control" name="delimiter"
+		      	     id="delimiter-field">
+		   </div>
 		</div>
 		<div class="form-group">
 		  <input type="checkbox" name="shared"> This payload is public accessible
@@ -72,5 +77,14 @@
 }
 
 <script>
+$(document).ready(function () {
+    var el = $('#delimiter-field');
+    el.prop('disabled', el.value != 'TXT');
+});
+
+function onSelection(el) {
+  console.log('selection changed..'+el.value);
+  $('#delimiter-field').prop('disabled', el.value != 'TXT');
+}
 //$('#upload-form').validate();
 </script>

@@ -41,6 +41,9 @@ import static org.quartz.DateBuilder.*;
 
 import org.reflections.Reflections;
 import services.jobs.*;
+import models.Payload;
+
+import ix.curation.DataSource;
 
 @Singleton
 public class SchedulerService {
@@ -78,10 +81,12 @@ public class SchedulerService {
                                      CompletedExecutionInstruction execInst) {
             
             final String key = trigger.getKey().getName();
+            Object result = ctx.getResult();
+            
             Ebean.execute(() -> {
                     List<models.Job> jobs = models.Job.find
                         .where().eq("key", key).findList();
-                    Logger.debug("get job for "+key+"..."+jobs.size());
+
                     if (jobs.isEmpty()) {
                         Logger.error("Can't retrieve job "+key);
                     }
@@ -113,9 +118,16 @@ public class SchedulerService {
                     job.status = models.Job.Status.FIRED;
                     job.name = ctx.getJobInstance().getClass().getName();
                     job.started = ctx.getFireTime().getTime();
+                    if (ctx.getMergedJobDataMap()
+                        .containsKey(JobParams.PAYLOAD)) {
+                        Payload payload = Payload.find
+                            .byId(ctx.getMergedJobDataMap()
+                                  .getLong(JobParams.PAYLOAD));
+                        job.setPayload(payload);
+                    }
                     job.save();
                     
-                    Logger.debug("-- Job "+job.id+" created.. "+job.key);
+                    Logger.debug("++ Job "+job.id+" created.. "+job.key);
                 });
         }
     }
@@ -269,6 +281,15 @@ public class SchedulerService {
         trigger.getJobDataMap().put(RegistrationJob.URL, url);
         scheduler.scheduleJob(trigger);
         
+        return trigger.getKey().getName();
+    }
+
+    public String submit (Class<? extends Job> jobClass,
+                          Map<String, Object> params,
+                          models.Payload payload) throws SchedulerException {
+        Trigger trigger = setupJob (jobClass, params);
+        trigger.getJobDataMap().put(JobParams.PAYLOAD, payload.id);
+        scheduler.scheduleJob(trigger);
         return trigger.getKey().getName();
     }
 

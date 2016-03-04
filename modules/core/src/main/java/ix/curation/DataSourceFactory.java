@@ -95,11 +95,25 @@ public class DataSourceFactory implements Props {
 
     public DataSource register (File file) throws IOException {
         Util.FileStats stats = Util.stats(file);
-        String key = stats.sha1.substring(0, 9); // truncated sha1
+        String key = stats.sha1.substring(0,9); // truncated sha1
         try (Transaction tx = gdb.beginTx()) {
             DataSource ds = _register (key, file.getName());
             ds.set(SHA1, stats.sha1);
             ds.set(SIZE, stats.size);
+            ds.set(URI, file.getCanonicalFile().toURI().toString());
+            tx.success();
+            return ds;
+        }
+    }
+
+    /*
+     * register a key and name independent of the file
+     */
+    public DataSource register (String key, String name, File file)
+        throws IOException {
+        try (Transaction tx = gdb.beginTx()) {
+            DataSource ds = _register (key, name);
+            ds.set(SIZE, file.length());
             ds.set(URI, file.getCanonicalFile().toURI().toString());
             tx.success();
             return ds;

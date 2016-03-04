@@ -149,7 +149,7 @@
 			     <td><i class="fa fa-@if(p.shared){unlock}else{lock}"></i></td>
 			     <td><a href='@{controllers.app.routes.App.getPayload(p.sha1())}' title='View payload details'>@p.title</td>
 			     <td><a href='@{controllers.api.routes.Api.download(p.sha1())}' title='Download payload'>@p.filename</a></td>
-			     <td>@{new java.util.Date(p.timestamp)}</td>
+			     <td>@p.updated</td>
 			   </tr>
 			}
 		        </tbody>
