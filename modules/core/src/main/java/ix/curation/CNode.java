@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class CNode implements Props, Comparable<CNode> {
     static final Logger logger = Logger.getLogger(CNode.class.getName());
+    static protected final String RANK = "_rank";
 
     public static final String NODE_INDEX = ".node_index";
     public static final String RELATIONSHIP_INDEX = ".relationship_index";
@@ -200,7 +201,10 @@ public class CNode implements Props, Comparable<CNode> {
     }
 
     public static void _delete (Node node) {
-        GraphDatabaseService gdb = node.getGraphDatabase();     
+        GraphDatabaseService gdb = node.getGraphDatabase();
+
+        List<Node> children = new ArrayList<Node>();
+        Node best = null;
         for (Relationship rel : node.getRelationships()) {
             Node xn = rel.getOtherNode(node);
             if (xn.hasLabel(AuxNodeType.SNAPSHOT)
@@ -208,13 +212,102 @@ public class CNode implements Props, Comparable<CNode> {
                 rel.delete();
                 xn.delete();
             }
+            else if (rel.isType(AuxRelType.CC)) {
+                if (rel.getStartNode().equals(xn)) {
+                    if (best == null
+                        || ((Integer)best.getProperty(RANK)
+                            < (Integer)xn.getProperty(RANK))
+                        || xn.getId() < best.getId())
+                        best = xn;
+                    children.add(xn);
+                }
+                
+                if (xn.hasRelationship(AuxRelType.CC, Direction.INCOMING)) {
+                    for (Relationship r : xn.getRelationships
+                             (AuxRelType.CC, Direction.INCOMING)) {
+                        Node n = r.getOtherNode(xn);
+                        if (best == null
+                            || ((Integer)best.getProperty(RANK)
+                                < (Integer)n.getProperty(RANK))
+                            || n.getId() < best.getId())
+                            best = n;
+                        // grand children
+                        children.add(n);
+                    }
+                }
+                rel.delete();
+            }
         }
+
+        if (!children.isEmpty()) {
+            // we're deleting the root node of the underlying connected
+            // component
+            assert best == null:
+                "We're screwed; there should a best ranked cc child!";
+            
+            best.addLabel(AuxNodeType.COMPONENT);
+            for (Node n : children) {
+                if (n != best) {
+                    n.createRelationshipTo(best, AuxRelType.CC);
+                    best.setProperty(RANK, (Integer)n.getProperty(RANK)
+                                     + (Integer)best.getProperty(RANK));
+                }
+            }
+        }
+        
         for (String index : gdb.index().nodeIndexNames()) 
             gdb.index().forNodes(index).remove(node);
         
         node.delete();
     }
 
+    protected static Node getRoot (Node node) {
+        Relationship rel = node.getSingleRelationship
+            (AuxRelType.CC, Direction.OUTGOING);
+        if (rel != null) {
+            do {
+                node = rel.getOtherNode(node);
+                rel = node.getSingleRelationship
+                    (AuxRelType.CC, Direction.OUTGOING);
+            }
+            while (rel != null);
+        }
+        return node;
+    }
+
+    protected static boolean find (Node p, Node q) {
+        return getRoot(p).equals(getRoot (q));
+    }
+
+    protected static void union (Node p, Node q) {
+        Node P = getRoot (p);
+        Node Q = getRoot (q);
+        if (!P.equals(Q)) {
+            int rankp = (Integer)P.getProperty(RANK);
+            int rankq = (Integer)Q.getProperty(RANK);
+            if (rankp < rankq) {
+                if (!p.hasRelationship(AuxRelType.CC,
+                                       Direction.OUTGOING)) {
+                    // p -> q
+                    Relationship rel =
+                        p.createRelationshipTo(q, AuxRelType.CC);
+                    if (p.hasLabel(AuxNodeType.COMPONENT))
+                        p.removeLabel(AuxNodeType.COMPONENT);
+                    q.setProperty(RANK, rankq+rankp);
+                }
+            }
+            else if (!q.hasRelationship
+                     (AuxRelType.CC, Direction.OUTGOING)) {
+                // q -> p
+                Relationship rel =
+                    q.createRelationshipTo(p, AuxRelType.CC);
+                if (q.hasLabel(AuxNodeType.COMPONENT))
+                    q.removeLabel(AuxNodeType.COMPONENT);
+                p.setProperty(RANK, rankq+rankp);
+            }
+        }
+    }
+    
     public void execute (Runnable r) {
         try (Transaction tx = gdb.beginTx()) {
             r.run();
@@ -316,17 +409,17 @@ public class CNode implements Props, Comparable<CNode> {
         node.put("id", _node.getId());
         try (Transaction tx = gdb.beginTx()) {
             if (_node.hasProperty(KIND))
-                node.put("kind", (String)_node.getProperty(KIND));
+                node.put(KIND, (String)_node.getProperty(KIND));
 
             if (_node.hasProperty(NAME))
-                node.put("name", (String)_node.getProperty(NAME));
+                node.put(NAME, (String)_node.getProperty(NAME));
 
             if (_node.hasProperty(KEY))
-                node.put("key", (String)_node.getProperty(KEY));
+                node.put(KEY, (String)_node.getProperty(KEY));
             
-            node.put("created", (Long)_node.getProperty(CREATED));
+            node.put(CREATED, (Long)_node.getProperty(CREATED));
             if (_node.hasProperty(UPDATED))
-                node.put("lastUpdated", (Long)_node.getProperty(UPDATED));
+                node.put(UPDATED, (Long)_node.getProperty(UPDATED));
 
             DataSource ds = datasource ();
             if (ds != null) {

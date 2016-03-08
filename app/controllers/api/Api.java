@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import services.GraphDbService;
+import services.EntityService;
 import services.SchedulerService;
 import services.CacheService;
 import services.CoreService;
@@ -56,7 +56,7 @@ public class Api extends Controller {
     
     @Inject SchedulerService scheduler;
     @Inject play.Application app;
-    @Inject GraphDbService graphDb;
+    @Inject EntityService es;
     @Inject CacheService cache;
     @Inject CoreService service;
     
@@ -77,7 +77,7 @@ public class Api extends Controller {
 
     public Result getDataSources () {
         ArrayNode sources = mapper.createArrayNode();
-        for (DataSource ds : graphDb.getDataSourceFactory().datasources()) {
+        for (DataSource ds : es.datasources()) {
             ObjectNode node = mapper.createObjectNode();
             node.put("key", ds.getKey());
             node.put("name", ds.getName());
@@ -115,12 +115,11 @@ public class Api extends Controller {
                 try {
                     final String key = routes.Api.getMetrics(label).toString();
                     return cache.getOrElse
-                        (graphDb.getLastUpdated(), key,new Callable<Result> () {
+                        (es.getLastUpdated(), key,new Callable<Result> () {
                                 public Result call () throws Exception {
                                     Logger.debug("Cache missed: "+key);
                                     return ok ((JsonNode)mapper.valueToTree
-                                               (graphDb.getEntityFactory()
-                                                .calcGraphMetrics(label)));
+                                               (es.calcMetrics(label)));
                                 }
                             });
                 }
@@ -136,7 +135,7 @@ public class Api extends Controller {
 
     public Result getNode (Long id) {
         try {
-            CNode n = graphDb.getNode(id);
+            CNode n = es.getNode(id);
             if (n != null) {
                 return ok (n.toJson());
             }

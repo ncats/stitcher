@@ -16,7 +16,7 @@ import ix.curation.EntityFactory;
 import ix.curation.GraphDb;
 import ix.curation.GraphMetrics;
 
-import services.GraphDbService;
+import services.EntityService;
 import services.CacheService;
 
 @DisallowConcurrentExecution
@@ -24,7 +24,7 @@ import services.CacheService;
 public class CalcMetricsJob implements Job, JobParams {
     static final AtomicLong lastRun = new AtomicLong ();
     
-    @Inject protected GraphDbService service;
+    @Inject protected EntityService service;
     @Inject protected CacheService cache;
 
     public CalcMetricsJob () {
@@ -40,8 +40,7 @@ public class CalcMetricsJob implements Job, JobParams {
                          +" triggered...");
 
             if (lastRun.get() < service.getLastUpdated()) {
-                Object metrics = service.getEntityFactory()
-                    .calcGraphMetrics();
+                Object metrics = service.calcMetrics();
                 ctx.setResult(metrics);
                 cache.set(METRICS, metrics, 0);
                 lastRun.set(System.currentTimeMillis());
@@ -49,8 +48,7 @@ public class CalcMetricsJob implements Job, JobParams {
             else {
                 Object metrics = cache.get(METRICS);
                 if (metrics == null) {
-                    metrics = service.getEntityFactory()
-                        .calcGraphMetrics();
+                    metrics = service.calcMetrics();
                     cache.set(METRICS, metrics, 0);
                     lastRun.set(System.currentTimeMillis());
                 }

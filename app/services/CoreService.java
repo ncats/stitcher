@@ -140,9 +140,9 @@ public class CoreService {
             payload.size = size;
             
             // also register this as a curation datasource
-            GraphDbService gdb = app.injector()
-                .instanceOf(GraphDbService.class);
-            DataSource ds = gdb.getDataSourceFactory().register(file);
+            EntityService es = app.injector()
+                .instanceOf(EntityService.class);
+            DataSource ds = es.register(file);
             payload.key = ds.getKey();
         }
         else {

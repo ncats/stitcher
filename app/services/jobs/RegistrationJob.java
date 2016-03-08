@@ -11,12 +11,12 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobExecutionContext;
 
 import ix.curation.GraphDb;
-import services.GraphDbService;
+import services.EntityService;
 
 public abstract class RegistrationJob
     implements Job, JobParams, PropertyChangeListener {
     
-    @Inject protected GraphDbService service;
+    @Inject protected EntityService service;
     
     protected int count;
     protected int error;

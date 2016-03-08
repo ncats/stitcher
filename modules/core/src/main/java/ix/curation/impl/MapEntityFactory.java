@@ -62,7 +62,7 @@ public class MapEntityFactory extends EntityRegistry<Map<String, Object>> {
                 public Entity call () throws Exception {
                     return _register (map);
                 }
-            });
+            }, true);
     }
 
     protected Entity _register (Map<String, Object> map) {

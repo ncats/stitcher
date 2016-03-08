@@ -19,6 +19,10 @@ import static org.junit.Assert.assertTrue;
 public class TestCore extends EntityRegistry<TestCore.TestPayload> {
     static final Logger logger = Logger.getLogger(TestCore.class.getName());
 
+    static {
+        GraphDb.addShutdownHook();
+    }
+
     static class TestPayload extends DefaultPayload {
         EntityType type;
 
@@ -158,7 +162,7 @@ public class TestCore extends EntityRegistry<TestCore.TestPayload> {
         assertTrue ("c. failure -- there should be 3 entities with N_Name=one "
                     , count == 3);
 
-        CurationMetrics metrics = calcCurationMetrics();
+        GraphMetrics metrics = calcGraphMetrics();
         logger.info("CurationMetric: "+Util.toJson(metrics));
         for (StitchKey key : Entity.KEYS) {
             Map<Object, Integer> dist = getStitchedValueDistribution (key);
@@ -265,7 +269,7 @@ public class TestCore extends EntityRegistry<TestCore.TestPayload> {
 
         // now delete everything..
         delete (getDataSource ());
-        metrics = calcCurationMetrics();
+        metrics = calcGraphMetrics();
         assertTrue ("11. failure -- number of entities should "
                     +"be 0 but instead is "+metrics.getEntityCount(),
                     0 == metrics.getEntityCount());

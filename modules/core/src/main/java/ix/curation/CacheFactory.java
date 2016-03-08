@@ -45,23 +45,6 @@ public class CacheFactory
     static final Map<File, CacheFactory> CACHES =
         new ConcurrentHashMap<File, CacheFactory>();
 
-    /*
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-                // do shutdown work here
-                public void run () {
-                    for (CacheFactory cf : CACHES.values()) {
-                        cf.cache.getCacheManager()
-                            .removeCache(cf.cache.getName());
-                        logger.info
-                            ("##### Shutting down cache: "
-                             +cf.cache.getName()+" ("+cf.refs+") #####");
-                    }
-                }
-            });
-    }
-    */
-    
     protected final File dir;
     protected final Ehcache cache;
     protected final AtomicLong refs = new AtomicLong (1l);
@@ -294,6 +277,21 @@ public class CacheFactory
             write (elm);
     }
 
+    public static void addShutdownHook () {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+                // do shutdown work here
+                public void run () {
+                    for (CacheFactory cf : CACHES.values()) {
+                        cf.cache.getCacheManager()
+                            .removeCache(cf.cache.getName());
+                        logger.info
+                            ("##### Shutting down cache: "
+                             +cf.cache.getName()+" ("+cf.refs+") #####");
+                    }
+                }
+            });
+    }
+    
     public static void main (String[] argv) throws Exception {
         if (argv.length == 0) {
             System.err.println("Usage: "+CacheFactory.class.getName()

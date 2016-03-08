@@ -25,7 +25,8 @@ import org.neo4j.graphdb.traversal.*;
 
 public class Entity extends CNode {
     static final Logger logger = Logger.getLogger(Entity.class.getName());
-
+    static protected final String RANK = "_rank";
+    
     public static StitchKey[] KEYS = EnumSet.allOf(StitchKey.class)
         .toArray(new StitchKey[0]);
     public static EntityType[] TYPES = EnumSet.allOf(EntityType.class)
@@ -73,6 +74,12 @@ public class Entity extends CNode {
         if (type == null)
             throw new IllegalArgumentException
                 ("Node does not have label of EntityType");
+
+        if (!node.hasProperty(RANK)) {
+            // setup node for connected component
+            node.setProperty(RANK, 1);
+            node.addLabel(AuxNodeType.COMPONENT);           
+        }           
     }
 
     public EntityType type () { return type; }
@@ -633,6 +640,7 @@ public class Entity extends CNode {
                 rel.setProperty(CREATED, System.currentTimeMillis());
                 rel.setProperty(VALUE, value); 
                 relindx.add(rel, key.name(), value);
+                union (n, node);
                 
                 logger.info(node.getId()
                             +" <-["+key+":\""+value+"\"]-> "+n.getId());
@@ -812,5 +820,66 @@ public class Entity extends CNode {
             }
         }
         return null;
+    }
+
+    protected static Node getRoot (Node node) {
+        Relationship rel = node.getSingleRelationship
+            (AuxRelType.CC, Direction.OUTGOING);
+        if (rel != null) {
+            do {
+                node = rel.getOtherNode(node);
+                rel = node.getSingleRelationship
+                    (AuxRelType.CC, Direction.OUTGOING);
+            }
+            while (rel != null);
+        }
+        return node;
+    }
+
+    protected static boolean find (Node p, Node q) {
+        return getRoot(p).equals(getRoot (q));
+    }
+
+    protected static void union (Node p, Node q) {
+        Node P = getRoot (p);
+        Node Q = getRoot (q);
+        if (!P.equals(Q)) {
+            int rankp = (Integer)P.getProperty(RANK);
+            int rankq = (Integer)Q.getProperty(RANK);
+            if (rankp < rankq) {
+                if (!p.hasRelationship(AuxRelType.CC,
+                                       Direction.OUTGOING)) {
+                    Relationship rel =
+                        p.createRelationshipTo(q, AuxRelType.CC);
+                    if (p.hasLabel(AuxNodeType.COMPONENT))
+                        p.removeLabel(AuxNodeType.COMPONENT);
+                    q.setProperty(RANK, rankq+rankp);
+                }
+            }
+            else if (!q.hasRelationship
+                     (AuxRelType.CC, Direction.OUTGOING)) {
+                Relationship rel =
+                    q.createRelationshipTo(p, AuxRelType.CC);
+                if (q.hasLabel(AuxNodeType.COMPONENT))
+                    q.removeLabel(AuxNodeType.COMPONENT);
+                p.setProperty(RANK, rankq+rankp);
+            }
+        }
+    }
+
+    public boolean stitched (long id) {
+        try (Transaction tx = gdb.beginTx()) {
+            return find (_node, gdb.getNodeById(id));
+        }
+    }
+    
+    public boolean stitched (Entity ent) {
+        try (Transaction tx = gdb.beginTx()) {
+            return find (_node, ent._node);
+        }
+    }
+
+    public void union (Entity ent) {
+        union (_node, ent._node);
     }
 }

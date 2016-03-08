@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <logger name="net.sf.ehcache" level="warn" additivity="false">
+    <appender-ref ref="STDOUT" />
+  </logger>
+  
+  <root level="error">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

@@ -22,6 +22,11 @@ lazy val commonDependencies = Seq(
   cache,
   javaWs,
   "org.neo4j" % "neo4j" % "2.3.2",
+  "org.apache.lucene" % "lucene-facet" % "3.6.2",
+  "org.apache.lucene" % "lucene-highlighter" % "3.6.2",
+  "org.apache.lucene" % "lucene-queryparser" % "3.6.2",
+  "org.apache.lucene" % "lucene-queries" % "3.6.2",
+  "org.apache.lucene" % "lucene-analyzers" % "3.6.2",
   "net.sf.ehcache" % "ehcache" % "2.10.1",
   "org.quartz-scheduler" % "quartz" % "2.2.2",
   "org.reflections" % "reflections" % "0.9.10" notTransitive (),
@@ -73,9 +78,11 @@ public class BuildInfo {
 
 lazy val core = (project in file("modules/core"))
   .settings(commonSettings: _*)
-  .settings(
-  name := "ixcurator-core",
+  .settings(name := "ixcurator-core",
     unmanagedBase <<= baseDirectory { base => base / "../../lib" },
+    cleanFiles <<= baseDirectory {
+      base => ((base / "../../") ** "_ix*.db").get
+    },
     libraryDependencies ++= commonDependencies,
     javacOptions ++= javaBuildOptions
 ).dependsOn(buildinfo).aggregate(buildinfo)

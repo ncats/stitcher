@@ -6,5 +6,6 @@ import org.neo4j.graphdb.RelationshipType;
  * auxilary relationship
  */
 public enum AuxRelType implements RelationshipType {
-    PAYLOAD
+    PAYLOAD,
+    CC // UnionFind connected component
 }

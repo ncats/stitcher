@@ -13,7 +13,7 @@ import play.db.ebean.Transactional;
 
 import views.html.*;
 
-import services.GraphDbService;
+import services.EntityService;
 import services.SchedulerService;
 import services.CoreService;
 import services.jobs.*;
@@ -25,7 +25,7 @@ public class App extends Controller {
     //@Inject WSClient ws;
     @Inject public SchedulerService scheduler;
     @Inject play.Application app;
-    @Inject public GraphDbService graphDb;
+    @Inject public EntityService es;
     @Inject public CoreService service;
 
     public App () {

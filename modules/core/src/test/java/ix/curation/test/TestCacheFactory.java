@@ -17,6 +17,10 @@ import static org.junit.Assert.assertTrue;
 public class TestCacheFactory {
     static final Logger logger =
         Logger.getLogger(TestCacheFactory.class.getName());
+
+    static {
+        CacheFactory.addShutdownHook();
+    }
     
     @Rule public TestName name = new TestName();
     

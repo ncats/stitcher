@@ -31,7 +31,7 @@ import ix.curation.StitchKey;
 import ix.curation.DataSource;
 import ix.curation.Entity;
 
-import services.GraphDbService;
+import services.EntityService;
 import services.CacheService;
 import services.CoreService;
 import services.WebSocketConsoleActor;

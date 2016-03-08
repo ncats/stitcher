@@ -831,17 +831,27 @@ public class EntityFactory implements Props {
     }
 
     public void execute (Runnable r) {
+        execute (r, true);
+    }
+    
+    public void execute (Runnable r, boolean commit) {
         try (Transaction tx = gdb.beginTx()) {
             r.run();
-            tx.success();
+            if (commit)
+                tx.success();
         }
     }
-
+ 
     public <V> V execute (Callable<V> c) {
+        return execute (c, true);
+    }
+    
+    public <V> V execute (Callable<V> c, boolean commit) {
         V result = null;
         try (Transaction tx = gdb.beginTx()) {
             result = c.call();
-            tx.success();
+            if (commit)
+                tx.success();
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't execute callable", ex);

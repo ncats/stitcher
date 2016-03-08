@@ -19,6 +19,10 @@ import static org.junit.Assert.assertTrue;
 public class TestDataSourceFactory {
     static final Logger logger =
         Logger.getLogger(TestDataSourceFactory.class.getName());
+
+    static {
+        GraphDb.addShutdownHook();
+    }
     
     @Rule public TestName name = new TestName();
 
@@ -46,7 +50,7 @@ public class TestDataSourceFactory {
             ("/jsonDumpINN100.txt.gz");
         srs.register(url);
         
-        CurationMetrics metrics = srs.calcCurationMetrics();
+        GraphMetrics metrics = srs.calcGraphMetrics();
         assertTrue ("Expecting entity count to be 99 but instead got "
                     +metrics.getEntityCount(), metrics.getEntityCount() == 99);
         assertTrue ("Expecting stitch count to be 0 but instead got "
@@ -180,7 +184,7 @@ public class TestDataSourceFactory {
                     cliques.size() == 2);
         
         // calculate connected components
-        CurationMetrics metrics = mef.calcCurationMetrics();
+        GraphMetrics metrics = mef.calcGraphMetrics();
         int cc1 = 0;
         Set<DataSource> ds = new HashSet<DataSource>();
         for (Iterator<Entity> it = mef.entities("CC_1"); it.hasNext(); ++cc1) {

@@ -22,6 +22,10 @@ import static org.junit.Assert.assertTrue;
 public class TestClique {
     @Rule public TestName name = new TestName();
     static final File TEMPDIR = new File (".");
+
+    static {
+        //GraphDb.addShutdownHook();
+    }
     
     class MyCliqueVisitor implements CliqueVisitor {
         public EnumSet<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
@@ -59,11 +63,14 @@ public class TestClique {
             for (StitchKey k : keys)
                 reg.add(k, k.name());
 
+            Entity ent = null;
             for (int i = 0; i < keys.size(); ++i) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 for (StitchKey k : keys)
                     map.put(k.name(), k+"-value");
-                reg.register(map);
+                Entity e = reg.register(map);
+                if (ent == null)
+                    ent = e;
             }
 
             Map<String, Object> map = new HashMap<String, Object>();
@@ -81,6 +88,8 @@ public class TestClique {
             assertTrue ("Expecting "+keys.size()+" matching keys, but instead "
                         +"got "+visitor.keys.size(),
                         visitor.keys.containsAll(keys));
+
+            ent.delete();
         }
         finally {
             graphDb.shutdown();
