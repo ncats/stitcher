@@ -282,18 +282,22 @@ public class CNode implements Props, Comparable<CNode> {
         if (!P.equals(Q)) {
             int rankp = (Integer)P.getProperty(RANK);
             int rankq = (Integer)Q.getProperty(RANK);
-            if (rankp < rankq) { // P -> Q
+            long dif = rankp - rankq;
+            if (dif == 0) {
+                // if two ranks are the same, we designate the older
+                // node as the parent
+                dif = Q.getId() - P.getId();
+            }
+            if (dif < 0) { // P -> Q
                 Relationship rel =
                     P.createRelationshipTo(Q, AuxRelType.CC);
-                //if (P.hasLabel(AuxNodeType.COMPONENT))
-                    P.removeLabel(AuxNodeType.COMPONENT);
+                P.removeLabel(AuxNodeType.COMPONENT);
                 Q.setProperty(RANK, rankq+rankp);
             }
             else { // Q -> P
                 Relationship rel =
                     Q.createRelationshipTo(P, AuxRelType.CC);
-                //if (Q.hasLabel(AuxNodeType.COMPONENT))
-                    Q.removeLabel(AuxNodeType.COMPONENT);
+                Q.removeLabel(AuxNodeType.COMPONENT);
                 P.setProperty(RANK, rankq+rankp);
             }
         }
@@ -442,6 +446,9 @@ public class CNode implements Props, Comparable<CNode> {
                 }
                 else if (n.hasLabel(AuxNodeType.DATA)) {
                     payload = n;
+                }
+                else if (n.hasLabel(AuxNodeType.COMPONENT)) {
+                    // should do something here..
                 }
                 else {
                     ObjectNode nb = mapper.createObjectNode();

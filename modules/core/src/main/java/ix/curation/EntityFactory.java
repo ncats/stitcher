@@ -16,6 +16,7 @@ import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Resource;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -669,6 +670,32 @@ public class EntityFactory implements Props {
 
     public Iterator<Entity[]> connectedComponents () {
         return new ConnectedComponents (gdb);
+    }
+
+    public Entity[] entities (String label, int skip, int top) {
+        return entities (DynamicLabel.label(label), skip, top);
+    }
+    
+    public Entity[] entities (Label label, int skip, int top) {
+        List<Entity> page = new ArrayList<Entity>();
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("skip", skip);
+        params.put("top", top);
+
+        //System.out.println("components: skip="+skip+" top="+top);
+        try (Transaction tx = gdb.beginTx();
+             Result result = gdb.execute
+             ("match(n:`"+label+"`) return n skip {skip} limit {top}", params)
+             ) {
+            while (result.hasNext()) {
+                Map<String, Object> row = result.next();
+                //System.out.println("  rows: "+row);
+                page.add(Entity._getEntity((Node)row.get("n")));
+            }
+            result.close();
+        }
+        
+        return page.toArray(new Entity[0]);
     }
 
     public Iterator<Entity> find (StitchKey key, Object value) {

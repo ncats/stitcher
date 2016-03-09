@@ -4,6 +4,7 @@
 GET	/datasources	controllers.api.Api.getDataSources
 GET	/metrics		controllers.api.Api.getMetrics(label: String ?= null)
 GET	/node/:id		controllers.api.Api.getNode(id: Long)
+GET	/entities/:label	controllers.api.Api.entities(label: String, skip: Integer ?= null, top: Integer ?= 10)
 GET	/console/:key	    controllers.api.Api.console(key: String)
 GET	/echo	controllers.api.Api.echo
 POST	/upload	controllers.api.Api.uploader

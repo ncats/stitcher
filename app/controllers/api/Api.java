@@ -224,4 +224,28 @@ public class Api extends Controller {
         }
         return internalServerError ("Unable to delete payload "+key);
     }
+
+    public Result entities (String label, Integer skip, Integer top) {
+        if ("@labels".equalsIgnoreCase(label)) {
+            return ok ((JsonNode)mapper.valueToTree
+                       (EnumSet.allOf(AuxNodeType.class)));
+        }
+        int s = skip != null ? skip : 0;
+        int t = top != null ? Math.min(top,1000) : 10;
+        
+        Entity[] entities = es.entities(label, s, t);
+        ArrayNode page = mapper.createArrayNode();
+        for (Entity e : entities) {
+            page.add(e.toJson());
+        }
+
+        ObjectNode result = mapper.createObjectNode();
+        result.put("skip", s);
+        result.put("top", t);
+        result.put("count", entities.length);
+        result.put("uri", request().uri());
+        result.put("contents", page);
+        
+        return ok (result);
+    }
 }

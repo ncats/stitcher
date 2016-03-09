@@ -146,6 +146,13 @@ public class GraphDb extends TransactionEventHandler.Adapter {
             cache.shutdown();
             gdb.shutdown();
         }
+        try {
+            taxonWriter.close();            
+            indexWriter.close();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public CNode getNode (long id) {

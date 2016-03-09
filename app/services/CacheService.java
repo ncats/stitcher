@@ -14,6 +14,7 @@ import play.Application;
 import play.inject.ApplicationLifecycle;
 import play.libs.F;
 
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -30,7 +31,7 @@ public class CacheService implements CacheApi {
     public static final String CACHE_TIME_TO_LIVE = "ix.cache.timeToLive";
     public static final String CACHE_TIME_TO_IDLE = "ix.cache.timeToIdle";
 
-    final Cache cache;
+    final Ehcache cache;
 
     @Inject
     public CacheService (Application app, ApplicationLifecycle lifecycle) {
@@ -42,8 +43,8 @@ public class CacheService implements CacheApi {
                                .getInt(CACHE_TIME_TO_LIVE, TIME_TO_LIVE))
             .timeToIdleSeconds(app.configuration()
                                .getInt(CACHE_TIME_TO_IDLE, TIME_TO_IDLE));
-        cache = new Cache (config);
-        CacheManager.getInstance().addCache(cache);     
+        cache = CacheManager.getInstance()
+            .addCacheIfAbsent(new Cache (config));
         cache.setSampledStatisticsEnabled(true);
 
         lifecycle.addStopHook(() -> {

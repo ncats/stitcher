@@ -19,7 +19,6 @@ public class EntityService {
         
     // unique data source associated with this instance
     protected DataSource datasource;
-    
     protected GraphDb graphDb;
     protected CoreService service;
     protected EntityFactory efac;
@@ -32,7 +31,7 @@ public class EntityService {
         try {
             graphDb = GraphDb.getInstance(service.dataDir(),
                                           service.getCacheFactory());
-            efac = new EntityFactory (graphDb);
+
             dsfac = new DataSourceFactory (graphDb);
             datasource = dsfac.getDataSourceByName(DATASOURCE);
             if (datasource == null) {
@@ -42,6 +41,7 @@ public class EntityService {
                     ("Data source "+datasource
                      +" ("+datasource.getId()+") registered...");
             }
+            efac = new EntityFactory (graphDb);     
         }
         catch (IOException ex) {
             ex.printStackTrace();
@@ -60,8 +60,15 @@ public class EntityService {
     }
 
     public GraphDb getGraphDb () { return graphDb; }
-    public EntityFactory getEntityFactory () { return efac; }
-    public DataSourceFactory getDataSourceFactory () { return dsfac; }
+
+    public EntityFactory getEntityFactory () { 
+        return efac;
+    }
+    
+    public DataSourceFactory getDataSourceFactory () {
+        return dsfac;
+    }
+    
     public long getLastUpdated () { return graphDb.getLastUpdated(); }
     public CNode getNode (long id) { return graphDb.getNode(id); }
 
@@ -70,13 +77,32 @@ public class EntityService {
     }
 
     public Set<DataSource> datasources () {
-        return dsfac.datasources();
+        return getDataSourceFactory().datasources();
     }
 
     public GraphMetrics calcMetrics (String label) {
-        return efac.calcGraphMetrics(label);
+        return getEntityFactory().calcGraphMetrics(label);
     }
+    
     public GraphMetrics calcMetrics () {
-        return efac.calcGraphMetrics();
+        return getEntityFactory().calcGraphMetrics();
+    }
+
+    public Entity[] entities (String label, int skip, int top) {
+        AuxNodeType type;
+        if (label == null) {
+            type = AuxNodeType.ENTITY;
+        }
+        else {
+            try {
+                type = AuxNodeType.valueOf(label.toUpperCase());
+            }
+            catch (Exception ex) {
+                //ex.printStackTrace();
+                //Logger.error("Unknown entity label \""+label+"\"!");
+                return getEntityFactory().entities(label, skip, top);
+            }
+        }
+        return getEntityFactory().entities(type, skip, top);
     }
 }
