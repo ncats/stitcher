@@ -84,6 +84,7 @@ lazy val core = (project in file("modules/core"))
       base => ((base / "../../") ** "_ix*.db").get
     },
     libraryDependencies ++= commonDependencies,
+    libraryDependencies += "com.typesafe" % "config" % "1.2.0",
     javacOptions ++= javaBuildOptions
 ).dependsOn(buildinfo).aggregate(buildinfo)
 

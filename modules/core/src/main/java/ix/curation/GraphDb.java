@@ -31,7 +31,9 @@ import org.apache.lucene.facet.index.CategoryContainer;
 /**
  * wrapper around GraphDatabaseService instance
  */
-public class GraphDb extends TransactionEventHandler.Adapter {
+public class GraphDb extends TransactionEventHandler.Adapter
+    implements KernelEventHandler {
+    
     static final String DEFAULT_CACHE = "cache"; // cache
     static final String DEFAULT_TAXON = "taxon"; // facet index
     static final String DEFAULT_INDEX = "index"; // lucene index
@@ -45,8 +47,7 @@ public class GraphDb extends TransactionEventHandler.Adapter {
 
     protected final File dir;
     protected final GraphDatabaseService gdb;
-    protected final AtomicLong refs = new AtomicLong (1l);
-    protected final CacheFactory cache;
+    protected CacheFactory cache;
     protected final AtomicLong lastUpdated = new AtomicLong ();
 
     protected IndexWriter indexWriter;
@@ -66,6 +67,7 @@ public class GraphDb extends TransactionEventHandler.Adapter {
     protected GraphDb (File dir, CacheFactory cache) throws IOException {
         gdb = new GraphDatabaseFactory().newEmbeddedDatabase(dir);
         gdb.registerTransactionEventHandler(this);
+        gdb.registerKernelEventHandler(this);
 
         File ixdb = new File (dir, DEFAULT_IXDB);
         ixdb.mkdirs();
@@ -139,20 +141,17 @@ public class GraphDb extends TransactionEventHandler.Adapter {
     public long getLastUpdated () { return lastUpdated.get(); }
     public GraphDatabaseService graphDb () { return gdb; }
     public CacheFactory getCache () { return cache; }
+    public void setCache (CacheFactory cache) {
+        if (cache == null)
+            throw new IllegalArgumentException ("Cache can't be null");
+        this.cache.shutdown();
+        this.cache = cache;
+    }
+    
     public File getPath () { return dir; }
     public void shutdown () {
-        if (refs.decrementAndGet() <= 1l) {
-            INSTANCES.remove(dir);
-            cache.shutdown();
-            gdb.shutdown();
-        }
-        try {
-            taxonWriter.close();            
-            indexWriter.close();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        cache.shutdown();
+        gdb.shutdown();
     }
 
     public CNode getNode (long id) {
@@ -167,6 +166,33 @@ public class GraphDb extends TransactionEventHandler.Adapter {
             }
         }
         return null;
+    }
+
+    /*
+     * KernelEventHandler
+     */
+    public void beforeShutdown () {
+        INSTANCES.remove(dir);  
+        try {
+            taxonWriter.close();
+            indexWriter.close();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public Object getResource () {
+        return null;
+    }
+
+    public void kernelPanic (ErrorState error) {
+        logger.log(Level.SEVERE, "Graph kernel panic: "+error);
+    }
+
+    public KernelEventHandler.ExecutionOrder orderComparedTo
+        (KernelEventHandler other) {
+        return KernelEventHandler.ExecutionOrder.DOESNT_MATTER;
     }
 
     public static GraphDb createTempDb () throws IOException {
@@ -208,8 +234,8 @@ public class GraphDb extends TransactionEventHandler.Adapter {
         return getInstance (new File (dir), cache);
     }
 
-    public static synchronized GraphDb getInstance
-        (File dir) throws IOException {
+    public static synchronized GraphDb getInstance (File dir)
+        throws IOException {
         return getInstance (dir, null);
     }
     
@@ -218,9 +244,6 @@ public class GraphDb extends TransactionEventHandler.Adapter {
         GraphDb gdb = INSTANCES.get(dir);
         if (gdb == null) {
             INSTANCES.put(dir, gdb = new GraphDb (dir, cache));
-        }
-        else {
-            gdb.refs.incrementAndGet();
         }
         return gdb;
     }
@@ -238,10 +261,9 @@ public class GraphDb extends TransactionEventHandler.Adapter {
                 public void run () {
                     for (GraphDb gdb : INSTANCES.values()) {
                         gdb.graphDb().shutdown();
-                        gdb.cache.shutdown();
                         logger.info
                             ("##### Shutting Down Graph Database: "
-                             +gdb.dir+" ("+gdb.refs+") #####");
+                             +gdb.dir+" #####");
                     }
                 }
             });

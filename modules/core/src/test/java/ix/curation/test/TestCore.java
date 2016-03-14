@@ -16,7 +16,7 @@ import ix.curation.impl.*;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
-public class TestCore extends EntityRegistry<TestCore.TestPayload> {
+public class TestCore extends EntityRegistry {
     static final Logger logger = Logger.getLogger(TestCore.class.getName());
 
     static {
@@ -95,7 +95,6 @@ public class TestCore extends EntityRegistry<TestCore.TestPayload> {
         return entities;
     }
 
-    @Override
     public Entity register (final TestPayload payload) {
         Entity ent = Entity._getEntity(_createNode (payload.type));
         return ent._add(payload);

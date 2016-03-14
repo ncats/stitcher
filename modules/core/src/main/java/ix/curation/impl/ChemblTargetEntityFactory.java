@@ -16,33 +16,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
-public class ChemblTargetEntityFactory extends EntityRegistry<Target> {
+public class ChemblTargetEntityFactory extends EntityRegistry {
     static Logger log;
-
-    protected EnumMap<StitchKey, Set<String>> stitches =
-            new EnumMap<StitchKey, Set<String>>(StitchKey.class);
 
     public ChemblTargetEntityFactory(GraphDatabaseService gdb) {
         super(gdb);
     }
 
-    public void clear() {
-        stitches.clear();
-    }
-
-    public void add(StitchKey key, String property) {
-        Set<String> props = stitches.get(key);
-        if (props == null) {
-            stitches.put(key, props = new TreeSet<String>());
-        }
-        props.add(property);
-    }
-
-    public Set<String> get(StitchKey key) {
-        return stitches.get(key);
-    }
-
-    @Override
     public Entity register (final Target target) {
         // execute in transaction context
         return execute (new Callable<Entity> () {

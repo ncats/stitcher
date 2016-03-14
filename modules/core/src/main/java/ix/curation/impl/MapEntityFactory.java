@@ -22,15 +22,10 @@ import java.util.concurrent.Callable;
 
 import ix.curation.*;
 
-public class MapEntityFactory extends EntityRegistry<Map<String, Object>> {
+public class MapEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(MapEntityFactory.class.getName());
 
-    private String idField = null;
-
-    protected EnumMap<StitchKey, Set<String>> stitches =
-        new EnumMap<StitchKey, Set<String>>(StitchKey.class);
-    
     public MapEntityFactory (String dir) throws IOException {
         super (dir);
     }
@@ -43,46 +38,6 @@ public class MapEntityFactory extends EntityRegistry<Map<String, Object>> {
         super (graphDb);
     }
     
-    public void setId(String idField) {this.idField = idField;}
-    public void clear () { stitches.clear(); }    
-    public void add (StitchKey key, String property) {
-        Set<String> props = stitches.get(key);
-        if (props == null) {
-            stitches.put(key, props = new TreeSet<String>());
-        }
-        props.add(property);
-    }
-    public Set<String> get (StitchKey key) {
-        return stitches.get(key);
-    }
-
-    @Override
-    public Entity register (final Map<String, Object> map) {
-        return execute (new Callable<Entity> () {
-                public Entity call () throws Exception {
-                    return _register (map);
-                }
-            }, true);
-    }
-
-    protected Entity _register (Map<String, Object> map) {
-        Entity ent = Entity._getEntity(_createNode (EntityType.Agent));
-        String id = null;
-        if (idField != null && map.containsKey(idField))
-            id = map.get(idField).toString();
-
-        DefaultPayload payload = new DefaultPayload (getDataSource ());
-        payload.putAll(map);
-        
-        for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
-            for (String prop : me.getValue()) {
-                ent._add(me.getKey(), new StitchValue (prop, map.get(prop)));
-            }
-        }
-        ent._add(payload);
-        return ent;
-    }
-
     public DataSource register (File file,  String... header)
         throws IOException {
         return register (file, "\t", header);
@@ -121,7 +76,7 @@ public class MapEntityFactory extends EntityRegistry<Map<String, Object>> {
     public int register (InputStream is, String delim, String... header)
         throws IOException {
         BufferedReader br = new BufferedReader (new InputStreamReader (is));
-        int ln = 1;
+        int ln = 1, count = 0;
         for (String line; (line = br.readLine()) != null; ++ln) {
             String[] toks = line.split(delim);
             if (header == null) {
@@ -144,52 +99,14 @@ public class MapEntityFactory extends EntityRegistry<Map<String, Object>> {
                 }
                 
                 Entity ent = register (row);
+                if (ent != null)
+                    ++count;
             }
         }
-        return ln;
+        return count;
     }
 
     public static void main (String[] argv) throws Exception {
-        if (argv.length < 2) {
-            System.err.println("Usage: "+MapEntityFactory.class.getName()
-                               +" DBDIR [sourcelabel] FILE PROPS...");
-            System.exit(1);
-        }
-        
-        MapEntityFactory mef = new MapEntityFactory (argv[0]);
-        for (int i = 3; i < argv.length; ++i) {
-            String[] toks = argv[i].split(":");
-            if (toks.length == 2) {
-                if ("id".equalsIgnoreCase(toks[0])) {
-                    mef.setId(toks[1]);
-                    logger.info("id property: "+toks[1]);
-                }
-                else {
-                    StitchKey key = StitchKey.valueOf(toks[0]);
-                    mef.add(key, toks[1]);
-                    logger.info(key + " => \"" + toks[1] + "\"");
-                }
-            }
-        }
-
-        try {
-            if (argv[2].startsWith("http")) {
-                DataSource ds = mef.register(new URL (argv[2]));
-                ds.setName(argv[1]);
-            }
-            else {
-                File file = new File (argv[2]);
-                if (file.exists()) {
-                    DataSource ds = mef.register(file);
-                    ds.setName(argv[1]);
-                }
-                else {
-                    logger.log(Level.SEVERE, "File "+file+" doesn't exist!");
-                }
-            }
-        }
-        finally {
-            mef.shutdown();
-        }
-    }    
+        register (argv, MapEntityFactory.class);
+    }
 }

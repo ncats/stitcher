@@ -88,6 +88,10 @@ public class EntityService {
         return getEntityFactory().calcGraphMetrics();
     }
 
+    public Entity getEntity (long id) {
+        return getEntityFactory().entity(id);
+    }
+    
     public Entity[] entities (String label, int skip, int top) {
         AuxNodeType type;
         if (label == null) {

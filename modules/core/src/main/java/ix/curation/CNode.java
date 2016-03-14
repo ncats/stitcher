@@ -61,7 +61,8 @@ public class CNode implements Props, Comparable<CNode> {
         
         if (node.hasProperty(CREATED)) {
             created = (Long)node.getProperty(CREATED);
-            lastUpdated = (Long)node.getProperty(UPDATED);
+            lastUpdated = node.hasProperty(UPDATED)
+                ? (Long)node.getProperty(UPDATED) : created;
         }
         else {
             // new node..
@@ -400,133 +401,138 @@ public class CNode implements Props, Comparable<CNode> {
     }
 
     public JsonNode toJson () {
+        try (Transaction tx = gdb.beginTx()) {
+            return _toJson ();
+        }
+    }
+    
+    public JsonNode _toJson () {
         ObjectNode node = mapper.createObjectNode();
         node.put("id", _node.getId());
-        try (Transaction tx = gdb.beginTx()) {
-            if (_node.hasProperty(KIND))
-                node.put(KIND, (String)_node.getProperty(KIND));
 
-            if (_node.hasProperty(NAME))
-                node.put(NAME, (String)_node.getProperty(NAME));
-
-            if (_node.hasProperty(KEY))
-                node.put(KEY, (String)_node.getProperty(KEY));
+        if (_node.hasProperty(KIND))
+            node.put(KIND, (String)_node.getProperty(KIND));
+        
+        if (_node.hasProperty(NAME))
+            node.put(NAME, (String)_node.getProperty(NAME));
+        
+        if (_node.hasProperty(KEY))
+            node.put(KEY, (String)_node.getProperty(KEY));
             
-            node.put(CREATED, (Long)_node.getProperty(CREATED));
-            if (_node.hasProperty(UPDATED))
-                node.put(UPDATED, (Long)_node.getProperty(UPDATED));
+        node.put(CREATED, (Long)_node.getProperty(CREATED));
+        if (_node.hasProperty(UPDATED))
+            node.put(UPDATED, (Long)_node.getProperty(UPDATED));
 
-            DataSource ds = datasource ();
-            if (ds != null) {
-                node.put("datasource", ds.getId());
+        DataSource ds = datasource ();
+        if (ds != null) {
+            node.put("datasource", ds.getId());
+        }
+
+        ArrayNode array = mapper.createArrayNode();
+        for (String l : _labels ()) {
+            if (ds != null && l.equals(ds._getKey()))
+                ;
+            else
+                array.add(l);
+        }
+        node.put("labels", array);
+
+        ArrayNode neighbors = mapper.createArrayNode();
+        List<Relationship> snapshots = new ArrayList<Relationship>();
+        Node parent = null;
+        Node payload = null;
+        for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
+            Node n = rel.getOtherNode(_node);
+            if (n.hasLabel(AuxNodeType.SNAPSHOT)) {
+                snapshots.add(rel);
             }
-
-            ArrayNode array = mapper.createArrayNode();
-            for (String l : _labels ()) {
-                if (ds != null && l.equals(ds._getKey()))
-                    ;
-                else
-                    array.add(l);
+            else if (_node.hasLabel(AuxNodeType.SNAPSHOT)
+                     || _node.hasLabel(AuxNodeType.DATA)) {
+                // there should only be one edge for snapshot node!
+                parent = n;
             }
-            node.put("labels", array);
-
-            ArrayNode neighbors = mapper.createArrayNode();
-            List<Relationship> snapshots = new ArrayList<Relationship>();
-            Node parent = null;
-            Node payload = null;
-            for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
-                Node n = rel.getOtherNode(_node);
-                if (n.hasLabel(AuxNodeType.SNAPSHOT)) {
-                    snapshots.add(rel);
-                }
-                else if (_node.hasLabel(AuxNodeType.SNAPSHOT)
-                         || _node.hasLabel(AuxNodeType.DATA)) {
-                    // there should only be one edge for snapshot node!
-                    parent = n;
-                }
-                else if (n.hasLabel(AuxNodeType.DATA)) {
-                    payload = n;
-                }
-                else if (n.hasLabel(AuxNodeType.COMPONENT)) {
-                    // should do something here..
-                }
-                else {
-                    ObjectNode nb = mapper.createObjectNode();
-                    nb.put("id", n.getId());
-                    if (null != rel.getType())
-                        nb.put("reltype", rel.getType().name());
-                    for (Map.Entry<String, Object> me :
-                             rel.getAllProperties().entrySet()) {
-                        nb.put(me.getKey(), mapper.valueToTree(me.getValue()));
-                    }
-                    neighbors.add(nb);
-                }
+            else if (n.hasLabel(AuxNodeType.DATA)) {
+                payload = n;
             }
-            
-            if (neighbors.size() > 0)
-                node.put("neighbors", neighbors);
-            
-            if (payload != null)
-                node.put("payload", payload.getId());
-            
-            if (!snapshots.isEmpty()) {
-                Collections.sort(snapshots, new Comparator<Relationship>() {
-                        public int compare (Relationship r1,
-                                            Relationship r2) {
-                            Long t2 = (Long)r2.getOtherNode(_node)
-                                .getProperty(CREATED);
-                            Long t1 = (Long)r1.getOtherNode(_node)
-                                .getProperty(CREATED);
-                            if (t1 == t2) return 0;
-                            return t1 < t2 ? -1 : 1;
-                        }
-                    });
-
-                array = mapper.createArrayNode();
-                for (Relationship rel : snapshots) {
-                    Node n = rel.getOtherNode(_node);
-                    String key = rel.getType().name();
-                    int pos = key.indexOf(".SNAPSHOT");
-                    if (pos > 0) {
-                        key = key.substring(0, pos);
-                    }
-                    ObjectNode sn = mapper.createObjectNode();
-                    sn.put("property", key);
-                    sn.put("timestamp", (Long)n.getProperty(CREATED));
-                    if (n.hasProperty(OLDVAL)) {
-                        sn.put("oldval",
-                               mapper.valueToTree(n.getProperty(OLDVAL)));
-                    }
-                    if (n.hasProperty(NEWVAL)) {
-                        sn.put("newval",
-                               mapper.valueToTree(n.getProperty(NEWVAL)));
-                    }
-                    array.add(sn);
-                }
-                node.put("snapshots", array);
+            else if (n.hasLabel(AuxNodeType.COMPONENT)) {
+                // should do something here..
             }
             else {
-                if (parent != null) {
-                    node.put("parent", parent.getId());
-                    array = mapper.createArrayNode();
-                    for (Map.Entry<String, Object> me :
-                             _node.getAllProperties().entrySet()) {
-                        ObjectNode n = mapper.createObjectNode();
-                        n.put("key", me.getKey());
-                        n.put("value", mapper.valueToTree(me.getValue()));
-                        array.add(n);
-                    }
-                    node.put("properties", array);
+                ObjectNode nb = mapper.createObjectNode();
+                nb.put("id", n.getId());
+                if (null != rel.getType())
+                    nb.put("reltype", rel.getType().name());
+                for (Map.Entry<String, Object> me :
+                         rel.getAllProperties().entrySet()) {
+                    nb.put(me.getKey(), mapper.valueToTree(me.getValue()));
                 }
-                    
-                if (_node.hasProperty(OLDVAL))
-                    node.put("oldval",
-                             mapper.valueToTree(_node.getProperty(OLDVAL)));
-
-                if (_node.hasProperty(NEWVAL))
-                    node.put("newval",
-                             mapper.valueToTree(_node.getProperty(NEWVAL)));
+                neighbors.add(nb);
             }
+        }
+            
+        if (neighbors.size() > 0)
+            node.put("neighbors", neighbors);
+            
+        if (payload != null)
+            node.put("payload", payload.getId());
+            
+        if (!snapshots.isEmpty()) {
+            Collections.sort(snapshots, new Comparator<Relationship>() {
+                    public int compare (Relationship r1,
+                                        Relationship r2) {
+                        Long t2 = (Long)r2.getOtherNode(_node)
+                            .getProperty(CREATED);
+                        Long t1 = (Long)r1.getOtherNode(_node)
+                            .getProperty(CREATED);
+                        if (t1 == t2) return 0;
+                        return t1 < t2 ? -1 : 1;
+                    }
+                });
+
+            array = mapper.createArrayNode();
+            for (Relationship rel : snapshots) {
+                Node n = rel.getOtherNode(_node);
+                String key = rel.getType().name();
+                int pos = key.indexOf(".SNAPSHOT");
+                if (pos > 0) {
+                    key = key.substring(0, pos);
+                }
+                ObjectNode sn = mapper.createObjectNode();
+                sn.put("property", key);
+                sn.put("timestamp", (Long)n.getProperty(CREATED));
+                if (n.hasProperty(OLDVAL)) {
+                    sn.put("oldval",
+                           mapper.valueToTree(n.getProperty(OLDVAL)));
+                }
+                if (n.hasProperty(NEWVAL)) {
+                    sn.put("newval",
+                           mapper.valueToTree(n.getProperty(NEWVAL)));
+                }
+                array.add(sn);
+            }
+            node.put("snapshots", array);
+        }
+        else {
+            if (parent != null) {
+                node.put("parent", parent.getId());
+                array = mapper.createArrayNode();
+                for (Map.Entry<String, Object> me :
+                         _node.getAllProperties().entrySet()) {
+                    ObjectNode n = mapper.createObjectNode();
+                    n.put("key", me.getKey());
+                    n.put("value", mapper.valueToTree(me.getValue()));
+                    array.add(n);
+                }
+                node.put("properties", array);
+            }
+                    
+            if (_node.hasProperty(OLDVAL))
+                node.put("oldval",
+                         mapper.valueToTree(_node.getProperty(OLDVAL)));
+
+            if (_node.hasProperty(NEWVAL))
+                node.put("newval",
+                         mapper.valueToTree(_node.getProperty(NEWVAL)));
         }
         return node;
     }

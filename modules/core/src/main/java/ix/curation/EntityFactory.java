@@ -690,7 +690,12 @@ public class EntityFactory implements Props {
             while (result.hasNext()) {
                 Map<String, Object> row = result.next();
                 //System.out.println("  rows: "+row);
-                page.add(Entity._getEntity((Node)row.get("n")));
+                Node n = (Node)row.get("n");
+                try {
+                    page.add(Entity._getEntity(n));
+                }
+                catch (Exception ex) { // not an entity
+                }
             }
             result.close();
         }

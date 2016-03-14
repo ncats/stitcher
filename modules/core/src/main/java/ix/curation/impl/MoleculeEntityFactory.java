@@ -12,27 +12,21 @@ import java.lang.reflect.Array;
 import chemaxon.struc.Molecule;
 import chemaxon.formats.MolImporter;
 
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Transaction;
+
 import ix.curation.*;
 import lychi.LyChIStandardizer;
 
-import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.GraphDatabaseService;
-
-
-public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
+public class MoleculeEntityFactory extends EntityRegistry {
     static final Logger logger =
-            Logger.getLogger(MoleculeEntityFactory.class.getName());
+        Logger.getLogger(MoleculeEntityFactory.class.getName());
 
     public static final String SMILES = "SMILES";
     public static final String MOLFILE = "MOLFILE";
     public static final String ACTION_TYPE = "ActionType";
 
-    protected EnumMap<StitchKey, Set<String>> stitches;
-    protected String id; // property id
     protected boolean useName; // use mol's name
-    protected Map<String, StitchKeyMapper> mappers;
-    // stitch key due to mappers
-    protected EnumMap<StitchKey, Set<String>> stitchMappers;
     protected Set<String> properties;
 
     public MoleculeEntityFactory(GraphDb graphDb) throws IOException {
@@ -49,47 +43,16 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
 
     @Override
     protected void init () {
-        stitches = new EnumMap<>(StitchKey.class);
-        mappers = new HashMap<String, StitchKeyMapper>();
-        stitchMappers = new EnumMap<>(StitchKey.class);
+        super.init();
         properties = new TreeSet<String>();
         useName = true;
     }
 
-    public void clear () { stitches.clear(); }
-    public MoleculeEntityFactory add (StitchKey key, String property) {
-        Set<String> props = stitches.get(key);
-        if (props == null) {
-            stitches.put(key, props = new TreeSet<String>());
-        }
-        props.add(property);
-        return this;
-    }
-    
-    public MoleculeEntityFactory add (String property, StitchKeyMapper mapper) {
-        mappers.put(property, mapper);
-        return this;
-    }
-
-    public Set<String> get (StitchKey key) {
-        return stitches.get(key);
-    }
-
-    public MoleculeEntityFactory setId (String id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getId() {
-        return id;
-    }
-    
     public MoleculeEntityFactory setUseName (boolean useName) {
         this.useName = useName;
         return this;
     }
 
-    @Override
     public Entity register (final Molecule mol) {
         // execute in transaction context
         try (Transaction tx = gdb.beginTx()) {
@@ -104,8 +67,8 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
     public Entity _register (final Molecule mol) {
         String idval =  null;
         // add unique identifier to node (source is already present as label?)
-        if (id != null) {
-            idval = mol.getProperty(id);
+        if (idField != null) {
+            idval = mol.getProperty(idField);
         }
 
         Entity ent = Entity._getEntity(_createNode (EntityType.Agent));
@@ -380,62 +343,13 @@ public class MoleculeEntityFactory extends EntityRegistry<Molecule> {
         return ds;
     }
 
+    @Override
     protected void updateMeta (DataSource ds) {
-        StitchKey[] keys = stitchMappers.keySet().toArray(new StitchKey[0]);
-        String[] sk = new String[keys.length];
-        for (int i = 0; i < sk.length; ++i)
-            sk[i] = keys[i].name();
-        ds.set(STITCHES, sk, true);
-        for (Map.Entry<StitchKey, Set<String>> me : stitchMappers.entrySet()) {
-            ds.set(me.getKey().name(), me.getValue().toArray(new String[0]));
-        }
+        super.updateMeta(ds);
         ds.set(PROPERTIES, properties.toArray(new String[0]));
     }
     
     public static void main(String[] argv) throws Exception {
-        if (argv.length < 3) {
-            System.err.println("Usage: " + MoleculeEntityFactory.class.getName()
-                    + " [DBDIR] [SourceName] [FILE|URL] PROPS...");
-            System.exit(1);
-        }
-
-        MoleculeEntityFactory mef = new MoleculeEntityFactory (argv[0]);
-        for (int i = 3; i < argv.length; ++i) {
-            String[] toks = argv[i].split(":");
-            if (toks.length == 2) {
-                try {
-                    if ("id".equalsIgnoreCase(toks[0])) {
-                        mef.setId(toks[1]);
-                        logger.info("id property: " + toks[1]);
-                    } else {
-                        StitchKey key = StitchKey.valueOf(toks[0]);
-                        mef.add(key, toks[1]);
-                        logger.info(key + " => \"" + toks[1] + "\"");
-                    }
-                } catch (Exception ex) {
-                    logger.warning(ex.getMessage());
-                }
-            }
-        }
-
-        try {
-            if (argv[2].startsWith("http")) {
-                DataSource ds = mef.register(new URL (argv[2]));
-                ds.setName(argv[1]);
-            }
-            else {
-                File file = new File (argv[2]);
-                if (file.exists()) {
-                    DataSource ds = mef.register(file);
-                    ds.setName(argv[1]);
-                }
-                else {
-                    logger.log(Level.SEVERE, "File "+file+" doesn't exist!");
-                }
-            }
-        }
-        finally {
-            mef.shutdown();
-        }
+        register (argv, MoleculeEntityFactory.class);
     }
 }

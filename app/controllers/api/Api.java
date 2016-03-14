@@ -230,6 +230,15 @@ public class Api extends Controller {
             return ok ((JsonNode)mapper.valueToTree
                        (EnumSet.allOf(AuxNodeType.class)));
         }
+        try {
+            long id = Long.parseLong(label);
+            Entity e = es.getEntity(id);
+            return e != null ? ok (e.toJson())
+                : notFound ("No such entity id "+id);
+        }
+        catch (NumberFormatException ex) {
+            // not id..
+        }
         int s = skip != null ? skip : 0;
         int t = top != null ? Math.min(top,1000) : 10;
         

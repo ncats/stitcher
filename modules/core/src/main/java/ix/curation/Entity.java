@@ -227,9 +227,12 @@ public class Entity extends CNode {
                 indexes = new HashSet<String>();
             
             for (Map.Entry<String, Object> me : data.entrySet()) {
-                if (indexes.contains(me.getKey()))
-                    index (me.getKey(), me.getValue());
-                node.setProperty(me.getKey(), me.getValue());
+                Object value = me.getValue();
+                if (value != null) {
+                    if (indexes.contains(me.getKey()))
+                        index (me.getKey(), value);
+                    node.setProperty(me.getKey(), value);
+                }
             }
         }
 

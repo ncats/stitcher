@@ -5,6 +5,8 @@ import java.util.*;
 import java.net.URL;
 import java.net.URI;
 import java.util.zip.*;
+import java.util.regex.*;
+
 import java.lang.reflect.Array;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -435,5 +437,87 @@ public class Util {
             logger.log(Level.SEVERE, "Can't parse json", ex);
         }
         return mol;
+    }
+
+    public static JsonNode toJsonNode (String...values) {
+        ObjectMapper mapper = new ObjectMapper ();
+        ArrayNode array = mapper.createArrayNode();
+        if (values != null) {
+            for (String v : values) 
+                array.add(v);
+        }
+        return array;
+    }
+
+    public static String[] tokenizer (String line, String delim) {
+        return delim.length() == 1 ? tokenizer (line, delim.charAt(0))
+            : line.split(delim);
+    }
+    
+    public static String[] tokenizer (String line, char delim) {
+        List<String> toks = new ArrayList<String>();
+
+        int len = line.length(), parity = 0;
+        StringBuilder curtok = new StringBuilder ();
+        for (int i = 0; i < len; ++i) {
+            char ch = line.charAt(i);
+            if (ch == '"') {
+                parity ^= 1;
+            }
+            if (ch == delim) {
+                if (parity == 0) {
+                    String tok = null;
+                    if (curtok.length() > 0) {
+                        tok = curtok.toString();
+                    }
+                    toks.add(tok);
+                    curtok.setLength(0);
+                }
+                else {
+                    curtok.append(ch);
+                }
+            }
+            else if (ch != '"') {
+                curtok.append(ch);
+            }
+        }
+
+        if (curtok.length() > 0) {
+            toks.add(curtok.toString());
+        }
+        // line ends in the delim character, so we add one more value
+        else if (line.charAt(len-1) == delim)
+            toks.add(null);
+
+        return toks.toArray(new String[0]);
+    }
+
+    static Pattern FloatRegex =
+        Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$");
+    static Pattern IntegerRegex = Pattern.compile("^[-+]?[0-9]+$");
+    
+    public static Class typeInference (String token) {
+        if (token == null || token.length() == 0)
+            return String.class;
+        
+        Matcher m = IntegerRegex.matcher(token);
+        if (m.matches())
+            return Long.class;
+
+        m = FloatRegex.matcher(token);
+        if (m.matches())
+            return Double.class;
+
+        // see if might be a structure
+        try {
+            MolHandler mh = new MolHandler (token);
+            Molecule mol = mh.getMolecule();
+            return Molecule.class;
+        }
+        catch (Exception ex) {
+        }
+
+        // ok, give up
+        return String.class;
     }
 }
