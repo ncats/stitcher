@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class CNode implements Props, Comparable<CNode> {
     static final Logger logger = Logger.getLogger(CNode.class.getName());
-    static protected final String RANK = "_rank";
+    static public final String RANK = "_rank";
 
     public static final String NODE_INDEX = ".node_index";
     public static final String RELATIONSHIP_INDEX = ".relationship_index";
@@ -425,7 +425,10 @@ public class CNode implements Props, Comparable<CNode> {
 
         DataSource ds = datasource ();
         if (ds != null) {
-            node.put("datasource", ds.getId());
+            ObjectNode src = mapper.createObjectNode();
+            src.put("id", ds.getId());
+            src.put("name", ds.getName());
+            node.put("datasource", src);
         }
 
         ArrayNode array = mapper.createArrayNode();
@@ -473,8 +476,18 @@ public class CNode implements Props, Comparable<CNode> {
         if (neighbors.size() > 0)
             node.put("neighbors", neighbors);
             
-        if (payload != null)
-            node.put("payload", payload.getId());
+        if (payload != null) {
+            ObjectNode pl = mapper.createObjectNode();
+            for (Map.Entry<String, Object> me :
+                     payload.getAllProperties().entrySet()) {
+                Object value = me.getValue();
+                pl.put(me.getKey(), mapper.valueToTree(value));
+            }
+            ObjectNode load = mapper.createObjectNode();
+            load.put("id", payload.getId());
+            load.put("content", pl);
+            node.put("payload", load);
+        }
             
         if (!snapshots.isEmpty()) {
             Collections.sort(snapshots, new Comparator<Relationship>() {

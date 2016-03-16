@@ -31,7 +31,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         super.init();
         setId ("UNII");
         setUseName (false);
-        add (StitchKey.N_Synonym, "Synonyms");
+        add (StitchKey.N_Name, "Synonyms");
         add (StitchKey.I_CAS, "CAS");
         add (StitchKey.I_UNII, "UNII");
     }
@@ -54,54 +54,30 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         br.close();        
         return count;
     }
-    
-    @Override
-    public DataSource register (File file) throws IOException {
-        DataSource ds = super.register(file);
-        Integer instances = (Integer)ds.get(INSTANCES);
-        if (instances != null) {
-            logger.warning("### Data source "+ds.getName()
-                           +" has already been registered with "+instances
-                           +" entities!");
-        }
-        else {
-            int count = register (ds.openStream());
-            ds.set(INSTANCES, count);
-            logger.info("$$$ end processing "+file.getName()
-                        +"; "+count+" entities registered!");
-        }
-        return ds;
-    }
-
-    @Override
-    public DataSource register (URL url) throws IOException {
-        DataSource ds = super.register(url);
-        Integer instances = (Integer)ds.get(INSTANCES);
-        if (instances != null) {
-            logger.warning("### Data source "+ds.getName()
-                           +" has already been registered with "+instances
-                           +" entities!");
-        }
-        else {
-            int count = register (ds.openStream());
-            ds.set(INSTANCES, count);
-            logger.info("$$$ end processing "+url
-                        +"; "+count+" entities registered!");
-        }
-        return ds;
-    }
 
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+SRSJsonEntityFactory.class.getName()
-                               +" DBDIR FILE...");
+                               +" DBDIR [cache=DIR] FILE...");
             System.exit(1);
         }
 
         SRSJsonEntityFactory mef = new SRSJsonEntityFactory (argv[0]);
         try {
             for (int i = 1; i < argv.length; ++i) {
-                mef.register(argv[i]);
+                int pos = argv[i].indexOf('=');
+                if (pos > 0) {
+                    String name = argv[i].substring(0, pos);
+                    if (name.equalsIgnoreCase("cache")) {
+                        mef.setCache(argv[i].substring(pos+1));
+                    }
+                    else {
+                        logger.warning("** Unknown parameter \""+name+"\"!");
+                    }
+                }
+                else {
+                    mef.register(argv[i]);
+                }
             }
         }
         finally {

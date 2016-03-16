@@ -5,8 +5,11 @@ import java.util.regex.*;
 import java.lang.reflect.Array;
 
 public class RegexStitchKeyMapper implements StitchKeyMapper {
-    Map<StitchKey, List<Pattern>> stitches =
+    protected Map<StitchKey, List<Pattern>> stitches =
         new EnumMap<StitchKey, List<Pattern>>(StitchKey.class);
+    protected int minlen = 1;
+    protected boolean normalized = false;
+    protected Set blacklist = new HashSet ();
     
     public RegexStitchKeyMapper () {
     }
@@ -28,28 +31,58 @@ public class RegexStitchKeyMapper implements StitchKeyMapper {
             throw new IllegalArgumentException (ex);
         }
     }
+
+    public void setMinLength (int minlen) { this.minlen = minlen; }
+    public int getMinLength () { return minlen; }
+    public void setNormalized (boolean normalized) {
+        this.normalized = normalized;
+    }
+    public boolean getNormalized () { return normalized; }
     
-    public Map<StitchKey, Object> map (String value) {
+    public void addBlacklist (Object value) {
+        if (value instanceof String)
+            value = ((String)value).toUpperCase();
+        blacklist.add(value);
+    }
+    public void removeBlacklist (Object value) {
+        if (value instanceof String)
+            blacklist.remove(((String)value).toUpperCase());
+        else
+            blacklist.remove(value);
+    }
+    public boolean isBlacklist (Object value) {
+        return value instanceof String
+            ? blacklist.contains(value.toString().toUpperCase())
+            : blacklist.contains(value);
+    }
+    
+    public Map<StitchKey, Object> map (Object value) {
         Map<StitchKey, Object> mapped = new HashMap<StitchKey, Object>();
-        
+
         for (Map.Entry<StitchKey, List<Pattern>> me : stitches.entrySet()) {
             StitchKey key = me.getKey();
             List values = new ArrayList ();
             for (Pattern p : me.getValue()) {
-                Matcher m = p.matcher(value);
+                Matcher m = p.matcher(value.toString());
                 while (m.find()) {
                     String v = m.group().trim().replaceAll("\"", "");
                     if (key.getType() == Long.class) {
                         try {
                             long lv = Long.parseLong(v);
-                            if (values.indexOf(lv) < 0)
+                            if (!isBlacklist (lv)
+                                && values.indexOf(lv) < 0)
                                 values.add(lv);
                         }
                         catch (NumberFormatException ex) {
                         }
                     }
-                    else {
-                        if (values.indexOf(v) < 0)
+                    else if (v.length() >= minlen) {
+                        // probably should provide a way to do this
+                        //  programmatically
+                        if (normalized)
+                            v = v.toUpperCase();
+                        
+                        if (!isBlacklist (v) && values.indexOf(v) < 0)
                             values.add(v);
                     }
                 }

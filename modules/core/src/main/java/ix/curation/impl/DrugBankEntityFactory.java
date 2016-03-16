@@ -24,9 +24,9 @@ public class DrugBankEntityFactory extends MoleculeEntityFactory {
         KeyMapper (StitchKey key) {
             this.key = key;
         }
-        public Map<StitchKey, Object> map (String value) {
+        public Map<StitchKey, Object> map (Object value) {
             Set<String> values = new TreeSet<String>();
-            for (String line : value.split("[\r\n]+")) {
+            for (String line : value.toString().split("[\r\n]+")) {
                 for (String tok : line.split(";")) {
                     values.add(normalize (tok.trim(), key));
                 }
@@ -58,24 +58,36 @@ public class DrugBankEntityFactory extends MoleculeEntityFactory {
         setId ("DRUGBANK_ID");
         setUseName (false);
         add (StitchKey.H_InChIKey, "INCHI_KEY");
-        add (StitchKey.N_Synonym, "GENERIC_NAME");
-        add (StitchKey.N_Synonym, "JCHEM_TRADITIONAL_IUPAC");
+        add (StitchKey.N_Name, "GENERIC_NAME");
+        add (StitchKey.N_Name, "JCHEM_TRADITIONAL_IUPAC");
         add ("DRUG_GROUPS", new KeyMapper (StitchKey.T_Keyword));
-        add ("SYNONYMS", new KeyMapper (StitchKey.N_Synonym));
-        add ("INTERNATIONAL_BRANDS", new KeyMapper (StitchKey.N_Synonym));
+        add ("SYNONYMS", new KeyMapper (StitchKey.N_Name));
+        add ("INTERNATIONAL_BRANDS", new KeyMapper (StitchKey.N_Name));
     }
 
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println
-                ("Usage: ix.curation.impl.DrugBankEntityFactory DB FILES...");
+                ("Usage: ix.curation.impl.DrugBankEntityFactory DB [cache=DIR] FILES...");
             System.exit(1);
         }
         
         DrugBankEntityFactory nef = new DrugBankEntityFactory (argv[0]);
         for (int i = 1; i < argv.length; ++i) {
-            logger.info("***** registering "+argv[i]+" ******");
-            nef.register(argv[i]);
+            int pos = argv[i].indexOf('=');
+            if (pos > 0) {
+                String name = argv[i].substring(0, pos);
+                if (name.equalsIgnoreCase("cache")) {
+                    nef.setCache(argv[i].substring(pos+1));
+                }
+                else {
+                    logger.warning("** Unknown parameter \""+name+"\"!");
+                }
+            }
+            else {
+                logger.info("***** registering "+argv[i]+" ******");
+                nef.register(argv[i]);
+            }
         }
         nef.shutdown();
     }

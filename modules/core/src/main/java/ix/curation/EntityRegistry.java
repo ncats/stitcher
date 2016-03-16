@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.concurrent.Callable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Array;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -122,7 +123,7 @@ public class EntityRegistry extends EntityFactory {
         //System.out.println("source:"+source);
         if (conf.hasPath("cache")) {
             String cache = conf.getString("cache");
-            graphDb.setCache(CacheFactory.getInstance(cache));
+            setCache (cache);
         }
 
         idField = null;
@@ -136,10 +137,10 @@ public class EntityRegistry extends EntityFactory {
 
         if (conf.hasPath("stitches")) {
             List<? extends ConfigObject> list = conf.getObjectList("stitches");
-            RegexStitchKeyMapper mapper = new RegexStitchKeyMapper ();
             
             for (ConfigObject obj : list) {
                 Config cf = obj.toConfig();
+                
                 if (!cf.hasPath("key")) {
                     logger.warning
                         ("Stitch element doesn't have \"key\" defined!");
@@ -166,11 +167,35 @@ public class EntityRegistry extends EntityFactory {
                 System.out.println("key="+key+" property=\""+property+"\"");
 
                 if (cf.hasPath("regex")) {
+                    RegexStitchKeyMapper mapper = new RegexStitchKeyMapper ();
+                    if (cf.hasPath("minlen")) {
+                        mapper.setMinLength(cf.getInt("minlen"));
+                    }
+                    
+                    if (cf.hasPath("normalize")) {
+                        mapper.setNormalized(cf.getBoolean("normalize"));
+                    }
+                    
+                    if (cf.hasPath("blacklist")) {
+                        ConfigValue cv = cf.getValue("blacklist");
+                        if (cv.valueType() == ConfigValueType.LIST) {
+                            List<String> values = (List<String>)cv.unwrapped();
+                            for (String v : values)
+                                mapper.addBlacklist(v);
+                        }
+                        else {
+                            mapper.addBlacklist(cv.unwrapped());
+                        }
+                    }
+                    
                     ConfigValue cv = cf.getValue("regex");
                     if (cv.valueType() == ConfigValueType.LIST) {
                         List<String> regexes = (List<String>)cv.unwrapped();
                         for (String regex : regexes) {
                             try {
+                                logger.info(key+" derived from regex \""
+                                            +regex+"\" on property \""
+                                            +property+"\"");
                                 mapper.add(key, regex);
                                 add (property, mapper);
                             }
@@ -184,6 +209,9 @@ public class EntityRegistry extends EntityFactory {
                     else {
                         String regex = (String)cv.unwrapped();
                         try {
+                            logger.info(key+" derived from regex \""
+                                        +regex+"\" on property \""
+                                        +property+"\"");
                             mapper.add(key, regex);
                             add (property, mapper);
                         }
@@ -252,8 +280,50 @@ public class EntityRegistry extends EntityFactory {
                 ent._add(me.getKey(), new StitchValue (prop, map.get(prop)));
             }
         }
+        mapValues (ent, map);
+        
         ent._add(payload);
         return ent;
+    }
+
+    protected void mapValues (Entity ent, Map<String, Object> values) {
+        stitchMappers.putAll(stitches);
+        
+        for (Map.Entry<String, StitchKeyMapper> me : mappers.entrySet()) {
+            Object value = values.get(me.getKey());
+            
+            if (value != null) {
+                Map<StitchKey, Object> mapping = me.getValue().map(value);
+                for (Map.Entry<StitchKey, Object> m : mapping.entrySet()) {
+                    //logger.info("mapper "+m.getKey()+" => "+m.getValue());
+                    Object val = m.getValue();
+                    if (val == null) {
+                    }
+                    else if (m.getKey() == StitchKey.T_Keyword) {
+                        if (val.getClass().isArray()) {
+                            int len = Array.getLength(val);
+                            for (int i = 0; i < len; ++i) {
+                                Object t = Array.get(val, i);
+                                ent._addLabel(DynamicLabel.label(t.toString()));
+                            }
+                        }
+                        else
+                            ent._addLabel(DynamicLabel.label(val.toString()));
+                    }
+                    else {
+                        ent._add(m.getKey(),
+                                 new StitchValue (me.getKey(), val));
+                    }
+                    
+                    Set<String> props = stitchMappers.get(m.getKey());
+                    if (props == null) {
+                        stitchMappers.put(m.getKey(),
+                                          props = new TreeSet<String>());
+                    }
+                    props.add(me.getKey());
+                }
+            }
+        }
     }
     
     public void addPropertyChangeListener (PropertyChangeListener l) {

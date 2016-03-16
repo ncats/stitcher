@@ -8,6 +8,9 @@ public class LineTokenizer implements Iterator<String[]> {
     protected Reader reader;
     protected char[] buf = new char[1];
     protected String[] tokens;
+    
+    protected int count, lines;
+    protected StringBuilder currentLine = new StringBuilder ();
 
     public LineTokenizer () {
         this ('\t');
@@ -24,12 +27,15 @@ public class LineTokenizer implements Iterator<String[]> {
         boolean quote = false;
         StringBuilder tok = new StringBuilder ();       
         while ((nb = reader.read(buf)) != -1) {
+            currentLine.append(buf[0]);
+            
             if (buf[0] == '"') {
                 quote = !quote;
             }
             else if (buf[0] == '\r') {
             }
             else if (buf[0] == '\n') {
+                ++lines;
                 if (!quote) {
                     tokens.add(tok.length() > 0? tok.toString() : null);
                     break;
@@ -52,15 +58,25 @@ public class LineTokenizer implements Iterator<String[]> {
             if (buf[0] != '\n')
                 tokens.add(tok.length() > 0 ? tok.toString() : null);           
         }
+        ++count;
         
         return tokens.toArray(new String[0]);
     }
     
     public void setInputStream (InputStream is) throws IOException {
         reader = new BufferedReader (new InputStreamReader (is));
+        lines = 0;
+        count = 0;
+        currentLine.setLength(0);
         tokens = nextLine ();
     }
 
+    public int getCount () { return count; }
+    public int getLineCount () { return lines; }
+    public String getCurrentLine () {
+        return currentLine.toString();
+    }
+    
     public boolean hasNext () {
         return tokens != null;
     }

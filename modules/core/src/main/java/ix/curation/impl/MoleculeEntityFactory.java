@@ -171,6 +171,7 @@ public class MoleculeEntityFactory extends EntityRegistry {
         }
 
         // now add any mapper
+        /*
         stitchMappers.putAll(stitches);
         for (Map.Entry<String, StitchKeyMapper> me : mappers.entrySet()) {
             String value = mol.getProperty(me.getKey());
@@ -206,6 +207,16 @@ public class MoleculeEntityFactory extends EntityRegistry {
                 }
                 payload.put(me.getKey(), value);
             }
+        }
+        */
+        if (!mappers.isEmpty()) {
+            Map<String, Object> values = new HashMap<String, Object>();
+            for (String key : mappers.keySet()) {
+                String v = mol.getProperty(key);
+                if (v != null)
+                    values.put(key, v);
+            }
+            mapValues (ent, values);
         }
 
         // now store all original properties..

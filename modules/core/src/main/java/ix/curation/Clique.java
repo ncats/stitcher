@@ -1,19 +1,8 @@
 package ix.curation;
 
 import java.util.Map;
-import java.util.Set;
 
-public interface Clique {
-    /*
-     * the clique size (number of nodes/entities)
-     */
-    int size ();
-
-    /*
-     * return the set of node ids
-     */
-    Set<Long> nodes ();
-    
+public interface Clique extends Component {
     /*
      * return all stitching values that formed this clique. note that if
      * there were one stitching value that participates in all of the 
@@ -25,10 +14,9 @@ public interface Clique {
     Map<StitchKey, Object> values ();
 
     /*
-     * return all entities for this clique. by virtual of being a clique,
-     * all entities returned are pairwise connected to each other.
+     * by virtual of being a clique, all entities returned are 
+     * pairwise connected to each other.
      */
-    Entity[] entities ();
     
     /*
      * return entities that are overlap between this and the given clique.

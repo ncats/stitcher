@@ -520,4 +520,21 @@ public class Util {
         // ok, give up
         return String.class;
     }
+
+    public static String sha1 (Collection<Long> ids) {
+        MessageDigest sha1 = sha1 ();
+        byte[] data = new byte[8];
+        for (Long id : ids) {
+            data[0] = (byte)((id >> 56) & 0xff);
+            data[1] = (byte)((id >> 48) & 0xff);
+            data[2] = (byte)((id >> 40) & 0xff);
+            data[3] = (byte)((id >> 32) & 0xff);
+            data[4] = (byte)((id >> 24) & 0xff);
+            data[5] = (byte)((id >> 16) & 0xff);
+            data[6] = (byte)((id >> 8) & 0xff);
+            data[7] = (byte)(id & 0xff);
+            sha1.update(data);
+        }
+        return hex (sha1.digest());
+    }
 }

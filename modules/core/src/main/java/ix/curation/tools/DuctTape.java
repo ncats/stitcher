@@ -5,6 +5,11 @@ import java.io.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import ix.curation.EntityFactory;
 import ix.curation.Entity;
 import ix.curation.GraphDb;
@@ -12,6 +17,7 @@ import ix.curation.CliqueVisitor;
 import ix.curation.StitchKey;
 import ix.curation.Util;
 import ix.curation.Clique;
+import ix.curation.Component;
 import ix.curation.DataSource;
 import ix.curation.DataSourceFactory;
 import ix.curation.AbstractEntityVisitor;
@@ -166,28 +172,58 @@ public class DuctTape implements CliqueVisitor {
             
         long[][] groups = eqv.components();
         System.out.println("## "+groups.length+" groups!");
+
+        ObjectMapper mapper = new ObjectMapper ();
+        ArrayNode stitches = mapper.createArrayNode();
         for (int i = 0; i < groups.length; ++i) {
             System.out.println("+++ group "+i+" ("+groups[i].length+")");
             int nc = 0;
+            ArrayNode nodes = mapper.createArrayNode();
             for (int j = 0; j < groups[i].length; ++j) {
                 if (cnodes.contains(groups[i][j]))
                     ++nc;
                 System.out.print(" "+groups[i][j]);
+                nodes.add(ef.entity(groups[i][j]).toJson());
             }
+            double score = (double)nc/groups[i].length;
+            
             Entity ent = ef.createStitch(ds, groups[i]);            
+            ObjectNode stitch = mapper.createObjectNode();
+            stitch.put("id", ent.getId());
+            stitch.put("count", groups[i].length);
+            stitch.put("score", score);
+            stitch.put("nodes", nodes);
+            stitches.add(stitch);
+
             System.out.println(" => "+ent.getId() + " "
-                               +String.format("%1$.3f",
-                                              (double)nc/groups[i].length));
+                               +String.format("%1$.3f", score));
         }
 
         int g = groups.length;
         for (Long id : singletons) {
             if (!eqv.contains(id)) {
-                Entity ent = ef.createStitch(ds, new long[]{id});       
+                Entity ent = ef.createStitch(ds, new long[]{id});
+                ObjectNode stitch = mapper.createObjectNode();
+                stitch.put("id", ent.getId());
+                stitch.put("count", 1);
+                ArrayNode nodes = mapper.createArrayNode();
+                nodes.add(ef.entity(id).toJson());
+                stitch.put("nodes", nodes);
+                stitches.add(stitch);
                 System.out.println("+++ group "+g+" (1)");
                 System.out.println(" "+id+" => "+ent.getId());
                 ++g;
             }
+        }
+
+        try {
+            FileWriter writer = new FileWriter ("stitch.json");
+            mapper.writerWithDefaultPrettyPrinter()
+                .writeValue(writer, stitches);
+            writer.close();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
         }
         
         Object instances = ds.get(DataSource.INSTANCES);
@@ -273,7 +309,19 @@ public class DuctTape implements CliqueVisitor {
         }
 
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
+        
         try {
+            /*
+            EntityFactory ef = new EntityFactory (graphDb);
+            Collection<Component> comps = ef.components();
+            for (Component c : comps) {
+                System.out.println
+                    (c.getId()+" "+String.format("%1$ 5d", c.size())
+                     +" "+c.nodes());
+            }
+            System.out.println("** "+comps.size()+" connected components!");
+            */            
+
             DuctTape dt = new DuctTape (graphDb);
             if (argv.length > 1)
                 for (int i = 1; i < argv.length; ++i)

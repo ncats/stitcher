@@ -61,46 +61,28 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
 
     public int register (InputStream is, String delim, int molcol)
         throws IOException {
-        BufferedReader br = new BufferedReader (new InputStreamReader (is));
         String[] header = null;
-        int lines = 0, count = 0;
         MolHandler mh = new MolHandler ();
 
-        String linebuf = null;
-        for (String line; (line = br.readLine()) != null; ++lines) {
-            line = line.trim();
-            if (line.length() == 0)
-                continue;
+        int count = 0; // entity count
+        LineTokenizer tokenizer = new LineTokenizer (delim.charAt(0));
+        tokenizer.setInputStream(is);
+        while (tokenizer.hasNext()) {
+            String[] row = tokenizer.next();
 
-            int pos = line.indexOf('"');
-            if (pos >= 0) {
-                if (linebuf != null) { // closing quote
-                    line = linebuf + line;
-                    linebuf = null;
-                }
-                else if (line.indexOf('"', pos+1) < 0) { // open quote
-                    linebuf = line;
-                    continue;
-                }
-            }
-            else if (linebuf != null) {
-                linebuf += line;
-                continue;
-            }
-                    
-            String[] row = Util.tokenizer(line, delim);
             if (header == null) {
-                pos = row[0].indexOf('#');
+                int pos = row[0].indexOf('#');
                 if (pos >= 0)
                     row[0] = row[0].substring(pos);
                 header = row;
             }
-            else if (line.charAt(0) != '#') {
+            else {
                 if (header.length != row.length) {
-                    logger.warning("Line "+lines+": columns mismatch; "
+                    logger.warning("Line "+tokenizer.getLineCount()
+                                   +": columns mismatch; "
                                    +"expecting "+header.length
                                    +" columns but instead got "+row.length
-                                   +"\n"+line);
+                                   +"\n"+tokenizer.getCurrentLine());
                 }
                 int ncols = Math.min(header.length, row.length);
                 Map<String, Object> props = new HashMap<String, Object>();
@@ -121,9 +103,11 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
                         }
                         catch (Exception ex) {
                             if (molcol >= 0)
-                                logger.warning("Line "+lines+", column "+(c+1)
-                                               +": bogus molecule "
-                                               +ex.getMessage());
+                                logger.warning
+                                    ("Line "+tokenizer.getLineCount()
+                                     +", column "+(c+1)
+                                     +": bogus molecule "
+                                     +ex.getMessage());
                         }
                     }
                     props.put(header[c], row[c]); 

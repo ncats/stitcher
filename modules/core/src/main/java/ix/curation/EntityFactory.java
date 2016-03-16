@@ -218,13 +218,64 @@ public class EntityFactory implements Props {
         public StitchKey key () { return key; }
     }
 
-    static class EClique implements Clique {
+    static class ComponentImpl implements Component {
+        Set<Long> nodes = new TreeSet<Long>();
+        Entity[] entities;
+        String id;
+        Node root;
+
+        ComponentImpl (Node node) {
+            GraphDatabaseService gdb = node.getGraphDatabase();
+            try (Transaction tx = gdb.beginTx()) {
+                if (!node.hasLabel(AuxNodeType.COMPONENT)
+                    || !node.hasProperty(CNode.RANK))
+                    throw new IllegalArgumentException
+                        ("Not a valid component node: "+node.getId());
+                traverse (node);
+
+                Integer rank = (Integer)node.getProperty(CNode.RANK);
+                if (rank != nodes.size())
+                    logger.warning("Rank is "+rank+" but there are "
+                                   +nodes.size()+" nodes in this component!");
+                
+                entities = new Entity[nodes.size()];
+                int i = 0;
+                for (Long id : nodes)
+                    entities[i++] = Entity._getEntity(gdb.getNodeById(id));
+            }
+            id = Util.sha1(nodes).substring(0, 9);
+            root = node;
+        }
+
+        void traverse (Node node) {
+            nodes.add(node.getId());
+            for (Relationship rel : node.getRelationships
+                     (AuxRelType.CC, Direction.INCOMING)) {
+                traverse (rel.getOtherNode(node));
+            }
+        }
+
+        public String getId () { return id; }
+        public Entity[] entities () { return entities; }
+        public int size () { return nodes.size(); }
+        public Set<Long> nodes () { return nodes; }
+        public int hashCode () { return nodes.hashCode(); }
+        public boolean equals (Object obj) {
+            if (obj instanceof ComponentImpl) {
+                return nodes.equals(((ComponentImpl)obj).nodes);
+            }
+            return false;
+        }
+    }
+
+    static class CliqueImpl implements Clique {
         final EnumMap<StitchKey, Object> values =
             new EnumMap (StitchKey.class);
         Entity[] entities;
         Set<Long> clique = new TreeSet<Long>();
+        String id;
         
-        EClique (BitSet C, long[] nodes, Set<StitchKey> keys,
+        CliqueImpl (BitSet C, long[] nodes, Set<StitchKey> keys,
                  GraphDatabaseService gdb) {
             entities = new Entity[C.cardinality()];
             try (Transaction tx = gdb.beginTx()) {
@@ -240,6 +291,7 @@ public class EntityFactory implements Props {
                 for (StitchKey key : keys)
                     update (gnodes, key);
             }
+            id = Util.sha1(clique).substring(0, 9);
         }
 
         void update (Node[] nodes, StitchKey key) {
@@ -294,10 +346,11 @@ public class EntityFactory implements Props {
             values.put(key, value);
         }
 
+        public String getId () { return id; }
         public int hashCode () { return clique.hashCode(); }
         public boolean equals (Object obj) {
-            if (obj instanceof EClique) {
-                return clique.equals(((EClique)obj).clique);
+            if (obj instanceof CliqueImpl) {
+                return clique.equals(((CliqueImpl)obj).clique);
             }
             return false;
         }
@@ -363,7 +416,7 @@ public class EntityFactory implements Props {
             for (Map.Entry<BitSet, EnumSet<StitchKey>> me
                      : cliques.entrySet()) {
                 if (!visitor.clique
-                    (new EClique (me.getKey(), nodes, me.getValue(), gdb)))
+                    (new CliqueImpl (me.getKey(), nodes, me.getValue(), gdb)))
                     return false;
             }
             return true;
@@ -444,6 +497,13 @@ public class EntityFactory implements Props {
 
     public GraphDb getGraphDb () { return graphDb; }
     public CacheFactory getCache () { return graphDb.getCache(); }
+    public void setCache (CacheFactory cache) {
+        graphDb.setCache(cache);
+    }
+    public void setCache (String cache) throws IOException {
+        graphDb.setCache(CacheFactory.getInstance(cache));
+    }
+    
     public long getLastUpdated () { return graphDb.getLastUpdated(); }
     
     public GraphMetrics calcGraphMetrics() {
@@ -670,6 +730,19 @@ public class EntityFactory implements Props {
 
     public Iterator<Entity[]> connectedComponents () {
         return new ConnectedComponents (gdb);
+    }
+
+    public Collection<Component> components () {
+        List<Component> comps = new ArrayList<Component>();
+        try (Transaction tx = gdb.beginTx()) {
+            for (Iterator<Node> it = gdb.findNodes(AuxNodeType.COMPONENT);
+                 it.hasNext(); ) {
+                Node node = it.next();
+                comps.add(new ComponentImpl (node));
+            }
+        }
+        
+        return comps;
     }
 
     public Entity[] entities (String label, int skip, int top) {
