@@ -427,6 +427,7 @@ public class CNode implements Props, Comparable<CNode> {
         if (ds != null) {
             ObjectNode src = mapper.createObjectNode();
             src.put("id", ds.getId());
+            src.put("key", ds.getKey());
             src.put("name", ds.getName());
             node.put("datasource", src);
         }
