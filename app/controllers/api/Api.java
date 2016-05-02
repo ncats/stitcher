@@ -33,13 +33,14 @@ import models.*;
 
 public class Api extends Controller {
 
-    class ConsoleWebSocket extends WebSocket<String> {
+    class ConsoleWebSocket extends LegacyWebSocket<String> {
         final String key;
         ConsoleWebSocket (String key) {
             this.key = key;
         }
 
-        public void onReady (In<String> in, Out<String> out) {
+        public void onReady (WebSocket.In<String> in,
+                             WebSocket.Out<String> out) {
         }
         
         public boolean isActor () { return true; }
@@ -55,7 +56,6 @@ public class Api extends Controller {
     }
     
     @Inject SchedulerService scheduler;
-    @Inject play.Application app;
     @Inject EntityService es;
     @Inject CacheService cache;
     @Inject CoreService service;
@@ -146,22 +146,17 @@ public class Api extends Controller {
         return notFound ("Unknown node "+id);
     }
 
-    public WebSocket<String> console (final String key) {
+    public LegacyWebSocket<String> console (final String key) {
         return new ConsoleWebSocket (key);
     }
 
-    public WebSocket<String> echo () {
+    public LegacyWebSocket<String> echo () {
         return WebSocket.withActor(WebSocketEchoActor::props);
     }
 
     @Transactional
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class, 
-                   maxLength = 1024*1024*1000000)
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result uploader () {
-        if (request().body().isMaxSizeExceeded()) {
-            return badRequest ("File too large!");
-        }
-
         Http.MultipartFormData body = request().body().asMultipartFormData();
         FilePart part = body.getFile("file");
         if (part != null) {

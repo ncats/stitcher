@@ -1,4 +1,6 @@
 
+@(app: controllers.app.App)
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,8 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Payload</title>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))'>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.css"))'>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("font-awesome.min.css"))'>
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap-wizard.css")'></link>    
   </head>
   <body>
@@ -31,8 +33,8 @@
 	</div>
       </div>
     </div>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("jquery.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.js"))'></script>
     <script type="text/javascript" src='@routes.Assets.versioned("javascripts/bootstrap-wizard.min.js")'></script>
     <script>
       $(function() {

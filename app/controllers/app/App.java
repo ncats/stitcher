@@ -7,6 +7,7 @@ import java.net.URI;
 
 import play.*;
 import play.mvc.*;
+import play.data.*;
 import play.libs.ws.*;
 import static play.mvc.Http.MultipartFormData.*;
 import play.db.ebean.Transactional;
@@ -22,15 +23,16 @@ import ix.curation.*;
 import models.*;
 
 public class App extends Controller {
-    //@Inject WSClient ws;
+    @Inject controllers.WebJarAssets webJarAssets;    
     @Inject public SchedulerService scheduler;
-    @Inject play.Application app;
     @Inject public EntityService es;
     @Inject public CoreService service;
 
     public App () {
     }
-    
+
+    public controllers.WebJarAssets webjars () { return webJarAssets; }    
+
     public Result build () {
         return ok(welcome.render("Build: "+ix.BuildInfo.TIME+" ("
                                  +ix.BuildInfo.BRANCH+"-"
@@ -46,13 +48,8 @@ public class App extends Controller {
     }
 
     @Transactional
-    @BodyParser.Of(value = BodyParser.MultipartFormData.class, 
-                   maxLength = 1024*1024*1000000)
+    @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result upload () {
-        if (request().body().isMaxSizeExceeded()) {
-            return badRequest (error.render("File too large!"));
-        }
-
         Http.MultipartFormData body = request().body().asMultipartFormData();
         Map<String, String[]> params = body.asFormUrlEncoded();
         FilePart part = body.getFile("file");
@@ -96,11 +93,11 @@ public class App extends Controller {
     public Result getPayload (String key) {
         models.Payload payload = service.getPayload(key);
         return ok (payload != null ? payloaddetails.render(this, payload)
-                   : error.render("Invalid payload: "+key));
+                   : error.render(this, "Invalid payload: "+key));
     }
 
     public Result setup () {
-        return ok (payloadsetup.render());
+        return ok (payloadsetup.render(this));
     }
 
     public Result dashboard () {

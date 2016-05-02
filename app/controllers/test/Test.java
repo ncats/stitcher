@@ -15,21 +15,23 @@ import services.jobs.*;
 
 
 public class Test extends Controller {
+    @Inject controllers.WebJarAssets webjars;
     @Inject public SchedulerService scheduler;
-    @Inject play.Application app;
+    @Inject Environment env;
 
     public Test () {
     }
-    
+
+    public controllers.WebJarAssets webjars () { return webjars; }
     public Result slidereveal () {
-        return ok (slidereveal.render("IxCurator"));
+        return ok (slidereveal.render(this, "IxCurator"));
     }
 
     public Result drugbank () {
         try {
             String key = scheduler.submit
                 (DrugBankMoleculeRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/drugbank-full-annotated.sdf"));
+                 env.getFile("../inxight-planning/files/drugbank-full-annotated.sdf"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {
@@ -41,7 +43,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (NPCMoleculeRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
+                 env.getFile("../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {
@@ -53,7 +55,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (SRSJsonRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/public2015-11-30.gsrs"));
+                 env.getFile("../inxight-planning/files/public2015-11-30.gsrs"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {
@@ -65,7 +67,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (IntegrityMoleculeRegistrationJob.class, null,
-                 app.getFile("../inxight-planning/files/integr.sdf.gz"));
+                 env.getFile("../inxight-planning/files/integr.sdf.gz"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {

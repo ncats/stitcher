@@ -86,6 +86,7 @@ public class DuctTape implements CliqueVisitor {
         logger.info("######### Elapsed time for \""+label+"\" ("
                     +cliques.size()+" cliques) "
                     +String.format("%1$.3fs", elapsed));
+        stitch (label);
     }
 
     public void clear () {
@@ -97,26 +98,27 @@ public class DuctTape implements CliqueVisitor {
 
     public void closure () {
         // perform closure on all connected components
-        int cc = 0;
-        for (Iterator<Entity[]> it = ef.connectedComponents(); it.hasNext();) {
+        int cc = 1;
+        for (Iterator<Entity[]> it = ef.connectedComponents();
+             it.hasNext(); ++cc) {
             Entity[] comp = it.next();
             if (comp.length > 2) {
                 clear ();
                 logger.info("######### Enumerating cliques for CC_"
-                            +(cc+1)+" ("+comp.length+")...");
+                            +cc+" ("+comp.length+")...");
                 long start = System.currentTimeMillis();
                 ef.cliqueEnumeration(KEYS, comp, this);
                 logger.info(cliques.size()+" clique(s) found!");
                 
                 closure (Arrays.asList(comp).iterator());
                 double elapsed = (System.currentTimeMillis()-start)*1e-3;
-                logger.info("######### Elapsed time for CC_"+(cc+1)+": "
+                logger.info("######### Elapsed time for CC_"+cc+": "
                             +String.format("%1$.3fs", elapsed));
+                stitch ("CC_"+cc);
             }
             else {
                 // 
             }
-            ++cc;
         }
     }
 
@@ -154,7 +156,7 @@ public class DuctTape implements CliqueVisitor {
                                    +") neighbors than mapped ("+max+")!");
                 }
 
-                if (max > 0) {
+                if (false && max > 0) {
                     //logger.info("** mapping entity "+id+" to "+mapped);
                     eqv.union(mapped, id);
                 }
@@ -165,7 +167,7 @@ public class DuctTape implements CliqueVisitor {
         }
     }
 
-    public void stitch () {
+    public void stitch (String name) {
         // first delete
         DataSource ds = dsf.register(SOURCE);
         ef.delete(ds);
@@ -216,14 +218,16 @@ public class DuctTape implements CliqueVisitor {
             }
         }
 
-        try {
-            FileWriter writer = new FileWriter ("stitch.json");
-            mapper.writerWithDefaultPrettyPrinter()
-                .writeValue(writer, stitches);
-            writer.close();
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        if (name != null) {
+            try {
+                FileWriter writer = new FileWriter (name+".json");
+                mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(writer, stitches);
+                writer.close();
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         
         Object instances = ds.get(DataSource.INSTANCES);
@@ -326,9 +330,8 @@ public class DuctTape implements CliqueVisitor {
             if (argv.length > 1)
                 for (int i = 1; i < argv.length; ++i)
                     dt.closure(argv[i]);
-            else
+            else 
                 dt.closure();
-            dt.stitch();
         }
         finally {
             graphDb.shutdown();

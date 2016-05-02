@@ -11,8 +11,10 @@ import javax.inject.Singleton;
 
 import play.inject.ApplicationLifecycle;
 import play.Application;
+import play.Environment;
 import play.Logger;
 import play.Configuration;
+import play.inject.Injector;
 import play.libs.F;
 import static play.mvc.Http.MultipartFormData.*;
 import play.db.ebean.Transactional;
@@ -43,21 +45,19 @@ public class CoreService {
     final public String DATA = "ix.data";
     final public String HASH = "ix.hash";
     final public String WORK = "ix.work";
-
-    final Application app;
     
     final File base;
     final File hash;
     final File data;
     final File work;
+    final Injector injector;
     CacheFactory cacheFactory;
     ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Inject
-    public CoreService (Application app, ApplicationLifecycle lifecycle) {
-        this.app = app;
+    public CoreService (Configuration config, Injector injector,
+                        ApplicationLifecycle lifecycle) {
 
-        Configuration config = app.configuration();
         String param = config.getString(BASE);
         if (param == null) {
             throw new IllegalStateException
@@ -87,6 +87,8 @@ public class CoreService {
                 shutdown ();
                 return F.Promise.pure(null);            
             });
+        
+        this.injector = injector;
     }
 
     public File baseDir () { return base; }
@@ -140,7 +142,7 @@ public class CoreService {
             payload.size = size;
             
             // also register this as a curation datasource
-            EntityService es = app.injector()
+            EntityService es = injector
                 .instanceOf(EntityService.class);
             DataSource ds = es.register(file);
             payload.key = ds.getKey();
@@ -160,7 +162,7 @@ public class CoreService {
         return payload;
     }
 
-    public Payload upload (FilePart part, Map<String, String[]> params)
+    public Payload upload (FilePart<File> part, Map<String, String[]> params)
         throws Exception {
         String name = part.getFilename();
         String content = part.getContentType();
@@ -195,7 +197,7 @@ public class CoreService {
         if (params.containsKey("delimiter"))
             param.put(JobParams.DELIMITER, params.get("delimiter")[0]);
         
-        SchedulerService scheduler = app.injector()
+        SchedulerService scheduler = injector
             .instanceOf(SchedulerService.class);
         scheduler.submit(PayloadScannerJob.class, param, payload);
         

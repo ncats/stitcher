@@ -1,5 +1,5 @@
 
-@(title: String)
+@(app: controllers.test.Test, title: String)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,11 +8,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@title</title>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))'>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.css"))'>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("font-awesome.min.css"))'>
     <link href='@routes.Assets.versioned("stylesheets/prettify.css")' rel="stylesheet">
     <link href='@routes.Assets.versioned("stylesheets/slidereveal.css")' rel="stylesheet">
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))'>
+    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("font-awesome.min.css"))'>
   </head>
   <body>
     <div id="download-bar">
@@ -324,8 +324,8 @@ $("slider").slideReveal({
         <h5><a href="https://github.com/nnattawat/slideReveal">SlideReveal</a> is maintained by <a href="https://github.com/nnattawat">nnattawat</a></h5>
       </div>
     </footer>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("jquery.min.js"))'></script>
+    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.js"))'></script>
     <script type="text/javascript" src='@routes.Assets.versioned("javascripts/jquery.slidereveal.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.versioned("javascripts/prettify.js")'></script>    
     <script type="text/javascript">

@@ -12,10 +12,13 @@ import javax.inject.Inject;
 import org.h2.tools.RunScript;
 import com.avaje.ebean.Ebean;
 
-import play.Application;
+import play.Environment;
+import play.Configuration;
 import play.Logger;
 import play.inject.Injector;
 import play.inject.ApplicationLifecycle;
+import play.db.NamedDatabase;
+import play.db.Database;
 
 import play.db.*;
 import play.libs.F;
@@ -51,12 +54,16 @@ public class SchedulerService {
     static final String QUARTZ_INIT = "ix.quartz.init";
     static final String QUARTZ_THREADS = "ix.quartz.threads";
 
+    // this is not pretty..we have to do this because injection doesn't
+    // work with quartz through its connectionProvider.class property
+    static private Database _quartzDb;
+    
     static public class QuartzConnectionProvider
         implements ConnectionProvider {
         public QuartzConnectionProvider () {}
 
         public Connection getConnection () throws SQLException {
-            return DB.getConnection(QUARTZ);
+            return _quartzDb.getConnection();        
         }
         public void initialize () throws SQLException {}
         public void shutdown () throws SQLException {}
@@ -137,36 +144,36 @@ public class SchedulerService {
     @Inject CacheService cache;
 
     @Inject
-    public SchedulerService (Application app,
-                             ApplicationLifecycle lifecycle) {
-        try {
-            digest = MessageDigest.getInstance("SHA1");
-            initDb (app);
-            
-            scheduler = createScheduler (app);
-            scheduler.getListenerManager().addJobListener
-                (new SchedulerJobListener ());
-            scheduler.getListenerManager().addTriggerListener
-                (new SchedulerTriggerListener ());
-            scheduler.start(); // now start the scheduler
-
-            // setup startup jobs
-            startupJobs ();
-
-            Logger.debug(getJobCount()+" job(s) stored in queue!");
-            for (JobKey job :
-                     scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
-                Logger.debug("++ "+job.getName());
-            }
-
-            lifecycle.addStopHook(() -> {
-                    shutdown ();
-                    return F.Promise.pure(null);
-                });
+    public SchedulerService (Environment env, Configuration config,
+                             Injector injector,
+                             @NamedDatabase("quartz") Database quartzDb,
+                             ApplicationLifecycle lifecycle) throws Exception {
+        digest = MessageDigest.getInstance("SHA1");
+        
+        // not cool.. but ok since this is a singleton class
+        initDb (env, config, quartzDb);
+        SchedulerService._quartzDb = quartzDb;
+        
+        scheduler = createScheduler (config, injector);
+        scheduler.getListenerManager().addJobListener
+            (new SchedulerJobListener ());
+        scheduler.getListenerManager().addTriggerListener
+            (new SchedulerTriggerListener ());
+        scheduler.start(); // now start the scheduler
+        
+        // setup startup jobs
+        startupJobs ();
+        
+        Logger.debug(getJobCount()+" job(s) stored in queue!");
+        for (JobKey job :
+                 scheduler.getJobKeys(GroupMatcher.anyJobGroup())) {
+            Logger.debug("++ "+job.getName());
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        
+        lifecycle.addStopHook(() -> {
+                shutdown ();
+                return F.Promise.pure(null);
+            });
     }
 
     void startupJobs () throws Exception {
@@ -351,8 +358,9 @@ public class SchedulerService {
         }
     }
 
-    static void initDb (Application app) throws Exception {
-        try (Connection con = DB.getConnection(QUARTZ)) {
+    static void initDb (Environment env, Configuration config, Database db)
+        throws Exception {
+        try (Connection con = db.getConnection()) {
             Statement stmt = con.createStatement();
             ResultSet rset = stmt.executeQuery
                 ("select count(*) from information_schema.tables "
@@ -366,13 +374,13 @@ public class SchedulerService {
             stmt.close();
 
             if (tables == 0) {
-                String quartz = app.configuration().getString(QUARTZ_INIT);
-                if (app.isProd()) {
+                String quartz = config.getString(QUARTZ_INIT);
+                if (env.isProd()) {
                     RunScript.execute(con, new InputStreamReader
-                                      (app.resourceAsStream(quartz)));
+                                      (env.resourceAsStream(quartz)));
                 }
                 else {
-                    File file = app.getFile("conf/"+quartz);
+                    File file = env.getFile("conf/"+quartz);
                     Logger.debug("Running script "+file+"...");
                     RunScript.execute(con, new FileReader (file));
                 }
@@ -381,10 +389,10 @@ public class SchedulerService {
         }
     }
 
-    static Properties createSchedulerConfig (Application app) {
+    static Properties createSchedulerConfig (Configuration config) {
         Properties props = new Properties ();
         props.put("org.quartz.threadPool.threadCount",
-                  app.configuration().getString(QUARTZ_THREADS, "4"));
+                  config.getString(QUARTZ_THREADS, "4"));
         props.put("org.quartz.jobStore.class",
                   "org.quartz.impl.jdbcjobstore.JobStoreTX");
         props.put("org.quartz.jobStore.driverDelegateClass",
@@ -395,12 +403,12 @@ public class SchedulerService {
         return props;
     }
 
-    static Scheduler createScheduler (Application app)
+    static Scheduler createScheduler (Configuration config, Injector injector)
         throws Exception {
         SchedulerFactory schedulerFactory =
-            new StdSchedulerFactory (createSchedulerConfig (app));
+            new StdSchedulerFactory (createSchedulerConfig (config));
         Scheduler scheduler = schedulerFactory.getScheduler();
-        scheduler.setJobFactory(new InjectorJobFactory (app.injector()));
+        scheduler.setJobFactory(new InjectorJobFactory (injector));
         
         Logger.debug("Scheduler initialized..."+scheduler);
         return scheduler;

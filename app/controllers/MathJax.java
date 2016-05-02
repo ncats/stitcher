@@ -7,8 +7,9 @@ import javax.inject.*;
 import play.*;
 import play.mvc.*;
 import play.libs.ws.*;
-
+import org.webjars.*;
 import views.html.*;
+
 import ix.curation.CacheFactory;
 
 public class MathJax extends Controller {
@@ -16,7 +17,8 @@ public class MathJax extends Controller {
     CacheFactory cache;
     File workDir;
     final Configuration config;
-
+    @Inject WebJarAssets webJarAssets;
+    
     @Inject
     public MathJax (Configuration config) {
         this.config = config;
@@ -30,7 +32,9 @@ public class MathJax extends Controller {
             ex.printStackTrace();
         }
     }
-
+    
+    public WebJarAssets webjars () { return webJarAssets; }
+    
     String getText (final String id) {
         try {
             return cache.getOrElse(id, new Callable<String> () {
@@ -62,10 +66,10 @@ public class MathJax extends Controller {
                 return ok (mathjax.render(text));
             }
         }
-        return ok (mathbox.render());
+        return ok (mathbox.render(this));
     }
     
-    @BodyParser.Of(value=BodyParser.FormUrlEncoded.class, maxLength=1024*10)
+    @BodyParser.Of(value=BodyParser.FormUrlEncoded.class)
     public Result mathjax () {
         String[] params = request().body().asFormUrlEncoded().get("matharea");
         if (params != null && params.length > 0) {

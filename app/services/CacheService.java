@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import play.Configuration;
 import play.cache.CacheApi;
 import play.Logger;
 import play.Application;
@@ -34,15 +35,12 @@ public class CacheService implements CacheApi {
     final Ehcache cache;
 
     @Inject
-    public CacheService (Application app, ApplicationLifecycle lifecycle) {
-        int maxElements = app.configuration()
-            .getInt(CACHE_MAX_ELEMENTS, MAX_ELEMENTS);
+    public CacheService (Configuration conf, ApplicationLifecycle lifecycle) {
+        int maxElements = conf.getInt(CACHE_MAX_ELEMENTS, MAX_ELEMENTS);
         CacheConfiguration config =
             new CacheConfiguration (getClass().getName(), maxElements)
-            .timeToLiveSeconds(app.configuration()
-                               .getInt(CACHE_TIME_TO_LIVE, TIME_TO_LIVE))
-            .timeToIdleSeconds(app.configuration()
-                               .getInt(CACHE_TIME_TO_IDLE, TIME_TO_IDLE));
+            .timeToLiveSeconds(conf.getInt(CACHE_TIME_TO_LIVE, TIME_TO_LIVE))
+            .timeToIdleSeconds(conf.getInt(CACHE_TIME_TO_IDLE, TIME_TO_IDLE));
         cache = CacheManager.getInstance()
             .addCacheIfAbsent(new Cache (config));
         cache.setSampledStatisticsEnabled(true);

@@ -7,7 +7,7 @@ lazy val buildDate = (new java.text.SimpleDateFormat("yyyyMMdd"))
 lazy val appVersion = "%s-%s-%s".format(branch, buildDate, commit)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   version := appVersion
 )
 
@@ -27,16 +27,12 @@ lazy val commonDependencies = Seq(
   "org.apache.lucene" % "lucene-queryparser" % "3.6.2",
   "org.apache.lucene" % "lucene-queries" % "3.6.2",
   "org.apache.lucene" % "lucene-analyzers" % "3.6.2",
-  "net.sf.ehcache" % "ehcache" % "2.10.1",
   "org.quartz-scheduler" % "quartz" % "2.2.2",
   "org.reflections" % "reflections" % "0.9.10" notTransitive (),
   "junit"             % "junit"           % "4.12"  % "test",
   "com.novocode"      % "junit-interface" % "0.11"  % "test",
-  "com.fasterxml.jackson.core" % "jackson-core" % "2.6.3",
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.3",
-  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.6.3",
   "log4j" % "log4j" % "1.2.17",
-  "org.webjars" %% "webjars-play" % "2.4.0",
+  "org.webjars" %% "webjars-play" % "2.5.0",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "handlebars" % "4.0.2",
@@ -87,8 +83,3 @@ lazy val core = (project in file("modules/core"))
     libraryDependencies += "com.typesafe" % "config" % "1.2.0",
     javacOptions ++= javaBuildOptions
 ).dependsOn(buildinfo).aggregate(buildinfo)
-
-
-// Play provides two styles of routers, one expects its actions to be injected, the
-// other, legacy style, accesses its actions statically.
-routesGenerator := InjectedRoutesGenerator
