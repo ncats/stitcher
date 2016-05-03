@@ -21,12 +21,12 @@ lazy val commonDependencies = Seq(
   javaJdbc,
   cache,
   javaWs,
-  "org.neo4j" % "neo4j" % "2.3.2",
-  "org.apache.lucene" % "lucene-facet" % "3.6.2",
-  "org.apache.lucene" % "lucene-highlighter" % "3.6.2",
-  "org.apache.lucene" % "lucene-queryparser" % "3.6.2",
-  "org.apache.lucene" % "lucene-queries" % "3.6.2",
-  "org.apache.lucene" % "lucene-analyzers" % "3.6.2",
+  "org.neo4j" % "neo4j" % "3.0.0",
+  "org.apache.lucene" % "lucene-core" % "5.5.0",
+  "org.apache.lucene" % "lucene-facet" % "5.5.0",
+  "org.apache.lucene" % "lucene-analyzers-common" % "5.5.0",
+  "org.apache.lucene" % "lucene-queryparser" % "5.5.0",
+  "org.apache.lucene" % "lucene-queries" % "5.5.0",
   "org.quartz-scheduler" % "quartz" % "2.2.2",
   "org.reflections" % "reflections" % "0.9.10" notTransitive (),
   "junit"             % "junit"           % "4.12"  % "test",
@@ -77,7 +77,7 @@ lazy val core = (project in file("modules/core"))
   .settings(name := "ixcurator-core",
     unmanagedBase <<= baseDirectory { base => base / "../../lib" },
     cleanFiles <<= baseDirectory {
-      base => ((base / "../../") ** "_ix*.db").get
+      base => ((base / "../../") ** "_ix*.db").get ++ (base / "target").get
     },
     libraryDependencies ++= commonDependencies,
     libraryDependencies += "com.typesafe" % "config" % "1.2.0",

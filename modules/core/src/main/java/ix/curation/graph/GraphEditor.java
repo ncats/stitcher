@@ -8,7 +8,6 @@ import ix.curation.StitchKey;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -25,11 +24,9 @@ public class GraphEditor {
             (GraphEditor.class.getName());
 
     protected final GraphDatabaseService gdb;
-    protected final GlobalGraphOperations gop;
 
     public GraphEditor (GraphDatabaseService gdb) {
         this.gdb = gdb;
-        this.gop = GlobalGraphOperations.at(gdb);
     }
 
     public void deprecateMetaLabel(Label source, RelationshipType type, boolean strict, int limit, boolean test) {
@@ -495,13 +492,12 @@ public class GraphEditor {
 
             PrintStream fos = new PrintStream(new FileOutputStream(filename));
             Set<Long> visited = new HashSet<>();
-            GlobalGraphOperations gop = GlobalGraphOperations.at(gdb);
             ArrayList<String> labels = new ArrayList<>(Arrays.asList(labelSet));
             StringBuffer sb = new StringBuffer();
             sb.append("IDs\tName\tLyChI\tsmiles");
             for (String entry: labels)
                 sb.append("\t"+entry);
-            for (Label l: gop.getAllLabels())
+            for (Label l: gdb.getAllLabels())
                 if (!l.name().startsWith("CC_") && !labels.contains(l.name())) {
                     String lName = l.name();
                     if (lName.indexOf('-') > -1 && new Scanner(lName.substring(lName.indexOf('-')+1)).hasNextInt())

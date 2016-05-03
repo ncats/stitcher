@@ -28,8 +28,6 @@ import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.index.lucene.LuceneTimeline;
 import org.neo4j.index.lucene.TimelineIndex;
 
-import org.neo4j.tooling.GlobalGraphOperations;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -467,7 +465,6 @@ public class EntityFactory implements Props {
 
     protected final GraphDb graphDb;
     protected final GraphDatabaseService gdb;
-    protected final GlobalGraphOperations gop;
     protected final TimelineIndex<Node> timeline;
     
     public EntityFactory (String dir) throws IOException {
@@ -488,7 +485,6 @@ public class EntityFactory implements Props {
         
         this.graphDb = graphDb;
         this.gdb = graphDb.graphDb();
-        this.gop = GlobalGraphOperations.at(gdb);
         try (Transaction tx = gdb.beginTx()) {
             this.timeline = new LuceneTimeline
                 (gdb, gdb.index().forNodes(CNode.NODE_TIMELINE));
@@ -642,7 +638,7 @@ public class EntityFactory implements Props {
         (StitchKey key, Label... labels) {
         Map<Object, Integer> values = new HashMap<Object, Integer>();
         try (Transaction tx = gdb.beginTx()) {
-            for (Relationship rel : gop.getAllRelationships()) {
+            for (Relationship rel : gdb.getAllRelationships()) {
                 if (rel.isType(key) && rel.hasProperty(Entity.VALUE)
                     && (labels == null
                         || (hasLabel (rel.getStartNode(), labels)

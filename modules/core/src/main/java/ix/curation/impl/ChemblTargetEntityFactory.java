@@ -1,5 +1,6 @@
 package ix.curation.impl;
 
+import java.io.File;
 import ix.curation.*;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.*;
@@ -148,7 +149,7 @@ public class ChemblTargetEntityFactory extends EntityRegistry {
         ResultSet rset = pst.executeQuery();
 
         GraphDatabaseService gdb = new GraphDatabaseFactory()
-                .newEmbeddedDatabase(argv[0]);
+            .newEmbeddedDatabase(new File (argv[0]));
 
         try (Transaction tx = gdb.beginTx()) {
             ChemblTargetEntityFactory ctef = new ChemblTargetEntityFactory(gdb);

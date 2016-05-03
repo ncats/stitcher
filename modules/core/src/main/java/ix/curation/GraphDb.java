@@ -14,19 +14,15 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.graphdb.event.*;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.*;
 import org.apache.lucene.store.*;
 import org.apache.lucene.facet.taxonomy.*;
 import org.apache.lucene.facet.taxonomy.directory.*;
-import org.apache.lucene.facet.index.CategoryDocumentBuilder;
 import org.apache.lucene.util.Version;
-import org.apache.lucene.analysis.KeywordAnalyzer;
-import org.apache.lucene.facet.index.CategoryContainer;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
 /**
  * wrapper around GraphDatabaseService instance
@@ -49,10 +45,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
     protected final GraphDatabaseService gdb;
     protected CacheFactory cache;
     protected final AtomicLong lastUpdated = new AtomicLong ();
-
     protected IndexWriter indexWriter;
-    protected DirectoryTaxonomyWriter taxonWriter;
-    protected CategoryDocumentBuilder taxonBuilder;
 
     protected GraphDb (File dir) throws IOException {
         this (dir, null);
@@ -60,7 +53,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
 
     static IndexWriterConfig createLuceneConfig () {
         IndexWriterConfig conf = new IndexWriterConfig
-            (Version.LUCENE_CURRENT, new KeywordAnalyzer ());
+            (new KeywordAnalyzer ());
         return conf;
     }
     
@@ -74,16 +67,9 @@ public class GraphDb extends TransactionEventHandler.Adapter
 
         File path = new File (ixdb, DEFAULT_INDEX);
         path.mkdirs();
-        Directory luceneDir = new NIOFSDirectory (path);
+        Directory luceneDir = new NIOFSDirectory (path.toPath());
         indexWriter = new IndexWriter (luceneDir, createLuceneConfig ());
 
-        path = new File (ixdb, DEFAULT_TAXON);
-        path.mkdirs();
-        luceneDir = new NIOFSDirectory (path);
-        taxonWriter = new DirectoryTaxonomyWriter
-            (luceneDir, IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-        taxonBuilder = new CategoryDocumentBuilder (taxonWriter);
-        
         // this must be initialized after graph initialization
         if (cache == null) {
             this.cache = CacheFactory.getInstance
@@ -116,14 +102,8 @@ public class GraphDb extends TransactionEventHandler.Adapter
 
         for (Node node : data.createdNodes()) {
             Document doc = createDoc (node);
-            CategoryContainer cats = new CategoryContainer ();
-            for (Label label : node.getLabels()) {
-                cats.addCategory(new CategoryPath ("node", label.name()));
-            }
-            taxonBuilder.setCategories(cats);
-            indexWriter.addDocument(taxonBuilder.build(doc));
+            indexWriter.addDocument(doc);
         }
-
         indexWriter.commit();
     }
 
@@ -174,7 +154,6 @@ public class GraphDb extends TransactionEventHandler.Adapter
     public void beforeShutdown () {
         INSTANCES.remove(dir);  
         try {
-            taxonWriter.close();
             indexWriter.close();
         }
         catch (IOException ex) {

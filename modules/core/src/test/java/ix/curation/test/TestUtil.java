@@ -11,7 +11,6 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.traversal.*;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import ix.curation.*;
 

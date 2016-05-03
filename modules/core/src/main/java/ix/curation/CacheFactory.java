@@ -27,10 +27,11 @@ import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 import org.apache.lucene.index.*;
 import org.apache.lucene.store.*;
 import org.apache.lucene.search.*;
-import org.apache.lucene.analysis.*;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.Document;
 
 public class CacheFactory
@@ -146,7 +147,7 @@ public class CacheFactory
     }
 
     static Object getValue (Document doc) throws Exception {
-        byte[] data = doc.getBinaryValue(VALUE);
+        byte[] data = doc.getBinaryValue(VALUE).bytes;
         ObjectInputStream ois = new ObjectInputStream
             (new ByteArrayInputStream (data));
         return ois.readObject();
@@ -163,7 +164,7 @@ public class CacheFactory
         
         String id = getKey ((Serializable)key);
         IndexSearcher searcher = new IndexSearcher
-            (IndexReader.open(indexWriter, true));
+            (DirectoryReader.open(indexWriter, true));
         try {
             TermQuery query = new TermQuery (new Term (KEY, id));           
             TopDocs hits = searcher.search(query, 1);
@@ -178,7 +179,6 @@ public class CacheFactory
         }
         finally {
             searcher.getIndexReader().close();
-            searcher.close();
         }
     }
     
@@ -186,14 +186,9 @@ public class CacheFactory
      * CacheWriter interface
      */
     static IndexWriter initIndex (File path) throws IOException {
-        Directory dir = new NIOFSDirectory (path);
-        Map<String, Analyzer> fields = new HashMap<String, Analyzer>();
-        fields.put(KEY, new KeywordAnalyzer ());
-        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper
-            (new StandardAnalyzer (Version.LUCENE_CURRENT), fields);
-        
+        Directory dir = new NIOFSDirectory (path.toPath());
         IndexWriterConfig config = new IndexWriterConfig
-            (Version.LUCENE_CURRENT, analyzer);
+            (new KeywordAnalyzer ());
         IndexWriter indexWriter = new IndexWriter (dir, config);
         logger.info("##### initializing cache: "+path
                     +"; "+indexWriter.numDocs()+" entries! ######");
@@ -247,9 +242,7 @@ public class CacheFactory
             try {
                 Document doc = new Document ();
                 String id = getKey (key);
-                Field f = new Field (KEY, true, id, Field.Store.NO,
-                                     Field.Index.NOT_ANALYZED,
-                                     Field.TermVector.NO);
+                Field f = new StringField (KEY, id, Field.Store.NO);
                 doc.add(f);
                 doc.add(new Field
                         (VALUE, Util.serialize(elm.getObjectValue())));

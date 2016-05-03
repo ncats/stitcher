@@ -54,7 +54,7 @@ public class MakeABigDump {
 
         // set connected component labels
         gdb = new GraphDatabaseFactory()
-                .newEmbeddedDatabase(neoDB);
+            .newEmbeddedDatabase(new File (neoDB));
         try {
             RelationshipType[] keys = {StitchKey.I_UNII, StitchKey.I_CAS, StitchKey.N_Name,
                     StitchKey.H_LyChI_L4, StitchKey.H_LyChI_L5, PredicateType.ActiveMoiety, PredicateType.ConceptOf};
@@ -67,7 +67,7 @@ public class MakeABigDump {
         }
 
         gdb = new GraphDatabaseFactory()
-                .newEmbeddedDatabase(neoDB);
+            .newEmbeddedDatabase(new File (neoDB));
         try {
             GraphEditor ge = new GraphEditor(gdb);
 
@@ -95,7 +95,7 @@ public class MakeABigDump {
         String[] main6 = {neoDB, chembl, chemblURL, "I_UniProt:I_UniProt", "I_ChEMBL:I_ChEMBL", "N_Name:GENERIC_NAME", "id:chembl_id"};
         MoleculeEntityFactory.main(main6);
 
-        gdb = new GraphDatabaseFactory().newEmbeddedDatabase(neoDB);
+        gdb = new GraphDatabaseFactory().newEmbeddedDatabase(new File (neoDB));
         try {
             GraphEditor ge = new GraphEditor(gdb);
             RelationshipType[] conservativeKeys = {StitchKey.I_UNII, StitchKey.H_LyChI_L5, StitchKey.N_Name, StitchKey.H_LyChI_L4, StitchKey.I_CAS};

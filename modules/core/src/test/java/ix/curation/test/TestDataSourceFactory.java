@@ -120,10 +120,10 @@ public class TestDataSourceFactory {
         MoleculeEntityFactory mef = new MoleculeEntityFactory (graphDb);
         mef.setId("ncgc_id");
         mef.add("PUBCHEM_SUBSTANCE_SYNONYM", new StitchKeyMapper () {
-                public Map<StitchKey, Object> map (String value) {
+                public Map<StitchKey, Object> map (Object value) {
                     Map<StitchKey, Set<String>> values =
                         new HashMap<StitchKey, Set<String>>();
-                    for (String s : value.split("\n")) {
+                    for (String s : value.toString().split("\n")) {
                         if (s.startsWith("DSSTox")) {
                             // ignore
                         }
