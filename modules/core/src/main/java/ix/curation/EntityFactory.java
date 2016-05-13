@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.DynamicLabel;
@@ -112,27 +113,27 @@ public class EntityFactory implements Props {
             try (Transaction tx = gdb.beginTx()) {
                 UnionFind eqv = new UnionFind ();
                 List<Long> singletons = new ArrayList<Long>();
-                for (Iterator<Node> it = gdb.findNodes(AuxNodeType.ENTITY);
-                     it.hasNext(); ) {
-                    Node node = it.next();
-                    int edges = 0;
-                    for (Relationship rel
-                             : node.getRelationships(Direction.BOTH,
-                                                     Entity.KEYS)) {
-                        eqv.union(rel.getStartNode().getId(),
-                                  rel.getEndNode().getId());
-                        ++edges;
-                    }
-                    
-                    if (edges == 0) {
-                        singletons.add(node.getId());
-                    }
-                }
+
+                gdb.findNodes(AuxNodeType.ENTITY).stream().forEach(node -> {
+                        int edges = 0;
+                        for (Relationship rel
+                                 : node.getRelationships(Direction.BOTH,
+                                                         Entity.KEYS)) {
+                            eqv.union(rel.getStartNode().getId(),
+                                      rel.getEndNode().getId());
+                            ++edges;
+                        }
+                        
+                        if (edges == 0) {
+                            singletons.add(node.getId());
+                        }
+                    });
                 
                 this.singletons = new long[singletons.size()];
                 for (int i = 0; i < this.singletons.length; ++i)
                     this.singletons[i] = singletons.get(i);
-                components = eqv.components();          
+                components = eqv.components();
+                tx.success();
             }
             this.gdb = gdb;
         }
@@ -163,6 +164,7 @@ public class EntityFactory implements Props {
                     for (int i = 0; i < cc.length; ++i) {
                         comp[i] = new Entity (gdb.getNodeById(cc[i]));
                     }
+                    tx.success();
                 }
             }
             else {
@@ -171,6 +173,7 @@ public class EntityFactory implements Props {
                     comp[0] = new Entity
                         (gdb.getNodeById
                          (singletons[current-components.length]));
+                    tx.success();
                 }
             }
             ++current;
@@ -208,6 +211,7 @@ public class EntityFactory implements Props {
                     }
                     adj[i] = bs;
                 }
+                tx.success();
             }
             this.key = key;
         }
@@ -240,6 +244,8 @@ public class EntityFactory implements Props {
                 int i = 0;
                 for (Long id : nodes)
                     entities[i++] = Entity._getEntity(gdb.getNodeById(id));
+                
+                tx.success();
             }
             id = Util.sha1(nodes).substring(0, 9);
             root = node;
@@ -288,6 +294,7 @@ public class EntityFactory implements Props {
 
                 for (StitchKey key : keys)
                     update (gnodes, key);
+                tx.success();
             }
             id = Util.sha1(clique).substring(0, 9);
         }
@@ -488,6 +495,7 @@ public class EntityFactory implements Props {
         try (Transaction tx = gdb.beginTx()) {
             this.timeline = new LuceneTimeline
                 (gdb, gdb.index().forNodes(CNode.NODE_TIMELINE));
+            tx.success();
         }
     }
 
@@ -529,36 +537,35 @@ public class EntityFactory implements Props {
         UnionFind eqv = new UnionFind ();
         
         try (Transaction tx = gdb.beginTx()) {
-            for (Iterator<Node> it = gdb.findNodes(label); it.hasNext(); ) {
-                Node node = it.next();
-                for (EntityType t : types) {
-                    if (node.hasLabel(t)) {
-                        Integer c = metrics.entityHistogram.get(t);
-                        metrics.entityHistogram.put(t, c != null ? c+1:1);
-                    }
-                }
-                int nrel = 0;
-                for (Relationship rel
-                         : node.getRelationships(Direction.BOTH, keys)) {
-                    Node xn = rel.getOtherNode(node);
-                    // do we count self reference?
-                    if (xn.hasLabel(label)) {
-                        if (!xn.equals(node)) {
-                            eqv.union(node.getId(), xn.getId());
-                            ++metrics.stitchCount;
+            gdb.findNodes(label).stream().forEach(node -> {
+                    for (EntityType t : types) {
+                        if (node.hasLabel(t)) {
+                            Integer c = metrics.entityHistogram.get(t);
+                            metrics.entityHistogram.put(t, c != null ? c+1:1);
                         }
-                        String key = rel.getType().name();
-                        Integer c = metrics.stitchHistogram.get(key);
-                        metrics.stitchHistogram.put(key, c != null ? c+1:1);
-                        ++nrel;
                     }
-                }
-                Integer c = metrics.entitySizeDistribution.get(nrel);
-                metrics.entitySizeDistribution.put(nrel, c!=null ? c+1:1);
-                
-                ++metrics.entityCount;
-            }
-
+                    int nrel = 0;
+                    for (Relationship rel
+                             : node.getRelationships(Direction.BOTH, keys)) {
+                        Node xn = rel.getOtherNode(node);
+                        // do we count self reference?
+                        if (xn.hasLabel(label)) {
+                            if (!xn.equals(node)) {
+                                eqv.union(node.getId(), xn.getId());
+                                ++metrics.stitchCount;
+                            }
+                            String key = rel.getType().name();
+                            Integer c = metrics.stitchHistogram.get(key);
+                            metrics.stitchHistogram.put(key, c != null ? c+1:1);
+                            ++nrel;
+                        }
+                    }
+                    Integer c = metrics.entitySizeDistribution.get(nrel);
+                    metrics.entitySizeDistribution.put(nrel, c!=null ? c+1:1);
+                    
+                    ++metrics.entityCount;
+                });
+            
             // we're double counting, so now we correct the counts
             metrics.stitchCount /= 2;
             for (String k : metrics.stitchHistogram.keySet()) {
@@ -578,31 +585,30 @@ public class EntityFactory implements Props {
                 metrics.connectedComponentHistogram.put
                     (comps[c].length, cnt!= null ? cnt+1:1);
             }
-            int cc = comps.length;
+            AtomicInteger cc = new AtomicInteger (comps.length);
             
             // now tag each node
             if (!label.name().startsWith("CC_")) {
-                for (Iterator<Node> it = gdb.findNodes(label); it.hasNext();) {
-                    Node node = it.next();
-                    for (Label l: node.getLabels())
-                        if (l.name().startsWith("CC_")
-                            || l.name().equals(AuxNodeType.SINGLETON.name()))
-                            node.removeLabel(l);
-                    Integer c = labels.get(node.getId());
-                    if (c == null) {
-                        node.addLabel(AuxNodeType.SINGLETON);
-                        ++metrics.singletonCount;
-                        c = ++cc; // increment the cc id
-                    }
-                    node.addLabel(DynamicLabel.label("CC_"+c));
-                }
+                gdb.findNodes(label).stream().forEach(node -> {
+                        for (Label l: node.getLabels())
+                            if (l.name().startsWith("CC_")
+                                || l.name().equals(AuxNodeType.SINGLETON.name()))
+                                node.removeLabel(l);
+                        Integer c = labels.get(node.getId());
+                        if (c == null) {
+                            node.addLabel(AuxNodeType.SINGLETON);
+                            ++metrics.singletonCount;
+                            c = cc.incrementAndGet(); // increment the cc id
+                        }
+                        node.addLabel(DynamicLabel.label("CC_"+c));
+                    });
             }
             
             if (metrics.singletonCount > 0) {
                 metrics.connectedComponentHistogram.put
                     (1, metrics.singletonCount);
             }
-            metrics.connectedComponentCount = cc;
+            metrics.connectedComponentCount = cc.get();
 
             tx.success();
         }
@@ -648,6 +654,7 @@ public class EntityFactory implements Props {
                         values.put(val, c!=null ? c+1:1);
                 }
             }
+            tx.success();
         }
         return values;
     }
@@ -660,6 +667,7 @@ public class EntityFactory implements Props {
             IndexHits<Relationship> hits = index.get(key.name(), value);
             count = hits.size();
             hits.close();
+            tx.success();
         }
         return count;
     }
@@ -731,11 +739,10 @@ public class EntityFactory implements Props {
     public Collection<Component> components () {
         List<Component> comps = new ArrayList<Component>();
         try (Transaction tx = gdb.beginTx()) {
-            for (Iterator<Node> it = gdb.findNodes(AuxNodeType.COMPONENT);
-                 it.hasNext(); ) {
-                Node node = it.next();
-                comps.add(new ComponentImpl (node));
-            }
+            gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
+                    comps.add(new ComponentImpl (node));
+                });
+            tx.success();
         }
         
         return comps;
@@ -767,6 +774,7 @@ public class EntityFactory implements Props {
                 }
             }
             result.close();
+            tx.success();
         }
         
         return page.toArray(new Entity[0]);
@@ -810,6 +818,8 @@ public class EntityFactory implements Props {
             for (Long id : ids) {
                 nodes[i++] = id;
             }
+            tx.success();
+            
             return cliqueEnumeration (keys, nodes, visitor);
         }
     }
@@ -834,6 +844,8 @@ public class EntityFactory implements Props {
         try (Transaction tx = gdb.beginTx()) {
             for (int i = 0; i < nodes.length; ++i)
                 nodes[i] = entities[i].getId();
+            tx.success();
+            
             return cliqueEnumeration (keys, nodes, visitor);
         }
     }

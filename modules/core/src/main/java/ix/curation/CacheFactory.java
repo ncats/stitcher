@@ -50,6 +50,8 @@ public class CacheFactory
     protected final Ehcache cache;
     protected final AtomicLong refs = new AtomicLong (1l);
     protected IndexWriter indexWriter;
+    protected DirectoryReader indexReader;
+    protected IndexSearcher indexSearcher;
     
     private CacheFactory (File dir) throws IOException {        
         dir.mkdirs();
@@ -93,6 +95,21 @@ public class CacheFactory
             cache.refs.incrementAndGet();
         }
         return cache;
+    }
+
+    protected synchronized IndexSearcher getIndexSearcher ()
+        throws IOException {
+        if (indexWriter.hasUncommittedChanges()) {
+            indexWriter.commit();
+            DirectoryReader reader =
+                DirectoryReader.openIfChanged(indexReader, indexWriter);
+            if (reader != null) {
+                indexReader.close();
+                indexReader = reader;
+                indexSearcher = new IndexSearcher (reader);
+            }
+        }
+        return indexSearcher;
     }
 
     public <T> T getOrElse (Object key, Callable<T> callable) {
@@ -163,23 +180,17 @@ public class CacheFactory
         }
         
         String id = getKey ((Serializable)key);
-        IndexSearcher searcher = new IndexSearcher
-            (DirectoryReader.open(indexWriter, true));
-        try {
-            TermQuery query = new TermQuery (new Term (KEY, id));           
-            TopDocs hits = searcher.search(query, 1);
-            //logger.info("retrieving cache for "+id+"..."+(hits.totalHits > 0));
-            Element elm = null;
-            if (hits.totalHits > 0) {
-                Document doc = searcher.doc(hits.scoreDocs[0].doc);
-                elm = new Element (key, getValue (doc));
-                cache.put(elm);
-            }
-            return elm;
+        IndexSearcher searcher = getIndexSearcher ();
+        TermQuery query = new TermQuery (new Term (KEY, id));           
+        TopDocs hits = searcher.search(query, 1);
+        //logger.info("retrieving cache for "+id+"..."+(hits.totalHits > 0));
+        Element elm = null;
+        if (hits.totalHits > 0) {
+            Document doc = searcher.doc(hits.scoreDocs[0].doc);
+            elm = new Element (key, getValue (doc));
+            cache.put(elm);
         }
-        finally {
-            searcher.getIndexReader().close();
-        }
+        return elm;
     }
     
     /**
@@ -199,6 +210,8 @@ public class CacheFactory
     public void init () {
         try {
             indexWriter = initIndex (dir);
+            indexReader = DirectoryReader.open(indexWriter);
+            indexSearcher = new IndexSearcher (indexReader);
         }
         catch (IOException ex) {
             logger.log(Level.SEVERE, "Can't initialize lucene for "+dir, ex);
@@ -210,6 +223,7 @@ public class CacheFactory
         try {
             logger.info("#### closing cache writer "+cache.getName()
                         +"; "+indexWriter.numDocs()+" entries #####");
+            indexReader.close();
             indexWriter.close();
         }
         catch (IOException ex) {

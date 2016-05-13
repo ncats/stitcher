@@ -276,12 +276,21 @@ public class MoleculeEntityFactory extends EntityRegistry {
         String[] hk = getCache().getOrElse(hash, new Callable<String[]> () {
                 public String[] call () throws Exception {
                     LyChIStandardizer lychi = new LyChIStandardizer ();
-                    /*
-                     * don't strip salt/solvent if the structure has metals
-                     */
-                    lychi.removeSaltOrSolvent
-                    (stripSalt && !LyChIStandardizer.containMetals(mol));
-                    lychi.standardize(mol);
+                    // only standardize if 
+                    if (mol.getAtomCount() < 1024) {
+                        /*
+                         * don't strip salt/solvent if the structure has metals
+                         */
+                        lychi.removeSaltOrSolvent
+                            (stripSalt
+                             && !LyChIStandardizer.containMetals(mol));
+                        lychi.standardize(mol);
+                    }
+                    else {
+                        logger.warning
+                        ("molecule has "+mol.getAtomCount()
+                         +" atoms; no standardization performed!");
+                    }
                     return LyChIStandardizer.hashKeyArray(mol);
                 }
             });
