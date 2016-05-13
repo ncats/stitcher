@@ -23,6 +23,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.RelationshipIndex;
@@ -537,7 +538,8 @@ public class EntityFactory implements Props {
         UnionFind eqv = new UnionFind ();
         
         try (Transaction tx = gdb.beginTx()) {
-            gdb.findNodes(label).stream().forEach(node -> {
+            ResourceIterator<Node> nodes = gdb.findNodes(label);
+            nodes.stream().forEach(node -> {
                     for (EntityType t : types) {
                         if (node.hasLabel(t)) {
                             Integer c = metrics.entityHistogram.get(t);
@@ -565,6 +567,7 @@ public class EntityFactory implements Props {
                     
                     ++metrics.entityCount;
                 });
+            nodes.close();
             
             // we're double counting, so now we correct the counts
             metrics.stitchCount /= 2;
@@ -589,7 +592,8 @@ public class EntityFactory implements Props {
             
             // now tag each node
             if (!label.name().startsWith("CC_")) {
-                gdb.findNodes(label).stream().forEach(node -> {
+                nodes = gdb.findNodes(label);
+                nodes.stream().forEach(node -> {
                         for (Label l: node.getLabels())
                             if (l.name().startsWith("CC_")
                                 || l.name().equals(AuxNodeType.SINGLETON.name()))
@@ -602,6 +606,7 @@ public class EntityFactory implements Props {
                         }
                         node.addLabel(DynamicLabel.label("CC_"+c));
                     });
+                nodes.close();
             }
             
             if (metrics.singletonCount > 0) {

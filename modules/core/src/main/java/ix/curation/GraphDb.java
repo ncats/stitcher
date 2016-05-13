@@ -13,8 +13,12 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.config.Setting;
 import org.neo4j.graphdb.event.*;
+import org.neo4j.graphdb.schema.IndexDefinition;
 
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.*;
@@ -37,6 +41,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
     static final String DEFAULT_IXDB = "ix.db"; // top-level
 
     static final Logger logger = Logger.getLogger(GraphDb.class.getName());
+    static {
+        /**
+         * VERY IMPORTANT: by default version neo4j version 3 set this
+         * to be IndexWriter.MAX_DOCS (2147483519). This will likely
+         * to generate "Too many open files" exceptions for any reasonably
+         * sized database!
+         */
+        System.setProperty("labelScanStore.maxPartitionSize", "200");
+    }
 
     static final Map<File, GraphDb> INSTANCES =
         new ConcurrentHashMap<File, GraphDb>();
@@ -56,9 +69,12 @@ public class GraphDb extends TransactionEventHandler.Adapter
             (new KeywordAnalyzer ());
         return conf;
     }
-    
+
     protected GraphDb (File dir, CacheFactory cache) throws IOException {
-        gdb = new GraphDatabaseFactory().newEmbeddedDatabase(dir);
+        gdb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dir)
+            .setConfig(GraphDatabaseSettings.dump_configuration, "true")
+            .newGraphDatabase();
+
         gdb.registerTransactionEventHandler(this);
         gdb.registerKernelEventHandler(this);
 
@@ -68,7 +84,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
         File path = new File (ixdb, DEFAULT_INDEX);
         path.mkdirs();
         Directory luceneDir = new NIOFSDirectory (path.toPath());
-        indexWriter = new IndexWriter (luceneDir, createLuceneConfig ());
+        //indexWriter = new IndexWriter (luceneDir, createLuceneConfig ());
 
         // this must be initialized after graph initialization
         if (cache == null) {
@@ -97,14 +113,14 @@ public class GraphDb extends TransactionEventHandler.Adapter
 
     void updateIndex (TransactionData data) throws Exception {
         for (Node node : data.deletedNodes()) {
-            indexWriter.deleteDocuments(createTerm (node));
+            //indexWriter.deleteDocuments(createTerm (node));
         }
 
         for (Node node : data.createdNodes()) {
             Document doc = createDoc (node);
-            indexWriter.addDocument(doc);
+            //indexWriter.addDocument(doc);
         }
-        indexWriter.commit();
+        //indexWriter.commit();
     }
 
     @Override
@@ -144,6 +160,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
                 }
                 return new CNode (node);
             }
+            tx.success();
         }
         return null;
     }
@@ -152,13 +169,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
      * KernelEventHandler
      */
     public void beforeShutdown () {
-        INSTANCES.remove(dir);  
+        logger.info("Instance "+dir+" shutting down...");
+        INSTANCES.remove(dir);
+        /*
         try {
             indexWriter.close();
         }
         catch (IOException ex) {
             ex.printStackTrace();
-        }
+            }*/
     }
 
     public Object getResource () {
