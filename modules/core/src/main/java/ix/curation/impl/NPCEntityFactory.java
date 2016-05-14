@@ -43,8 +43,20 @@ public class NPCEntityFactory extends MoleculeEntityFactory {
         
         NPCEntityFactory nef = new NPCEntityFactory (argv[0]);
         for (int i = 1; i < argv.length; ++i) {
-            logger.info("***** registering "+argv[i]+" ******");
-            nef.register(argv[i]);
+            int pos = argv[i].indexOf('=');
+            if (pos > 0) {
+                String name = argv[i].substring(0, pos);
+                if (name.equalsIgnoreCase("cache")) {
+                    nef.setCache(argv[i].substring(pos+1));
+                }
+                else {
+                    logger.warning("** Unknown parameter \""+name+"\"!");
+                }
+            }
+            else {
+                logger.info("***** registering "+argv[i]+" ******");
+                nef.register(argv[i]);
+            }
         }
         nef.shutdown();
     }

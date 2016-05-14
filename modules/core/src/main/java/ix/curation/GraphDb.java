@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -19,6 +20,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.graphdb.event.*;
 import org.neo4j.graphdb.schema.IndexDefinition;
+import org.neo4j.graphdb.schema.IndexCreator;
 
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.*;
@@ -41,14 +43,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
     static final String DEFAULT_IXDB = "ix.db"; // top-level
 
     static final Logger logger = Logger.getLogger(GraphDb.class.getName());
+
+    /**
+     * VERY IMPORTANT: by default version neo4j version 3 set this
+     * to be true, which in turn uses the BlockTreeOrdsPostingsFormat
+     * codec that generates a large number of files when traversing the 
+     * nodes and as a result we get "Too many open files" exceptions.
+     */
     static {
-        /**
-         * VERY IMPORTANT: by default version neo4j version 3 set this
-         * to be IndexWriter.MAX_DOCS (2147483519). This will likely
-         * to generate "Too many open files" exceptions for any reasonably
-         * sized database!
-         */
-        System.setProperty("labelScanStore.maxPartitionSize", "200");
+        System.setProperty("org.neo4j.kernel.api.impl.index.IndexWriterConfigs.block.tree.ords.posting.format", "false");
     }
 
     static final Map<File, GraphDb> INSTANCES =
@@ -57,6 +60,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
     protected final File dir;
     protected final GraphDatabaseService gdb;
     protected CacheFactory cache;
+    protected boolean localCache;
     protected final AtomicLong lastUpdated = new AtomicLong ();
     protected IndexWriter indexWriter;
 
@@ -78,6 +82,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
         gdb.registerTransactionEventHandler(this);
         gdb.registerKernelEventHandler(this);
 
+        /*
+        try (Transaction tx = gdb.beginTx()) {
+            IndexCreator index = gdb.schema().indexFor(AuxNodeType.ENTITY);
+            IndexDefinition def = index.create();
+            gdb.schema().awaitIndexOnline(def, 10, TimeUnit.SECONDS);
+            tx.success();
+        }
+        */
+
         File ixdb = new File (dir, DEFAULT_IXDB);
         ixdb.mkdirs();
 
@@ -90,9 +103,11 @@ public class GraphDb extends TransactionEventHandler.Adapter
         if (cache == null) {
             this.cache = CacheFactory.getInstance
                    (new File (ixdb, DEFAULT_CACHE));
+            localCache = true;
         }
         else {
             this.cache = cache;
+            localCache = false;
         }
         this.dir = dir;
     }
@@ -146,8 +161,9 @@ public class GraphDb extends TransactionEventHandler.Adapter
     
     public File getPath () { return dir; }
     public void shutdown () {
-        cache.shutdown();
         gdb.shutdown();
+        if (localCache)
+            cache.shutdown();
     }
 
     public CNode getNode (long id) {
