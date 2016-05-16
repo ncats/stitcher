@@ -171,44 +171,6 @@ public class MoleculeEntityFactory extends EntityRegistry {
         }
 
         // now add any mapper
-        /*
-        stitchMappers.putAll(stitches);
-        for (Map.Entry<String, StitchKeyMapper> me : mappers.entrySet()) {
-            String value = mol.getProperty(me.getKey());
-            if (value != null) {
-                Map<StitchKey, Object> mapping = me.getValue().map(value);
-                for (Map.Entry<StitchKey, Object> m : mapping.entrySet()) {
-                    //logger.info("mapper "+m.getKey()+" => "+m.getValue());
-                    Object val = m.getValue();
-                    if (val == null) {
-                    }
-                    else if (m.getKey() == StitchKey.T_Keyword) {
-                        if (val.getClass().isArray()) {
-                            int len = Array.getLength(val);
-                            for (int i = 0; i < len; ++i) {
-                                Object t = Array.get(val, i);
-                                ent._addLabel(DynamicLabel.label(t.toString()));
-                            }
-                        }
-                        else
-                            ent._addLabel(DynamicLabel.label(val.toString()));
-                    }
-                    else {
-                        ent._add(m.getKey(),
-                                 new StitchValue (me.getKey(), val));
-                    }
-                    
-                    Set<String> props = stitchMappers.get(m.getKey());
-                    if (props == null) {
-                        stitchMappers.put(m.getKey(),
-                                          props = new TreeSet<String>());
-                    }
-                    props.add(me.getKey());
-                }
-                payload.put(me.getKey(), value);
-            }
-        }
-        */
         if (!mappers.isEmpty()) {
             Map<String, Object> values = new HashMap<String, Object>();
             for (String key : mappers.keySet()) {

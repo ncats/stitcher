@@ -234,7 +234,7 @@ public class EntityFactory implements Props {
                     || !node.hasProperty(CNode.RANK))
                     throw new IllegalArgumentException
                         ("Not a valid component node: "+node.getId());
-                traverse (node);
+                traverse (gdb, node);
 
                 Integer rank = (Integer)node.getProperty(CNode.RANK);
                 if (rank != nodes.size())
@@ -252,12 +252,15 @@ public class EntityFactory implements Props {
             root = node;
         }
 
-        void traverse (Node node) {
-            nodes.add(node.getId());
-            for (Relationship rel : node.getRelationships
-                     (AuxRelType.CC, Direction.INCOMING)) {
-                traverse (rel.getOtherNode(node));
-            }
+        void traverse (GraphDatabaseService gdb, Node node) {
+            gdb.findNodes(CNode.CLASS_LABEL,
+                          Props.PARENT, node.getId()).stream()
+                .forEach(n -> {
+                        Long pid = (Long)n.getProperty(Props.PARENT);
+                        nodes.add(n.getId());
+                        if (!pid.equals(n.getId()))
+                            traverse (gdb, n);
+                    });
         }
 
         public String getId () { return id; }
@@ -823,7 +826,6 @@ public class EntityFactory implements Props {
             for (Long id : ids) {
                 nodes[i++] = id;
             }
-            tx.success();
             
             return cliqueEnumeration (keys, nodes, visitor);
         }
@@ -849,7 +851,6 @@ public class EntityFactory implements Props {
         try (Transaction tx = gdb.beginTx()) {
             for (int i = 0; i < nodes.length; ++i)
                 nodes[i] = entities[i].getId();
-            tx.success();
             
             return cliqueEnumeration (keys, nodes, visitor);
         }
@@ -892,8 +893,6 @@ public class EntityFactory implements Props {
             if (iterator == null)
                 iterator = new EntityIterator
                     (index.get(key, value).iterator());
-            
-            tx.success();
         }
         return iterator;
     }

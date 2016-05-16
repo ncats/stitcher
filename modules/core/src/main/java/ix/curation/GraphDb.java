@@ -22,14 +22,6 @@ import org.neo4j.graphdb.event.*;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.IndexCreator;
 
-import org.apache.lucene.document.*;
-import org.apache.lucene.index.*;
-import org.apache.lucene.store.*;
-import org.apache.lucene.facet.taxonomy.*;
-import org.apache.lucene.facet.taxonomy.directory.*;
-import org.apache.lucene.util.Version;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
-
 /**
  * wrapper around GraphDatabaseService instance
  */
@@ -62,16 +54,9 @@ public class GraphDb extends TransactionEventHandler.Adapter
     protected CacheFactory cache;
     protected boolean localCache;
     protected final AtomicLong lastUpdated = new AtomicLong ();
-    protected IndexWriter indexWriter;
 
     protected GraphDb (File dir) throws IOException {
         this (dir, null);
-    }
-
-    static IndexWriterConfig createLuceneConfig () {
-        IndexWriterConfig conf = new IndexWriterConfig
-            (new KeywordAnalyzer ());
-        return conf;
     }
 
     protected GraphDb (File dir, CacheFactory cache) throws IOException {
@@ -79,28 +64,40 @@ public class GraphDb extends TransactionEventHandler.Adapter
             .setConfig(GraphDatabaseSettings.dump_configuration, "true")
             .newGraphDatabase();
 
+        try (Transaction tx = gdb.beginTx()) {
+            IndexCreator index = gdb.schema().indexFor(CNode.CLASS_LABEL)
+                .on(Props.PARENT);
+            try {
+                IndexDefinition def = index.create();
+                /*
+                  gdb.schema().awaitIndexOnline
+                  (def, 100, TimeUnit.SECONDS);*/
+            }
+            catch (Exception ex) {
+                logger.info("Index \""+Props.PARENT+"\" already exists!");
+            }
+
+            index = gdb.schema().indexFor(AuxNodeType.SNAPSHOT)
+                .on(Props.PARENT);      
+            try {
+                IndexDefinition def = index.create();
+            }
+            catch (Exception ex) {
+                logger.info("Index \""+AuxNodeType.SNAPSHOT
+                            +"\" already exists!");
+            }
+    
+            tx.success();
+        }
+        
         gdb.registerTransactionEventHandler(this);
         gdb.registerKernelEventHandler(this);
 
-        /*
-        try (Transaction tx = gdb.beginTx()) {
-            IndexCreator index = gdb.schema().indexFor(AuxNodeType.ENTITY);
-            IndexDefinition def = index.create();
-            gdb.schema().awaitIndexOnline(def, 10, TimeUnit.SECONDS);
-            tx.success();
-        }
-        */
-
-        File ixdb = new File (dir, DEFAULT_IXDB);
-        ixdb.mkdirs();
-
-        File path = new File (ixdb, DEFAULT_INDEX);
-        path.mkdirs();
-        Directory luceneDir = new NIOFSDirectory (path.toPath());
-        //indexWriter = new IndexWriter (luceneDir, createLuceneConfig ());
-
         // this must be initialized after graph initialization
         if (cache == null) {
+            File ixdb = new File (dir, DEFAULT_IXDB);
+            ixdb.mkdirs();
+            
             this.cache = CacheFactory.getInstance
                    (new File (ixdb, DEFAULT_CACHE));
             localCache = true;
@@ -112,41 +109,9 @@ public class GraphDb extends TransactionEventHandler.Adapter
         this.dir = dir;
     }
 
-    static Term createTerm (Node node) {
-        Term t = new Term (node.getClass().getName(),
-                           String.valueOf(node.getId()));
-        return t;
-    }
-
-    static Document createDoc (Node node) {
-        Document doc = new Document ();
-        doc.add(new Field (node.getClass().getName(),
-                           String.valueOf(node.getId()), Field.Store.YES,
-                           Field.Index.NOT_ANALYZED_NO_NORMS));
-        return doc;
-    }
-
-    void updateIndex (TransactionData data) throws Exception {
-        for (Node node : data.deletedNodes()) {
-            //indexWriter.deleteDocuments(createTerm (node));
-        }
-
-        for (Node node : data.createdNodes()) {
-            Document doc = createDoc (node);
-            //indexWriter.addDocument(doc);
-        }
-        //indexWriter.commit();
-    }
-
     @Override
     public void afterCommit (TransactionData data, Object state) {
         lastUpdated.set(System.currentTimeMillis());
-        try (Transaction tx = gdb.beginTx()) {
-            updateIndex (data);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     public long getLastUpdated () { return lastUpdated.get(); }
@@ -187,13 +152,6 @@ public class GraphDb extends TransactionEventHandler.Adapter
     public void beforeShutdown () {
         logger.info("Instance "+dir+" shutting down...");
         INSTANCES.remove(dir);
-        /*
-        try {
-            indexWriter.close();
-        }
-        catch (IOException ex) {
-            ex.printStackTrace();
-            }*/
     }
 
     public Object getResource () {
