@@ -108,6 +108,30 @@ public class Entity extends CNode {
         }
         return false;
     }
+
+    public Map<StitchKey, Object> keys () {
+        try (Transaction tx = gdb.beginTx()) {
+            return _keys ();
+        }
+    }
+
+    public Map<StitchKey, Object> _keys () {
+        EnumMap<StitchKey, Object> keys = new EnumMap<>(StitchKey.class);
+        for (StitchKey key : KEYS) {
+            Object value = null;
+            for (Relationship rel
+                     : _node.getRelationships(key, Direction.BOTH)) {
+                Object v = rel.getProperty(VALUE);
+                if (v == null);
+                else if (value == null) value = v;
+                else value = Util.merge(value, v);
+            }
+            
+            if (value != null)
+                keys.put(key, value);
+        }
+        return keys;
+    }
     
     public Entity[] neighbors () {
         return neighbors (Entity.KEYS);
