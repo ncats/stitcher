@@ -2,6 +2,10 @@ package ix.curation;
 
 import java.util.Map;
 
+/*
+ * by virtual of being a clique, all entities returned are 
+ * pairwise connected to each other.
+ */
 public interface Clique extends Component {
     /*
      * return all stitching values that formed this clique. note that if
@@ -12,20 +16,4 @@ public interface Clique extends Component {
      * determine which.
      */
     Map<StitchKey, Object> values ();
-
-    /*
-     * by virtual of being a clique, all entities returned are 
-     * pairwise connected to each other.
-     */
-    
-    /*
-     * return entities that are overlap between this and the given clique.
-     * if there are no overlaps, then null is returned.
-     */
-    Entity[] entities (Clique clique);
-    
-    /*
-     * determine if this clique has any common nodes to the given clique
-     */
-    boolean overlaps (Clique clique);
 }

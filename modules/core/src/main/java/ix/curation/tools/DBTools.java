@@ -55,14 +55,7 @@ public class DBTools {
         for (Iterator<Entity> it = ef.entities(source); it.hasNext(); ) {
             Entity e = it.next();
             ps.print(e.getId());
-            if (e.is(AuxNodeType.SUPERNODE)) {
-                Entity[] nb = e.neighbors(StitchKey.STITCHED);
-                for (Entity n : nb)
-                    ps.print("\t"+n.payloadId());
-            }
-            else {
-                ps.print("\t"+e.payloadId());
-            }
+            ps.print("\t"+e.payloadId());
             ps.println();
         }
     }

@@ -26,3 +26,28 @@ class in a particular module, use the ```runMain``` syntax, e.g.,
 ./activator "project core" "runMain ix.curation.tools.DuctTape"
 ```
 
+Stitching Approach
+==================
+
+We propose a graph-based approach to entity stitching and
+resolution. Briefly, our approach uses clique detection to do the
+stitching and resolution as follows:
+
+1. For a given hypergraph (multi-edge) of stitched entities, extract
+connected components based on stitching keys as defined in
+```StitchKey```.
+
+2. For each connected component, perform exhaustive clique enumeration
+over each stitch key. A clique is a complete subgraph of size 3 or
+larger.
+
+3. Next we identify a set of high confidence cliques. A high
+confidence clique is a clique for which its members do not belong to
+any other clique. All nodes in a clique are merged to become a
+stitched node.
+
+4. For the leftover cliques, we perform a sort by descending order of
+the value |V| * |E| where |V| and |E| are the clique size and the
+cardinality of stitch keys, respectively. Stitched nodes are created
+as we iterate through this order ignoring any nodes that have already
+been stitched.

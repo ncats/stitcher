@@ -9,6 +9,7 @@ public interface Props {
     public static final String STATUS = "status";
     public static final String CREATOR = "creator";
     public static final String PARENT = "parent";
+    public static final String SCORE = "score";
 
     public static final String SOURCE = "source";
     public static final String ID = "id";

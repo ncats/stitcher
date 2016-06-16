@@ -37,7 +37,7 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                     StitchKey.H_LyChI_L3)).toArray(new StitchKey[0]);
 
     static boolean DEBUG = false;
-    
+
     class Expander extends AbstractEntityVisitor {
         public Entity start;
         StitchKey key;
@@ -61,52 +61,118 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
         }
     }
 
+    static class CliqueComponent implements Component {
+        double score;
+        Set<Long> nodes = new TreeSet<Long>();
+        Entity[] entities;
+        String id;
+        
+        CliqueComponent (double score, Entity... entities) {
+            this.score = score;
+            for (Entity e : entities) {
+                nodes.add(e.getId());
+            }
+            
+            id = Util.sha1(nodes).substring(0, 9);    
+            this.entities = entities;
+        }
+
+        public String getId() { return id; }
+        public Entity[] entities () { return entities; }
+        public int size () { return entities.length; }
+        public Set<Long> nodes () { return nodes; }
+        public int hashCode () { return nodes.hashCode(); }
+        public boolean equals (Object obj) {
+            if (obj instanceof Component) {
+                return nodes.equals(((Component)obj).nodes());
+            }
+            return false;
+        }
+
+        public Iterator<Entity> iterator () {
+            return Arrays.asList(entities).iterator();
+        }
+        
+        @Override
+        public Double score () { return score; }
+    }
+
     EntityFactory ef;
     List<Clique> cliques = new ArrayList<Clique>();
     UnionFind eqv = new UnionFind ();
     List<Long> singletons = new ArrayList<Long>();
-    Set<Long> cnodes = new HashSet<Long>(); // clique nodes
-    
+    Map<Entity, Set<Clique>> entities = new HashMap<Entity, Set<Clique>>();
+
     public CliqueEntityResolution () {
     }
 
     /**
      * EntityResolution interface
      */
-    public void resolve (EntityFactory ef, Consumer<Entity[]> component) {
+    public void resolve (EntityFactory ef, Consumer<Component> consumer) {
         this.ef = ef;
+
+        cliques.clear();
+        Set<DataSource> sources =
+            DataSourceFactory.getDataSources(ef.getGraphDb());
+        
         ef.component(comp -> {
                 clear ();               
                 Entity[] entities = comp.entities();
                 if (entities.length > 1) {
-                    logger.info(">>>>> cliques for "
-                                +"component of size "+comp.size()+"...");
+                    if (DEBUG) {
+                        logger.info(">>>>> cliques for "
+                                    +"component of size "+comp.size()+"...");
+                    }
                     long start = System.currentTimeMillis();
                     ef.cliqueEnumeration(KEYS, entities, this);
-                    logger.info(cliques.size()+" clique(s) found!");
+                    if (DEBUG)
+                        logger.info(cliques.size()+" clique(s) found!");
                     
                     closure (Arrays.asList(entities).iterator());
-                    double elapsed = (System.currentTimeMillis()-start)*1e-3;
-                    logger.info("<<<<< Elapsed time for clique enumeration: "
-                                +String.format("%1$.3fs", elapsed));
                     
-                    for (long[] group : eqv.components()) 
-                        component.accept(ef.entities(group));
+                    if (DEBUG) {
+                        double elapsed =
+                            (System.currentTimeMillis()-start)*1e-3;
+                        logger.info
+                            ("<<<<< Elapsed time for clique enumeration: "
+                             +String.format("%1$.3fs", elapsed));
+                    }
+                    
+                    for (long[] group : eqv.components()) {
+                        Map<DataSource, Integer> counts =
+                            new HashMap<DataSource, Integer>();
+                        for (int i = 0; i < group.length; ++i) {
+                            DataSource ds = ef.entity(group[i]).datasource();
+                            Integer c = counts.get(ds);
+                            counts.put(ds, c!=null ? c+1:1);
+                        }
+                        
+                        double sum = 0.;
+                        for (Integer c : counts.values())
+                            sum += 1./c;
+                        consumer.accept
+                            (new CliqueComponent (sum/sources.size(),
+                                                  ef.entities(group)));
+                    }
                     
                     for (Long id : singletons)
-                        component.accept(ef.entities(new long[]{id}));
+                        consumer.accept
+                            (new CliqueComponent
+                             (1, ef.entities(new long[]{id})));
                 }
                 else {
-                    component.accept(entities);
+                    consumer.accept(new CliqueComponent (1, entities));
                 }
             });
+        
+        //debug ();
+        debug2();
     }
 
     void clear () {
-        cliques.clear();
         eqv.clear();
         singletons.clear();
-        cnodes.clear();
     }
 
     void closure (Iterator<Entity> iter) { // transitive closure
@@ -154,6 +220,140 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
         }
     }
 
+    void debug () {
+        try {
+            PrintStream debug = new PrintStream
+                (new FileOutputStream ("cliques.txt"));
+        
+            int n = 1;
+            for (Clique c : cliques) {
+                debug.println("+++++ clique "+n
+                              +" ("+c.size()+") ++++++");
+                debug.print("nodes:");
+                for (Entity e : c)
+                    debug.print(" "+e.getId());
+                debug.println();
+                debug.print("keys:");
+                for (Map.Entry<StitchKey, Object> me : c.values().entrySet())
+                    debug.print(" "+me.getKey()+"="
+                                +Util.toString(me.getValue(), 0));
+                debug.println("\n");
+                
+                ++n;
+            }
+            
+            debug.close();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    void debug2 () {
+        try {
+            PrintStream ps = new PrintStream
+                (new FileOutputStream ("zzentities.txt"));
+            Set<Entity> order = new TreeSet<Entity>(new Comparator<Entity> () {
+                    public int compare (Entity e1, Entity e2) {
+                        Set<Clique> c1 = entities.get(e1);
+                        Set<Clique> c2 = entities.get(e2);
+                        int d = c2.size() - c1.size();
+                        if (d == 0) {
+                            long dif = (e1.getId() - e2.getId());
+                            if (dif < 0) d = -1;
+                            else if (dif > 0) d = 1;
+                        }
+                        return d;
+                    }
+                });
+            order.addAll(entities.keySet());
+            
+            for (Entity ent : order) {
+                Set<Clique> cliques = entities.get(ent);
+                ps.println("["+ent.getId()+" "+cliques.size()+"]");
+                for (Clique c : cliques) {
+                    ps.print("  nodes: [");
+                    for (Entity e : c)
+                        ps.print(e.getId()+",");
+                    ps.println("]");
+                    ps.print("  keys:");
+                    for (Map.Entry<StitchKey, Object> me
+                             : c.values().entrySet())
+                        ps.print(" "+me.getKey()+"="
+                                 +Util.toString(me.getValue(), 0));
+                    ps.println("\n");
+                }
+            }
+            
+            ps.close();
+
+            PrintStream zz = new PrintStream
+                (new FileOutputStream ("zzcliques.txt"));
+
+            Collections.sort(cliques, new Comparator<Clique> () {
+                    public int compare (Clique c1, Clique c2) {
+                        int d = c2.values().size()*c2.size()
+                            - c1.values().size()*c1.size();
+                        if (d == 0)
+                            d = c2.values().size() - c1.values().size();
+                        if (d == 0)
+                            d = c2.size() - c1.size();
+                        return d;
+                    }
+                });
+
+            PrintStream yy = new PrintStream
+                (new FileOutputStream ("yycliques.txt"));
+            
+            int n = 1, m = 1;
+            for (Clique c : cliques) {
+                int max = 0;
+                for (Entity e : c) {
+                    Set<Clique> set = entities.get(e);
+                    if (set.size() > max) {
+                        max = set.size();
+                    }
+                }
+                
+                if (max == 1) {
+                    zz.println("+++++ clique "+n
+                               +" ("+c.size()+") ++++++");
+                    zz.print("nodes:");
+                    for (Entity e : c)
+                        zz.print(" "+e.getId());
+                    zz.println();
+                    zz.print("keys:");
+                    for (Map.Entry<StitchKey, Object> me
+                             : c.values().entrySet())
+                        zz.print(" "+me.getKey()+"="
+                                 +Util.toString(me.getValue(), 0));
+                    zz.println("\n");
+                    ++n;
+                }
+                else {
+                    yy.println("+++++ clique "+m
+                               +" ("+c.size()+") ++++++");
+                    yy.print("nodes:");
+                    for (Entity e : c)
+                        yy.print(" "+e.getId()+"("+entities.get(e).size()+")");
+                    yy.println();
+                    yy.print("keys:");
+                    for (Map.Entry<StitchKey, Object> me
+                             : c.values().entrySet())
+                        yy.print(" "+me.getKey()+"="
+                                 +Util.toString(me.getValue(), 0));
+                    yy.println("\n");
+                    ++m;
+                }
+            }
+            zz.close();
+            yy.close();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     /**
      * CliqueVisitor interface
      */
@@ -162,21 +362,21 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
         int index = cliques.size();
 
         Set<DataSource> sources = new HashSet<DataSource>();
-        for (Entity e : clique.entities()) {
+        for (Entity e : clique) {
             sources.add(e.datasource());
         }
-
+        
         Map<StitchKey, Object> values = clique.values();
+        /*
         for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
             switch (me.getKey()) {
             case H_LyChI_L5:
             case H_LyChI_L4:
-                logger.info("Transitive closure on clique "
-                            +me.getKey()+"="+me.getValue()+"...");
+                if (DEBUG) {
+                    logger.info("Transitive closure on clique "
+                                +me.getKey()+"="+me.getValue()+"...");
+                }
                 closure (clique, me.getKey());
-                break;
-
-            case H_LyChI_L3:
                 break;
 
             default:
@@ -185,13 +385,59 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                 // conservative.. maximum span of datasource on this clique
                 int size = clique.size()*(clique.size()-1)/2;
                 if (size == count && clique.size() == sources.size()) {
-                    logger.info("Transitive closure on clique "
-                                +me.getKey()+"="+me.getValue()+"...");
+                    if (DEBUG) {
+                        logger.info("Transitive closure on clique "
+                                    +me.getKey()+"="+me.getValue()+"...");
+                    }
                     closure (clique, me.getKey());
                 }
             }
         }
-        cliques.add(clique);
+        */
+
+        // filter out any stitch that has multiple values
+        EnumSet<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
+        for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
+            if (me.getValue().getClass().isArray())
+                keys.add(me.getKey());
+        }
+        
+        for (StitchKey k : keys)
+            values.remove(k);
+
+        if (!values.isEmpty()) {
+            // map entity to its cliques
+            for (Entity e : clique) {
+                Set<Clique> cliques = entities.get(e);
+                if (cliques == null) {
+                    entities.put(e, cliques = new HashSet<Clique>());
+                }
+                cliques.add(clique);
+            }
+            
+            cliques.add(clique);
+            
+            /*
+            List<Clique> remove = new ArrayList<Clique>();
+            List<Clique> add = new ArrayList<Clique>();
+            for (Clique c : cliques) {
+                if (c.overlaps(clique)) {
+                    remove.add(c);
+                    add.add(c.add(clique));
+                }
+            }
+            
+            if (remove.isEmpty())
+                cliques.add(clique);
+            else {
+                cliques.removeAll(remove);
+                cliques.addAll(add);
+            }
+            */
+        }
+        else {
+            logger.info("Clique "+clique.nodes()+" not added: "+values);
+        }
         
         return true;
     }
@@ -204,9 +450,6 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
             if (value != null)
                 closure (key, value, entities);
         }
-        
-        for (Entity e : entities)
-            cnodes.add(e.getId());
     }
     
     void closure (StitchKey key, Object value, Entity... entities) {
@@ -234,8 +477,10 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
             AtomicInteger total = new AtomicInteger ();
             cer.resolve(ef, comp -> {
                     //System.out.println(c.length+" component resolved");
-                    System.out.println("+++++ "+total+" ("
-                                       +comp.length+") +++++");
+                    System.out.println("+++++ "+total+" size="
+                                       +comp.size()+" score="
+                                       +String.format("%1$.3f", comp.score())
+                                       +" +++++");
                     for (Entity e : comp) {
                         Map<StitchKey, Object> keys = e.keys();
                         System.out.print

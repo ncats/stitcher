@@ -133,7 +133,7 @@ public class GinasLoader extends MoleculeEntityFactory {
             }
         }
         if (codes.length() > 0)
-            cmpd.setProperty(StitchKey.N_Code.name(), codes);
+            cmpd.setProperty(StitchKey.I_Code.name(), codes);
 
 
         //"relationships":[{"relatedSubstance":{"substanceClass":"reference","approvalID":"2ZM8CX04RZ","refPname":"INSULIN GLARGINE","refuuid":"cd9541e4-2723-4ab5-ac73-6fcfdbf5c84d"},"type":"SUBSTANCE-\u003eSUB_CONCEPT","references":[],"access":[]}]

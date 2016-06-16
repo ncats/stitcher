@@ -43,7 +43,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
      * nodes and as a result we get "Too many open files" exceptions.
      */
     static {
-        System.setProperty("org.neo4j.kernel.api.impl.index.IndexWriterConfigs.block.tree.ords.posting.format", "false");
+        //System.setProperty("org.neo4j.kernel.api.impl.index.IndexWriterConfigs.block.tree.ords.posting.format", "false");
     }
 
     static final Map<File, GraphDb> INSTANCES =
@@ -59,36 +59,32 @@ public class GraphDb extends TransactionEventHandler.Adapter
         this (dir, null);
     }
 
+    void createIndex (Label label, String name) {
+        IndexCreator index = gdb.schema().indexFor(label).on(name);
+        try {
+            IndexDefinition def = index.create();
+            /*
+              gdb.schema().awaitIndexOnline
+              (def, 100, TimeUnit.SECONDS);*/
+        }
+        catch (Exception ex) {
+            logger.info("Index \""+name
+                        +"\" already exists for node "+label+"!");
+        }
+    }
+    
     protected GraphDb (File dir, CacheFactory cache) throws IOException {
         gdb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dir)
             .setConfig(GraphDatabaseSettings.dump_configuration, "true")
             .newGraphDatabase();
 
+        /*
         try (Transaction tx = gdb.beginTx()) {
-            IndexCreator index = gdb.schema().indexFor(CNode.CLASS_LABEL)
-                .on(Props.PARENT);
-            try {
-                IndexDefinition def = index.create();
-                /*
-                  gdb.schema().awaitIndexOnline
-                  (def, 100, TimeUnit.SECONDS);*/
-            }
-            catch (Exception ex) {
-                logger.info("Index \""+Props.PARENT+"\" already exists!");
-            }
-
-            index = gdb.schema().indexFor(AuxNodeType.SNAPSHOT)
-                .on(Props.PARENT);      
-            try {
-                IndexDefinition def = index.create();
-            }
-            catch (Exception ex) {
-                logger.info("Index \""+AuxNodeType.SNAPSHOT
-                            +"\" already exists!");
-            }
-    
+            createIndex (CNode.CLASS_LABEL, Props.PARENT);
+            createIndex (AuxNodeType.SNAPSHOT, Props.PARENT);
             tx.success();
         }
+        */
         
         gdb.registerTransactionEventHandler(this);
         gdb.registerKernelEventHandler(this);

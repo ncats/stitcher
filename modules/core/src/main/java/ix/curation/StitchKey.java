@@ -7,48 +7,36 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public enum StitchKey implements RelationshipType {
     /*
-     * This should be treated as strongest possible
-     */
-    STITCHED,
-    
-    /*
      * Name
      */
-    N_Official, // official name
-    N_Systematic, // systematic Name
-    N_Brand, // brand name
-    N_Common, // common name
-    N_INN, // INN name
-    N_USAN, // USAN name
-    N_Code, // code name
-    N_Synonym, // synonym
     N_Name, // any name
 
     /*
      * Identifier
      */
-    I_UNII, // FDA UNII
-    I_CAS, // CAS registry number
-    I_SID(Long.class), // pubchem sid
-    I_CID(Long.class), // public cid
-    I_NCT, // clinical trial NCT
-    I_PMID(Long.class), // PubMed id
-    I_UniProt, // UniProt id
-    I_ChEMBL, // CHEMBL_ID
+    I_UNII(2), // FDA UNII
+    I_CAS(1), // CAS registry number
+    I_SID(1, Long.class), // pubchem sid
+    I_CID(2, Long.class), // public cid
+    I_NCT(1), // clinical trial NCT
+    I_PMID(2,Long.class), // PubMed id
+    I_UniProt(2), // UniProt id
+    I_ChEMBL(2), // CHEMBL_ID
+    I_Code(1), // any code
     I_Any, // Any generic id
 
     /*
      * Hash
      */
-    H_InChIKey, // InChIKey
+    H_InChIKey(3), // InChIKey
     H_LyChI_L1, // LyChI Layer 1
     H_LyChI_L2, // LyChI layer 2
     H_LyChI_L3, // LyChI layer 3
-    H_LyChI_L4, // LyChI layer 4
-    H_LyChI_L5, // LyChI layer 4 with salt + solvent
-    H_SHA1, // SHA1 hash
-    H_SHA256, // SHA256 hash
-    H_MD5, // MD5 hash
+    H_LyChI_L4(2), // LyChI layer 4
+    H_LyChI_L5(3), // LyChI layer 4 with salt + solvent
+    H_SHA1(5), // SHA1 hash
+    H_SHA256(5), // SHA256 hash
+    H_MD5(4), // MD5 hash
 
     /*
      * URL
@@ -62,13 +50,19 @@ public enum StitchKey implements RelationshipType {
     T_Keyword // Keyword
     ;
   
-    final Class type;
+    final public Class type;
+    final public int priority; // priority -5 (lowest) to 5 (highest)
     StitchKey () {
-        this (String.class);
+        this (0, String.class);
+    }
+    StitchKey (int priority) {
+        this (priority, String.class);
     }
     StitchKey (Class type) {
-        this.type = type;
+        this (0, type);
     }
-
-    public Class getType () { return type; }
+    StitchKey (int priority, Class type) {
+        this.type = type;
+        this.priority = priority;
+    }
 }

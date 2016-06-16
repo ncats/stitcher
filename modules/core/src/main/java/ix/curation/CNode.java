@@ -266,6 +266,23 @@ public class CNode implements Props, Comparable<CNode> {
         return getRoot(p).equals(getRoot (q));
     }
 
+    protected boolean connected (Node n) {
+        return find (_node, n);
+    }
+
+    /*
+     * does node belong to the same connected component?
+     */
+    public boolean connected (long id) {
+        try (Transaction tx = gdb.beginTx()) {
+            return connected (gdb.getNodeById(id));
+        }
+    }
+
+    public boolean connected (CNode n) {
+        return connected (n._node);
+    }
+
     protected static void union (Node p, Node q) {
         Node P = getRoot (p);
         Node Q = getRoot (q);

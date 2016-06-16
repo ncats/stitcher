@@ -208,6 +208,7 @@ public class Util {
                 sb.append("["+len);
                 if (len > 0) {
                     int min = Math.min(len, max-5);
+                    if (max <= 0) min = len;
                     for (int i = 0; i < min; ++i) {
                         Object v = Array.get(obj, i);
                         sb.append(","+(v != null

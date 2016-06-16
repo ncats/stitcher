@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -226,8 +227,10 @@ public class EntityFactory implements Props {
         Set<Long> nodes = new TreeSet<Long>();
         Entity[] entities;
         String id;
-        Node root;
 
+        ComponentImpl () {
+        }
+        
         ComponentImpl (Node node) {
             GraphDatabaseService gdb = node.getGraphDatabase();
             try (Transaction tx = gdb.beginTx()) {
@@ -250,7 +253,6 @@ public class EntityFactory implements Props {
                 tx.success();
             }
             id = Util.sha1(nodes).substring(0, 9);
-            root = node;
         }
 
         void traverse (GraphDatabaseService gdb, Node node) {
@@ -264,6 +266,40 @@ public class EntityFactory implements Props {
                     });
         }
 
+        ComponentImpl (GraphDatabaseService gdb, long[] nodes) {
+            try (Transaction tx = gdb.beginTx()) {
+                entities = new Entity[nodes.length];
+                for (int i = 0; i < nodes.length; ++i) {
+                    entities[i] = Entity._getEntity(gdb.getNodeById(nodes[i]));
+                    this.nodes.add(nodes[i]);
+                }
+                id = Util.sha1(this.nodes).substring(0, 9);
+            }
+        }
+
+        ComponentImpl (Component... comps) {
+            Set<Entity> entities = new TreeSet<Entity>();
+            for (Component c : comps)
+                for (Entity e : c) {
+                    entities.add(e);
+                    nodes.add(e.getId());
+                }
+
+            this.entities = entities.toArray(new Entity[0]);
+            id = Util.sha1(nodes).substring(0, 9);
+        }
+
+        ComponentImpl (Entity... entities) {
+            for (Entity e : entities)
+                nodes.add(e.getId());
+            this.entities = entities;
+            id = Util.sha1(nodes).substring(0, 9);
+        }
+
+        public Iterator<Entity> iterator () {
+            return Arrays.asList(entities).iterator();
+        }
+        
         public String getId () { return id; }
         public Entity[] entities () { return entities; }
         public int size () { return nodes.size(); }
@@ -275,33 +311,75 @@ public class EntityFactory implements Props {
             }
             return false;
         }
+
+        protected List<Entity> ov (Component comp) {
+            List<Entity> ov = new ArrayList<Entity>();
+            for (Entity e : comp) {
+                long id = e.getId();
+                if (nodes.contains(id))
+                    ov.add(e);
+            }
+            return ov;
+        }
+
+        @Override
+        public Component add (Component comp) {
+            return new ComponentImpl (this, comp);
+        }
+
+        @Override
+        public Component and (Component comp) {
+            List<Entity> ov = ov (comp);
+            return ov.isEmpty() ? null
+                : new ComponentImpl (ov.toArray(new Entity[0]));
+        }
+
+        @Override
+        public Component xor (Component comp) {
+            List<Entity> ov = new ArrayList<Entity>();
+            for (Entity e : comp) {
+                long id = e.getId();
+                if (!nodes.contains(id))
+                    ov.add(e);
+            }
+            
+            for (Entity e : this) {
+                long id = e.getId();
+                if (!comp.nodes().contains(id))
+                    ov.add(e);
+            }
+            
+            return ov.isEmpty()
+                ? null : new ComponentImpl (ov.toArray(new Entity[0]));
+        }
     }
 
-    static class CliqueImpl implements Clique {
+    static class CliqueImpl extends ComponentImpl implements Clique {
         final EnumMap<StitchKey, Object> values =
             new EnumMap (StitchKey.class);
-        Entity[] entities;
-        Set<Long> clique = new TreeSet<Long>();
-        String id;
+
+        CliqueImpl (Component... comps) {
+            super (comps);
+        }
         
-        CliqueImpl (BitSet C, long[] nodes, Set<StitchKey> keys,
-                 GraphDatabaseService gdb) {
+        CliqueImpl (BitSet C, long[] gnodes, Set<StitchKey> keys,
+                    GraphDatabaseService gdb) {
             entities = new Entity[C.cardinality()];
             try (Transaction tx = gdb.beginTx()) {
-                Node[] gnodes = new Node[C.cardinality()];
+                Node[] nodes = new Node[C.cardinality()];
                 for (int i = C.nextSetBit(0), j = 0;
                      i >= 0; i = C.nextSetBit(i+1)) {
-                    gnodes[j] = gdb.getNodeById(nodes[i]);
-                    entities[j] = Entity._getEntity(gnodes[j]);
-                    clique.add(nodes[i]);
+                    nodes[j] = gdb.getNodeById(gnodes[i]);
+                    entities[j] = Entity._getEntity(nodes[j]);
+                    this.nodes.add(gnodes[i]);
                     ++j;
                 }
 
                 for (StitchKey key : keys)
-                    update (gnodes, key);
+                    update (nodes, key);
                 tx.success();
             }
-            id = Util.sha1(clique).substring(0, 9);
+            id = Util.sha1(nodes).substring(0, 9);
         }
 
         void update (Node[] nodes, StitchKey key) {
@@ -356,52 +434,20 @@ public class EntityFactory implements Props {
             values.put(key, value);
         }
 
-        public String getId () { return id; }
-        public int hashCode () { return clique.hashCode(); }
-        public boolean equals (Object obj) {
-            if (obj instanceof CliqueImpl) {
-                return clique.equals(((CliqueImpl)obj).clique);
-            }
-            return false;
-        }
-        public int size () { return clique.size(); }
-        public Set<Long> nodes () { return clique; }
         public Map<StitchKey, Object> values () { return values; }
-        public Entity[] entities () { return entities; }
-        public Entity[] entities (Clique C) {
-            Set<Long> ov = getOverlapNodes (C);
-            Entity[] ent = null;
-            if (!ov.isEmpty()) {
-                ent = new Entity[ov.size()];
-                int i = 0;
-                for (Entity e : entities)
-                    if (ov.contains(e.getId()))
-                        ent[i++] = e;
-            }
-            return ent;
-        }
         
-        public boolean overlaps (Clique C) {
-            return !getOverlapNodes(C).isEmpty();
-        }
-
-        Set<Long> getOverlapNodes (Clique C) {
-            Set<Long> ref, other;
-            if (C.size() < clique.size()) {
-                ref = C.nodes();
-                other = this.clique;
+        @Override
+        public Clique add (Component clique) {
+            CliqueImpl ci = null;           
+            List<Entity> ov = ov (clique);
+            if (!ov.isEmpty()) {
+                ci = new CliqueImpl (this, clique);
+                if (clique instanceof Clique) {
+                    ci.values.putAll(((Clique)clique).values());
+                }
+                ci.values.putAll(values);
             }
-            else {
-                ref = this.clique;
-                other = C.nodes();
-            }
-            
-            Set<Long> ov = new HashSet<Long>();
-            for (Long id : ref)
-                if (other.contains(id))
-                    ov.add(id);
-            
-            return ov;
+            return ci;
         }
     }
     
@@ -448,7 +494,7 @@ public class EntityFactory implements Props {
         void bronKerbosch (Graph G, BitSet C, BitSet P, BitSet S) {
             if (P.isEmpty() && S.isEmpty()) {
                 // only consider cliques that are of size >= 3
-                if (C.cardinality() >= 3) {
+                if (C.cardinality() > 2) {
                     BitSet c = (BitSet)C.clone();
                     
                     EnumSet<StitchKey> keys = cliques.get(c);
@@ -539,71 +585,82 @@ public class EntityFactory implements Props {
          RelationshipType[] keys) {
         return calcGraphMetrics (gdb, AuxNodeType.ENTITY, types, keys);
     }
+
+    public static GraphMetrics calcGraphMetrics (Stream<Node> nodes) {
+        return calcGraphMetrics (nodes, Entity.TYPES, Entity.KEYS);
+    }
+    
+    public static GraphMetrics calcGraphMetrics
+        (Stream<Node> nodes, EntityType[] types, RelationshipType[] keys) {
+        DefaultGraphMetrics metrics = new DefaultGraphMetrics ();
+        nodes.forEach(node -> {
+                for (EntityType t : types) {
+                    if (node.hasLabel(t)) {
+                        Integer c = metrics.entityHistogram.get(t);
+                        metrics.entityHistogram.put(t, c != null ? c+1:1);
+                    }
+                }
+                int nrel = 0;
+                for (Relationship rel
+                         : node.getRelationships(Direction.BOTH, keys)) {
+                    Node xn = rel.getOtherNode(node);
+                    // do we count self reference?
+                    if (!xn.equals(node)) {
+                        ++metrics.stitchCount;
+                    }
+                    String key = rel.getType().name();
+                    Integer c = metrics.stitchHistogram.get(key);
+                    metrics.stitchHistogram.put(key, c != null ? c+1:1);
+                    ++nrel;
+                }
+                Integer c = metrics.entitySizeDistribution.get(nrel);
+                metrics.entitySizeDistribution.put(nrel, c!=null ? c+1:1);
+                
+                if (node.hasLabel(AuxNodeType.COMPONENT)) {
+                    Component comp = new ComponentImpl (node);
+                    Integer cnt = metrics.connectedComponentHistogram.get
+                        (comp.size());
+                    metrics.connectedComponentHistogram.put
+                        (comp.size(), cnt!= null ? cnt+1:1);
+                    if (comp.size() == 1) {
+                        ++metrics.singletonCount;
+                    }
+                    ++metrics.connectedComponentCount;
+                    /*
+                      if (comp.size() > 5)
+                      logger.info("Component "+node.getId()
+                      +" has "+comp.size()+" member(s)!");
+                    */
+                }
+                
+                ++metrics.entityCount;
+            });
+        
+        // we're double counting, so now we correct the counts
+        metrics.stitchCount /= 2;
+        for (String k : metrics.stitchHistogram.keySet()) {
+            metrics.stitchHistogram.put
+                (k, metrics.stitchHistogram.get(k)/2);
+        }
+        
+        return metrics;
+    }
     
     public static GraphMetrics calcGraphMetrics
         (GraphDatabaseService gdb, Label label,
          EntityType[] types, RelationshipType[] keys) {
-        
-        DefaultGraphMetrics metrics = new DefaultGraphMetrics ();
-        
+
+        GraphMetrics metrics = null;
         try (Transaction tx = gdb.beginTx()) {
-            ResourceIterator<Node> nodes = gdb.findNodes(label);
-            nodes.stream().forEach(node -> {
-                    for (EntityType t : types) {
-                        if (node.hasLabel(t)) {
-                            Integer c = metrics.entityHistogram.get(t);
-                            metrics.entityHistogram.put(t, c != null ? c+1:1);
-                        }
-                    }
-                    int nrel = 0;
-                    for (Relationship rel
-                             : node.getRelationships(Direction.BOTH, keys)) {
-                        Node xn = rel.getOtherNode(node);
-                        // do we count self reference?
-                        if (xn.hasLabel(label)) {
-                            if (!xn.equals(node)) {
-                                ++metrics.stitchCount;
-                            }
-                            String key = rel.getType().name();
-                            Integer c = metrics.stitchHistogram.get(key);
-                            metrics.stitchHistogram.put(key, c != null ? c+1:1);
-                            ++nrel;
-                        }
-                    }
-                    Integer c = metrics.entitySizeDistribution.get(nrel);
-                    metrics.entitySizeDistribution.put(nrel, c!=null ? c+1:1);
-
-                    if (node.hasLabel(AuxNodeType.COMPONENT)) {
-                        Component comp = new ComponentImpl (node);
-                        Integer cnt = metrics.connectedComponentHistogram.get
-                            (comp.size());
-                        metrics.connectedComponentHistogram.put
-                            (comp.size(), cnt!= null ? cnt+1:1);
-                        if (comp.size() == 1) {
-                            ++metrics.singletonCount;
-                        }
-                        ++metrics.connectedComponentCount;
-                        /*
-                        if (comp.size() > 5)
-                            logger.info("Component "+node.getId()
-                                        +" has "+comp.size()+" member(s)!");
-                        */
-                    }
-                    
-                    ++metrics.entityCount;
-                });
-            nodes.close();
-            
-            // we're double counting, so now we correct the counts
-            metrics.stitchCount /= 2;
-            for (String k : metrics.stitchHistogram.keySet()) {
-                metrics.stitchHistogram.put
-                    (k, metrics.stitchHistogram.get(k)/2);
-            }
-
+            metrics = calcGraphMetrics
+                (gdb.findNodes(label).stream(), types, keys);
             tx.success();
         }
         return metrics;
+    }
+
+    public static GraphMetrics calcGraphMetrics (Component component) {
+        return calcGraphMetrics (component.stream().map(e -> e._node()));
     }
 
     static boolean hasLabel (Node node, Label... labels) {
@@ -867,8 +924,10 @@ public class EntityFactory implements Props {
                                       long[] nodes, CliqueVisitor visitor) {
         { EnumSet<StitchKey> set = EnumSet.noneOf(StitchKey.class);
             for (StitchKey k : keys) set.add(k);
+            /*
             logger.info("enumerating cliques over "+set+" spanning "
                         +nodes.length+" nodes...");
+            */
         }
         
         CliqueEnumeration clique = new CliqueEnumeration (gdb, keys); 
@@ -979,52 +1038,40 @@ public class EntityFactory implements Props {
         return result;  
     }
 
-    public Entity createStitch (DataSource source, Entity... children) {
+    public Entity createStitch (DataSource source, Component component) {
         try (Transaction tx = gdb.beginTx()) {
-            Entity ent = _createStitch (source, children);
+            Entity ent = _createStitch (source, component);
             tx.success();
             return ent;
         }
     }
 
-    public Entity _createStitch (DataSource source, Entity... children) {
-        Node node = gdb.createNode(AuxNodeType.SUPERNODE, AuxNodeType.ENTITY,
+    public Entity createStitch (DataSource source, long[] component) {
+        try (Transaction tx = gdb.beginTx()) {
+            Entity ent = _createStitch (source, component);
+            tx.success();
+            return ent;
+        }       
+    }
+    
+    public Entity _createStitch (DataSource source, long[] component) {
+        return _createStitch (source, new ComponentImpl (gdb, component));
+    }
+    
+    public Entity _createStitch (DataSource source, Component component) {
+        Node node = gdb.createNode(AuxNodeType.STITCHED,
                                    DynamicLabel.label(source._getKey()));
         node.setProperty(SOURCE, source._getKey());
-        Entity entity = null;
-        Set<String> sources = new HashSet<String>();    
-        for (Entity e : children) {
-            if (entity == null) {
-                // inherite the type from the first child
-                node.addLabel(e.type());
-                entity = Entity._getEntity(node);
-            }
-            else if (entity.type() != e.type())
-                throw new IllegalArgumentException
-                    ("Can't stitch entities of different type: "
-                     +entity.type()+" and "+e.type());
-            entity._stitch(e, null);
+        node.setProperty(SCORE, component.score());
+
+        Set<String> sources = new HashSet<String>();
+        for (Entity e : component) {
             sources.add((String)e._node.getProperty(SOURCE));
         }
         for (String s : sources)
             node.addLabel(DynamicLabel.label(s));
         
-        return entity;
-    }
-
-    public Entity createStitch (DataSource source, long[] children) {
-        try (Transaction tx = gdb.beginTx()) {
-            Entity ent = _createStitch (source, children);
-            tx.success();
-            return ent;
-        }
-    }
-
-    public Entity _createStitch (DataSource source, long[] children) {
-        Entity[] entities = new Entity[children.length];
-        for (int i = 0; i < children.length; ++i)
-            entities[i] = _entity (children[i]);
-        return _createStitch (source, entities);
+        return Entity._getEntity(node);
     }
 
     // return the last k updated entities

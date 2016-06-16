@@ -3,47 +3,46 @@
 @(app: controllers.app.App, payload: List[Payload])
 
 @payloadrow(p: models.Payload) = {
-<tr>
-  <td>
-    <i class="fa fa-@if(p.shared){unlock}else{lock}"></i>
-  </td>
-  <td><a href='@controllers.app.routes.App.getPayload(p.sha1())'
-  	 title='View payload details'>@p.title</a></td>
-  <td><a href='@controllers.api.routes.Api.download(p.sha1())'
-  	 title='Download payload'>@p.filename</a></td>
-  <td>@p.size</td>
-  <td>@p.updated</td>
-  <td><code>@p.sha1()</code></td>
-  <td><button class="btn btn-danger btn-xs"
+  <tr>
+    <td>
+      <i class="fa fa-@if(p.shared){unlock}else{lock}"></i>
+    </td>
+    <td><a href='@controllers.app.routes.App.getPayload(p.sha1())'
+  	  title='View payload details'>@p.title</a></td>
+    <td><a href='@controllers.api.routes.Api.download(p.sha1())'
+  	  title='Download payload'>@p.filename</a></td>
+    <td>@p.size</td>
+    <td>@p.updated</td>
+    <td><code>@p.sha1()</code></td>
+    <td><button class="btn btn-danger btn-xs"
   	      title="Delete payload"
   	      onclick="onDelete('@p.sha1()','@p.filename')"><i class="fa fa-trash"></i></button></td>
-</tr>
+  </tr>
 }
 
 @shell(app){
-	 <div class="row">
-           <div class="col-lg-12">
-               <h1 class="page-header">Payload (@payload.size)
-	       <a href="@controllers.app.routes.App.upload" role="button"
-		  class="btn btn-primary pull-right">Add</a></h1>
-            </div>
-            <!-- /.col-lg-12 -->
-          </div>
-
+	  <div class="row">
+      <div class="col-lg-12">
+        <h1 class="page-header">Payload (@payload.size)
+	        <a href="@controllers.app.routes.App.upload" role="button"
+          		  class="btn btn-primary pull-right">Add</a>
+        </h1>
+      </div>
+    </div>
 	  <div class="panel panel-default">
 	    <div class="panel-body">
 	      <table class="table table-striped">
-		<tr>
-		  <th></th>
-		  <th>Name</th>
-		  <th>File <i class="fa fa-download"></i></th>
-		  <th>Size</th>
-		  <th>Date</th>
-		  <th>SHA1</th>
-		  <th></th>
-		</tr>
-		@for(p <- payload) {
-		  @payloadrow(p)
+      		<tr>
+		        <th></th>
+      		  <th>Name</th>
+      		  <th>File <i class="fa fa-download"></i></th>
+		        <th>Size</th>
+      		  <th>Date</th>
+		        <th>SHA1</th>
+      		  <th></th>
+		      </tr>
+		      @for(p <- payload) {
+      		  @payloadrow(p)
 	        }
 	      </table>
 	    </div>

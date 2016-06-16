@@ -781,58 +781,6 @@ public class Entity extends CNode {
         path.pop();
     }
 
-    public void stitch (Entity child, Map<String, Object> properties) {
-        try (Transaction tx = gdb.beginTx()) {
-            _stitch (child, properties);
-            tx.success();
-        }
-    }
-
-    protected Relationship getStitchRel (Node node) {
-        for (Relationship rel : node.getRelationships
-                 (Direction.OUTGOING, StitchKey.STITCHED)) {
-            if (rel.getOtherNode(node).equals(_node)) {
-                return rel;
-            }
-        }
-        return null;
-    }
-    
-    public void _stitch (Entity child, Map<String, Object> properties) {
-        Relationship rel = getStitchRel (child._node);
-        if (rel == null) {
-            rel = child._node.createRelationshipTo
-                (_node, StitchKey.STITCHED);
-            rel.setProperty(CREATED, System.currentTimeMillis());
-        }
-        else {
-            rel.setProperty(UPDATED, System.currentTimeMillis());
-        }
-        
-        if (properties != null) {
-            RelationshipIndex index = _relationshipIndex ();
-            for (Map.Entry<String, Object> me : properties.entrySet()) {
-                Object value = me.getValue();
-                if (value == null) {
-                    index.remove(rel, me.getKey());
-                    rel.removeProperty(me.getKey());
-                }
-                else {
-                    if (value.getClass().isArray()) {
-                        int len = Array.getLength(value);
-                        for (int i = 0; i < len; ++i) {
-                            index.add(rel, me.getKey(), Array.get(value, i));
-                        }
-                    }
-                    else {
-                        index.add(rel, me.getKey(), value);
-                    }
-                    rel.setProperty(me.getKey(), value);
-                }
-            }
-        }
-    }
-
     public Map<String, Object> payload (Entity entity) {
         try (Transaction tx = gdb.beginTx()) {
             return _payload (entity);
@@ -846,18 +794,6 @@ public class Entity extends CNode {
             }
         }
         return null;
-    }
-
-    public boolean stitched (long id) {
-        try (Transaction tx = gdb.beginTx()) {
-            return find (_node, gdb.getNodeById(id));
-        }
-    }
-    
-    public boolean stitched (Entity ent) {
-        try (Transaction tx = gdb.beginTx()) {
-            return find (_node, ent._node);
-        }
     }
 
     public void union (Entity ent) {

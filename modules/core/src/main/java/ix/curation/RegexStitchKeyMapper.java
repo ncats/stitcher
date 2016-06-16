@@ -66,7 +66,7 @@ public class RegexStitchKeyMapper implements StitchKeyMapper {
                 Matcher m = p.matcher(value.toString());
                 while (m.find()) {
                     String v = m.group().trim().replaceAll("\"", "");
-                    if (key.getType() == Long.class) {
+                    if (key.type == Long.class) {
                         try {
                             long lv = Long.parseLong(v);
                             if (!isBlacklist (lv)
@@ -94,7 +94,7 @@ public class RegexStitchKeyMapper implements StitchKeyMapper {
                 mapped.put(key, values.iterator().next());
             }
             else {
-                Object ary = Array.newInstance(key.getType(), values.size());
+                Object ary = Array.newInstance(key.type, values.size());
                 for (int i = 0; i < values.size(); ++i)
                     Array.set(ary, i, values.get(i));
                 mapped.put(key, ary);
