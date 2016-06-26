@@ -16,7 +16,6 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Transaction;
 
 import ix.curation.*;
-import lychi.LyChIStandardizer;
 
 public class MoleculeEntityFactory extends EntityRegistry {
     static final Logger logger =
@@ -227,58 +226,6 @@ public class MoleculeEntityFactory extends EntityRegistry {
      */
     protected String normalize (String value, StitchKey key) {
         return value.toUpperCase();
-    }
-
-    private String[] lychify (final Molecule mol, final boolean stripSalt)
-        throws Exception {
-        String hash = Util.sha1hex("LyChI:" + mol.exportToFormat("smiles"));
-        if (stripSalt == false)
-            hash = Util.sha1hex("LyChISalt:" + mol.exportToFormat("smiles"));
-
-        String[] hk = getCache().getOrElse(hash, new Callable<String[]> () {
-                public String[] call () throws Exception {
-                    LyChIStandardizer lychi = new LyChIStandardizer ();
-                    // only standardize if 
-                    if (mol.getAtomCount() < 1024) {
-                        /*
-                         * don't strip salt/solvent if the structure has metals
-                         */
-                        lychi.removeSaltOrSolvent
-                            (stripSalt
-                             && !LyChIStandardizer.containMetals(mol));
-                        lychi.standardize(mol);
-                    }
-                    else {
-                        logger.warning
-                        ("molecule has "+mol.getAtomCount()
-                         +" atoms; no standardization performed!");
-                    }
-                    return LyChIStandardizer.hashKeyArray(mol);
-                }
-            });
-        return hk;
-    }
-
-    protected void lychify (Entity ent, Molecule mol) {
-        try {
-            Molecule stdmol = mol.cloneMolecule();
-            String[] hk = lychify (stdmol, true);
-            if (hk != null) {
-                ent._set(StitchKey.H_LyChI_L3, new StitchValue (hk[2]));
-                ent._set(StitchKey.H_LyChI_L4, new StitchValue (hk[3]));
-            }
-            
-            // with salt + solvent
-            stdmol = mol.cloneMolecule();
-            hk = lychify (stdmol, false);
-            if (hk != null)
-                ent._set(StitchKey.H_LyChI_L5, new StitchValue (hk[3]));
-        }
-        catch (Exception ex) {
-            logger.log(Level.SEVERE, "Can't generate LyChI hash for entity "
-                       +ent.getId(), ex);
-            firePropertyChange ("error", ent, ex);
-        }
     }
 
     public int register (InputStream is) throws IOException {

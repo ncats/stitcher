@@ -484,8 +484,10 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                     for (Entity e : comp) {
                         Map<StitchKey, Object> keys = e.keys();
                         System.out.print
-                            (String.format("%1$10s[%2$ 10d]",
-                                           e.payloadId().toString(), e.getId())
+                            (String.format
+                             ("%1$10s[%2$ 10d]",
+                              e.payloadId() != null
+                              ? e.payloadId().toString() : "", e.getId())
                              +": "+keys.size()+"={");
                         int i = 0;
                         for (Map.Entry<StitchKey, Object> me

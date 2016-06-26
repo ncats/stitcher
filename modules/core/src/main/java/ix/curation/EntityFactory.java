@@ -241,9 +241,13 @@ public class EntityFactory implements Props {
                 traverse (gdb, node);
 
                 Integer rank = (Integer)node.getProperty(CNode.RANK);
-                if (rank != nodes.size())
-                    logger.warning("Rank is "+rank+" but there are "
+                /*
+                if (rank != nodes.size()) {
+                    logger.warning("Node #"+node.getId()
+                                   +": Rank is "+rank+" but there are "
                                    +nodes.size()+" nodes in this component!");
+                }
+                */
                 
                 entities = new Entity[nodes.size()];
                 int i = 0;

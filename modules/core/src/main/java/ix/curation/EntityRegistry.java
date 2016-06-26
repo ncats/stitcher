@@ -26,6 +26,10 @@ import com.typesafe.config.ConfigValueType;
 import com.typesafe.config.ConfigList;
 import com.typesafe.config.ConfigObject;
 
+import chemaxon.struc.Molecule;
+import chemaxon.util.MolHandler;
+import lychi.LyChIStandardizer;
+
 public class EntityRegistry extends EntityFactory {
     static final Logger logger =
         Logger.getLogger(EntityRegistry.class.getName());
@@ -106,10 +110,8 @@ public class EntityRegistry extends EntityFactory {
         return registerFromConfig
             (base, ConfigFactory.parseReader(new InputStreamReader (is)));
     }
-        
-    protected DataSource registerFromConfig (File base, Config conf)
-        throws Exception {
-        
+
+    protected void parseConfig (Config conf) throws Exception {
         if (!conf.hasPath("source")) {
             throw new IllegalArgumentException
                 ("Configuration contains no \"source\" definition!");
@@ -164,7 +166,7 @@ public class EntityRegistry extends EntityFactory {
                 }
 
                 String property = cf.getString("property");
-                System.out.println("key="+key+" property=\""+property+"\"");
+                logger.info("key="+key+" property=\""+property+"\"");
 
                 if (cf.hasPath("regex")) {
                     RegexStitchKeyMapper mapper = new RegexStitchKeyMapper ();
@@ -230,7 +232,14 @@ public class EntityRegistry extends EntityFactory {
         else {
             logger.warning("No \"stitches\" value defined!");
         }
+    }
+    
+    protected DataSource registerFromConfig (File base, Config conf)
+        throws Exception {
 
+        parseConfig (conf);
+
+        Config source = conf.getConfig("source");
         DataSource ds;
         
         String data = source.getString("data");
@@ -274,16 +283,63 @@ public class EntityRegistry extends EntityFactory {
 
         DefaultPayload payload = new DefaultPayload (getDataSource ());
         payload.putAll(map);
+
+        if (strucField != null) {
+            Object value = map.get(strucField);
+            if (value != null) {
+                if (value instanceof Molecule) {
+                    lychify (ent, (Molecule)value);
+                }
+                else {
+                    try {
+                        MolHandler mh = new MolHandler (value.toString());
+                        lychify (ent, mh.getMolecule());
+                    }
+                    catch (Exception ex) {
+                        logger.warning(id+": Can't parse structure: "+value);
+                    }
+                }
+            }
+        }
         
         for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
             for (String prop : me.getValue()) {
-                ent._add(me.getKey(), new StitchValue (prop, map.get(prop)));
+                Object value = normalize (me.getKey(), map.get(prop));
+                ent._add(me.getKey(), new StitchValue (prop, value));
             }
         }
         mapValues (ent, map);
         
         ent._add(payload);
         return ent;
+    }
+
+    /*
+     * subclass can override this.. 
+     */
+    protected Object normalize (StitchKey key, Object value) {
+        if (value != null) {
+            if (value.getClass().isArray()) {
+            }
+            else {
+                switch (key) {
+                case N_Name:
+                case I_UNII:
+                case H_InChIKey:
+                case H_LyChI_L1:
+                case H_LyChI_L2:
+                case H_LyChI_L3:
+                case H_LyChI_L4:
+                case H_LyChI_L5:
+                case H_SHA1:
+                case H_SHA256:
+                case H_MD5:
+                    value = value.toString().toUpperCase();
+                    break;
+                }
+            }
+        }
+        return value;
     }
 
     protected void mapValues (Entity ent, Map<String, Object> values) {
@@ -323,6 +379,58 @@ public class EntityRegistry extends EntityFactory {
                     props.add(me.getKey());
                 }
             }
+        }
+    }
+
+    protected String[] lychify (final Molecule mol, final boolean stripSalt)
+        throws Exception {
+        String hash = Util.sha1hex("LyChI:" + mol.exportToFormat("smiles"));
+        if (stripSalt == false)
+            hash = Util.sha1hex("LyChISalt:" + mol.exportToFormat("smiles"));
+
+        String[] hk = getCache().getOrElse(hash, new Callable<String[]> () {
+                public String[] call () throws Exception {
+                    LyChIStandardizer lychi = new LyChIStandardizer ();
+                    // only standardize if 
+                    if (mol.getAtomCount() < 1024) {
+                        /*
+                         * don't strip salt/solvent if the structure has metals
+                         */
+                        lychi.removeSaltOrSolvent
+                            (stripSalt
+                             && !LyChIStandardizer.containMetals(mol));
+                        lychi.standardize(mol);
+                    }
+                    else {
+                        logger.warning
+                        ("molecule has "+mol.getAtomCount()
+                         +" atoms; no standardization performed!");
+                    }
+                    return LyChIStandardizer.hashKeyArray(mol);
+                }
+            });
+        return hk;
+    }
+
+    protected void lychify (Entity ent, Molecule mol) {
+        try {
+            Molecule stdmol = mol.cloneMolecule();
+            String[] hk = lychify (stdmol, true);
+            if (hk != null) {
+                ent._set(StitchKey.H_LyChI_L3, new StitchValue (hk[2]));
+                ent._set(StitchKey.H_LyChI_L4, new StitchValue (hk[3]));
+            }
+            
+            // with salt + solvent
+            stdmol = mol.cloneMolecule();
+            hk = lychify (stdmol, false);
+            if (hk != null)
+                ent._set(StitchKey.H_LyChI_L5, new StitchValue (hk[3]));
+        }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, "Can't generate LyChI hash for entity "
+                       +ent.getId(), ex);
+            firePropertyChange ("error", ent, ex);
         }
     }
     

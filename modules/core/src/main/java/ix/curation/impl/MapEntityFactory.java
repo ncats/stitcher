@@ -20,11 +20,14 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.concurrent.Callable;
 
+import com.typesafe.config.Config;
 import ix.curation.*;
 
 public class MapEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(MapEntityFactory.class.getName());
+
+    protected String delimiter = "\t";
 
     public MapEntityFactory (String dir) throws IOException {
         super (dir);
@@ -40,12 +43,21 @@ public class MapEntityFactory extends EntityRegistry {
     
     public DataSource register (File file,  String... header)
         throws IOException {
-        return register (file, "\t", header);
+        return register (file, delimiter, header);
     }
 
     @Override
     public DataSource register (File file) throws IOException {
-        return register (file, "\t", (String[])null);
+        return register (file, delimiter, (String[])null);
+    }
+
+    @Override
+    protected void parseConfig (Config conf) throws Exception {
+        super.parseConfig(conf);
+        if (conf.getConfig("source").hasPath("delimiter")) {
+            delimiter = conf.getConfig("source").getString("delimiter");
+            logger.info("### Delimiter: '"+delimiter+"'");
+        }
     }
     
     public DataSource register (File file, String delim, String... header)
@@ -66,11 +78,11 @@ public class MapEntityFactory extends EntityRegistry {
     }
 
     public int register (InputStream is) throws IOException {
-        return register (is, "\t", (String[])null);
+        return register (is, delimiter, (String[])null);
     }
     
     public int register (InputStream is, String... header) throws IOException {
-        return register (is, "\t", header);
+        return register (is, delimiter, header);
     }
     
     public int register (InputStream is, String delim, String... header)
@@ -81,11 +93,13 @@ public class MapEntityFactory extends EntityRegistry {
             String[] toks = line.split(delim);
             if (header == null) {
                 header = toks;
+                logger.info("## header: ");
             }
             else {
                 Map<String, Object> row = new HashMap<String, Object>();
                 if (header.length != toks.length) {
-                    logger.warning(ln + ": mismatch token count");
+                    logger.warning(ln + ": mismatch token count; expecting "
+                                   +header.length+" but got "+toks.length+"!");
                 }
                 int len = Math.min(header.length, toks.length);
                 for (int i = 0; i < len; ++i) {
