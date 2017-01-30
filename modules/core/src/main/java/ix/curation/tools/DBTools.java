@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ix.curation.EntityFactory;
 import ix.curation.Entity;
@@ -60,6 +61,20 @@ public class DBTools {
         }
     }
 
+    public void components () {
+        AtomicInteger ai = new AtomicInteger (0);
+        ef.components(c -> {
+                int score = c.score().intValue();               
+                if (score > 100) {
+                    System.out.println("++++++++++++ Component "
+                                       +ai.get()+" ++++++++++++");
+                    System.out.println("score: "+score);
+                    System.out.println("size: "+c.size());
+                }
+                ai.getAndIncrement();
+            });
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+DBTools.class.getName()
@@ -82,6 +97,9 @@ public class DBTools {
                 else {
                     System.err.println("No datasource specified!");
                 }
+            }
+            else if ("components".equalsIgnoreCase(cmd)) {
+                dbt.components();
             }
             else if ("dump".equalsIgnoreCase(cmd)) {
                 if (argv.length > 2) {

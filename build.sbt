@@ -21,7 +21,7 @@ lazy val commonDependencies = Seq(
   javaJdbc,
   cache,
   javaWs,
-  "org.neo4j" % "neo4j" % "3.0.3",
+  "org.neo4j" % "neo4j" % "3.1.0",
   "org.apache.lucene" % "lucene-core" % "5.5.0",
   "org.apache.lucene" % "lucene-facet" % "5.5.0",
   "org.apache.lucene" % "lucene-analyzers-common" % "5.5.0",

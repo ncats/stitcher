@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.DynamicLabel;
@@ -46,6 +47,9 @@ import ix.curation.graph.UnionFind;
 public class EntityFactory implements Props {
     static final Logger logger = Logger.getLogger
         (EntityFactory.class.getName());
+
+    static final double CLIQUE_WEIGHT = 0.7;
+    static final int CLIQUE_MINSIZE = 3;
 
     static class DefaultGraphMetrics implements GraphMetrics {
         int entityCount;
@@ -194,9 +198,43 @@ public class EntityFactory implements Props {
      */
     static class Graph {
         final BitSet[] adj;
-        final StitchKey key;
-        
+        StitchKey key;
+        GraphDatabaseService gdb;
+        Node[] nodes;
+
         Graph (GraphDatabaseService gdb, StitchKey key, long[] nodes) {
+            this (gdb, nodes);
+            this.key = key;
+        }
+        
+        Graph (Component comp) {
+            Entity[] entities = comp.entities();
+            adj = new BitSet[entities.length];
+            if (entities.length > 0) {
+                gdb = entities[0].getGraphDb();
+                try (Transaction tx = gdb.beginTx()) {
+                    for (int i = 0; i < entities.length; ++i) {
+                        Node n = entities[i]._node();
+                        BitSet bs = new BitSet (entities.length);
+                        for (Relationship rel :
+                                 n.getRelationships(key, Direction.BOTH)) {
+                            Node m = rel.getOtherNode(n);
+                            long id = m.getId();
+                            for (int j = 0; j < entities.length; ++j) 
+                                if (i != j && entities[j].getId() == id) {
+                                    bs.set(j);
+                                    break;
+                                }
+                        }
+                        adj[i] = bs;
+                        nodes[i] = n;
+                    }
+                    tx.success();
+                }
+            }
+        }
+        
+        Graph (GraphDatabaseService gdb, long[] nodes) {
             adj = new BitSet[nodes.length];
             try (Transaction tx = gdb.beginTx()) {
                 for (int i = 0; i < nodes.length; ++i) {
@@ -213,32 +251,45 @@ public class EntityFactory implements Props {
                             }
                     }
                     adj[i] = bs;
+                    this.nodes[i] = n;
                 }
                 tx.success();
             }
-            this.key = key;
+            this.gdb = gdb;
         }
+
+        public BitSet maxclique (StitchKey key, Object value) {
+            return null;
+        }
+
+        // construct a clique based on the given set of nodes
         
         public BitSet edges (int n) { return adj[n]; }
         public StitchKey key () { return key; }
+        public int size () { return adj.length; }
     }
 
     static class ComponentImpl implements Component {
         Set<Long> nodes = new TreeSet<Long>();
         Entity[] entities;
         String id;
+        GraphDatabaseService gdb;
 
         ComponentImpl () {
         }
         
         ComponentImpl (Node node) {
-            GraphDatabaseService gdb = node.getGraphDatabase();
+            instrument (node);
+        }
+
+        void instrument (Node node) {
+            gdb = node.getGraphDatabase();
             try (Transaction tx = gdb.beginTx()) {
                 if (!node.hasLabel(AuxNodeType.COMPONENT)
                     || !node.hasProperty(CNode.RANK))
                     throw new IllegalArgumentException
                         ("Not a valid component node: "+node.getId());
-                traverse (gdb, node);
+                traverse (node);
 
                 Integer rank = (Integer)node.getProperty(CNode.RANK);
                 /*
@@ -259,14 +310,14 @@ public class EntityFactory implements Props {
             id = Util.sha1(nodes).substring(0, 9);
         }
 
-        void traverse (GraphDatabaseService gdb, Node node) {
+        void traverse (Node node) {
             gdb.findNodes(CNode.CLASS_LABEL,
                           Props.PARENT, node.getId()).stream()
                 .forEach(n -> {
                         Long pid = (Long)n.getProperty(Props.PARENT);
                         nodes.add(n.getId());
                         if (!pid.equals(n.getId()))
-                            traverse (gdb, n);
+                            traverse (n);
                     });
         }
 
@@ -279,12 +330,31 @@ public class EntityFactory implements Props {
                 }
                 id = Util.sha1(this.nodes).substring(0, 9);
             }
+            this.gdb = gdb;         
+        }
+
+        ComponentImpl (GraphDatabaseService gdb, Long... nodes) {
+            try (Transaction tx = gdb.beginTx()) {
+                entities = new Entity[nodes.length];
+                for (int i = 0; i < nodes.length; ++i) {
+                    entities[i] = Entity._getEntity(gdb.getNodeById(nodes[i]));
+                    this.nodes.add(nodes[i]);
+                }
+                id = Util.sha1(this.nodes).substring(0, 9);
+            }
+            this.gdb = gdb;         
         }
 
         ComponentImpl (Component... comps) {
             Set<Entity> entities = new TreeSet<Entity>();
             for (Component c : comps)
                 for (Entity e : c) {
+                    if (gdb == null) {
+                        // this assumes that all entities come from the same
+                        // underlying graphdb instance!
+                        gdb = e.getGraphDb();
+                    }
+                    
                     entities.add(e);
                     nodes.add(e.getId());
                 }
@@ -294,12 +364,56 @@ public class EntityFactory implements Props {
         }
 
         ComponentImpl (Entity... entities) {
-            for (Entity e : entities)
+            for (Entity e : entities) {
+                if (gdb == null)
+                    gdb = e.getGraphDb();
                 nodes.add(e.getId());
+            }
             this.entities = entities;
             id = Util.sha1(nodes).substring(0, 9);
         }
 
+        /*
+         * unique set of values that span the given stitch key
+         */
+        public Object[] values (StitchKey key) {
+            Set values = new HashSet ();
+            for (Entity e : entities) {
+                try (Transaction tx = e._node().getGraphDatabase().beginTx()) {
+                    for (Relationship rel :
+                             e._node().getRelationships(key, Direction.BOTH)) {
+                        if (rel.hasProperty(VALUE))
+                            values.add(rel.getProperty(VALUE));
+                    }
+                }
+            }
+            return values.toArray(new Object[0]);
+        }
+        
+        public Component filter (StitchKey key, Object value) {
+            try (Transaction tx = gdb.beginTx()) {
+                return _filter (key, value);
+            }
+        }
+
+        public Component _filter (StitchKey key, Object value) {
+            RelationshipIndex index =
+                gdb.index().forRelationships(Entity.relationshipIndexName());
+            try (IndexHits<Relationship> hits = index.get(key.name(), value)) {
+                Set<Long> subset = new TreeSet<Long>();
+                for (Relationship rel : hits) {
+                    long id = rel.getStartNode().getId();
+                    if (nodes.contains(id))
+                        subset.add(id);
+                    id = rel.getEndNode().getId();
+                    if (nodes.contains(id))
+                        subset.add(id);
+                }
+                
+                return new ComponentImpl (gdb, subset.toArray(new Long[0]));
+            }
+        }
+        
         public Iterator<Entity> iterator () {
             return Arrays.asList(entities).iterator();
         }
@@ -356,6 +470,60 @@ public class EntityFactory implements Props {
             return ov.isEmpty()
                 ? null : new ComponentImpl (ov.toArray(new Entity[0]));
         }
+
+        public String toString () {
+            return getClass().getName()+"{id="+id+",size="
+                +nodes.size()+",nodes="+nodes+"}";
+        }
+    }
+
+    static class ComponentLazy extends ComponentImpl {
+        final Node seed;
+        final Integer rank;
+        AtomicBoolean inited = new AtomicBoolean (false);
+        
+        ComponentLazy (Node node) {
+            try (Transaction tx = node.getGraphDatabase().beginTx()) {
+                if (!node.hasLabel(AuxNodeType.COMPONENT))
+                    throw new IllegalArgumentException
+                        ("Not a valid component node: "+node.getId());
+                
+                rank = (Integer)node.getProperty(CNode.RANK);
+                if (rank == null)
+                    throw new IllegalArgumentException
+                        ("Node does not contain rank");
+                
+                seed = node;
+                tx.success();
+            }
+        }
+
+        void init () {
+            if (!inited.get()) {
+                instrument (seed);
+                inited.set(true);
+            }
+        }
+
+        @Override public int size () {
+            init ();
+            return rank;
+        }
+        @Override public Set<Long> nodes () {
+            init ();
+            return super.nodes();
+        }
+        @Override public Entity[] entities () {
+            init ();
+            return super.entities();
+        }
+        @Override public Iterator<Entity> iterator () {
+            init ();
+            return super.iterator();
+        }
+        @Override public Double score () {
+            return rank.doubleValue();
+        }
     }
 
     static class CliqueImpl extends ComponentImpl implements Clique {
@@ -365,7 +533,7 @@ public class EntityFactory implements Props {
         CliqueImpl (Component... comps) {
             super (comps);
         }
-        
+
         CliqueImpl (BitSet C, long[] gnodes, Set<StitchKey> keys,
                     GraphDatabaseService gdb) {
             entities = new Entity[C.cardinality()];
@@ -437,7 +605,7 @@ public class EntityFactory implements Props {
 
             values.put(key, value);
         }
-
+        
         public Map<StitchKey, Object> values () { return values; }
         
         @Override
@@ -452,6 +620,12 @@ public class EntityFactory implements Props {
                 ci.values.putAll(values);
             }
             return ci;
+        }
+
+        @Override
+        public Double score () {
+            return Math.pow(size(), 1. - CLIQUE_WEIGHT)
+                * Math.pow(values.size(), CLIQUE_WEIGHT);
         }
     }
     
@@ -471,12 +645,30 @@ public class EntityFactory implements Props {
 
         public boolean enumerate (long[] nodes, CliqueVisitor visitor) {
             cliques.clear();
+
+            for (StitchKey key : keys) {
+                enumerate (key, nodes);
+            }
             
-            for (StitchKey key : keys) enumerate (key, nodes);
             for (Map.Entry<BitSet, EnumSet<StitchKey>> me
                      : cliques.entrySet()) {
-                if (!visitor.clique
-                    (new CliqueImpl (me.getKey(), nodes, me.getValue(), gdb)))
+                
+                Clique clique = new CliqueImpl
+                    (me.getKey(), nodes, me.getValue(), gdb);
+
+                // filter out any clique that has multiple values for
+                //   a particular stitch key
+                Map<StitchKey, Object> values = clique.values();
+                EnumSet<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
+                for (Map.Entry<StitchKey, Object> e : values.entrySet()) {
+                    if (e.getValue().getClass().isArray())
+                        keys.add(e.getKey());
+                }
+        
+                for (StitchKey k : keys)
+                    values.remove(k);
+                
+                if (!values.isEmpty() && !visitor.clique(clique))
                     return false;
             }
             return true;
@@ -490,38 +682,110 @@ public class EntityFactory implements Props {
             BitSet C = new BitSet (nodes.length);
             BitSet S = new BitSet (nodes.length);
             Graph G = new Graph (gdb, key, nodes);
-            
-            //logger.info("Clique enumeration "+key+" |G|="+nodes.length+"...");
+
+            /*
+            { Set<Long> g = new TreeSet<Long>();
+                for (int i = 0; i < nodes.length; ++i)
+                    g.add(nodes[i]);
+                logger.info("Clique enumeration "+key+" G="+g+"...");
+            }
+            */
             bronKerbosch (G, C, P, S);
         }
 
-        void bronKerbosch (Graph G, BitSet C, BitSet P, BitSet S) {
+        boolean bronKerbosch (Graph G, BitSet C, BitSet P, BitSet S) {
+            boolean done = false;
             if (P.isEmpty() && S.isEmpty()) {
-                // only consider cliques that are of size >= 3
-                if (C.cardinality() > 2) {
+                // only consider cliques that are of size >= CLIQUE_MINSIZE
+                if (C.cardinality() >= CLIQUE_MINSIZE) {
                     BitSet c = (BitSet)C.clone();
                     
                     EnumSet<StitchKey> keys = cliques.get(c);
                     if (keys == null) {
                         cliques.put(c, EnumSet.of(G.key()));
+                        //logger.info("Clique found.."+c);
                     }
                     else
                         keys.add(G.key());
+                    
+                    done = C.cardinality() == G.size();
                 }
             }
             else {
-                for (int u = P.nextSetBit(0); u >=0 ; u = P.nextSetBit(u+1)) {
+                for (int u = P.nextSetBit(0); u >=0 && !done ;
+                     u = P.nextSetBit(u+1)) {
                     P.clear(u);
                     BitSet PP = (BitSet)P.clone();
                     BitSet SS = (BitSet)S.clone();
                     PP.and(G.edges(u));
                     SS.and(G.edges(u));
                     C.set(u);
-                    bronKerbosch (G, C, PP, SS);
+                    done = bronKerbosch (G, C, PP, SS);
                     C.clear(u);
                     S.set(u);
                 }
             }
+            
+            return done;
+        }
+    }
+
+    static class MaxCliqueEnum {
+        final GraphDatabaseService gdb;
+        final Map<BitSet, CliqueImpl> cliques =
+            new HashMap<BitSet, CliqueImpl>();
+        final StitchKey[] keys;
+        
+        MaxCliqueEnum (GraphDatabaseService gdb, StitchKey[] keys) {
+            this.gdb = gdb;
+            this.keys = keys;
+        }
+
+        public boolean enumerate (long[] nodes, CliqueVisitor visitor) {
+            cliques.clear();
+            
+            /*
+             * for each key, we first identify all unique values; then
+             * for each key-value combination, we construct a subgraph
+             * that spans only those key-value nodes whereas in 
+             * CliqueEnumeration we need to enumerate over all maximal
+             * cliques for all possible stitch key-value combinations.
+             */
+            ComponentImpl subgraph = new ComponentImpl (gdb, nodes);
+            logger.info("** "+subgraph);
+            for (StitchKey key : keys) {
+                // find all unique values for this subgraph over the given
+                // stitch key
+                Object[] vals = subgraph.values(key);
+                if (vals.length > 0) {
+                    System.err.print(" ++  "+key+":");
+                    for (int i = 0; i < vals.length; ++i) {
+                        Component comp = subgraph.filter(key, vals[i]);
+                        System.err.print(" "+vals[i]+"("+comp.size()+")");
+                        if (comp.size() >= CLIQUE_MINSIZE) {
+                            maxclique (comp, key, vals[i]);
+                        }
+                    }
+                    System.err.println();
+                }
+            }
+            
+            for (Map.Entry<BitSet, CliqueImpl> me: cliques.entrySet()) {
+            }
+            
+            return true;
+        }
+
+        void maxclique (Component comp, StitchKey key, Object value) {
+            Graph G = new Graph (comp);
+            BitSet C = G.maxclique(key, value);
+            CliqueImpl clique = cliques.get(C);
+            if (clique == null) {
+                cliques.put(C, clique);
+            }
+            Object val = clique.values().get(key);
+            clique.values()
+                .put(key, val == null ? value : Util.merge(val, value));
         }
     }
 
@@ -792,7 +1056,7 @@ public class EntityFactory implements Props {
         List<Component> comps = new ArrayList<Component>();
         try (Transaction tx = gdb.beginTx()) {
             gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
-                    comps.add(new ComponentImpl (node));
+                    comps.add(new ComponentLazy (node));
                 });
             tx.success();
         }
@@ -800,10 +1064,10 @@ public class EntityFactory implements Props {
         return comps;
     }
 
-    public void component (Consumer<Component> consumer) {
+    public void components (Consumer<Component> consumer) {
         try (Transaction tx = gdb.beginTx()) {
             gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
-                    consumer.accept(new ComponentImpl (node));
+                    consumer.accept(new ComponentLazy (node));
                 });
         }
     }
@@ -898,7 +1162,8 @@ public class EntityFactory implements Props {
     public boolean cliqueEnumeration (StitchKey[] keys, CliqueVisitor visitor) {
         ConnectedComponents cc = new ConnectedComponents (gdb);
         long[][] comps = cc.components();
-        for (int i = 0; i < comps.length && comps[i].length >= 3; ++i) {
+        for (int i = 0; i < comps.length
+                 && comps[i].length >= CLIQUE_MINSIZE; ++i) {
             if (!cliqueEnumeration (keys, comps[i], visitor))
                 return false;
         }
@@ -926,17 +1191,21 @@ public class EntityFactory implements Props {
     
     public boolean cliqueEnumeration (StitchKey[] keys,
                                       long[] nodes, CliqueVisitor visitor) {
+        /*
         { EnumSet<StitchKey> set = EnumSet.noneOf(StitchKey.class);
             for (StitchKey k : keys) set.add(k);
-            /*
+
             logger.info("enumerating cliques over "+set+" spanning "
                         +nodes.length+" nodes...");
-            */
         }
-        
-        CliqueEnumeration clique = new CliqueEnumeration (gdb, keys); 
-        // enumerate all cliques for this key
-        return clique.enumerate(nodes, visitor);
+        */
+
+        if (nodes.length >= CLIQUE_MINSIZE) {
+            CliqueEnumeration clique = new CliqueEnumeration (gdb, keys); 
+            // enumerate all cliques for this key
+            return clique.enumerate(nodes, visitor);
+        }
+        return false;
     }
     
     public Iterator<Entity> find (String key, Object value) {

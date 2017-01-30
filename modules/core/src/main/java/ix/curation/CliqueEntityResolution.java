@@ -128,7 +128,8 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                     ef.cliqueEnumeration(KEYS, entities, this);
                     if (DEBUG)
                         logger.info(cliques.size()+" clique(s) found!");
-                    
+
+                    /*
                     closure (Arrays.asList(entities).iterator());
                     
                     if (DEBUG) {
@@ -160,9 +161,10 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                         consumer.accept
                             (new CliqueComponent
                              (1, ef.entities(new long[]{id})));
+                    */
                 }
                 else {
-                    consumer.accept(new CliqueComponent (1, entities));
+                    //consumer.accept(new CliqueComponent (1, entities));
                 }
             });
         
@@ -292,10 +294,10 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
 
             Collections.sort(cliques, new Comparator<Clique> () {
                     public int compare (Clique c1, Clique c2) {
-                        int d = c2.values().size()*c2.size()
-                            - c1.values().size()*c1.size();
-                        if (d == 0)
-                            d = c2.values().size() - c1.values().size();
+                        double s = c2.score() - c1.score();
+                        if (s < 0.) return -1;
+                        if (s > 0.) return 1;
+                        int d = c2.values().size() - c1.values().size();
                         if (d == 0)
                             d = c2.size() - c1.size();
                         return d;
@@ -317,7 +319,8 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                 
                 if (max == 1) {
                     zz.println("+++++ clique "+n
-                               +" ("+c.size()+") ++++++");
+                               +" ("+c.size()
+                               +String.format(" %1$.3f) ++++++", c.score()));
                     zz.print("nodes:");
                     for (Entity e : c)
                         zz.print(" "+e.getId());
@@ -332,7 +335,8 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                 }
                 else {
                     yy.println("+++++ clique "+m
-                               +" ("+c.size()+") ++++++");
+                               +" ("+c.size()
+                               +String.format(" %1$.3f) ++++++", c.score()));
                     yy.print("nodes:");
                     for (Entity e : c)
                         yy.print(" "+e.getId()+"("+entities.get(e).size()+")");
@@ -395,49 +399,16 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
         }
         */
 
-        // filter out any stitch that has multiple values
-        EnumSet<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
-        for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
-            if (me.getValue().getClass().isArray())
-                keys.add(me.getKey());
+        // map entity to its cliques
+        for (Entity e : clique) {
+            Set<Clique> cliques = entities.get(e);
+            if (cliques == null) {
+                entities.put(e, cliques = new HashSet<Clique>());
+            }
+            cliques.add(clique);
         }
         
-        for (StitchKey k : keys)
-            values.remove(k);
-
-        if (!values.isEmpty()) {
-            // map entity to its cliques
-            for (Entity e : clique) {
-                Set<Clique> cliques = entities.get(e);
-                if (cliques == null) {
-                    entities.put(e, cliques = new HashSet<Clique>());
-                }
-                cliques.add(clique);
-            }
-            
-            cliques.add(clique);
-            
-            /*
-            List<Clique> remove = new ArrayList<Clique>();
-            List<Clique> add = new ArrayList<Clique>();
-            for (Clique c : cliques) {
-                if (c.overlaps(clique)) {
-                    remove.add(c);
-                    add.add(c.add(clique));
-                }
-            }
-            
-            if (remove.isEmpty())
-                cliques.add(clique);
-            else {
-                cliques.removeAll(remove);
-                cliques.addAll(add);
-            }
-            */
-        }
-        else {
-            logger.info("Clique "+clique.nodes()+" not added: "+values);
-        }
+        cliques.add(clique);
         
         return true;
     }

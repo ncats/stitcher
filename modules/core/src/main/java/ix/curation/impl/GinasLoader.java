@@ -8,7 +8,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ix.curation.*;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 import java.io.*;

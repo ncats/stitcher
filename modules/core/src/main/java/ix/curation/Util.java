@@ -195,6 +195,20 @@ public class Util {
         return null;
     }
 
+    public static long[] toPrimitive (Long... values) {
+        long[] p = new long[values.length];
+        for (int i = 0; i < p.length; ++i)
+            p[i] = values[i];
+        return p;
+    }
+
+    public static double[] toPrimitive (Double... values) {
+        double[] p = new double[values.length];
+        for (int i = 0; i < p.length; ++i)
+            p[i] = values[i];
+        return p;
+    }
+
     public static String toString (Object obj) {
         return toString (obj, 10);
     }
