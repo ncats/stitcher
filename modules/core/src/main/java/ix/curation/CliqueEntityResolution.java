@@ -116,7 +116,7 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
         Set<DataSource> sources =
             DataSourceFactory.getDataSources(ef.getGraphDb());
         
-        ef.component(comp -> {
+        ef.components(comp -> {
                 clear ();               
                 Entity[] entities = comp.entities();
                 if (entities.length > 1) {
