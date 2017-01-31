@@ -202,11 +202,6 @@ public class EntityFactory implements Props {
         GraphDatabaseService gdb;
         Node[] nodes;
 
-        Graph (GraphDatabaseService gdb, StitchKey key, long[] nodes) {
-            this (gdb, nodes);
-            this.key = key;
-        }
-        
         Graph (Component comp) {
             Entity[] entities = comp.entities();
             adj = new BitSet[entities.length];
@@ -234,9 +229,10 @@ public class EntityFactory implements Props {
             }
         }
         
-        Graph (GraphDatabaseService gdb, long[] nodes) {
+        Graph (GraphDatabaseService gdb, StitchKey key, long[] nodes) {
             adj = new BitSet[nodes.length];
             try (Transaction tx = gdb.beginTx()) {
+                this.nodes = new Node[nodes.length];
                 for (int i = 0; i < nodes.length; ++i) {
                     Node n = gdb.getNodeById(nodes[i]);
                     BitSet bs = new BitSet (nodes.length);
@@ -256,6 +252,7 @@ public class EntityFactory implements Props {
                 tx.success();
             }
             this.gdb = gdb;
+            this.key = key;
         }
 
         public BitSet maxclique (StitchKey key, Object value) {
@@ -1160,6 +1157,7 @@ public class EntityFactory implements Props {
     }
 
     public boolean cliqueEnumeration (StitchKey[] keys, CliqueVisitor visitor) {
+        /*
         ConnectedComponents cc = new ConnectedComponents (gdb);
         long[][] comps = cc.components();
         for (int i = 0; i < comps.length
@@ -1167,6 +1165,32 @@ public class EntityFactory implements Props {
             if (!cliqueEnumeration (keys, comps[i], visitor))
                 return false;
         }
+        return true;
+        */
+        
+        try (Transaction tx = gdb.beginTx()) {
+            for (Iterator<Node> it = gdb.findNodes(AuxNodeType.COMPONENT);
+                 it.hasNext();) {
+                Node node = it.next();
+                
+                Integer rank = (Integer)node.getProperty(CNode.RANK);
+                if (rank == null)
+                    throw new RuntimeException ("Component node "+node.getId()
+                                                +" has no rank!");
+                if (rank >= CLIQUE_MINSIZE) {
+                    Component comp = new ComponentImpl (node);
+                    Set<Long> nodes = comp.nodes();
+                    long[] c = new long[nodes.size()];
+                    int i = 0;
+                    for (Iterator<Long> ii = nodes.iterator(); ii.hasNext();)
+                        c[i++] = ii.next();
+                    
+                    if (!cliqueEnumeration (keys, c, visitor))
+                        return false;
+                }
+            }
+        }
+        
         return true;
     }
 
@@ -1185,7 +1209,8 @@ public class EntityFactory implements Props {
         }
     }
     
-    public boolean cliqueEnumeration(Entity[] entities, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (Entity[] entities,
+                                      CliqueVisitor visitor) {
         return cliqueEnumeration (Entity.KEYS, entities, visitor);
     }
     

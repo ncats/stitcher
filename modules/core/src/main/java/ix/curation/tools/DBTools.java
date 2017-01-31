@@ -2,6 +2,7 @@ package ix.curation.tools;
 
 import java.util.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +14,10 @@ import ix.curation.DataSourceFactory;
 import ix.curation.GraphDb;
 import ix.curation.StitchKey;
 import ix.curation.AuxNodeType;
+import ix.curation.CliqueVisitor;
+import ix.curation.Clique;
+import ix.curation.Props;
+
 
 public class DBTools {
     static final Logger logger = Logger.getLogger(DBTools.class.getName());
@@ -75,6 +80,45 @@ public class DBTools {
             });
     }
 
+    public void cliques () {
+        ef.cliqueEnumeration(new CliqueVisitor () {
+                public boolean clique (Clique clique) {
+                    System.out.println
+                        ("+++++++ Clique "+clique.getId()+" +++++++");
+                    System.out.println("size: "+clique.size());
+                    System.out.println(String.format("score: %1$.3f",
+                                                     clique.score()));
+                    if (clique.size() > 0) {
+                        Entity e = clique.entities()[0].parent();
+                        System.out.println("parent: " +e.getId());
+                        System.out.print("nodes:");
+                        for (Entity n : clique)
+                            System.out.print(" "+n.getId());
+                        System.out.println();
+                        System.out.println("rank: "+e.get(Props.RANK));
+                    }
+                    
+                    for (Map.Entry<StitchKey, Object> me
+                             : clique.values().entrySet()) {
+                        System.out.print(me.getKey()+":");
+                        Object val = me.getValue();
+                        if (val.getClass().isArray()) {
+                            int len = Array.getLength(val);
+                            for (int i = 0; i < len; ++i) {
+                                System.out.print(" "+Array.get(val, i));
+                            }
+                        }
+                        else
+                            System.out.print(" "+val);
+                        System.out.println();
+                    }
+                    System.out.println();
+                    
+                    return true;
+                }
+            });
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+DBTools.class.getName()
@@ -100,6 +144,9 @@ public class DBTools {
             }
             else if ("components".equalsIgnoreCase(cmd)) {
                 dbt.components();
+            }
+            else if ("cliques".equalsIgnoreCase(cmd)) {
+                dbt.cliques();
             }
             else if ("dump".equalsIgnoreCase(cmd)) {
                 if (argv.length > 2) {

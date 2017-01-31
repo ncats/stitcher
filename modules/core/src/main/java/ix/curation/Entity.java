@@ -83,6 +83,14 @@ public class Entity extends CNode {
 
     public EntityType type () { return type; }
     
+    public Entity parent () {
+        try (Transaction tx = gdb.beginTx()) {
+            Entity e = new Entity (_parent ());
+            tx.success();
+            return e;
+        }
+    }
+    
     public Object get (StitchKey key) {
         try (Transaction tx = gdb.beginTx()) {
             return _get (key);

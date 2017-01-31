@@ -33,7 +33,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class CNode implements Props, Comparable<CNode> {
     static final Logger logger = Logger.getLogger(CNode.class.getName());
-    static public final String RANK = "_rank";
 
     public static final String NODE_INDEX = ".node_index";
     public static final String RELATIONSHIP_INDEX = ".relationship_index";
@@ -92,6 +91,14 @@ public class CNode implements Props, Comparable<CNode> {
             return 0;
         
         return d < 0l ? -1 : 1;
+    }
+
+    public Node _parent () {
+        Long id = (Long)_node.getProperty(PARENT);
+        if (id == null)
+            throw new RuntimeException
+                ("Node "+_node.getId()+" doesn't a parent!");
+        return gdb.getNodeById(id);
     }
 
     public Long lastUpdated () { return lastUpdated; }
