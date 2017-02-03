@@ -94,11 +94,19 @@ public class CNode implements Props, Comparable<CNode> {
     }
 
     public Node _parent () {
-        Long id = (Long)_node.getProperty(PARENT);
-        if (id == null)
-            throw new RuntimeException
-                ("Node "+_node.getId()+" doesn't a parent!");
-        return gdb.getNodeById(id);
+        Node n = _node;
+        do {
+            Long id = (Long)n.getProperty(PARENT);
+            if (id == null)
+                throw new RuntimeException
+                    ("Node "+n.getId()+" doesn't a parent!");
+            
+            if (id == n.getId())
+                break;
+            n = gdb.getNodeById(id);
+            
+        } while (true);
+        return n;
     }
 
     public Long lastUpdated () { return lastUpdated; }

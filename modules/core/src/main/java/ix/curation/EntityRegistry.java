@@ -167,7 +167,7 @@ public class EntityRegistry extends EntityFactory {
 
                 String property = cf.getString("property");
                 logger.info("key="+key+" property=\""+property+"\"");
-
+                
                 if (cf.hasPath("regex")) {
                     RegexStitchKeyMapper mapper = new RegexStitchKeyMapper ();
                     if (cf.hasPath("minlen")) {
@@ -177,7 +177,7 @@ public class EntityRegistry extends EntityFactory {
                     if (cf.hasPath("normalize")) {
                         mapper.setNormalized(cf.getBoolean("normalize"));
                     }
-                    
+
                     if (cf.hasPath("blacklist")) {
                         ConfigValue cv = cf.getValue("blacklist");
                         if (cv.valueType() == ConfigValueType.LIST) {
@@ -223,6 +223,21 @@ public class EntityRegistry extends EntityFactory {
                                  +regex+" ("+ex.getMessage()+")");
                         }
                     }
+                }
+                else if (cf.hasPath("blacklist")) {
+                    BlacklistStitchKeyMapper mapper =
+                        new BlacklistStitchKeyMapper (key);
+                    
+                    ConfigValue cv = cf.getValue("blacklist");
+                    if (cv.valueType() == ConfigValueType.LIST) {
+                        List<String> values = (List<String>)cv.unwrapped();
+                        for (String v : values)
+                            mapper.addBlacklist(v);
+                    }
+                    else {
+                        mapper.addBlacklist(cv.unwrapped());
+                    }
+                    add (property, mapper);
                 }
                 else { // treat this as normal stitch key
                     add (key, property);
@@ -304,8 +319,10 @@ public class EntityRegistry extends EntityFactory {
         
         for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
             for (String prop : me.getValue()) {
-                Object value = normalize (me.getKey(), map.get(prop));
-                ent._add(me.getKey(), new StitchValue (prop, value));
+                if (!mappers.containsKey(prop)) { // deal with mappers later
+                    Object value  = normalize (me.getKey(), map.get(prop));
+                    ent._add(me.getKey(), new StitchValue (prop, value));
+                }
             }
         }
         mapValues (ent, map);

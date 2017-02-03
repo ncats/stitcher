@@ -4,12 +4,11 @@ import java.util.*;
 import java.util.regex.*;
 import java.lang.reflect.Array;
 
-public class RegexStitchKeyMapper implements StitchKeyMapper {
+public class RegexStitchKeyMapper extends BlacklistStitchKeyMapper {
     protected Map<StitchKey, List<Pattern>> stitches =
         new EnumMap<StitchKey, List<Pattern>>(StitchKey.class);
     protected int minlen = 1;
     protected boolean normalized = false;
-    protected Set blacklist = new HashSet ();
     
     public RegexStitchKeyMapper () {
     }
@@ -38,24 +37,8 @@ public class RegexStitchKeyMapper implements StitchKeyMapper {
         this.normalized = normalized;
     }
     public boolean getNormalized () { return normalized; }
-    
-    public void addBlacklist (Object value) {
-        if (value instanceof String)
-            value = ((String)value).toUpperCase();
-        blacklist.add(value);
-    }
-    public void removeBlacklist (Object value) {
-        if (value instanceof String)
-            blacklist.remove(((String)value).toUpperCase());
-        else
-            blacklist.remove(value);
-    }
-    public boolean isBlacklist (Object value) {
-        return value instanceof String
-            ? blacklist.contains(value.toString().toUpperCase())
-            : blacklist.contains(value);
-    }
-    
+
+    @Override
     public Map<StitchKey, Object> map (Object value) {
         Map<StitchKey, Object> mapped = new HashMap<StitchKey, Object>();
 

@@ -90,14 +90,15 @@ public class DBTools {
                                                      clique.score()));
                     if (clique.size() > 0) {
                         Entity e = clique.entities()[0].parent();
-                        System.out.println("parent: " +e.getId());
+                        System.out.println("parent: " +e.getId()
+                                           +" ("+e.get(Props.RANK)+")");
                         System.out.print("nodes:");
                         for (Entity n : clique)
                             System.out.print(" "+n.getId());
                         System.out.println();
-                        System.out.println("rank: "+e.get(Props.RANK));
                     }
-                    
+
+                    System.out.println("-- stitch keys --");
                     for (Map.Entry<StitchKey, Object> me
                              : clique.values().entrySet()) {
                         System.out.print(me.getKey()+":");

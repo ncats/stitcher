@@ -87,34 +87,43 @@ public class MapEntityFactory extends EntityRegistry {
     
     public int register (InputStream is, String delim, String... header)
         throws IOException {
-        BufferedReader br = new BufferedReader (new InputStreamReader (is));
-        int ln = 1, count = 0;
-        for (String line; (line = br.readLine()) != null; ++ln) {
-            String[] toks = line.split(delim);
+        LineTokenizer tokenizer = new LineTokenizer (delim.charAt(0));
+        tokenizer.setInputStream(is);
+        
+        int count = 0;
+        while (tokenizer.hasNext()) {
+            String[] toks = tokenizer.next();
+
             if (header == null) {
                 header = toks;
-                logger.info("## header: ");
+                logger.info("## HEADER: ");
+                for (int i = 0; i < header.length; ++i)
+                    logger.info("  "+i+": \""+header[i]+"\"");
+            }
+            else if (header.length != toks.length) {
+                logger.warning(tokenizer.getLineCount()
+                               + ": mismatch token count; expecting "
+                               +header.length+" but got "+toks.length+"!");
             }
             else {
                 Map<String, Object> row = new HashMap<String, Object>();
-                if (header.length != toks.length) {
-                    logger.warning(ln + ": mismatch token count; expecting "
-                                   +header.length+" but got "+toks.length+"!");
-                }
-                int len = Math.min(header.length, toks.length);
-                for (int i = 0; i < len; ++i) {
-                    String[] values = toks[i].split("\\|");
-                    if (values.length > 1) {
-                        row.put(header[i], values);
-                    }
-                    else {
-                        row.put(header[i], toks[i]);
+                for (int i = 0; i < toks.length; ++i) {
+                    if (toks[i] != null) {
+                        String[] values = toks[i].split("\\|");
+                        if (values.length > 1) {
+                            row.put(header[i], values);
+                        }
+                        else {
+                            row.put(header[i], toks[i]);
+                        }
                     }
                 }
-                
-                Entity ent = register (row);
-                if (ent != null)
-                    ++count;
+
+                if (!row.isEmpty()) {
+                    Entity ent = register (row);
+                    if (ent != null)
+                        ++count;
+                }
             }
         }
         return count;

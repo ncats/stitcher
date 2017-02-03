@@ -105,11 +105,19 @@ public class LineTokenizer implements Iterator<String[]> {
         for (String a : argv) {
             System.out.println("["+a+"]");
             tokenizer.setInputStream(new FileInputStream (a));
+            String[] header = null;
             for (int i = 0; tokenizer.hasNext(); ++i) {
                 String[] tokens = tokenizer.next();
                 System.out.print(i+": ("+tokens.length+")");
-                for (int j = 0; j< tokens.length; ++j)
-                    System.out.print(" <<"+tokens[j]+">>");
+                if (header == null) {
+                    for (int j = 0; j< tokens.length; ++j)
+                        System.out.print(" <<"+tokens[j]+">>");
+                    header = tokens;
+                }
+                else {
+                    for (int j = 0; j< tokens.length; ++j)
+                        System.out.print(" <<"+header[j]+">:<"+tokens[j]+">>");
+                }
                 System.out.println("--\n");
             }
         }
