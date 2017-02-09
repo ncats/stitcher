@@ -81,8 +81,7 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
                     logger.warning("Line "+tokenizer.getLineCount()
                                    +": columns mismatch; "
                                    +"expecting "+header.length
-                                   +" columns but instead got "+row.length
-                                   +"\n"+tokenizer.getCurrentLine());
+                                   +" columns but instead got "+row.length);
                 }
                 int ncols = Math.min(header.length, row.length);
                 Map<String, Object> props = new HashMap<String, Object>();

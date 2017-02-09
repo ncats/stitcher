@@ -385,7 +385,8 @@ public class EntityRegistry extends EntityFactory {
                     }
                     else {
                         ent._add(m.getKey(),
-                                 new StitchValue (me.getKey(), val));
+                                 new StitchValue (me.getKey(),
+                                                  normalize (m.getKey(), val)));
                     }
                     
                     Set<String> props = stitchMappers.get(m.getKey());

@@ -28,6 +28,7 @@ public class MapEntityFactory extends EntityRegistry {
         Logger.getLogger(MapEntityFactory.class.getName());
 
     protected String delimiter = "\t";
+    protected String[] header;
 
     public MapEntityFactory (String dir) throws IOException {
         super (dir);
@@ -70,9 +71,11 @@ public class MapEntityFactory extends EntityRegistry {
                            +" entities!");
         }
         else {
-            int count = register (ds.openStream(), delim, header);
-            ds.set("_header", header);      
-            ds.set(INSTANCES, count);
+            instances = register (ds.openStream(), delim, header);
+            ds.set(PROPERTIES, header == null ? this.header : header);
+            ds.set(INSTANCES, instances);
+            updateMeta (ds);
+            logger.info("$$$ "+instances+" entities registered for "+ds);
         }
         return ds;
     }
@@ -95,7 +98,7 @@ public class MapEntityFactory extends EntityRegistry {
             String[] toks = tokenizer.next();
 
             if (header == null) {
-                header = toks;
+                this.header = header = toks;
                 logger.info("## HEADER: ");
                 for (int i = 0; i < header.length; ++i)
                     logger.info("  "+i+": \""+header[i]+"\"");

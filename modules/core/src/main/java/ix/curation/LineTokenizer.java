@@ -20,6 +20,11 @@ public class LineTokenizer implements Iterator<String[]> {
         this.delim = delim;
     }
 
+    public void setDelimiter (char delim) {
+        this.delim = delim;
+    }
+    public char getDelimiter () { return delim; }
+
     protected String[] nextLine () throws IOException {
         List<String> tokens = new ArrayList<String>();
         int i = 0, nb;
@@ -97,28 +102,41 @@ public class LineTokenizer implements Iterator<String[]> {
 
     public static void main (String[] argv) throws Exception {
         if (argv.length == 0) {
-            System.err.println("Usage: LineTokenizer FILES...");
+            System.err.println("Usage: LineTokenizer [delimiter=tab] FILES...");
             System.exit(1);
         }
 
         LineTokenizer tokenizer = new LineTokenizer ();
         for (String a : argv) {
-            System.out.println("["+a+"]");
-            tokenizer.setInputStream(new FileInputStream (a));
-            String[] header = null;
-            for (int i = 0; tokenizer.hasNext(); ++i) {
-                String[] tokens = tokenizer.next();
-                System.out.print(i+": ("+tokens.length+")");
-                if (header == null) {
-                    for (int j = 0; j< tokens.length; ++j)
-                        System.out.print(" <<"+tokens[j]+">>");
-                    header = tokens;
+            int pos = a.indexOf('=');
+            if (pos > 0) {
+                if ("delimiter".equals(a.substring(0, pos))) {
+                    String delimiter = a.substring(pos+1);
+                    if ("tab".equalsIgnoreCase(delimiter))
+                        delimiter = "\t";
+                    System.err.println("DELIMITER="+delimiter.charAt(0));
+                    tokenizer.setDelimiter(delimiter.charAt(0));
                 }
-                else {
-                    for (int j = 0; j< tokens.length; ++j)
-                        System.out.print(" <<"+header[j]+">:<"+tokens[j]+">>");
+            }
+            else {
+                System.out.println("["+a+"]");
+                tokenizer.setInputStream(new FileInputStream (a));
+                String[] header = null;
+                for (int i = 0; tokenizer.hasNext(); ++i) {
+                    String[] tokens = tokenizer.next();
+                    System.out.print(i+": ("+tokens.length+")");
+                    if (header == null) {
+                        for (int j = 0; j< tokens.length; ++j)
+                            System.out.print(" <<"+tokens[j]+">>");
+                        header = tokens;
+                    }
+                    else {
+                        for (int j = 0; j< tokens.length; ++j)
+                            System.out.print
+                                (" <<"+header[j]+">:<"+tokens[j]+">>");
+                    }
+                    System.out.println("--\n");
                 }
-                System.out.println("--\n");
             }
         }
     }
