@@ -107,6 +107,7 @@ public class LineTokenizer implements Iterator<String[]> {
         }
 
         LineTokenizer tokenizer = new LineTokenizer ();
+        Map<String, Set<String>> uvals = new HashMap<>();       
         for (String a : argv) {
             int pos = a.indexOf('=');
             if (pos > 0) {
@@ -124,20 +125,33 @@ public class LineTokenizer implements Iterator<String[]> {
                 String[] header = null;
                 for (int i = 0; tokenizer.hasNext(); ++i) {
                     String[] tokens = tokenizer.next();
-                    System.out.print(i+": ("+tokens.length+")");
+                    //System.out.print(i+": ("+tokens.length+")");
                     if (header == null) {
                         for (int j = 0; j< tokens.length; ++j)
                             System.out.print(" <<"+tokens[j]+">>");
                         header = tokens;
                     }
                     else {
-                        for (int j = 0; j< tokens.length; ++j)
+                        for (int j = 0; j< tokens.length; ++j) {
+                            /*
                             System.out.print
-                                (" <<"+header[j]+">:<"+tokens[j]+">>");
+                            (" <<"+header[j]+">:<"+tokens[j]+">>");*/
+                            Set<String> uv = uvals.get(header[j]);
+                            if (uv == null)
+                                uvals.put(header[j], uv = new TreeSet<>());
+                            uv.add(tokens[j]);
+                        }
                     }
-                    System.out.println("--\n");
+                    //System.out.println("--\n");
                 }
             }
+        }
+
+        System.out.println("##### unique values ######");
+        for (Map.Entry<String, Set<String>> me : uvals.entrySet()) {
+            System.out.println("++++++ "+me.getKey()+" +++++++");
+            for (String v : me.getValue())
+                System.out.println(v);
         }
     }
 }

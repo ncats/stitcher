@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
 import java.security.DigestInputStream;
+import java.util.regex.*;
 
 import ix.curation.GraphDb;
 import ix.curation.StitchKey;
@@ -98,6 +99,18 @@ public class DrugsAtFDA extends MapEntityFactory {
         {"TYPE 9- BLA","Type 9 - New indication submitted as distinct BLA, consolidated"}
     };
 
+    static final Pattern ProductRe;
+    static {
+        Pattern p = null;
+        try {
+            p = Pattern.compile("([^\\(]+)\\(([^\\)]+)");
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        ProductRe = p;
+    }
+    
     public DrugsAtFDA (GraphDb graphDb) throws IOException {
         super (graphDb);
     }
@@ -198,7 +211,27 @@ public class DrugsAtFDA extends MapEntityFactory {
                         String value = toks[i].trim();
                         if ("Form".equals(header[i])
                             || "ActiveIngredient".equals(header[i])) {
-                            String[] vals = value.split(";");
+                            String[] vals = null;
+                            
+                            // there are two cases of this:
+                            //   TRIPLE SULFA (SULFABENZAMIDE;SULFACETAMIDE;SULFATHIAZOLE)
+                            Matcher m = ProductRe.matcher(value);
+                            if (m.find()) {
+                                String name = m.group(1).trim();
+                                String[] comp = m.group(2).split(";");
+                                // only consider the individual components if
+                                //  they are separated by ;'s
+                                if (comp.length > 1) {
+                                    vals = new String[comp.length+1];
+                                    for (int i = 0; i < comp.length; ++i)
+                                        vals[i] = comp[i];
+                                    vals[comp.length] = name;
+                                }
+                            }
+
+                            if (vals == null)
+                                vals = value.split(";");
+                            
                             row.put(header[i], vals.length == 1
                                     ? vals[0] : vals);
                         }
@@ -420,12 +453,20 @@ public class DrugsAtFDA extends MapEntityFactory {
                 ("Usage: ix.curation.impl.DrugsAtFDA DB (ZIPFILE|DIR)");
             System.exit(1);
         }
-        
+
+        Matcher m = ProductRe.matcher("TRIPLE SULFA (SULFABENZAMIDE;SULFACETAMIDE;SULFATHIAZOLE)");
+        if (m.find()) {
+            System.out.println(m.group(1));
+            System.out.println(m.group(2));
+        }
+
+        /*
         DrugsAtFDA fda = new DrugsAtFDA (argv[0]);
         for (int i = 1; i < argv.length; ++i) {
             logger.info("***** registering "+argv[i]+" ******");
             fda.register(new File (argv[i]));
         }
         fda.shutdown();
+        */
     }
 }
