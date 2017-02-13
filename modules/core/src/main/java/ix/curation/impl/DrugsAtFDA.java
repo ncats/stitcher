@@ -223,8 +223,8 @@ public class DrugsAtFDA extends MapEntityFactory {
                                 //  they are separated by ;'s
                                 if (comp.length > 1) {
                                     vals = new String[comp.length+1];
-                                    for (int i = 0; i < comp.length; ++i)
-                                        vals[i] = comp[i];
+                                    for (int j = 0; j < comp.length; ++j)
+                                        vals[j] = comp[j];
                                     vals[comp.length] = name;
                                 }
                             }
