@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.security.MessageDigest;
 import java.security.DigestInputStream;
 import java.util.regex.*;
+import java.lang.reflect.Array;
 
 import ix.curation.GraphDb;
 import ix.curation.StitchKey;
@@ -153,12 +154,15 @@ public class DrugsAtFDA extends MapEntityFactory {
                          : data.entrySet()) {
                     System.out.println("++++++ "+me.getKey()+" ++++++");
                     for (Map<String, Object> row : me.getValue().values()) {
-                        if (count++ == 0) {
-                            ds.set(PROPERTIES, row.keySet()
-                                   .toArray(new String[0]));
-                            //System.out.println(me.getKey()+": "+row);
+                        if (row.containsKey("ActiveIngredient")) {
+                            // only register those with active ingredients
+                            if (count++ == 0) {
+                                ds.set(PROPERTIES, row.keySet()
+                                       .toArray(new String[0]));
+                                //System.out.println(me.getKey()+": "+row);
+                            }
+                            register (row);
                         }
-                        register (row);
                     }
                 }
                 ds.set(INSTANCES, count);
@@ -223,8 +227,8 @@ public class DrugsAtFDA extends MapEntityFactory {
                                 //  they are separated by ;'s
                                 if (comp.length > 1) {
                                     vals = new String[comp.length+1];
-                                    for (int i = 0; i < comp.length; ++i)
-                                        vals[i] = comp[i];
+                                    for (int j = 0; j < comp.length; ++j)
+                                        vals[j] = comp[j];
                                     vals[comp.length] = name;
                                 }
                             }
@@ -232,8 +236,7 @@ public class DrugsAtFDA extends MapEntityFactory {
                             if (vals == null)
                                 vals = value.split(";");
                             
-                            row.put(header[i], vals.length == 1
-                                    ? vals[0] : vals);
+                            row.put(header[i], vals);
                         }
                         else
                             row.put(header[i], value);
@@ -259,11 +262,8 @@ public class DrugsAtFDA extends MapEntityFactory {
             if (header == null) {
                 header = toks;
             }
-            else {
+            else if (data.containsKey(toks[1])) {
                 Map<String, Map<String, Object>> app = data.get(toks[1]);
-                if (app == null)
-                    data.put(toks[1], app = new HashMap<>());
-
                 Map<String, Object> row = app.get(toks[2]);
                 if (row == null)
                     app.put(toks[2], row = new HashMap<>());
@@ -292,14 +292,12 @@ public class DrugsAtFDA extends MapEntityFactory {
             if (header == null) {
                 header = toks;
             }
-            else {
+            else if (data.containsKey(toks[0])) {
                 Map<String, Map<String, Object>> products = data.get(toks[0]);
-                if (products != null) {
-                    for (Map<String, Object> p : products.values()) 
-                        for (int i = 1; i < toks.length; ++i) 
-                            if (toks[i] != null)
-                                p.put(header[i], toks[i].trim());
-                }
+                for (Map<String, Object> p : products.values()) 
+                    for (int i = 0; i < toks.length; ++i) 
+                        if (toks[i] != null)
+                            p.put(header[i], toks[i].trim());
             }
         }
         logger.info(count+" applications loaded!");
@@ -323,26 +321,47 @@ public class DrugsAtFDA extends MapEntityFactory {
             if (header == null) {
                 header = toks;
             }
-            else {
+            else if (data.containsKey(toks[2])) {
                 Map<String, Map<String, Object>> products = data.get(toks[2]);
-                if (products != null) {
-                    for (Map<String, Object> p : products.values()) 
-                        for (int i = 1; i < toks.length; ++i) 
-                            if (toks[i] != null) {
-                                if ("ApplicationDocsTypeID".equals(header[i])) {
-                                    p.put("ApplicationDocsType",
-                                          DocumentType[Integer.parseInt
-                                                       (toks[i])]);
-                                }
-                                p.put(header[i], toks[i].trim());
+                for (Map<String, Object> p : products.values()) 
+                    for (int i = 0; i < toks.length; ++i) 
+                        if (toks[i] != null) {
+                            if ("ApplicationDocsTypeID".equals(header[i])) {
+                                p.put("ApplicationDocsType",
+                                      DocumentType[Integer.parseInt
+                                                   (toks[i])]);
                             }
-                }
+                            p.put(header[i], toks[i].trim());
+                        }
             }
         }
         logger.info(count+" application docs loaded!");
         return count;
     }
 
+    // parallel array
+    static void append (String key, String value, Map<String, Object> data) {
+        Object ary = data.get(key);
+        int len = 0;
+        if (ary == null)
+            data.put(key, ary = new String[1]);
+        else if (!ary.getClass().isArray()) {
+            String[] a = new String[2];
+            a[0] = (String)ary;
+            data.put(key, ary = a);
+            len = 1;
+        }
+        else {
+            len = Array.getLength(ary);
+            String[] a = new String[len+1];
+            for (int i = 0; i < len; ++i)
+                a[i] = (String)Array.get(ary, i);
+            data.put(key, ary = a);
+        }
+        
+        Array.set(ary, len, value);
+    }
+    
     int loadSubmissions (InputStream is,
                          Map<String, Map<String, Map<String, Object>>> data)
         throws IOException {
@@ -360,23 +379,25 @@ public class DrugsAtFDA extends MapEntityFactory {
             if (header == null) {
                 header = toks;
             }
-            else {
-                Map<String, Map<String, Object>> products = data.get(toks[2]);
-                if (products != null) {
-                    for (Map<String, Object> p : products.values()) 
-                        for (int i = 0; i < toks.length; ++i) 
-                            if (toks[i] != null) {
-                                if ("SubmissionClassCodeID".equals(header[i])) {
-                                    p.put("SubmissionClass",
-                                          SubmissionClass[Integer.parseInt
-                                                          (toks[i])][0]);
-                                    p.put("SubmissionClassDescription",
-                                          SubmissionClass[Integer.parseInt
-                                                          (toks[i])][1]);
-                                }
-                                p.put(header[i], toks[i].trim());
+            else if (data.containsKey(toks[0])) {
+                Map<String, Map<String, Object>> products = data.get(toks[0]);
+                for (Map<String, Object> p : products.values()) 
+                    for (int i = 1; i < toks.length; ++i) {
+                        if (toks[i] != null) {
+                            if ("SubmissionClassCodeID".equals(header[i])) {
+                                append ("SubmissionClass",
+                                        SubmissionClass[Integer.parseInt
+                                                        (toks[i])][0], p);
+                                append ("SubmissionClassDescription",
+                                        SubmissionClass[Integer.parseInt
+                                                        (toks[i])][1], p);
                             }
-                }
+                            append (header[i], toks[i].trim(), p);
+                        }
+                        else {
+                            append (header[i], "", p);
+                        }
+                    }
             }
         }
         logger.info(count+" submissions loaded!");
@@ -446,7 +467,15 @@ public class DrugsAtFDA extends MapEntityFactory {
         return getDataSourceFactory().register
             (Util.sha1hex(md.digest()).substring(0,9), "Drugs@FDA", zipfile);
     }
-    
+
+    static void test () {
+        Matcher m = ProductRe.matcher("TRIPLE SULFA (SULFABENZAMIDE;SULFACETAMIDE;SULFATHIAZOLE)");
+        if (m.find()) {
+            System.out.println(m.group(1));
+            System.out.println(m.group(2));
+        }
+    }
+        
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println
@@ -454,19 +483,13 @@ public class DrugsAtFDA extends MapEntityFactory {
             System.exit(1);
         }
 
-        Matcher m = ProductRe.matcher("TRIPLE SULFA (SULFABENZAMIDE;SULFACETAMIDE;SULFATHIAZOLE)");
-        if (m.find()) {
-            System.out.println(m.group(1));
-            System.out.println(m.group(2));
-        }
-
-        /*
+        //test ();
+        
         DrugsAtFDA fda = new DrugsAtFDA (argv[0]);
         for (int i = 1; i < argv.length; ++i) {
             logger.info("***** registering "+argv[i]+" ******");
             fda.register(new File (argv[i]));
         }
         fda.shutdown();
-        */
     }
 }
