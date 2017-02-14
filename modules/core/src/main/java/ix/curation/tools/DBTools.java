@@ -17,7 +17,7 @@ import ix.curation.AuxNodeType;
 import ix.curation.CliqueVisitor;
 import ix.curation.Clique;
 import ix.curation.Props;
-
+import ix.curation.Component;
 
 public class DBTools {
     static final Logger logger = Logger.getLogger(DBTools.class.getName());
@@ -80,45 +80,61 @@ public class DBTools {
             });
     }
 
+    public void clique (long id) {
+        Component comp = ef.component(id);
+        System.out.println
+            ("+++++++ Cliques for component "+comp.getId()
+             +" ("+comp.size()+") +++++++");
+        System.out.println("nodes: "+comp.nodeSet());
+        
+        comp.cliques(c -> {
+                    dumpClique (c);
+                    return true;
+            });
+    }
+
     public void cliques () {
         ef.cliqueEnumeration(new CliqueVisitor () {
                 public boolean clique (Clique clique) {
-                    System.out.println
-                        ("+++++++ Clique "+clique.getId()+" +++++++");
-                    System.out.println("size: "+clique.size());
-                    System.out.println(String.format("score: %1$.3f",
-                                                     clique.score()));
-                    if (clique.size() > 0) {
-                        Entity e = clique.entities()[0].parent();
-                        System.out.println("parent: " +e.getId()
-                                           +" ("+e.get(Props.RANK)+")");
-                        System.out.print("nodes:");
-                        for (Entity n : clique)
-                            System.out.print(" "+n.getId());
-                        System.out.println();
-                    }
-
-                    System.out.println("-- stitch keys --");
-                    for (Map.Entry<StitchKey, Object> me
-                             : clique.values().entrySet()) {
-                        System.out.print(me.getKey()+":");
-                        Object val = me.getValue();
-                        if (val.getClass().isArray()) {
-                            int len = Array.getLength(val);
-                            for (int i = 0; i < len; ++i) {
-                                System.out.print(" "+Array.get(val, i));
-                            }
-                        }
-                        else
-                            System.out.print(" "+val);
-                        System.out.println();
-                    }
-                    System.out.println();
-                    
+                    dumpClique (clique);
                     return true;
                 }
             });
     }
+
+    void dumpClique (Clique clique) {
+        System.out.println
+            ("+++++++ Clique "+clique.getId()+" +++++++");
+        System.out.println("size: "+clique.size());
+        System.out.println(String.format("score: %1$.3f",
+                                         clique.score()));
+        if (clique.size() > 0) {
+            Entity e = clique.entities()[0].parent();
+            System.out.println("parent: " +e.getId()
+                               +" ("+e.get(Props.RANK)+")");
+            System.out.print("nodes:");
+            for (Entity n : clique)
+                System.out.print(" "+n.getId());
+            System.out.println();
+        }
+
+        System.out.println("-- stitch keys --");
+        for (Map.Entry<StitchKey, Object> me
+                 : clique.values().entrySet()) {
+            System.out.print(me.getKey()+":");
+            Object val = me.getValue();
+            if (val.getClass().isArray()) {
+                int len = Array.getLength(val);
+                for (int i = 0; i < len; ++i) {
+                    System.out.print(" "+Array.get(val, i));
+                }
+            }
+            else
+                System.out.print(" "+val);
+            System.out.println();
+        }
+        System.out.println();
+    }   
 
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
@@ -148,6 +164,14 @@ public class DBTools {
             }
             else if ("cliques".equalsIgnoreCase(cmd)) {
                 dbt.cliques();
+            }
+            else if ("clique".equalsIgnoreCase(cmd)) {
+                if (argv.length > 2) {
+                    dbt.clique(Long.parseLong(argv[2]));
+                }
+                else {
+                    System.err.println("No component id specified!");
+                }
             }
             else if ("dump".equalsIgnoreCase(cmd)) {
                 if (argv.length > 2) {

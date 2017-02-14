@@ -111,6 +111,8 @@ public class DrugsAtFDA extends MapEntityFactory {
         }
         ProductRe = p;
     }
+
+    char delimiter = ',';
     
     public DrugsAtFDA (GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -123,6 +125,11 @@ public class DrugsAtFDA extends MapEntityFactory {
     public DrugsAtFDA (File dir) throws IOException {
         super (dir);
     }
+
+    public void setDelimiter (char delimiter) {
+        this.delimiter = delimiter;
+    }
+    public char getDelimiter () { return delimiter; }
 
     @Override
     protected void init () {
@@ -185,7 +192,7 @@ public class DrugsAtFDA extends MapEntityFactory {
                       Map<String, Map<String, Map<String, Object>>> data)
         throws IOException {
         int count = 0;  
-        LineTokenizer tokenizer = new LineTokenizer (',');
+        LineTokenizer tokenizer = new LineTokenizer (delimiter);
         tokenizer.setInputStream(is);
         
         String[] header = null;
@@ -253,7 +260,7 @@ public class DrugsAtFDA extends MapEntityFactory {
                              Map<String, Map<String, Map<String, Object>>> data)
         throws IOException {
         int count = 0;
-        LineTokenizer tokenizer = new LineTokenizer (',');
+        LineTokenizer tokenizer = new LineTokenizer (delimiter);
         tokenizer.setInputStream(is);
 
         String[] header = null;
@@ -283,7 +290,7 @@ public class DrugsAtFDA extends MapEntityFactory {
             throw new IllegalArgumentException ("Input data is empty!");
             
         int count = 0;
-        LineTokenizer tokenizer = new LineTokenizer (',');
+        LineTokenizer tokenizer = new LineTokenizer (delimiter);
         tokenizer.setInputStream(is);
 
         String[] header = null;
@@ -311,7 +318,7 @@ public class DrugsAtFDA extends MapEntityFactory {
             throw new IllegalArgumentException ("Input data is empty!");
         
         int count = 0;
-        LineTokenizer tokenizer = new LineTokenizer (',');
+        LineTokenizer tokenizer = new LineTokenizer (delimiter);
         tokenizer.setInputStream(is);
 
         //"ApplicationDocsID","ApplicationDocsTypeID","ApplNo","SubmissionType","SubmissionNo","ApplicationDocsTitle","ApplicationDocsURL","ApplicationDocsDate"
@@ -369,7 +376,7 @@ public class DrugsAtFDA extends MapEntityFactory {
             throw new IllegalArgumentException ("Input data is empty!");
         
         int count = 0;
-        LineTokenizer tokenizer = new LineTokenizer (',');
+        LineTokenizer tokenizer = new LineTokenizer (delimiter);
         tokenizer.setInputStream(is);
 
         //"ApplNo","SubmissionClassCodeID","SubmissionType","SubmissionNo","SubmissionStatus","SubmissionStatusDate","SubmissionsPublicNotes","ReviewPriority"
@@ -479,7 +486,7 @@ public class DrugsAtFDA extends MapEntityFactory {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println
-                ("Usage: ix.curation.impl.DrugsAtFDA DB (ZIPFILE|DIR)");
+                ("Usage: ix.curation.impl.DrugsAtFDA DB [delimiter=,|tab] (ZIPFILE|DIR)");
             System.exit(1);
         }
 
@@ -487,8 +494,24 @@ public class DrugsAtFDA extends MapEntityFactory {
         
         DrugsAtFDA fda = new DrugsAtFDA (argv[0]);
         for (int i = 1; i < argv.length; ++i) {
-            logger.info("***** registering "+argv[i]+" ******");
-            fda.register(new File (argv[i]));
+            int pos = argv[i].indexOf('=');
+            if (pos > 0) {
+                if (argv[i].startsWith("delimiter")) {
+                    String del = argv[i].substring(pos+1);
+                    if ("tab".equalsIgnoreCase(del))
+                        fda.setDelimiter('\t');
+                    else
+                        fda.setDelimiter(del.charAt(0));
+                    logger.info("## delimiter: "+del);
+                }
+                else {
+                    System.err.println("** Unknown option: "+argv[i]);
+                }
+            }
+            else {
+                logger.info("***** registering "+argv[i]+" ******");
+                fda.register(new File (argv[i]));
+            }
         }
         fda.shutdown();
     }

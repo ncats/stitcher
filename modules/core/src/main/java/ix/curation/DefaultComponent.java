@@ -12,7 +12,7 @@ public class DefaultComponent implements Component {
 
     public String getId () { return comp.getId(); }
     public int size () { return comp.size(); }
-    public Set<Long> nodes () { return comp.nodes(); }
+    public Set<Long> nodeSet () { return comp.nodeSet(); }
     public Entity[] entities () { return comp.entities(); }
     public Iterator<Entity> iterator () { return comp.iterator(); }
     public Component xor (Component c) { return comp.xor(c); }

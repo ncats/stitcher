@@ -20,15 +20,32 @@ public interface Component extends Iterable<Entity> {
     /*
      * return the set of node ids
      */
-    Set<Long> nodes ();
+    Set<Long> nodeSet ();
+    
+    default long[] nodes () {
+        Set<Long> nodes = nodeSet ();
+        long[] ids = new long[nodes.size()];
+        int i = 0;
+        for (Long id : nodes)
+            ids[i++] = id;
+        return ids;
+    }
+
+    default void cliques (CliqueVisitor visitor, StitchKey... keys) {
+        throw new UnsupportedOperationException
+            ("cliques() is not supported for this implementation");
+    }
 
     /*
      * return all entities for this component.
      */
     Entity[] entities ();
 
+    /*
+     * determine if the given component overlaps with this component
+     */
     default boolean overlaps (Component c) {
-        Set<Long> nodes = nodes();
+        Set<Long> nodes = nodeSet ();
         for (Long n : c.nodes())
             if (nodes.contains(n))
                 return true;

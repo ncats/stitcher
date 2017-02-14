@@ -80,7 +80,7 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
         public String getId() { return id; }
         public Entity[] entities () { return entities; }
         public int size () { return entities.length; }
-        public Set<Long> nodes () { return nodes; }
+        public Set<Long> nodeSet () { return nodes; }
         public int hashCode () { return nodes.hashCode(); }
         public boolean equals (Object obj) {
             if (obj instanceof Component) {

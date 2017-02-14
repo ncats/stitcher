@@ -49,7 +49,7 @@ public class EntityFactory implements Props {
         (EntityFactory.class.getName());
 
     static final double CLIQUE_WEIGHT = 0.7;
-    static final int CLIQUE_MINSIZE = 3;
+    static final int CLIQUE_MINSIZE = 2;
 
     static class DefaultGraphMetrics implements GraphMetrics {
         int entityCount;
@@ -418,13 +418,23 @@ public class EntityFactory implements Props {
         public String getId () { return id; }
         public Entity[] entities () { return entities; }
         public int size () { return nodes.size(); }
-        public Set<Long> nodes () { return nodes; }
+        public Set<Long> nodeSet () { return nodes; }
         public int hashCode () { return nodes.hashCode(); }
         public boolean equals (Object obj) {
             if (obj instanceof ComponentImpl) {
                 return nodes.equals(((ComponentImpl)obj).nodes);
             }
             return false;
+        }
+
+        @Override
+        public void cliques (CliqueVisitor visitor, StitchKey... keys) {
+            try (Transaction tx = gdb.beginTx()) {
+                CliqueEnumeration clique = new CliqueEnumeration
+                    (gdb, keys == null || keys.length == 0
+                     ? Entity.KEYS : keys);
+                clique.enumerate(nodes (), visitor);
+            }
         }
 
         protected List<Entity> ov (Component comp) {
@@ -460,7 +470,7 @@ public class EntityFactory implements Props {
             
             for (Entity e : this) {
                 long id = e.getId();
-                if (!comp.nodes().contains(id))
+                if (!comp.nodeSet().contains(id))
                     ov.add(e);
             }
             
@@ -506,9 +516,9 @@ public class EntityFactory implements Props {
             init ();
             return rank;
         }
-        @Override public Set<Long> nodes () {
+        @Override public Set<Long> nodeSet () {
             init ();
-            return super.nodes();
+            return super.nodeSet();
         }
         @Override public Entity[] entities () {
             init ();
@@ -642,7 +652,7 @@ public class EntityFactory implements Props {
 
         public boolean enumerate (long[] nodes, CliqueVisitor visitor) {
             cliques.clear();
-
+            
             for (StitchKey key : keys) {
                 enumerate (key, nodes);
             }
@@ -652,7 +662,7 @@ public class EntityFactory implements Props {
                 
                 Clique clique = new CliqueImpl
                     (me.getKey(), nodes, me.getValue(), gdb);
-
+                
                 // filter out any clique that has multiple values for
                 //   a particular stitch key
                 Map<StitchKey, Object> values = clique.values();
@@ -661,13 +671,14 @@ public class EntityFactory implements Props {
                     if (e.getValue().getClass().isArray())
                         keys.add(e.getKey());
                 }
-        
+                
                 for (StitchKey k : keys)
                     values.remove(k);
                 
                 if (!values.isEmpty() && !visitor.clique(clique))
                     return false;
             }
+            
             return true;
         }
         
@@ -687,12 +698,14 @@ public class EntityFactory implements Props {
                 logger.info("Clique enumeration "+key+" G="+g+"...");
             }
             */
+            
             bronKerbosch (G, C, P, S);
         }
 
         boolean bronKerbosch (Graph G, BitSet C, BitSet P, BitSet S) {
             boolean done = false;
             if (P.isEmpty() && S.isEmpty()) {
+                //logger.info("@Clique "+C);
                 // only consider cliques that are of size >= CLIQUE_MINSIZE
                 if (C.cardinality() >= CLIQUE_MINSIZE) {
                     BitSet c = (BitSet)C.clone();
@@ -1069,7 +1082,7 @@ public class EntityFactory implements Props {
         }
     }
 
-    public Entity[] component (long id) {
+    public Component component (long id) {
         try (Transaction tx = gdb.beginTx()) {
             Node node = gdb.getNodeById(id);
             if (!node.hasLabel(AuxNodeType.COMPONENT))
@@ -1077,7 +1090,7 @@ public class EntityFactory implements Props {
             Component comp = new ComponentImpl (node);
             tx.success();
             
-            return comp.entities();
+            return comp;
         }
     }
 
@@ -1179,13 +1192,7 @@ public class EntityFactory implements Props {
                                                 +" has no rank!");
                 if (rank >= CLIQUE_MINSIZE) {
                     Component comp = new ComponentImpl (node);
-                    Set<Long> nodes = comp.nodes();
-                    long[] c = new long[nodes.size()];
-                    int i = 0;
-                    for (Iterator<Long> ii = nodes.iterator(); ii.hasNext();)
-                        c[i++] = ii.next();
-                    
-                    if (!cliqueEnumeration (keys, c, visitor))
+                    if (!cliqueEnumeration (keys, comp.nodes(), visitor))
                         return false;
                 }
             }
