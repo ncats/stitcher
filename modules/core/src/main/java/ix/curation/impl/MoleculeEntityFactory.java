@@ -70,7 +70,7 @@ public class MoleculeEntityFactory extends EntityRegistry {
             idval = mol.getProperty(idField);
         }
 
-        Entity ent = Entity._getEntity(_createNode (EntityType.Agent));
+        Entity ent = Entity._getEntity(_createNode ());
         DefaultPayload payload = new DefaultPayload (getDataSource ());
 
         if (idval != null) {

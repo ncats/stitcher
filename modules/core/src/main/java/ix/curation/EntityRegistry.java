@@ -291,7 +291,7 @@ public class EntityRegistry extends EntityFactory {
     }
 
     protected Entity _register (Map<String, Object> map) {
-        Entity ent = Entity._getEntity(_createNode (EntityType.Agent));
+        Entity ent = Entity._getEntity(_createNode ());
         String id = null;
         if (idField != null && map.containsKey(idField))
             id = map.get(idField).toString();
@@ -465,21 +465,21 @@ public class EntityRegistry extends EntityFactory {
         pcs.firePropertyChange(property, oldVal, newVal);
     }
     
-    protected Node _createNode (EntityType type) {
+    protected Node _createNode () {
         if (source == null) {
             throw new IllegalStateException
                 ("Can't create entity without a data source!");
         }
         
-        Node node = gdb.createNode(type, AuxNodeType.ENTITY,
+        Node node = gdb.createNode(AuxNodeType.ENTITY,
                                    DynamicLabel.label(source.getKey()));
         node.setProperty(SOURCE, source.getKey());
         return node;
     }
     
-    protected Node createNode (EntityType type) {
+    protected Node createNode () {
         try (Transaction tx = gdb.beginTx()) {
-            Node node = _createNode (type);
+            Node node = _createNode ();
             tx.success();
             return node;
         }

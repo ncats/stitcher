@@ -39,8 +39,6 @@ public class CNode implements Props, Comparable<CNode> {
     public static final String PARENT_INDEX = ".parent_index";
     public static final String NODE_TIMELINE = "node.timeline";
 
-    static public final Label CLASS_LABEL = Label.label(CNode.class.getName());
-
     protected ObjectMapper mapper = new ObjectMapper ();
     protected final Node _node;
     protected GraphDatabaseService gdb;
@@ -69,7 +67,6 @@ public class CNode implements Props, Comparable<CNode> {
         else {
             // new node..
             created = lastUpdated = System.currentTimeMillis();
-            node.addLabel(CLASS_LABEL);
             node.setProperty(CREATED, created);
             node.setProperty(UPDATED, lastUpdated);
             node.setProperty(KIND, getClass().getName());
@@ -96,7 +93,7 @@ public class CNode implements Props, Comparable<CNode> {
     public Node _parent () {
         Node n = _node;
         do {
-            Long id = (Long)n.getProperty(PARENT);
+            Long id = (Long)n.getProperty(PARENT, null);
             if (id == null)
                 throw new RuntimeException
                     ("Node "+n.getId()+" doesn't a parent!");
@@ -237,7 +234,8 @@ public class CNode implements Props, Comparable<CNode> {
         }
 
         final List<Node> children = new ArrayList<Node>();
-        gdb.findNodes(CLASS_LABEL, PARENT, node.getId()).stream().forEach(n -> {
+        gdb.findNodes(AuxNodeType.ENTITY,
+                      PARENT, node.getId()).stream().forEach(n -> {
                 if (!n.equals(node))
                     children.add(n);
             });

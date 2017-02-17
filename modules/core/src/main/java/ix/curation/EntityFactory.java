@@ -289,13 +289,11 @@ public class EntityFactory implements Props {
                 traverse (node);
 
                 Integer rank = (Integer)node.getProperty(CNode.RANK);
-                /*
                 if (rank != nodes.size()) {
                     logger.warning("Node #"+node.getId()
                                    +": Rank is "+rank+" but there are "
                                    +nodes.size()+" nodes in this component!");
                 }
-                */
                 
                 entities = new Entity[nodes.size()];
                 int i = 0;
@@ -308,14 +306,13 @@ public class EntityFactory implements Props {
         }
 
         void traverse (Node node) {
-            gdb.findNodes(CNode.CLASS_LABEL,
-                          Props.PARENT, node.getId()).stream()
-                .forEach(n -> {
-                        Long pid = (Long)n.getProperty(Props.PARENT);
-                        nodes.add(n.getId());
-                        if (!pid.equals(n.getId()))
-                            traverse (n);
-                    });
+            nodes.add(node.getId());
+            for (Relationship rel :
+                     node.getRelationships(Direction.BOTH, Entity.KEYS)) {
+                Node xn = rel.getOtherNode(node);
+                if (!nodes.contains(xn.getId()))
+                    traverse (xn);
+            }
         }
 
         ComponentImpl (GraphDatabaseService gdb, long[] nodes) {
@@ -370,6 +367,15 @@ public class EntityFactory implements Props {
             id = Util.sha1(nodes).substring(0, 9);
         }
 
+        Long[] _filterStitchedNodes (StitchKey key, Object value) {
+            Set<Long> subset = new TreeSet<Long>();
+            if (EntityFactory._filterStitchedNodes
+                (gdb, subset, key, value) > 0) {
+                subset.retainAll(nodes);
+            }
+            return subset.toArray(new Long[0]);
+        }
+        
         /*
          * unique set of values that span the given stitch key
          */
@@ -394,21 +400,7 @@ public class EntityFactory implements Props {
         }
 
         public Component _filter (StitchKey key, Object value) {
-            RelationshipIndex index =
-                gdb.index().forRelationships(Entity.relationshipIndexName());
-            try (IndexHits<Relationship> hits = index.get(key.name(), value)) {
-                Set<Long> subset = new TreeSet<Long>();
-                for (Relationship rel : hits) {
-                    long id = rel.getStartNode().getId();
-                    if (nodes.contains(id))
-                        subset.add(id);
-                    id = rel.getEndNode().getId();
-                    if (nodes.contains(id))
-                        subset.add(id);
-                }
-                
-                return new ComponentImpl (gdb, subset.toArray(new Long[0]));
-            }
+            return new ComponentImpl (gdb, _filterStitchedNodes (key, value));
         }
         
         public Iterator<Entity> iterator () {
@@ -427,6 +419,30 @@ public class EntityFactory implements Props {
             return false;
         }
 
+        public Map<Object, Integer> stats (StitchKey key) {
+            Map<Object, Integer> stats = new HashMap<>();
+            try (Transaction tx = gdb.beginTx()) {
+                Set<Long> seen = new HashSet<>();
+                for (int i = 0; i < entities.length; ++i) {
+                    Node n = entities[i]._node();
+                    for (Relationship rel :
+                             n.getRelationships(Direction.BOTH, key)) {
+                        if (!seen.contains(rel.getId())) {
+                            Node xn = rel.getOtherNode(n);
+                            Object val = rel.getProperty(VALUE, null);
+                            if (val != null) {
+                                Integer c = stats.get(val);
+                                stats.put(val, c == null ? 1 : (c+1));
+                            }
+                            seen.add(rel.getId());
+                        }
+                    }
+                }
+            }
+            
+            return stats;
+        }
+
         @Override
         public void cliques (CliqueVisitor visitor, StitchKey... keys) {
             try (Transaction tx = gdb.beginTx()) {
@@ -434,6 +450,18 @@ public class EntityFactory implements Props {
                     (gdb, keys == null || keys.length == 0
                      ? Entity.KEYS : keys);
                 clique.enumerate(nodes (), visitor);
+            }
+        }
+
+        @Override
+        public void cliques (StitchKey key,
+                             Object value, CliqueVisitor visitor) {
+            try (Transaction tx = gdb.beginTx()) {
+                Long[] nodes = _filterStitchedNodes (key, value);
+                if (nodes.length > 0) {
+                    CliqueEnumeration clique = new CliqueEnumeration (gdb, key);
+                    clique.enumerate(Util.toPrimitive(nodes), visitor);
+                }
             }
         }
 
@@ -645,7 +673,7 @@ public class EntityFactory implements Props {
             new HashMap<BitSet, EnumSet<StitchKey>>();
         final StitchKey[] keys;
         
-        CliqueEnumeration (GraphDatabaseService gdb, StitchKey[] keys) {
+        CliqueEnumeration (GraphDatabaseService gdb, StitchKey... keys) {
             this.gdb = gdb;
             this.keys = keys;
         }
@@ -1239,6 +1267,38 @@ public class EntityFactory implements Props {
         }
         return false;
     }
+
+    public boolean cliqueEnumeration (StitchKey key, Object value,
+                                      CliqueVisitor visitor) {
+        Set<Long> matches = new HashSet<>();
+        if (_filterStitchedNodes (gdb, matches, key, value) > 0) {
+            CliqueEnumeration clique = new CliqueEnumeration (gdb, Entity.KEYS);
+            return clique.enumerate
+                (Util.toPrimitive(matches.toArray(new Long[0])), visitor);
+        }
+        return false;
+    }
+
+    static int _filterStitchedNodes (GraphDatabaseService gdb,
+                                     Set<Long> matches,
+                                     StitchKey key, Object value) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("value", value);
+        try (Transaction tx = gdb.beginTx();  Result result = gdb.execute
+             ("match(n)-[e:`"+key
+              +"`]-(m) where e.value = {value} "
+              +"return id(n) as `n`, id(m) as `m`", params)) {
+            int edges = 0;
+            for (; result.hasNext(); ++edges) {
+                Map<String, Object> row = result.next();
+                matches.add((Long)row.get("n"));
+                matches.add((Long)row.get("m"));
+            }
+            result.close();
+            
+            return edges;
+        }
+    }
     
     public Iterator<Entity> find (String key, Object value) {
         Iterator<Entity> iterator = null;
@@ -1264,6 +1324,7 @@ public class EntityFactory implements Props {
         return iterator;
     }
 
+    
     /**
      * iterate over entities of a particular data source
      */

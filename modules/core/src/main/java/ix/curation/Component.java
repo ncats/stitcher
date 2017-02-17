@@ -1,5 +1,6 @@
 package ix.curation;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -23,12 +24,7 @@ public interface Component extends Iterable<Entity> {
     Set<Long> nodeSet ();
     
     default long[] nodes () {
-        Set<Long> nodes = nodeSet ();
-        long[] ids = new long[nodes.size()];
-        int i = 0;
-        for (Long id : nodes)
-            ids[i++] = id;
-        return ids;
+        return Util.toPrimitive(nodeSet().toArray(new Long[0]));
     }
 
     default void cliques (CliqueVisitor visitor, StitchKey... keys) {
@@ -36,6 +32,16 @@ public interface Component extends Iterable<Entity> {
             ("cliques() is not supported for this implementation");
     }
 
+    default void cliques (StitchKey key, Object value, CliqueVisitor visitor) {
+        throw new UnsupportedOperationException
+            ("cliques() is not supported for this implementation");
+    }
+
+    default Map<Object, Integer> stats (StitchKey key) {
+        throw new UnsupportedOperationException
+            ("stats() is not supported for this implementation");       
+    }
+    
     /*
      * return all entities for this component.
      */

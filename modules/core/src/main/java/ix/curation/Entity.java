@@ -59,7 +59,8 @@ public class Entity extends CNode {
     
     protected Entity (Node node) {
         super (node);
-        
+
+        /*
         for (Iterator<Label> labels = node.getLabels().iterator();
              labels.hasNext(); ) {
             Label l = labels.next();
@@ -70,10 +71,12 @@ public class Entity extends CNode {
                 // not of EntityType
             }
         }
+
         if (type == null)
             throw new IllegalArgumentException
                 ("Node does not have label of EntityType");
-
+        */
+        
         if (!node.hasProperty(RANK)) {
             // setup node for connected component
             node.setProperty(RANK, 1);

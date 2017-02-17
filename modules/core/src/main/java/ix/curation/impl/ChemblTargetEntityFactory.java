@@ -38,7 +38,7 @@ public class ChemblTargetEntityFactory extends EntityRegistry {
     }
 
     public Entity _register (Target target) {
-        Entity ent = Entity._getEntity(_createNode(EntityType.TargetBiology));
+        Entity ent = Entity._getEntity(_createNode());
         DefaultPayload payload = new DefaultPayload(getDataSource());
         ent._node().setProperty("TargetType", target.type.toString());
         ent._node().setProperty(StitchKey.N_Name.toString(), target.name);

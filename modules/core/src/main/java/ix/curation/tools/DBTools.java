@@ -86,19 +86,32 @@ public class DBTools {
             ("+++++++ Cliques for component "+comp.getId()
              +" ("+comp.size()+") +++++++");
         System.out.println("nodes: "+comp.nodeSet());
-        
+        System.out.println("-- stitches --");
+        for (StitchKey key : EnumSet.allOf(StitchKey.class)) {
+            Map<Object, Integer> stats = comp.stats(key);
+            if (!stats.isEmpty())
+                System.out.println(key+": "+stats);
+        }
+        System.out.println();
         comp.cliques(c -> {
                     dumpClique (c);
                     return true;
-            });
+            }, StitchKey.H_LyChI_L4, StitchKey.H_LyChI_L5,
+            StitchKey.I_CAS, StitchKey.I_UNII);
     }
 
     public void cliques () {
-        ef.cliqueEnumeration(new CliqueVisitor () {
-                public boolean clique (Clique clique) {
-                    dumpClique (clique);
-                    return true;
-                }
+        ef.cliqueEnumeration(clique -> {
+                dumpClique (clique);
+                return true;
+            });
+    }
+
+    public void cliques (StitchKey key, Object value) {
+        System.out.println("+++++++ Cliques for "+key+"="+value+" +++++++");
+        ef.cliqueEnumeration(key, value, clique -> {
+                dumpClique (clique);
+                return true;
             });
     }
 
@@ -163,7 +176,12 @@ public class DBTools {
                 dbt.components();
             }
             else if ("cliques".equalsIgnoreCase(cmd)) {
-                dbt.cliques();
+                if (argv.length > 3) {
+                    StitchKey key = StitchKey.valueOf(argv[2]);
+                    dbt.cliques(key, argv[3]);
+                }
+                else
+                    dbt.cliques();
             }
             else if ("clique".equalsIgnoreCase(cmd)) {
                 if (argv.length > 2) {
