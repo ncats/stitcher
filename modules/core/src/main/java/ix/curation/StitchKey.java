@@ -19,11 +19,11 @@ public enum StitchKey implements RelationshipType {
     I_SID(1, Long.class), // pubchem sid
     I_CID(2, Long.class), // public cid
     I_NCT(1), // clinical trial NCT
-    I_PMID(2,Long.class), // PubMed id
+    I_PMID(2, Long.class), // PubMed id
     I_UniProt(2), // UniProt id
     I_ChEMBL(2), // CHEMBL_ID
     I_Code(1), // any code
-    I_Any, // Any generic id
+    I_Any(1, Long.class), // Any numeric id
 
     /*
      * Hash

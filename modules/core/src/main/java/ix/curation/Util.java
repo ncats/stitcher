@@ -552,4 +552,62 @@ public class Util {
         }
         return hex (sha1.digest());
     }
+
+    public static void dump (Component component) {
+        dump (System.out, component);
+    }
+    
+    public static void dump (OutputStream os, Component component) {
+        PrintStream ps = new PrintStream (os);
+        ps.println
+            ("+++++++ Component "+component.getId()+" +++++++");
+        ps.println("nodes: "+component.nodeSet());
+        ps.println("size: "+component.size());
+        ps.println("-- stitches --");
+        for (StitchKey key : EnumSet.allOf(StitchKey.class)) {
+            Map<Object, Integer> stats = component.stats(key);
+            if (!stats.isEmpty())
+                ps.println(key+": "+stats);
+        }
+        ps.println();
+    }
+
+    public static void dump (Clique clique) {
+        dump (System.out, clique);
+    }
+    
+    public static void dump (OutputStream os, Clique clique) {
+        PrintStream ps = new PrintStream (os);
+        ps.println
+            ("+++++++ Clique "+clique.getId()+" +++++++");
+        ps.println("size: "+clique.size());
+        ps.println(String.format("score: %1$.3f",
+                                         clique.score()));
+        if (clique.size() > 0) {
+            Entity e = clique.entities()[0].parent();
+            ps.println("parent: " +e.getId()
+                               +" ("+e.get(Props.RANK)+")");
+            ps.print("nodes:");
+            for (Entity n : clique)
+                ps.print(" "+n.getId());
+            ps.println();
+        }
+
+        ps.println("-- stitch keys --");
+        for (Map.Entry<StitchKey, Object> me
+                 : clique.values().entrySet()) {
+            ps.print(me.getKey()+":");
+            Object val = me.getValue();
+            if (val.getClass().isArray()) {
+                int len = Array.getLength(val);
+                for (int i = 0; i < len; ++i) {
+                    ps.print(" "+Array.get(val, i));
+                }
+            }
+            else
+                ps.print(" "+val);
+            ps.println();
+        }
+        ps.println();
+    }
 }

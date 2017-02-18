@@ -377,33 +377,6 @@ public class Entity extends CNode {
         set (key, null);
     }
 
-    public static void _delete (Node node) {
-        GraphDatabaseService gdb = node.getGraphDatabase();     
-        for (Relationship rel : node.getRelationships()) {
-            Node xn = rel.getOtherNode(node);
-            if (xn.hasLabel(AuxNodeType.SNAPSHOT)
-                || rel.isType(AuxRelType.PAYLOAD)) {
-                rel.delete();
-                xn.delete();
-            }
-            else {
-                for (String index : gdb.index().relationshipIndexNames())
-                    gdb.index().forRelationships(index).remove(rel);
-                
-                for (StitchKey k : KEYS) {
-                    if (rel.isType(k)) {
-                        rel.delete();
-                        break;
-                    }
-                }
-            }
-        }
-        
-        for (String index : gdb.index().nodeIndexNames()) 
-            gdb.index().forNodes(index).remove(node);
-        node.delete();
-    }
-
     @Override
     public void _delete () {
         for (Relationship rel : _node.getRelationships

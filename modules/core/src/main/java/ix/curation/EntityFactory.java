@@ -33,13 +33,6 @@ import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.index.lucene.LuceneTimeline;
 import org.neo4j.index.lucene.TimelineIndex;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import ix.curation.graph.UnionFind;
 
 // NOTE: methods and variables that begin with underscore "_" generally assume that a graph database transaction is already open!

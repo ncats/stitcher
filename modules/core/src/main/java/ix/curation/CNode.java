@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.concurrent.Callable;
 import java.lang.reflect.Array;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Direction;
@@ -234,31 +236,25 @@ public class CNode implements Props, Comparable<CNode> {
         }
 
         final List<Node> children = new ArrayList<Node>();
-        gdb.findNodes(AuxNodeType.ENTITY,
-                      PARENT, node.getId()).stream().forEach(n -> {
-                if (!n.equals(node))
-                    children.add(n);
-            });
-        
-        if (!children.isEmpty()) {
-            Long pid = (Long)node.getProperty(PARENT);
-            if (pid.equals(node.getId())) { // this is the root
-                // find the highest rank children and promote it to be the
-                // root
-                Integer r = null;
-                for (Node n : children)
-                    if (r == null
-                        || r.compareTo((Integer)n.getProperty(RANK)) < 0) {
-                        pid = n.getId();
-                        r = (Integer)n.getProperty(RANK);
+        AtomicLong newRoot = new AtomicLong ();
+        AtomicInteger rank = new AtomicInteger ();
+        gdb.findNodes(AuxNodeType.ENTITY, PARENT, node.getId())
+            .stream().forEach(n -> {
+                    if (!n.equals(node)) {
+                        Integer r = (Integer)n.getProperty(RANK);
+                        if (newRoot.get() == 0l || r > rank.get()) {
+                            newRoot.set(n.getId());
+                            rank.set(r);
+                        }
+                        children.add(n);
                     }
-            }
+                });
 
-            // update the new parent
+        if (newRoot.get() != 0l) {
             for (Node n : children)
-                n.setProperty(PARENT, pid);
+                n.setProperty(PARENT, newRoot.get());
         }
-        
+
         for (String index : gdb.index().nodeIndexNames()) 
             gdb.index().forNodes(index).remove(node);
         

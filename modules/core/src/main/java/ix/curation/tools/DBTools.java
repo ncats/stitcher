@@ -18,6 +18,7 @@ import ix.curation.CliqueVisitor;
 import ix.curation.Clique;
 import ix.curation.Props;
 import ix.curation.Component;
+import ix.curation.Util;
 
 public class DBTools {
     static final Logger logger = Logger.getLogger(DBTools.class.getName());
@@ -82,27 +83,17 @@ public class DBTools {
 
     public void clique (long id) {
         Component comp = ef.component(id);
-        System.out.println
-            ("+++++++ Cliques for component "+comp.getId()
-             +" ("+comp.size()+") +++++++");
-        System.out.println("nodes: "+comp.nodeSet());
-        System.out.println("-- stitches --");
-        for (StitchKey key : EnumSet.allOf(StitchKey.class)) {
-            Map<Object, Integer> stats = comp.stats(key);
-            if (!stats.isEmpty())
-                System.out.println(key+": "+stats);
-        }
-        System.out.println();
+        Util.dump(comp);
         comp.cliques(c -> {
-                    dumpClique (c);
-                    return true;
+                Util.dump (c);
+                return true;
             }, StitchKey.H_LyChI_L4, StitchKey.H_LyChI_L5,
             StitchKey.I_CAS, StitchKey.I_UNII);
     }
 
     public void cliques () {
         ef.cliqueEnumeration(clique -> {
-                dumpClique (clique);
+                Util.dump(clique);
                 return true;
             });
     }
@@ -110,44 +101,11 @@ public class DBTools {
     public void cliques (StitchKey key, Object value) {
         System.out.println("+++++++ Cliques for "+key+"="+value+" +++++++");
         ef.cliqueEnumeration(key, value, clique -> {
-                dumpClique (clique);
+                Util.dump(clique);
                 return true;
             });
     }
 
-    void dumpClique (Clique clique) {
-        System.out.println
-            ("+++++++ Clique "+clique.getId()+" +++++++");
-        System.out.println("size: "+clique.size());
-        System.out.println(String.format("score: %1$.3f",
-                                         clique.score()));
-        if (clique.size() > 0) {
-            Entity e = clique.entities()[0].parent();
-            System.out.println("parent: " +e.getId()
-                               +" ("+e.get(Props.RANK)+")");
-            System.out.print("nodes:");
-            for (Entity n : clique)
-                System.out.print(" "+n.getId());
-            System.out.println();
-        }
-
-        System.out.println("-- stitch keys --");
-        for (Map.Entry<StitchKey, Object> me
-                 : clique.values().entrySet()) {
-            System.out.print(me.getKey()+":");
-            Object val = me.getValue();
-            if (val.getClass().isArray()) {
-                int len = Array.getLength(val);
-                for (int i = 0; i < len; ++i) {
-                    System.out.print(" "+Array.get(val, i));
-                }
-            }
-            else
-                System.out.print(" "+val);
-            System.out.println();
-        }
-        System.out.println();
-    }   
 
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {

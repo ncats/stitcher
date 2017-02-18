@@ -339,6 +339,7 @@ public class EntityRegistry extends EntityFactory {
             if (value.getClass().isArray()) {
             }
             else {
+                /*
                 switch (key) {
                 case N_Name:
                 case I_UNII:
@@ -353,6 +354,21 @@ public class EntityRegistry extends EntityFactory {
                 case H_MD5:
                     value = value.toString().toUpperCase();
                     break;
+                }
+                */
+                
+                if (key.type.isAssignableFrom(Number.class)) {
+                    try {
+                        value = Long.parseLong(value.toString());
+                    }
+                    catch (NumberFormatException ex) {
+                        logger.log(Level.SEVERE, key
+                                   +": Can't convert value \""+value
+                                   +"\" to long!", ex);
+                    }
+                }
+                else {
+                    value = value.toString().toUpperCase();
                 }
             }
         }
@@ -411,12 +427,13 @@ public class EntityRegistry extends EntityFactory {
                     LyChIStandardizer lychi = new LyChIStandardizer ();
                     // only standardize if 
                     if (mol.getAtomCount() < 1024) {
-                        /*
-                         * don't strip salt/solvent if the structure has metals
-                         */
                         lychi.removeSaltOrSolvent
                             (stripSalt
-                             && !LyChIStandardizer.containMetals(mol));
+                             /*
+                              * don't strip salt/solvent if the structure 
+                              * has metals
+                              */
+                             /*&& !LyChIStandardizer.containMetals(mol)*/);
                         lychi.standardize(mol);
                     }
                     else {
