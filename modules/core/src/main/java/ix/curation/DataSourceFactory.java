@@ -41,7 +41,9 @@ public class DataSourceFactory implements Props {
     protected DataSource _register (String key, String name) {
         Index<Node> index = gdb.index().forNodes
             (DataSource.nodeIndexName());
-        
+
+        key = name + "." + key; // help us debug these graphs by datasource
+
         Node n = index.get(KEY, key).getSingle();
         if (n == null) {
             n = gdb.createNode(AuxNodeType.DATASOURCE);
