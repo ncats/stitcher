@@ -7,7 +7,7 @@ import java.net.URL;
 import java.util.logging.Logger;
 import java.lang.reflect.Array;
 
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 import ix.curation.*;
@@ -96,7 +96,8 @@ public class TestCore extends EntityRegistry {
     }
 
     public Entity register (final TestPayload payload) {
-        Entity ent = Entity._getEntity(_createNode (payload.type));
+        setDataSource(payload.getSource());
+        Entity ent = Entity._getEntity(_createNode ());
         return ent._add(payload);
     }
 

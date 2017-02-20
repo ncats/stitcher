@@ -58,7 +58,7 @@ public class TestClique {
             reg.setDataSource(source);
             
             EnumSet<StitchKey> keys = EnumSet.of
-                (StitchKey.I_CAS, StitchKey.N_Synonym,
+                (StitchKey.I_CAS,
                  StitchKey.I_UNII, StitchKey.N_Name);
             for (StitchKey k : keys)
                 reg.add(k, k.name());

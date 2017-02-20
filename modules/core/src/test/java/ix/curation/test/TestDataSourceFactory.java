@@ -136,9 +136,9 @@ public class TestDataSourceFactory {
                             set.add(s.substring(4));
                         }
                         else {
-                            Set set = values.get(StitchKey.N_Synonym);
+                            Set set = values.get(StitchKey.N_Name);
                             if (set == null) {
-                                values.put(StitchKey.N_Synonym,
+                                values.put(StitchKey.N_Name,
                                            set = new HashSet());
                             }
                             
@@ -162,7 +162,7 @@ public class TestDataSourceFactory {
         mef.register(getClass().getResource("/aspirin_tox.sdf"));
         
         mef.setId("ID");
-        mef.add(StitchKey.N_Synonym, "Synonyms");
+        mef.add(StitchKey.N_Name, "Synonyms");
         mef.add(StitchKey.I_CAS, "CAS");
         mef.add(StitchKey.I_UNII, "CompoundUNII");
         mef.add(StitchKey.I_CID, "CompoundCID");
