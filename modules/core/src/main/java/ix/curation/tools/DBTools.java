@@ -106,6 +106,17 @@ public class DBTools {
             });
     }
 
+    public void find (String prop, Object value) {
+        System.out.println("+++++++++ Entities with "+prop+"=\""
+                           +value+"\" ++++++++");
+        int count = 0;
+        for (Iterator<Entity> it = ef.find(prop, value);
+             it.hasNext(); ++count) {
+            Entity e = it.next();
+            System.out.println(e.getId()+": "+e.properties());
+        }
+        System.out.println("### "+count+" entities found!");
+    }
 
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
@@ -155,6 +166,14 @@ public class DBTools {
                 }
                 else {
                     System.err.println("No datasource specified!");
+                }
+            }
+            else if ("find".equalsIgnoreCase(cmd)) {
+                if (argv.length > 3) {
+                    dbt.find(argv[2], argv[3]);
+                }
+                else {
+                    System.err.println("No property and value specified!");
                 }
             }
             else

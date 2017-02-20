@@ -489,7 +489,7 @@ public class EntityRegistry extends EntityFactory {
         }
         
         Node node = gdb.createNode(AuxNodeType.ENTITY,
-                                   DynamicLabel.label(source.getKey()));
+                                   DynamicLabel.label(source.getName()));
         node.setProperty(SOURCE, source.getKey());
         return node;
     }
