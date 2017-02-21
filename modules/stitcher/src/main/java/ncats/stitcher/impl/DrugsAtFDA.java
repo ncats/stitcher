@@ -3,7 +3,6 @@ package ncats.stitcher.impl;
 import java.util.*;
 import java.util.zip.*;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import java.io.File;
 import java.io.IOException;
@@ -134,10 +133,65 @@ public class DrugsAtFDA extends MapEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setId("ApplNo").add(StitchKey.N_Name, "ActiveIngredient")
-            .add(StitchKey.N_Name, "DrugName");
+        setId("ApplNo").add(StitchKey.N_Name, "ActiveIngredient");
     }
-    
+
+    protected String[] prodKeys = {"DrugName", "MarketingStatus", "SponsorName", "ApplType",
+            "IngredientStrength", "ProductID", "EarliestDate", "ProdRoute", "ProdForm"}; // these last five are computed
+
+    protected Map<String, ArrayList<String>> addProd(String ingredient, Map<String, ArrayList<String>> drug, String product, Map<String, Object> row) {
+        for (String key: prodKeys) {
+            if (!drug.containsKey(key))
+                drug.put(key, new ArrayList<>());
+            if (row.containsKey(key))
+                drug.get(key).add(row.get(key).toString());
+        }
+        drug.get("ProductID").add(product);
+        // compute earliest submission date
+        if (row.containsKey("SubmissionStatusDate"))
+            drug.get("EarliestDate").add(((String[])row.get("SubmissionStatusDate"))[0]);
+        else {
+            drug.get("EarliestDate").add("Not given");
+        }
+        // compute form
+        if (row.containsKey("Form")) {
+            String[] form = (String[])row.get("Form");
+            drug.get("ProdForm").add(form[0]);
+            if (form.length>1)
+                drug.get("ProdRoute").add(form[1]);
+            else
+                drug.get("ProdRoute").add("Not given");
+        } else {
+            // code never gets here with current FDA file
+            drug.get("ProdForm").add("Not given");
+            drug.get("ProdRoute").add("Not given");
+        }
+        // compute ingredient strength
+        if (((String[])row.get("ActiveIngredient")).length > 1) {
+            String[] ingreds = (String[])row.get("ActiveIngredient");
+            String[] strength = row.get("Strength").toString().split(";");
+            int index = ingreds.length;
+            if (strength.length == 1 && ingreds.length == 2) {
+                strength = row.get("Strength").toString().split("/[\\d]");
+            }
+            if (strength.length < ingreds.length && ingreds.length > 2 && strength.length == 1 // Triple sulfas or TRISULFAPYRIMIDINES case
+                    && ingreds[ingreds.length-1].trim().equals(ingredient)) {
+                index = 0;
+            } else if (strength.length > 1 || ingreds.length < 3 || strength.length == ingreds.length) {
+                for (int i = 0; i < ingreds.length; i++)
+                    if (ingreds[i].trim().equals(ingredient))
+                        index = i;
+            }
+            if (index < strength.length)
+                drug.get("IngredientStrength").add(strength[index].trim());
+            else
+                drug.get("IngredientStrength").add("Not found");
+        } else {
+            drug.get("IngredientStrength").add(row.get("Strength").toString());
+        }
+        return drug;
+    }
+
     @Override
     public DataSource register (File file) throws IOException {
         try {
@@ -155,22 +209,44 @@ public class DrugsAtFDA extends MapEntityFactory {
             }
             else {
                 setDataSource (ds);
-                
-                int count = 0;
+
+                // extract active ingredients / drugs
+
+                Map<String, Map<String, ArrayList<String>>> drugs = new TreeMap<>();
                 for (Map.Entry<String, Map<String, Map<String, Object>>> me
-                         : data.entrySet()) {
-                    System.out.println("++++++ "+me.getKey()+" ++++++");
-                    for (Map<String, Object> row : me.getValue().values()) {
+                        : data.entrySet()) {
+                    for (String key : me.getValue().keySet()) {
+                        Map<String, Object> row = me.getValue().get(key);
                         if (row.containsKey("ActiveIngredient")) {
-                            // only register those with active ingredients
-                            if (count++ == 0) {
-                                ds.set(PROPERTIES, row.keySet()
-                                       .toArray(new String[0]));
-                                //System.out.println(me.getKey()+": "+row);
+                            for (String ingred: (String[])row.get("ActiveIngredient")) {
+                                ingred = ingred.trim();
+                                String product = me.getKey()+"-"+key;
+                                if (drugs.containsKey(ingred)) {
+                                    drugs.put(ingred, addProd(ingred, drugs.get(ingred), product, row));
+                                } else {
+                                    drugs.put(ingred, addProd(ingred, new TreeMap<>(), product, row));
+                                }
                             }
-                            register (row);
                         }
                     }
+                }
+
+
+                int count = 0;
+                for (String ingred: drugs.keySet()) {
+                    System.out.println("++++++ "+ingred+" ++++++");
+                    Map<String, ArrayList<String>> prodInfo = drugs.get(ingred);
+                    Map<String, Object> drugData = new TreeMap<>();
+                    drugData.put("ActiveIngredient", ingred);
+                    for (String key: prodInfo.keySet()) {
+                        drugData.put(key, prodInfo.get(key).toArray(new String[prodInfo.get(key).size()]));
+                    }
+                    if (count++ == 0) {
+                        ds.set(PROPERTIES, drugData.keySet()
+                                .toArray(new String[0]));
+                        //System.out.println(me.getKey()+": "+row);
+                    }
+                    register (drugData);
                 }
                 ds.set(INSTANCES, count);
                 updateMeta (ds);
