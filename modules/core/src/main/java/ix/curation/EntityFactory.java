@@ -446,14 +446,42 @@ public class EntityFactory implements Props {
             }
         }
 
+        void dfs (Set<Long> nodes, Set<Relationship> edges,
+                  Node n, StitchKey key, Object value) {
+            nodes.add(n.getId());
+            for (Relationship rel : n.getRelationships(Direction.BOTH)) {
+                if (rel.isType(key)
+                    && value.equals(rel.getProperty(VALUE, null)))
+                    edges.add(rel);
+                Node xn = rel.getOtherNode(n);
+                if (!nodes.contains(xn.getId()))
+                    dfs (nodes, edges, xn, key, value); 
+            }
+        }
+        
+        Set<Long> getNodes (StitchKey key, Object value) {
+            Set<Long> nodes = new TreeSet<>();
+            Set<Relationship> edges = new HashSet<>();
+            try (Transaction tx = gdb.beginTx()) {
+                dfs (nodes, edges, entities[0]._node(), key, value);
+                nodes.clear();
+                for (Relationship rel : edges) {
+                    nodes.add(rel.getStartNode().getId());
+                    nodes.add(rel.getEndNode().getId());
+                }
+            }
+            return nodes;
+        }
+        
         @Override
         public void cliques (StitchKey key,
                              Object value, CliqueVisitor visitor) {
             try (Transaction tx = gdb.beginTx()) {
-                Long[] nodes = _filterStitchedNodes (key, value);
-                if (nodes.length > 0) {
+                Set<Long> nodes = getNodes (key, value);
+                if (!nodes.isEmpty()) {
                     CliqueEnumeration clique = new CliqueEnumeration (gdb, key);
-                    clique.enumerate(Util.toPrimitive(nodes), visitor);
+                    clique.enumerate(Util.toPrimitive
+                                     (nodes.toArray(new Long[0])), visitor);
                 }
             }
         }
@@ -674,9 +702,8 @@ public class EntityFactory implements Props {
         public boolean enumerate (long[] nodes, CliqueVisitor visitor) {
             cliques.clear();
             
-            for (StitchKey key : keys) {
+            for (StitchKey key : keys)
                 enumerate (key, nodes);
-            }
             
             for (Map.Entry<BitSet, EnumSet<StitchKey>> me
                      : cliques.entrySet()) {

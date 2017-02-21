@@ -23,8 +23,27 @@ public class StitchUntangled {
 
     public int untangle (Component component) {
         Util.dump(component);
-        
         UnionFind uf = new UnionFind ();
+
+        /*
+        for (StitchKey k : EnumSet.allOf(StitchKey.class)) {
+            Map<Object, Integer> stats = component.stats(k);
+            for (Map.Entry<Object, Integer> v : stats.entrySet()) {
+                if (v.getValue() < 200) {
+                    component.cliques(k, v.getKey(), c -> {
+                            Util.dump(c);
+                            
+                            long[] nodes = c.nodes();
+                            for (int i = 0; i < nodes.length; ++i)
+                                for (int j = i+1; j < nodes.length; ++j)
+                                    uf.union(nodes[i], nodes[j]);
+                            return true;
+                        });
+                }
+            }
+        }
+        */
+
         component.cliques(c -> {
                 Util.dump(c);
                 
@@ -46,8 +65,7 @@ public class StitchUntangled {
                 }
                 
                 return true;
-            }, StitchKey.H_LyChI_L4, StitchKey.H_LyChI_L5,
-            StitchKey.I_CAS, StitchKey.I_UNII);
+            }, StitchKey.keys(1, -1));
 
         long[][] clumps = uf.components();
         System.out.println("**** Clumps *****");
@@ -56,6 +74,10 @@ public class StitchUntangled {
             for (int j = 0; j < clumps[i].length; ++j)
                 System.out.print(" "+clumps[i][j]);
             System.out.println();
+            ef.cliqueEnumeration(clumps[i], c -> {
+                    Util.dump(c);
+                    return true;
+                });
         }
         
         return 0;

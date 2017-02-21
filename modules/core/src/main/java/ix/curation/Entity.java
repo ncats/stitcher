@@ -143,6 +143,16 @@ public class Entity extends CNode {
         }
         return keys;
     }
+
+    public Map<String, Object> _properties () {
+        return _node.getAllProperties();
+    }
+
+    public Map<String, Object> properties () {
+        try (Transaction tx = gdb.beginTx()) {
+            return _properties ();
+        }
+    }
     
     public Entity[] neighbors () {
         return neighbors (Entity.KEYS);
@@ -568,6 +578,36 @@ public class Entity extends CNode {
         return this;
     }
 
+    public boolean stitch (Entity target, StitchKey key, Object value) {
+        try (Transaction tx = gdb.beginTx()) {
+            boolean ok = _stitch (target, key, value);
+            tx.success();
+            return ok;
+        }
+    }
+
+    public boolean _stitch (Entity target, StitchKey key, Object value) {
+        for (Relationship rel : _node.getRelationships(key, Direction.BOTH)) {
+            Node xn = rel.getOtherNode(_node);
+            if (xn.equals(target._node)
+                && value.equals(rel.getProperty(VALUE, null)))
+                // already exist relationship and value to target node
+                return false;
+        }
+        
+        Relationship rel = _node.createRelationshipTo(target._node, key);
+        rel.setProperty(CREATED, System.currentTimeMillis());
+        rel.setProperty(VALUE, value);
+        
+        RelationshipIndex relindx = _relationshipIndex (_node);
+        relindx.add(rel, key.name(), value);
+        union (_node, target._node);
+        
+        logger.info(_node.getId()
+                    +" <-["+key+":\""+value+"\"]-> "+target._node.getId());
+        return true;
+    }
+
     public Entity update (StitchKey key, Object oldVal, Object newVal) {
         if (oldVal == null && newVal == null)
             throw new IllegalArgumentException ("oldVal and newVal are null");
@@ -659,6 +699,7 @@ public class Entity extends CNode {
         finally {
             hits.close();
         }
+
         index.add(node, key.name(), value);
     }
 

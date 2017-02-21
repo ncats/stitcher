@@ -390,11 +390,12 @@ public class Util {
                     JsonNode unii = node.get("approvalID");
                     if (unii != null) {
                         mol.setProperty("UNII", unii.asText());
+                        mol.setName(unii.asText());
                     }
                     
                     JsonNode names = node.get("names");
                     if (names != null && names.isArray()) {
-                        int size = ((ArrayNode)names).size();
+                        int size = names.size();
                         StringBuilder sb = new StringBuilder ();
                         for (int i = 0; i < size; ++i) {
                             JsonNode n = names.get(i);
@@ -408,18 +409,20 @@ public class Util {
                     
                     JsonNode codes = node.get("codes");
                     if (codes != null && codes.isArray()) {
-                        int size = ((ArrayNode)codes).size();
+                        int size = codes.size();
                         Map<String, StringBuilder> buf =
                             new HashMap<String, StringBuilder>();
                         for (int i = 0; i < size; ++i) {
                             JsonNode n = codes.get(i);
-                            String sys = n.get("codeSystem").asText();
-                            StringBuilder sb = buf.get(sys);
-                            if (sb == null) {
-                                buf.put(sys, sb = new StringBuilder ());
+                            if ("PRIMARY".equals(n.get("type").asText())) {
+                                String sys = n.get("codeSystem").asText();
+                                StringBuilder sb = buf.get(sys);
+                                if (sb == null) {
+                                    buf.put(sys, sb = new StringBuilder ());
+                                }
+                                if (sb.length() > 0) sb.append("\n");
+                                sb.append(n.get("code").asText());
                             }
-                            if (sb.length() > 0) sb.append("\n");
-                            sb.append(n.get("code").asText());
                         }
                         
                         for (Map.Entry<String, StringBuilder> me
@@ -431,7 +434,7 @@ public class Util {
 
                     JsonNode refs = node.get("references");
                     if (refs != null && refs.isArray()) {
-                        int size = ((ArrayNode)refs).size();
+                        int size = refs.size();
                         StringBuilder sb = new StringBuilder ();
                         for (int i = 0; i < size; ++i) {
                             JsonNode n = refs.get(i);
@@ -439,6 +442,24 @@ public class Util {
                             sb.append(n.get("citation").asText());
                         }
                         mol.setProperty("References", sb.toString());
+                    }
+
+                    JsonNode rels = node.get("relationships");
+                    if (rels != null && rels.isArray()) {
+                        StringBuilder sb = new StringBuilder ();
+                        for (int i = 0; i < rels.size(); ++i) {
+                            JsonNode n = rels.get(i);
+                            String type = n.get("type").asText();
+                            if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
+                                String id = n.get("relatedSubstance")
+                                    .get("approvalID").asText();
+                                if (sb.length() > 0) sb.append("\n");
+                                sb.append(id);
+                            }
+                        }
+                        
+                        if (sb.length() > 0)
+                            mol.setProperty("ActiveMoieties", sb.toString());
                     }
                 }
                 else
@@ -558,16 +579,41 @@ public class Util {
     }
     
     public static void dump (OutputStream os, Component component) {
+        ObjectMapper mapper = new ObjectMapper ();
         PrintStream ps = new PrintStream (os);
         ps.println
             ("+++++++ Component "+component.getId()+" +++++++");
-        ps.println("nodes: "+component.nodeSet());
-        ps.println("size: "+component.size());
+        ps.println("nodes="+component.size() + " "+component.nodeSet());
+        /*
+        try {
+            for (Entity e : component.entities()) {
+                ps.println("  "+e.getId()+": "
+                           +mapper.writerWithDefaultPrettyPrinter()
+                           .writeValueAsString(e.keys()));
+            }
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            }*/
+        
         ps.println("-- stitches --");
         for (StitchKey key : EnumSet.allOf(StitchKey.class)) {
-            Map<Object, Integer> stats = component.stats(key);
-            if (!stats.isEmpty())
-                ps.println(key+": "+stats);
+            final Map<Object, Integer> stats = component.stats(key);
+            if (!stats.isEmpty()) {
+                Set<Object> sorted = new TreeSet<>(new Comparator () {
+                        public int compare (Object o1, Object o2) {
+                            int d = stats.get(o2) - stats.get(o1);
+                            if (d == 0)
+                                d = o1.toString().compareTo(o2.toString());
+                            return d;
+                        }
+                    });
+                sorted.addAll(stats.keySet());
+                
+                ps.println(key+"="+stats.size());
+                for (Object v : sorted)
+                    ps.println("  "+v + ": "+stats.get(v));
+            }
         }
         ps.println();
     }

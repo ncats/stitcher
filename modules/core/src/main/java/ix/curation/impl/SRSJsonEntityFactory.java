@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.security.DigestInputStream;
 
 import ix.curation.*;
+import static ix.curation.StitchKey.*;
 import chemaxon.struc.Molecule;
 
 public class SRSJsonEntityFactory extends MoleculeEntityFactory {
@@ -31,27 +32,80 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         super.init();
         setId ("UNII");
         setUseName (false);
-        add (StitchKey.N_Name, "Synonyms");
-        add (StitchKey.I_CAS, "CAS");
-        add (StitchKey.I_UNII, "UNII");
+        add (N_Name, "Synonyms")
+            .add (I_CAS, "CAS")
+            .add (I_UNII, "UNII")
+            .add (T_ActiveMoiety, "ActiveMoieties")
+            ;
     }
 
     @Override
     public int register (InputStream is) throws IOException {
         BufferedReader br = new BufferedReader (new InputStreamReader (is));
         int count = 0, ln = 0;
+        Map<String, Entity> activeMoieties = new HashMap<>();
+        Map<String, Set<Entity>> unresolved = new HashMap<>();
         for (String line; (line = br.readLine()) != null; ++ln) {
             System.out.println("+++++ "+(count+1)+"/"+(ln+1)+" +++++");
             String[] toks = line.split("\t");
+            if (toks.length < 2) {
+                logger.warning(ln+": Expecting 3 fields, but instead got "
+                               +toks.length+";\n"+line);
+                continue;
+            }
             
             //logger.info("JSON: "+toks[2]);
             Molecule mol = Util.fromJson(toks[2]);
             if (mol != null) {
-                register (mol);
+                Entity ent = register (mol);
+                
+                String moieties = mol.getProperty("ActiveMoieties");
+                if (moieties != null) {
+                    String[] actives = moieties.split("\n");
+                    for (String a : actives) {
+                        if (a.equals(mol.getProperty("UNII"))) {
+                            activeMoieties.put(a, ent);
+                        }
+                        else if (activeMoieties.containsKey(a)) {
+                            Entity e = activeMoieties.get(a);
+                            // create link from e -> ent
+                            ent.stitch(e, T_ActiveMoiety, a);
+                        }
+                        else {
+                            Set<Entity> ents = unresolved.get(a);
+                            if (ents == null)
+                                unresolved.put(a, ents = new HashSet<>());
+                            ents.add(ent);
+                        }
+                    }
+                }
                 ++count;
             }
         }
-        br.close();        
+        br.close();
+
+        logger.info("## "+unresolved.size()+" unresolved active moieties!");
+        for (Map.Entry<String, Set<Entity>> me : unresolved.entrySet()) {
+            Entity active = activeMoieties.get(me.getKey());
+            if (active != null) {
+                for (Entity e : me.getValue())
+                    e.stitch(active, T_ActiveMoiety, me.getKey());
+            }
+            else {
+                int cnt = 0;
+                for (Iterator<Entity> it = find (I_UNII, me.getKey());
+                     it.hasNext(); ++cnt) {
+                    active = it.next();
+                    for (Entity e : me.getValue())
+                        e.stitch(active, T_ActiveMoiety, me.getKey());
+                }
+                
+                if (cnt == 0)
+                    logger.warning("** Unknown reference to active moiety: "
+                                   +me.getKey());
+            }
+        }
+        
         return count;
     }
 

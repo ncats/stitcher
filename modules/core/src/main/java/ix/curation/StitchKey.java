@@ -1,5 +1,7 @@
 package ix.curation;
 
+import java.util.Set;
+import java.util.EnumSet;
 import org.neo4j.graphdb.RelationshipType;
 
 /**
@@ -47,11 +49,12 @@ public enum StitchKey implements RelationshipType {
     /*
      * Tag
      */
+    T_ActiveMoiety(5), // active moiety relationship
     T_Keyword // Keyword
     ;
   
     final public Class type;
-    final public int priority; // priority -5 (lowest) to 5 (highest)
+    final public int priority; // priority 0 (lowest) to 5 (highest)
     StitchKey () {
         this (0, String.class);
     }
@@ -64,5 +67,25 @@ public enum StitchKey implements RelationshipType {
     StitchKey (int priority, Class type) {
         this.type = type;
         this.priority = priority;
+    }
+
+    // return StitchKey based on the priority range (inclusive)
+    public static StitchKey[] keys (int lower, int upper) {
+        Set<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
+        for (StitchKey k : EnumSet.allOf(StitchKey.class)) {
+            if ((lower < 0 || k.priority >= lower)
+                && (upper < 0 || k.priority <= upper))
+                keys.add(k);
+        }
+        
+        return keys.toArray(new StitchKey[0]);
+    }
+
+    public static StitchKey[] keys (Class cls) {
+        Set<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
+        for (StitchKey k : EnumSet.allOf(StitchKey.class))
+            if (cls.isAssignableFrom(k.type))
+                keys.add(k);
+        return keys.toArray(new StitchKey[0]);
     }
 }

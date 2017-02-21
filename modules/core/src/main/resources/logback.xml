@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <conversionRule conversionWord="coloredLevel"
+		  converterClass="play.api.libs.logback.ColoredLevel"/>  
   <logger name="net.sf.ehcache" level="warn" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>
+
+  <logger name="ch.qos.logback.classic" level="OFF"/>
   
   <root level="error">
     <appender-ref ref="STDOUT" />
