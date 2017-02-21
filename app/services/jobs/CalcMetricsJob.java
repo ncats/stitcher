@@ -12,9 +12,9 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobExecutionContext;
 import org.quartz.DisallowConcurrentExecution;
 
-import ix.curation.EntityFactory;
-import ix.curation.GraphDb;
-import ix.curation.GraphMetrics;
+import ncats.stitcher.EntityFactory;
+import ncats.stitcher.GraphDb;
+import ncats.stitcher.GraphMetrics;
 
 import services.EntityService;
 import services.CacheService;

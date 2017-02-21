@@ -10,7 +10,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionException;
 import org.quartz.JobExecutionContext;
 
-import ix.curation.GraphDb;
+import ncats.stitcher.GraphDb;
 import services.EntityService;
 
 public abstract class RegistrationJob

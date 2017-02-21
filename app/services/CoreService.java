@@ -30,10 +30,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 
-import ix.curation.CacheFactory;
-import ix.curation.DataSourceFactory;
-import ix.curation.DataSource;
-import ix.curation.Util;
+import ncats.stitcher.CacheFactory;
+import ncats.stitcher.DataSourceFactory;
+import ncats.stitcher.DataSource;
+import ncats.stitcher.Util;
 
 import models.Payload;
 import services.jobs.JobParams;

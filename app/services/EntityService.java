@@ -11,7 +11,7 @@ import play.cache.CacheApi;
 import play.inject.ApplicationLifecycle;
 import play.libs.F;
 
-import ix.curation.*;
+import ncats.stitcher.*;
 
 @Singleton
 public class EntityService {

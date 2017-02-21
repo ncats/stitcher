@@ -1,9 +1,9 @@
 package services.jobs;
 
 import java.io.IOException;
-import ix.curation.GraphDb;
-import ix.curation.impl.MoleculeEntityFactory;
-import ix.curation.impl.IntegrityMoleculeEntityFactory;
+import ncats.stitcher.GraphDb;
+import ncats.stitcher.impl.MoleculeEntityFactory;
+import ncats.stitcher.impl.IntegrityMoleculeEntityFactory;
 
 public class IntegrityMoleculeRegistrationJob extends MoleculeRegistrationJob {
     public IntegrityMoleculeRegistrationJob () {

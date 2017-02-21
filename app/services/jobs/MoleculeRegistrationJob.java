@@ -25,11 +25,11 @@ import org.quartz.TriggerBuilder;
 import org.quartz.Trigger;
 import org.quartz.DateBuilder;
 
-import ix.curation.impl.MoleculeEntityFactory;
-import ix.curation.GraphDb;
-import ix.curation.StitchKey;
-import ix.curation.DataSource;
-import ix.curation.Entity;
+import ncats.stitcher.impl.MoleculeEntityFactory;
+import ncats.stitcher.GraphDb;
+import ncats.stitcher.StitchKey;
+import ncats.stitcher.DataSource;
+import ncats.stitcher.Entity;
 
 import services.EntityService;
 import services.CacheService;

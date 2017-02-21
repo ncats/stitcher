@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import play.Logger;
-import ix.curation.Util;
+import ncats.stitcher.Util;
 
 public class DelimiterRecordScanner extends RecordScanner<String[]> {
     protected String delimiter;

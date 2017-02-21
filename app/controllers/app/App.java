@@ -19,7 +19,7 @@ import services.SchedulerService;
 import services.CoreService;
 import services.jobs.*;
 
-import ix.curation.*;
+import ncats.stitcher.*;
 import models.*;
 
 public class App extends Controller {

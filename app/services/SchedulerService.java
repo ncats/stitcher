@@ -46,7 +46,7 @@ import org.reflections.Reflections;
 import services.jobs.*;
 import models.Payload;
 
-import ix.curation.DataSource;
+import ncats.stitcher.DataSource;
 
 @Singleton
 public class SchedulerService {

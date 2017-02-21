@@ -7,7 +7,7 @@ import play.Logger;
 import chemaxon.formats.MolImporter;
 import chemaxon.struc.Molecule;
 
-import ix.curation.Util;
+import ncats.stitcher.Util;
 
 public class MolRecordScanner extends RecordScanner<Molecule> {
     protected MolImporter mi;

@@ -10,7 +10,7 @@ import play.libs.ws.*;
 import org.webjars.*;
 import views.html.*;
 
-import ix.curation.CacheFactory;
+import ncats.stitcher.CacheFactory;
 
 public class MathJax extends Controller {
     final SecureRandom rand = new SecureRandom ();

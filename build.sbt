@@ -47,10 +47,10 @@ lazy val commonDependencies = Seq(
 lazy val root = (project in file("."))
   .enablePlugins(PlayJava, PlayEbean)
   .settings(commonSettings: _*)
-  .settings(name := """ixcurator""")
+  .settings(name := """ncats-stitcher""")
   .settings(
   libraryDependencies ++= commonDependencies
-).dependsOn(core).aggregate(core, buildinfo)
+).dependsOn(stitcher).aggregate(stitcher, buildinfo)
 
 lazy val buildinfo = (project in file("modules/build"))
   .settings(commonSettings: _*)
@@ -72,9 +72,9 @@ public class BuildInfo {
     }
 )
 
-lazy val core = (project in file("modules/core"))
+lazy val stitcher = (project in file("modules/stitcher"))
   .settings(commonSettings: _*)
-  .settings(name := "ixcurator-core",
+  .settings(name := "stitcher-core",
     unmanagedBase <<= baseDirectory { base => base / "../../lib" },
     cleanFiles <<= baseDirectory {
       base => ((base / "../../") ** "_ix*.db").get ++ (base / "target").get
