@@ -146,14 +146,16 @@ public class RanchoEntityFactory extends LineMoleculeEntityFactory {
 
     public static void main (String[] argv) throws Exception {
         GraphDb.addShutdownHook();
-        //register (argv, RanchoEntityFactory.class);
+        register (argv, RanchoEntityFactory.class);
         //System.exit(0);
 
+        /*
         String[] gsrsArgv = {"base.db", "data/public2016-06-10.gsrs"};
         SRSJsonEntityFactory.main(gsrsArgv);
         String[] fdaArgv = {"base.db", "data/drugsatfda.zip"};
         DrugsAtFDA.main(fdaArgv);
         String[] ranchoArgv = {"base.db", "data/rancho.conf"};
         register (ranchoArgv, RanchoEntityFactory.class);
+        */
     }
 }
