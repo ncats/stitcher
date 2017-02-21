@@ -80,11 +80,13 @@ public class EntityFactory implements Props {
         public int getSingletonCount () { return singletonCount; }
     }
 
-    class EntityIterator implements Iterator<Entity> {
+    static class EntityIterator implements Iterator<Entity> {
         final Iterator<Node> iter;
+        final GraphDatabaseService gdb;
 
-        EntityIterator (Iterator<Node> iter) {
+        EntityIterator (GraphDatabaseService gdb, Iterator<Node> iter) {
             this.iter = iter;
+            this.gdb = gdb;
         }
 
         public boolean hasNext () {
@@ -360,15 +362,6 @@ public class EntityFactory implements Props {
             id = Util.sha1(nodes).substring(0, 9);
         }
 
-        Long[] _filterStitchedNodes (StitchKey key, Object value) {
-            Set<Long> subset = new TreeSet<Long>();
-            if (EntityFactory._filterStitchedNodes
-                (gdb, subset, key, value) > 0) {
-                subset.retainAll(nodes);
-            }
-            return subset.toArray(new Long[0]);
-        }
-        
         /*
          * unique set of values that span the given stitch key
          */
@@ -393,7 +386,8 @@ public class EntityFactory implements Props {
         }
 
         public Component _filter (StitchKey key, Object value) {
-            return new ComponentImpl (gdb, _filterStitchedNodes (key, value));
+            return new ComponentImpl
+                (gdb, EntityFactory.nodes(gdb, key.name(), value));
         }
         
         public Iterator<Entity> iterator () {
@@ -410,6 +404,19 @@ public class EntityFactory implements Props {
                 return nodes.equals(((ComponentImpl)obj).nodes);
             }
             return false;
+        }
+
+        @Override
+        public long[] nodes (StitchKey key, Object value) {
+            Set<Long> nodes = new TreeSet<>();
+            for (Iterator<Entity> it =
+                     EntityFactory.find(gdb, key.name(), value);
+                 it.hasNext(); ) {
+                long id = it.next().getId();
+                if (this.nodes.contains(id))
+                    nodes.add(id);
+            }
+            return Util.toPrimitive(nodes.toArray(new Long[0]));
         }
 
         public Map<Object, Integer> stats (StitchKey key) {
@@ -451,7 +458,8 @@ public class EntityFactory implements Props {
             nodes.add(n.getId());
             for (Relationship rel : n.getRelationships(Direction.BOTH)) {
                 if (rel.isType(key)
-                    && value.equals(rel.getProperty(VALUE, null)))
+                    && (value == null
+                        || value.equals(rel.getProperty(VALUE, null))))
                     edges.add(rel);
                 Node xn = rel.getOtherNode(n);
                 if (!nodes.contains(xn.getId()))
@@ -1290,37 +1298,17 @@ public class EntityFactory implements Props {
 
     public boolean cliqueEnumeration (StitchKey key, Object value,
                                       CliqueVisitor visitor) {
-        Set<Long> matches = new HashSet<>();
-        if (_filterStitchedNodes (gdb, matches, key, value) > 0) {
+        long[] nodes = nodes (key.name(), value);
+        if (nodes.length > 0) {
             CliqueEnumeration clique = new CliqueEnumeration (gdb, Entity.KEYS);
-            return clique.enumerate
-                (Util.toPrimitive(matches.toArray(new Long[0])), visitor);
+            return clique.enumerate(nodes, visitor);
         }
         return false;
     }
 
-    static int _filterStitchedNodes (GraphDatabaseService gdb,
-                                     Set<Long> matches,
-                                     StitchKey key, Object value) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("value", value);
-        try (Transaction tx = gdb.beginTx();  Result result = gdb.execute
-             ("match(n)-[e:`"+key
-              +"`]-(m) where e.value = {value} "
-              +"return id(n) as `n`, id(m) as `m`", params)) {
-            int edges = 0;
-            for (; result.hasNext(); ++edges) {
-                Map<String, Object> row = result.next();
-                matches.add((Long)row.get("n"));
-                matches.add((Long)row.get("m"));
-            }
-            result.close();
-            
-            return edges;
-        }
-    }
-    
-    public Iterator<Entity> find (String key, Object value) {
+
+    public static Iterator<Entity> find (GraphDatabaseService gdb,
+                                         String key, Object value) {
         Iterator<Entity> iterator = null;
         try (Transaction tx = gdb.beginTx()) {
             Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());
@@ -1331,7 +1319,7 @@ public class EntityFactory implements Props {
                     IndexHits<Node> hits = index.get(key, v);
                     // return on the first non-empty hits
                     if (hits.size() > 0) {
-                        iterator = new EntityIterator (hits.iterator());
+                        iterator = new EntityIterator (gdb, hits.iterator());
                         break;
                     }
                 }
@@ -1339,11 +1327,28 @@ public class EntityFactory implements Props {
 
             if (iterator == null)
                 iterator = new EntityIterator
-                    (index.get(key, value).iterator());
+                    (gdb, index.get(key, value).iterator());
         }
+        
         return iterator;
     }
 
+    public Iterator<Entity> find (String key, Object value) {
+        return find (gdb, key, value);
+    }
+
+    public long[] nodes (String key, Object value) {
+        return nodes (gdb, key, value);
+    }
+    
+    public static long[] nodes (GraphDatabaseService gdb,
+                                String key, Object value) {
+        Set<Long> nodes = new TreeSet<>();
+        for (Iterator<Entity> it = find (gdb, key, value); it.hasNext(); ) {
+            nodes.add(it.next().getId());
+        }
+        return Util.toPrimitive(nodes.toArray(new Long[0]));
+    }
     
     /**
      * iterate over entities of a particular data source
@@ -1355,7 +1360,7 @@ public class EntityFactory implements Props {
     public Iterator<Entity> entities (String label) {
         try (Transaction tx = gdb.beginTx()) {
             return new EntityIterator
-                (gdb.findNodes(DynamicLabel.label(label)));
+                (gdb, gdb.findNodes(DynamicLabel.label(label)));
         }
     }
 
@@ -1387,7 +1392,7 @@ public class EntityFactory implements Props {
      */
     public Iterator<Entity> entities () {
         try (Transaction tx = gdb.beginTx()) {
-            return new EntityIterator (gdb.findNodes(AuxNodeType.ENTITY));
+            return new EntityIterator (gdb, gdb.findNodes(AuxNodeType.ENTITY));
         }
     }
     

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import ix.curation.graph.UnionFind;
+import static ix.curation.StitchKey.*;
 
 public class StitchUntangled {
     static final Logger logger = Logger.getLogger
@@ -25,25 +26,40 @@ public class StitchUntangled {
         Util.dump(component);
         UnionFind uf = new UnionFind ();
 
-        /*
+        Set<Long> promiscous = new TreeSet<>();
+        // all priority 5 keys
         for (StitchKey k : EnumSet.allOf(StitchKey.class)) {
             Map<Object, Integer> stats = component.stats(k);
-            for (Map.Entry<Object, Integer> v : stats.entrySet()) {
-                if (v.getValue() < 200) {
-                    component.cliques(k, v.getKey(), c -> {
-                            Util.dump(c);
+            if (5 == k.priority) {
+                for (Map.Entry<Object, Integer> v : stats.entrySet()) {
+                    long[] nodes = component.nodes(k, v.getKey());
+                    logger.info(k+"="+v.getKey()+" => "+nodes.length);
+                    if (nodes.length > 0) {
+                        for (int i = 0; i < nodes.length; ++i) {
+                            Entity e = ef.entity(nodes[i]);
+                            Object val = e.keys().get(k);
+                            assert (val != null);
+                            if (i > 0)
+                                System.out.print(" ");
                             
-                            long[] nodes = c.nodes();
-                            for (int i = 0; i < nodes.length; ++i)
-                                for (int j = i+1; j < nodes.length; ++j)
-                                    uf.union(nodes[i], nodes[j]);
-                            return true;
-                        });
+                            System.out.print(nodes[i]);
+                            if (val.getClass().isArray()
+                                && Array.getLength(val) > 1) {
+                                promiscous.add(nodes[i]);
+                            }
+                            else {
+                                for (int j = 0; j < i; ++j)
+                                    if (!promiscous.contains(nodes[j]))
+                                        uf.union(nodes[i], nodes[j]);
+                            }
+                        }
+                        System.out.println();                   
+                    }
                 }
             }
         }
-        */
 
+        /*
         component.cliques(c -> {
                 Util.dump(c);
                 
@@ -66,19 +82,25 @@ public class StitchUntangled {
                 
                 return true;
             }, StitchKey.keys(1, -1));
-
+        */
+        
         long[][] clumps = uf.components();
-        System.out.println("**** Clumps *****");
+        System.out.println("************** Refined Clusters ****************");
         for (int i = 0; i < clumps.length; ++i) {
             System.out.print((i+1)+" "+clumps[i].length+":");
             for (int j = 0; j < clumps[i].length; ++j)
                 System.out.print(" "+clumps[i][j]);
             System.out.println();
+            /*
             ef.cliqueEnumeration(clumps[i], c -> {
                     Util.dump(c);
                     return true;
                 });
+            */
         }
+
+        System.out.println("************** Promicuous ****************");
+        System.out.println(promiscous);
         
         return 0;
     }

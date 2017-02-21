@@ -578,6 +578,28 @@ public class Entity extends CNode {
         return this;
     }
 
+    // update but don't stitch
+    static protected void _update (Node node, StitchKey key, Object value) {
+        Index<Node> index = _nodeIndex (node);
+        
+        Object oldval = node.getProperty(key.name(), null);
+        if (oldval == null) {
+            node.setProperty(key.name(), value);
+        }
+        else {
+            Object newval = Util.merge(oldval, value);
+            node.setProperty(key.name(), newval);
+        }
+        
+        if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            for (int i = 0; i < len; ++i)
+                index.add(node, key.name(), Array.get(value, i));
+        }
+        else 
+            index.add(node, key.name(), value);
+    }
+    
     public boolean stitch (Entity target, StitchKey key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
             boolean ok = _stitch (target, key, value);
@@ -586,7 +608,14 @@ public class Entity extends CNode {
         }
     }
 
+    /**
+     * manually perform the stitch; if either of the nodes is already stitched
+     * on the designated key, then the value is append to the existing values.
+     */    
     public boolean _stitch (Entity target, StitchKey key, Object value) {
+        if (value == null)
+            throw new IllegalArgumentException ("Stitch value can't be null!");
+        
         for (Relationship rel : _node.getRelationships(key, Direction.BOTH)) {
             Node xn = rel.getOtherNode(_node);
             if (xn.equals(target._node)
@@ -602,6 +631,10 @@ public class Entity extends CNode {
         RelationshipIndex relindx = _relationshipIndex (_node);
         relindx.add(rel, key.name(), value);
         union (_node, target._node);
+
+        // now update node properties
+        _update (_node, key, value);
+        _update (target._node, key, value);
         
         logger.info(_node.getId()
                     +" <-["+key+":\""+value+"\"]-> "+target._node.getId());

@@ -35,7 +35,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         add (N_Name, "Synonyms")
             .add (I_CAS, "CAS")
             .add (I_UNII, "UNII")
-            .add (T_ActiveMoiety, "ActiveMoieties")
+            //.add (T_ActiveMoiety, "ActiveMoieties")
             ;
     }
 
@@ -68,8 +68,9 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         }
                         else if (activeMoieties.containsKey(a)) {
                             Entity e = activeMoieties.get(a);
-                            // create link from e -> ent
-                            ent.stitch(e, T_ActiveMoiety, a);
+                            // create manual stitch from e -> ent
+                            if (!ent.equals(e))
+                                ent.stitch(e, T_ActiveMoiety, a);
                         }
                         else {
                             Set<Entity> ents = unresolved.get(a);
@@ -89,7 +90,8 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
             Entity active = activeMoieties.get(me.getKey());
             if (active != null) {
                 for (Entity e : me.getValue())
-                    e.stitch(active, T_ActiveMoiety, me.getKey());
+                    if (!active.equals(e))
+                        e.stitch(active, T_ActiveMoiety, me.getKey());
             }
             else {
                 int cnt = 0;
@@ -97,7 +99,8 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                      it.hasNext(); ++cnt) {
                     active = it.next();
                     for (Entity e : me.getValue())
-                        e.stitch(active, T_ActiveMoiety, me.getKey());
+                        if (!active.equals(e))
+                            e.stitch(active, T_ActiveMoiety, me.getKey());
                 }
                 
                 if (cnt == 0)

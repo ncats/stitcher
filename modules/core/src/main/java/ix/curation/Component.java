@@ -27,6 +27,11 @@ public interface Component extends Iterable<Entity> {
         return Util.toPrimitive(nodeSet().toArray(new Long[0]));
     }
 
+    default long[] nodes (StitchKey key, Object value) {
+        throw new UnsupportedOperationException
+            ("nodes(key,value) is not supported for this implementation");
+    }
+
     default void cliques (CliqueVisitor visitor, StitchKey... keys) {
         throw new UnsupportedOperationException
             ("cliques() is not supported for this implementation");
