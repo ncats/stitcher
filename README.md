@@ -1,5 +1,5 @@
-InXight Curator
-===============
+Stitcher
+========
 
 This codebase is based on the latest version of the Play framework
 and as such it needs Java 8 to build. Modules are defined under
