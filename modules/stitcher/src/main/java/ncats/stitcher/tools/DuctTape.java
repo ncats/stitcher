@@ -22,14 +22,14 @@ import ncats.stitcher.DataSource;
 import ncats.stitcher.DataSourceFactory;
 import ncats.stitcher.AbstractEntityVisitor;
 import ncats.stitcher.graph.UnionFind;
+import static ncats.stitcher.BuildInfo.*;
 
 public class DuctTape implements CliqueVisitor {
     static final Logger logger = Logger.getLogger(DuctTape.class.getName());
 
     public static final String SOURCE = 
         "### "+DuctTape.class.getSimpleName()+" built on "
-        +ix.BuildInfo.TIME+" (commit: "
-        +ix.BuildInfo.COMMIT+"/"+ix.BuildInfo.BRANCH+")";
+        +TIME+" (commit: " +COMMIT+"/"+BRANCH+")";
 
     /**
      * Don't include L3 hash
