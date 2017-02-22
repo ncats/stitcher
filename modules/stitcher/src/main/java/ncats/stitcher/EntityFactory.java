@@ -1190,45 +1190,42 @@ public class EntityFactory implements Props {
     }
 
     public boolean cliqueEnumeration (CliqueVisitor visitor) {
-        return cliqueEnumeration (Entity.KEYS, visitor);
+        return cliqueEnumeration (visitor, Entity.KEYS);
     }
 
     public boolean cliqueEnumeration (String label, CliqueVisitor visitor) {
         return label != null ? 
-            cliqueEnumeration (Entity.KEYS,
-                               DynamicLabel.label(label), visitor)
-            : cliqueEnumeration (Entity.KEYS, visitor);
+            cliqueEnumeration (DynamicLabel.label(label), visitor, Entity.KEYS)
+            : cliqueEnumeration (visitor, Entity.KEYS);
     }
     
-    public boolean cliqueEnumeration (StitchKey[] keys,
-                                      String label, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (String label, CliqueVisitor visitor,
+                                      StitchKey... keys) {
         if (keys == null || keys.length == 0)
             keys = Entity.KEYS;
         
         return label != null ?
-            cliqueEnumeration (keys, DynamicLabel.label(label), visitor)
-            : cliqueEnumeration (keys, visitor);
+            cliqueEnumeration (DynamicLabel.label(label), visitor, keys)
+            : cliqueEnumeration (visitor, keys);
     }
 
-    public boolean cliqueEnumeration (StitchKey[] keys,
-                                      Label label, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (Label label, CliqueVisitor visitor,
+                                      StitchKey[] keys) {
         try (Transaction tx = gdb.beginTx()) {
+            
             List<Long> ids = new ArrayList<Long>();
             for (Iterator<Node> it = gdb.findNodes(label); it.hasNext(); ) {
                 Node n = it.next();
                 ids.add(n.getId());
             }
-            long[] nodes = new long[ids.size()];
-            int i = 0;
-            for (Long id : ids) {
-                nodes[i++] = id;
-            }
             
-            return cliqueEnumeration (keys, nodes, visitor);
+            return cliqueEnumeration
+                (Util.toPrimitive(ids.toArray(new Long[0])), visitor, keys);
         }
     }
 
-    public boolean cliqueEnumeration (StitchKey[] keys, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (CliqueVisitor visitor,
+                                      StitchKey... keys) {
         /*
         ConnectedComponents cc = new ConnectedComponents (gdb);
         long[][] comps = cc.components();
@@ -1251,7 +1248,7 @@ public class EntityFactory implements Props {
                                                 +" has no rank!");
                 if (rank >= CLIQUE_MINSIZE) {
                     Component comp = new ComponentImpl (node);
-                    if (!cliqueEnumeration (keys, comp.nodes(), visitor))
+                    if (!cliqueEnumeration (comp.nodes(), visitor, keys))
                         return false;
                 }
             }
@@ -1261,27 +1258,27 @@ public class EntityFactory implements Props {
     }
 
     public boolean cliqueEnumeration (long[] nodes, CliqueVisitor visitor) {
-        return cliqueEnumeration (Entity.KEYS, nodes, visitor);
+        return cliqueEnumeration (nodes, visitor, Entity.KEYS);
     }
 
     public boolean cliqueEnumeration
-        (StitchKey[] keys, Entity[] entities, CliqueVisitor visitor) {
+        (Entity[] entities, CliqueVisitor visitor, StitchKey... keys) {
         long[] nodes = new long[entities.length];
         try (Transaction tx = gdb.beginTx()) {
             for (int i = 0; i < nodes.length; ++i)
                 nodes[i] = entities[i].getId();
             
-            return cliqueEnumeration (keys, nodes, visitor);
+            return cliqueEnumeration (nodes, visitor, keys);
         }
     }
     
     public boolean cliqueEnumeration (Entity[] entities,
                                       CliqueVisitor visitor) {
-        return cliqueEnumeration (Entity.KEYS, entities, visitor);
+        return cliqueEnumeration (entities, visitor, Entity.KEYS);
     }
     
-    public boolean cliqueEnumeration (StitchKey[] keys,
-                                      long[] nodes, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (long[] nodes, CliqueVisitor visitor,
+                                      StitchKey... keys) {
         /*
         { EnumSet<StitchKey> set = EnumSet.noneOf(StitchKey.class);
             for (StitchKey k : keys) set.add(k);
@@ -1357,7 +1354,7 @@ public class EntityFactory implements Props {
      * iterate over entities of a particular data source
      */
     public Iterator<Entity> entities (DataSource source) {
-        return entities (source.getKey());
+        return entities (source.getName());
     }
 
     public Iterator<Entity> entities (String label) {

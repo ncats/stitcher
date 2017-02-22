@@ -80,7 +80,7 @@ public class DuctTape implements CliqueVisitor {
         
         logger.info("######### Enumerating cliques for \""+label+"\"...");
         long start = System.currentTimeMillis();
-        ef.cliqueEnumeration(KEYS, label, this);
+        ef.cliqueEnumeration(label, this, KEYS);
         double elapsed = (System.currentTimeMillis()-start)*1e-3;
         closure (ef.entities(label));   
         logger.info("######### Elapsed time for \""+label+"\" ("
@@ -107,7 +107,7 @@ public class DuctTape implements CliqueVisitor {
                 logger.info("######### Enumerating cliques for CC_"
                             +cc+" ("+comp.length+")...");
                 long start = System.currentTimeMillis();
-                ef.cliqueEnumeration(KEYS, comp, this);
+                ef.cliqueEnumeration(comp, this, KEYS);
                 logger.info(cliques.size()+" clique(s) found!");
                 
                 closure (Arrays.asList(comp).iterator());

@@ -142,7 +142,7 @@ public class StitchUntangled {
                     ef.cliqueEnumeration(ext, c -> {
                             Util.dump(c);
                             return true;
-                        });
+                        }, H_LyChI_L4, H_LyChI_L5, N_Name, I_CAS, I_UNII);
                 }
             }
             System.out.println();
