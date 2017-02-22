@@ -55,11 +55,11 @@ lazy val root = (project in file("."))
 lazy val buildinfo = (project in file("modules/build"))
   .settings(commonSettings: _*)
   .settings(
-  name := "ixcurator-buildinfo",
+  name := "stitcher-buildinfo",
     sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
       val file = dir / "BuildInfo.java"
       IO.write(file, """
-package ix;
+package ncats.stitcher;
 public class BuildInfo { 
    public static final String BRANCH = "%s";
    public static final String DATE = "%s";

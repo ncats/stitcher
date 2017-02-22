@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import java.util.function.BiPredicate;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,6 +30,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.index.lucene.LuceneTimeline;
 import org.neo4j.index.lucene.TimelineIndex;
@@ -452,26 +454,13 @@ public class EntityFactory implements Props {
                 clique.enumerate(nodes (), visitor);
             }
         }
-
-        void dfs (Set<Long> nodes, Set<Relationship> edges,
-                  Node n, StitchKey key, Object value) {
-            nodes.add(n.getId());
-            for (Relationship rel : n.getRelationships(Direction.BOTH)) {
-                if (rel.isType(key)
-                    && (value == null
-                        || value.equals(rel.getProperty(VALUE, null))))
-                    edges.add(rel);
-                Node xn = rel.getOtherNode(n);
-                if (!nodes.contains(xn.getId()))
-                    dfs (nodes, edges, xn, key, value); 
-            }
-        }
         
         Set<Long> getNodes (StitchKey key, Object value) {
             Set<Long> nodes = new TreeSet<>();
             Set<Relationship> edges = new HashSet<>();
             try (Transaction tx = gdb.beginTx()) {
-                dfs (nodes, edges, entities[0]._node(), key, value);
+                EntityFactory.dfs
+                    (nodes, edges, entities[0]._node(), key, value);
                 nodes.clear();
                 for (Relationship rel : edges) {
                     nodes.add(rel.getStartNode().getId());
@@ -884,6 +873,20 @@ public class EntityFactory implements Props {
         }
     }
 
+    static void dfs (Set<Long> nodes, Set<Relationship> edges,
+                     Node n, StitchKey key, Object value) {
+        nodes.add(n.getId());
+        for (Relationship rel : n.getRelationships(Direction.BOTH)) {
+            if (rel.isType(key)
+                && (value == null
+                    || value.equals(rel.getProperty(VALUE, null))))
+                edges.add(rel);
+            Node xn = rel.getOtherNode(n);
+            if (!nodes.contains(xn.getId()))
+                dfs (nodes, edges, xn, key, value); 
+        }
+    }
+    
     public GraphDb getGraphDb () { return graphDb; }
     public CacheFactory getCache () { return graphDb.getCache(); }
     public void setCache (CacheFactory cache) {
@@ -1385,6 +1388,76 @@ public class EntityFactory implements Props {
 
     public Entity _entity (long id) {
         return Entity._getEntity(gdb.getNodeById(id));  
+    }
+
+    static void dfs (Set<Long> nodes, Node n,
+                     BiPredicate<StitchKey, Object> predicate) {
+        nodes.add(n.getId());
+        for (Relationship rel : n.getRelationships(Direction.BOTH)) {
+            try {
+                StitchKey key = StitchKey.valueOf(rel.getType().name());
+                Object value = rel.getProperty(VALUE, null);
+                if (predicate.test(key, value)) {
+                    Node xn = rel.getOtherNode(n);
+                    if (!nodes.contains(xn.getId()))
+                        dfs (nodes, xn, predicate);
+                }
+            }
+            catch (IllegalArgumentException ex) {
+                // not a StitchKey
+            }
+        }
+    }
+
+    public long[] expand (long id, BiPredicate<StitchKey, Object> predicate) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _expand (id, predicate);
+        }
+    }
+    
+    public long[] _expand (long id, BiPredicate<StitchKey, Object> predicate) {
+        try {
+            Set<Long> nodes = new TreeSet<>();
+            dfs (nodes, gdb.getNodeById(id), predicate);
+            if (nodes.size() < 2)
+                nodes.clear();
+            
+            return Util.toPrimitive(nodes.toArray(new Long[0]));
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Node not found: "+id);
+        }
+        return null;
+    }
+
+    public long[] _neighbors (long id, StitchKey... keys) {
+        Set<Long> nb = new TreeSet<>();
+        try {
+            if (keys == null || keys.length == 0)
+                keys = Entity.KEYS;
+            
+            Node node = gdb.getNodeById(id);
+            for (Relationship rel :
+                     node.getRelationships(Direction.BOTH, keys)) {
+                Node xn = rel.getOtherNode(node);
+                nb.add(xn.getId());
+            }
+            
+            if (!nb.isEmpty())
+                nb.add(id);
+            
+            return Util.toPrimitive(nb.toArray(new Long[0]));
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Node not found: "+id);
+        }
+        return null;
+    }
+
+    public long[] neighbors (long id, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _neighbors (id, keys);
+        }
     }
     
     /**

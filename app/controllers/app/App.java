@@ -20,6 +20,7 @@ import services.CoreService;
 import services.jobs.*;
 
 import ncats.stitcher.*;
+import static ncats.stitcher.BuildInfo.*;
 import models.*;
 
 public class App extends Controller {
@@ -34,9 +35,7 @@ public class App extends Controller {
     public controllers.WebJarAssets webjars () { return webJarAssets; }    
 
     public Result build () {
-        return ok(welcome.render("Build: "+ix.BuildInfo.TIME+" ("
-                                 +ix.BuildInfo.BRANCH+"-"
-                                 +ix.BuildInfo.COMMIT+")"));
+        return ok(welcome.render("Build: "+TIME+" ("+BRANCH+"-"+COMMIT+")"));
     }
 
     public Result console (String key) {
