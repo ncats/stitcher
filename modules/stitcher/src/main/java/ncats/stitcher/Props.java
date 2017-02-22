@@ -10,7 +10,8 @@ public interface Props {
     public static final String CREATOR = "creator";
     public static final String PARENT = "parent";
     public static final String SCORE = "score";
-    static public final String RANK = "rank";
+    public static final String RANK = "rank";
+    public static final String LYCHI = "lychi"; // lychi canonical smiles
     
     public static final String SOURCE = "source";
     public static final String ID = "id";
