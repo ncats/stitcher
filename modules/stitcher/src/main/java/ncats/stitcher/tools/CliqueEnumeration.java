@@ -26,7 +26,7 @@ public class CliqueEnumeration implements CliqueVisitor {
     }
 
     public void enumerate (StitchKey[] keys, String label) {
-        ef.cliqueEnumeration(keys, label, this);
+        ef.cliqueEnumeration(label, this, keys);
 
         List<Clique> sorted = new ArrayList<Clique>(cliques);
         Collections.sort(sorted, new Comparator<Clique>() {

@@ -23,7 +23,7 @@ and ```{target}``` can be {```compile```, ```test```}. To run a particular
 class in a particular module, use the ```runMain``` syntax, e.g.,
 
 ```
-./activator "project core" "runMain ix.curation.tools.DuctTape"
+./activator "project stitcher" "runMain ncats.stitcher.tools.DuctTape"
 ```
 
 Stitching Approach

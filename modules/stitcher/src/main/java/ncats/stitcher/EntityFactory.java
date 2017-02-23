@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import java.util.function.BiPredicate;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,6 +30,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.index.lucene.LuceneTimeline;
 import org.neo4j.index.lucene.TimelineIndex;
@@ -452,26 +454,13 @@ public class EntityFactory implements Props {
                 clique.enumerate(nodes (), visitor);
             }
         }
-
-        void dfs (Set<Long> nodes, Set<Relationship> edges,
-                  Node n, StitchKey key, Object value) {
-            nodes.add(n.getId());
-            for (Relationship rel : n.getRelationships(Direction.BOTH)) {
-                if (rel.isType(key)
-                    && (value == null
-                        || value.equals(rel.getProperty(VALUE, null))))
-                    edges.add(rel);
-                Node xn = rel.getOtherNode(n);
-                if (!nodes.contains(xn.getId()))
-                    dfs (nodes, edges, xn, key, value); 
-            }
-        }
         
         Set<Long> getNodes (StitchKey key, Object value) {
             Set<Long> nodes = new TreeSet<>();
             Set<Relationship> edges = new HashSet<>();
             try (Transaction tx = gdb.beginTx()) {
-                dfs (nodes, edges, entities[0]._node(), key, value);
+                EntityFactory.dfs
+                    (nodes, edges, entities[0]._node(), key, value);
                 nodes.clear();
                 for (Relationship rel : edges) {
                     nodes.add(rel.getStartNode().getId());
@@ -884,6 +873,20 @@ public class EntityFactory implements Props {
         }
     }
 
+    static void dfs (Set<Long> nodes, Set<Relationship> edges,
+                     Node n, StitchKey key, Object value) {
+        nodes.add(n.getId());
+        for (Relationship rel : n.getRelationships(Direction.BOTH)) {
+            if (rel.isType(key)
+                && (value == null
+                    || value.equals(rel.getProperty(VALUE, null))))
+                edges.add(rel);
+            Node xn = rel.getOtherNode(n);
+            if (!nodes.contains(xn.getId()))
+                dfs (nodes, edges, xn, key, value); 
+        }
+    }
+    
     public GraphDb getGraphDb () { return graphDb; }
     public CacheFactory getCache () { return graphDb.getCache(); }
     public void setCache (CacheFactory cache) {
@@ -1187,45 +1190,42 @@ public class EntityFactory implements Props {
     }
 
     public boolean cliqueEnumeration (CliqueVisitor visitor) {
-        return cliqueEnumeration (Entity.KEYS, visitor);
+        return cliqueEnumeration (visitor, Entity.KEYS);
     }
 
     public boolean cliqueEnumeration (String label, CliqueVisitor visitor) {
         return label != null ? 
-            cliqueEnumeration (Entity.KEYS,
-                               DynamicLabel.label(label), visitor)
-            : cliqueEnumeration (Entity.KEYS, visitor);
+            cliqueEnumeration (DynamicLabel.label(label), visitor, Entity.KEYS)
+            : cliqueEnumeration (visitor, Entity.KEYS);
     }
     
-    public boolean cliqueEnumeration (StitchKey[] keys,
-                                      String label, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (String label, CliqueVisitor visitor,
+                                      StitchKey... keys) {
         if (keys == null || keys.length == 0)
             keys = Entity.KEYS;
         
         return label != null ?
-            cliqueEnumeration (keys, DynamicLabel.label(label), visitor)
-            : cliqueEnumeration (keys, visitor);
+            cliqueEnumeration (DynamicLabel.label(label), visitor, keys)
+            : cliqueEnumeration (visitor, keys);
     }
 
-    public boolean cliqueEnumeration (StitchKey[] keys,
-                                      Label label, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (Label label, CliqueVisitor visitor,
+                                      StitchKey[] keys) {
         try (Transaction tx = gdb.beginTx()) {
+            
             List<Long> ids = new ArrayList<Long>();
             for (Iterator<Node> it = gdb.findNodes(label); it.hasNext(); ) {
                 Node n = it.next();
                 ids.add(n.getId());
             }
-            long[] nodes = new long[ids.size()];
-            int i = 0;
-            for (Long id : ids) {
-                nodes[i++] = id;
-            }
             
-            return cliqueEnumeration (keys, nodes, visitor);
+            return cliqueEnumeration
+                (Util.toPrimitive(ids.toArray(new Long[0])), visitor, keys);
         }
     }
 
-    public boolean cliqueEnumeration (StitchKey[] keys, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (CliqueVisitor visitor,
+                                      StitchKey... keys) {
         /*
         ConnectedComponents cc = new ConnectedComponents (gdb);
         long[][] comps = cc.components();
@@ -1248,7 +1248,7 @@ public class EntityFactory implements Props {
                                                 +" has no rank!");
                 if (rank >= CLIQUE_MINSIZE) {
                     Component comp = new ComponentImpl (node);
-                    if (!cliqueEnumeration (keys, comp.nodes(), visitor))
+                    if (!cliqueEnumeration (comp.nodes(), visitor, keys))
                         return false;
                 }
             }
@@ -1258,27 +1258,27 @@ public class EntityFactory implements Props {
     }
 
     public boolean cliqueEnumeration (long[] nodes, CliqueVisitor visitor) {
-        return cliqueEnumeration (Entity.KEYS, nodes, visitor);
+        return cliqueEnumeration (nodes, visitor, Entity.KEYS);
     }
 
     public boolean cliqueEnumeration
-        (StitchKey[] keys, Entity[] entities, CliqueVisitor visitor) {
+        (Entity[] entities, CliqueVisitor visitor, StitchKey... keys) {
         long[] nodes = new long[entities.length];
         try (Transaction tx = gdb.beginTx()) {
             for (int i = 0; i < nodes.length; ++i)
                 nodes[i] = entities[i].getId();
             
-            return cliqueEnumeration (keys, nodes, visitor);
+            return cliqueEnumeration (nodes, visitor, keys);
         }
     }
     
     public boolean cliqueEnumeration (Entity[] entities,
                                       CliqueVisitor visitor) {
-        return cliqueEnumeration (Entity.KEYS, entities, visitor);
+        return cliqueEnumeration (entities, visitor, Entity.KEYS);
     }
     
-    public boolean cliqueEnumeration (StitchKey[] keys,
-                                      long[] nodes, CliqueVisitor visitor) {
+    public boolean cliqueEnumeration (long[] nodes, CliqueVisitor visitor,
+                                      StitchKey... keys) {
         /*
         { EnumSet<StitchKey> set = EnumSet.noneOf(StitchKey.class);
             for (StitchKey k : keys) set.add(k);
@@ -1354,7 +1354,7 @@ public class EntityFactory implements Props {
      * iterate over entities of a particular data source
      */
     public Iterator<Entity> entities (DataSource source) {
-        return entities (source.getKey());
+        return entities (source.getName());
     }
 
     public Iterator<Entity> entities (String label) {
@@ -1385,6 +1385,76 @@ public class EntityFactory implements Props {
 
     public Entity _entity (long id) {
         return Entity._getEntity(gdb.getNodeById(id));  
+    }
+
+    static void dfs (Set<Long> nodes, Node n,
+                     BiPredicate<StitchKey, Object> predicate) {
+        nodes.add(n.getId());
+        for (Relationship rel : n.getRelationships(Direction.BOTH)) {
+            try {
+                StitchKey key = StitchKey.valueOf(rel.getType().name());
+                Object value = rel.getProperty(VALUE, null);
+                if (predicate.test(key, value)) {
+                    Node xn = rel.getOtherNode(n);
+                    if (!nodes.contains(xn.getId()))
+                        dfs (nodes, xn, predicate);
+                }
+            }
+            catch (IllegalArgumentException ex) {
+                // not a StitchKey
+            }
+        }
+    }
+
+    public long[] expand (long id, BiPredicate<StitchKey, Object> predicate) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _expand (id, predicate);
+        }
+    }
+    
+    public long[] _expand (long id, BiPredicate<StitchKey, Object> predicate) {
+        try {
+            Set<Long> nodes = new TreeSet<>();
+            dfs (nodes, gdb.getNodeById(id), predicate);
+            if (nodes.size() < 2)
+                nodes.clear();
+            
+            return Util.toPrimitive(nodes.toArray(new Long[0]));
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Node not found: "+id);
+        }
+        return null;
+    }
+
+    public long[] _neighbors (long id, StitchKey... keys) {
+        Set<Long> nb = new TreeSet<>();
+        try {
+            if (keys == null || keys.length == 0)
+                keys = Entity.KEYS;
+            
+            Node node = gdb.getNodeById(id);
+            for (Relationship rel :
+                     node.getRelationships(Direction.BOTH, keys)) {
+                Node xn = rel.getOtherNode(node);
+                nb.add(xn.getId());
+            }
+            
+            if (!nb.isEmpty())
+                nb.add(id);
+            
+            return Util.toPrimitive(nb.toArray(new Long[0]));
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Node not found: "+id);
+        }
+        return null;
+    }
+
+    public long[] neighbors (long id, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _neighbors (id, keys);
+        }
     }
     
     /**

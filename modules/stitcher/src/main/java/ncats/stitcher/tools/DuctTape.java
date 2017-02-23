@@ -22,14 +22,14 @@ import ncats.stitcher.DataSource;
 import ncats.stitcher.DataSourceFactory;
 import ncats.stitcher.AbstractEntityVisitor;
 import ncats.stitcher.graph.UnionFind;
+import static ncats.stitcher.BuildInfo.*;
 
 public class DuctTape implements CliqueVisitor {
     static final Logger logger = Logger.getLogger(DuctTape.class.getName());
 
     public static final String SOURCE = 
         "### "+DuctTape.class.getSimpleName()+" built on "
-        +ix.BuildInfo.TIME+" (commit: "
-        +ix.BuildInfo.COMMIT+"/"+ix.BuildInfo.BRANCH+")";
+        +TIME+" (commit: " +COMMIT+"/"+BRANCH+")";
 
     /**
      * Don't include L3 hash
@@ -80,7 +80,7 @@ public class DuctTape implements CliqueVisitor {
         
         logger.info("######### Enumerating cliques for \""+label+"\"...");
         long start = System.currentTimeMillis();
-        ef.cliqueEnumeration(KEYS, label, this);
+        ef.cliqueEnumeration(label, this, KEYS);
         double elapsed = (System.currentTimeMillis()-start)*1e-3;
         closure (ef.entities(label));   
         logger.info("######### Elapsed time for \""+label+"\" ("
@@ -107,7 +107,7 @@ public class DuctTape implements CliqueVisitor {
                 logger.info("######### Enumerating cliques for CC_"
                             +cc+" ("+comp.length+")...");
                 long start = System.currentTimeMillis();
-                ef.cliqueEnumeration(KEYS, comp, this);
+                ef.cliqueEnumeration(comp, this, KEYS);
                 logger.info(cliques.size()+" clique(s) found!");
                 
                 closure (Arrays.asList(comp).iterator());

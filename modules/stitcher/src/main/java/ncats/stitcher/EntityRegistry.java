@@ -29,6 +29,7 @@ import com.typesafe.config.ConfigObject;
 import chemaxon.struc.Molecule;
 import chemaxon.util.MolHandler;
 import lychi.LyChIStandardizer;
+import lychi.util.ChemUtil;
 
 public class EntityRegistry extends EntityFactory {
     static final Logger logger =
@@ -419,7 +420,7 @@ public class EntityRegistry extends EntityFactory {
     protected String[] lychify (final Molecule mol, final boolean stripSalt)
         throws Exception {
         String hash = Util.sha1hex("LyChI:" + mol.exportToFormat("smiles"));
-        if (stripSalt == false)
+        if (!stripSalt)
             hash = Util.sha1hex("LyChISalt:" + mol.exportToFormat("smiles"));
 
         String[] hk = getCache().getOrElse(hash, new Callable<String[]> () {
@@ -427,13 +428,21 @@ public class EntityRegistry extends EntityFactory {
                     LyChIStandardizer lychi = new LyChIStandardizer ();
                     // only standardize if 
                     if (mol.getAtomCount() < 1024) {
-                        lychi.removeSaltOrSolvent
-                            (stripSalt
-                             /*
-                              * don't strip salt/solvent if the structure 
-                              * has metals
-                              */
-                             /*&& !LyChIStandardizer.containMetals(mol)*/);
+                        boolean salt = stripSalt;
+                        if (salt) {
+                            /*
+                             * if molecule contains metal and is inorganic, 
+                             * then we only remove water
+                             */
+                            if (LyChIStandardizer.containMetals(mol)
+                                && LyChIStandardizer.isInorganic(mol)) {
+                                // remove only water
+                                LyChIStandardizer.dehydrate(mol);
+                                salt = false;
+                            }
+                        }
+                        
+                        lychi.removeSaltOrSolvent(salt);
                         lychi.standardize(mol);
                     }
                     else {
@@ -441,7 +450,13 @@ public class EntityRegistry extends EntityFactory {
                         ("molecule has "+mol.getAtomCount()
                          +" atoms; no standardization performed!");
                     }
-                    return LyChIStandardizer.hashKeyArray(mol);
+                    String[] hk = LyChIStandardizer.hashKeyArray(mol);
+                    String[] re = new String[hk.length+1];
+                    for (int i = 0; i < hk.length; ++i)
+                        re[i] = hk[i];
+                    re[hk.length] = ChemUtil.canonicalSMILES(mol);
+                    
+                    return re;
                 }
             });
         return hk;
@@ -454,6 +469,7 @@ public class EntityRegistry extends EntityFactory {
             if (hk != null) {
                 ent._set(StitchKey.H_LyChI_L3, new StitchValue (hk[2]));
                 ent._set(StitchKey.H_LyChI_L4, new StitchValue (hk[3]));
+                ent._snapshot(LYCHI, hk[4]); // store the lychi smiles
             }
             
             // with salt + solvent

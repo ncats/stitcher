@@ -114,7 +114,7 @@ public class CliqueEntityResolution implements EntityResolution, CliqueVisitor {
                                     +"component of size "+comp.size()+"...");
                     }
                     long start = System.currentTimeMillis();
-                    ef.cliqueEnumeration(KEYS, entities, this);
+                    ef.cliqueEnumeration(entities, this, KEYS);
                     if (DEBUG)
                         logger.info(cliques.size()+" clique(s) found!");
 
