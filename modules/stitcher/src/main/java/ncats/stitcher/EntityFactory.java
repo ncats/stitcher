@@ -471,8 +471,8 @@ public class EntityFactory implements Props {
         }
         
         @Override
-        public void cliques (StitchKey key,
-                             Object value, CliqueVisitor visitor) {
+        public void cliques (CliqueVisitor visitor,
+                             StitchKey key, Object value) {
             try (Transaction tx = gdb.beginTx()) {
                 Set<Long> nodes = getNodes (key, value);
                 if (!nodes.isEmpty()) {
@@ -503,6 +503,31 @@ public class EntityFactory implements Props {
             List<Entity> ov = ov (comp);
             return ov.isEmpty() ? null
                 : new ComponentImpl (ov.toArray(new Entity[0]));
+        }
+
+        @Override
+        public Component add (long[] nodes, StitchKey... keys) {
+            try (Transaction tx = gdb.beginTx()) {
+                Set<Long> added = new TreeSet<>(this.nodes);
+                int size = added.size();
+                for (int i = 0; i < nodes.length; ++i) {
+                    Node n = gdb.getNodeById(nodes[i]);
+                    for (Relationship rel :
+                             n.getRelationships(Direction.BOTH, keys)) {
+                        Node xn = rel.getOtherNode(n);
+                        if (this.nodes.contains(xn.getId())) {
+                            added.add(nodes[i]);
+                        }
+                    }
+                }
+                
+                Component comp = this;
+                if (added.size() > size) {
+                    comp = new ComponentImpl (gdb, added.toArray(new Long[0]));
+                }
+                
+                return comp;
+            }
         }
 
         @Override
@@ -1153,6 +1178,12 @@ public class EntityFactory implements Props {
         }
     }
 
+    public Component component (long[] nodes) {
+        try (Transaction tx = gdb.beginTx()) {
+            return new ComponentImpl (gdb, nodes);
+        }
+    }
+
     public Entity[] entities (String label, int skip, int top) {
         return entities (DynamicLabel.label(label), skip, top);
     }
@@ -1189,28 +1220,28 @@ public class EntityFactory implements Props {
         return find (key.name(), value);
     }
 
-    public boolean cliqueEnumeration (CliqueVisitor visitor) {
-        return cliqueEnumeration (visitor, Entity.KEYS);
+    public boolean cliques (CliqueVisitor visitor) {
+        return cliques (visitor, Entity.KEYS);
     }
 
-    public boolean cliqueEnumeration (String label, CliqueVisitor visitor) {
+    public boolean cliques (String label, CliqueVisitor visitor) {
         return label != null ? 
-            cliqueEnumeration (DynamicLabel.label(label), visitor, Entity.KEYS)
-            : cliqueEnumeration (visitor, Entity.KEYS);
+            cliques (DynamicLabel.label(label), visitor, Entity.KEYS)
+            : cliques (visitor, Entity.KEYS);
     }
     
-    public boolean cliqueEnumeration (String label, CliqueVisitor visitor,
-                                      StitchKey... keys) {
+    public boolean cliques (String label, CliqueVisitor visitor,
+                            StitchKey... keys) {
         if (keys == null || keys.length == 0)
             keys = Entity.KEYS;
         
         return label != null ?
-            cliqueEnumeration (DynamicLabel.label(label), visitor, keys)
-            : cliqueEnumeration (visitor, keys);
+            cliques (DynamicLabel.label(label), visitor, keys)
+            : cliques (visitor, keys);
     }
 
-    public boolean cliqueEnumeration (Label label, CliqueVisitor visitor,
-                                      StitchKey[] keys) {
+    public boolean cliques (Label label, CliqueVisitor visitor,
+                            StitchKey[] keys) {
         try (Transaction tx = gdb.beginTx()) {
             
             List<Long> ids = new ArrayList<Long>();
@@ -1219,19 +1250,18 @@ public class EntityFactory implements Props {
                 ids.add(n.getId());
             }
             
-            return cliqueEnumeration
+            return cliques
                 (Util.toPrimitive(ids.toArray(new Long[0])), visitor, keys);
         }
     }
 
-    public boolean cliqueEnumeration (CliqueVisitor visitor,
-                                      StitchKey... keys) {
+    public boolean cliques (CliqueVisitor visitor, StitchKey... keys) {
         /*
         ConnectedComponents cc = new ConnectedComponents (gdb);
         long[][] comps = cc.components();
         for (int i = 0; i < comps.length
                  && comps[i].length >= CLIQUE_MINSIZE; ++i) {
-            if (!cliqueEnumeration (keys, comps[i], visitor))
+            if (!cliques (keys, comps[i], visitor))
                 return false;
         }
         return true;
@@ -1248,7 +1278,7 @@ public class EntityFactory implements Props {
                                                 +" has no rank!");
                 if (rank >= CLIQUE_MINSIZE) {
                     Component comp = new ComponentImpl (node);
-                    if (!cliqueEnumeration (comp.nodes(), visitor, keys))
+                    if (!cliques (comp.nodes(), visitor, keys))
                         return false;
                 }
             }
@@ -1257,28 +1287,27 @@ public class EntityFactory implements Props {
         return true;
     }
 
-    public boolean cliqueEnumeration (long[] nodes, CliqueVisitor visitor) {
-        return cliqueEnumeration (nodes, visitor, Entity.KEYS);
+    public boolean cliques (long[] nodes, CliqueVisitor visitor) {
+        return cliques (nodes, visitor, Entity.KEYS);
     }
 
-    public boolean cliqueEnumeration
+    public boolean cliques
         (Entity[] entities, CliqueVisitor visitor, StitchKey... keys) {
         long[] nodes = new long[entities.length];
         try (Transaction tx = gdb.beginTx()) {
             for (int i = 0; i < nodes.length; ++i)
                 nodes[i] = entities[i].getId();
             
-            return cliqueEnumeration (nodes, visitor, keys);
+            return cliques (nodes, visitor, keys);
         }
     }
     
-    public boolean cliqueEnumeration (Entity[] entities,
-                                      CliqueVisitor visitor) {
-        return cliqueEnumeration (entities, visitor, Entity.KEYS);
+    public boolean cliques (Entity[] entities, CliqueVisitor visitor) {
+        return cliques (entities, visitor, Entity.KEYS);
     }
     
-    public boolean cliqueEnumeration (long[] nodes, CliqueVisitor visitor,
-                                      StitchKey... keys) {
+    public boolean cliques (long[] nodes, CliqueVisitor visitor,
+                            StitchKey... keys) {
         /*
         { EnumSet<StitchKey> set = EnumSet.noneOf(StitchKey.class);
             for (StitchKey k : keys) set.add(k);
@@ -1296,8 +1325,8 @@ public class EntityFactory implements Props {
         return false;
     }
 
-    public boolean cliqueEnumeration (StitchKey key, Object value,
-                                      CliqueVisitor visitor) {
+    public boolean cliques (CliqueVisitor visitor,
+                            StitchKey key, Object value) {
         long[] nodes = nodes (key.name(), value);
         if (nodes.length > 0) {
             CliqueEnumeration clique = new CliqueEnumeration (gdb, Entity.KEYS);
@@ -1387,44 +1416,62 @@ public class EntityFactory implements Props {
         return Entity._getEntity(gdb.getNodeById(id));  
     }
 
-    static void dfs (Set<Long> nodes, Node n,
-                     BiPredicate<StitchKey, Object> predicate) {
+    static void dfs (Set<Long> nodes, Node n, StitchValue sv) {
         nodes.add(n.getId());
-        for (Relationship rel : n.getRelationships(Direction.BOTH)) {
-            try {
-                StitchKey key = StitchKey.valueOf(rel.getType().name());
-                Object value = rel.getProperty(VALUE, null);
-                if (predicate.test(key, value)) {
-                    Node xn = rel.getOtherNode(n);
-                    if (!nodes.contains(xn.getId()))
-                        dfs (nodes, xn, predicate);
-                }
-            }
-            catch (IllegalArgumentException ex) {
-                // not a StitchKey
+        for (Relationship rel :
+                 n.getRelationships(Direction.BOTH, sv.getKey())) {
+            Object relval = rel.getProperty(sv.getName(), null);
+            if (sv != null && sv.getValue().equals(relval)) {
+                Node xn = rel.getOtherNode(n);
+                if (!nodes.contains(xn.getId()))
+                    dfs (nodes, xn, sv);
             }
         }
     }
 
-    public long[] expand (long id, BiPredicate<StitchKey, Object> predicate) {
+    public Map<StitchValue, long[]> expand (long id) {
         try (Transaction tx = gdb.beginTx()) {
-            return _expand (id, predicate);
+            return _expand (id);
         }
     }
     
-    public long[] _expand (long id, BiPredicate<StitchKey, Object> predicate) {
+    public Map<StitchValue, long[]> _expand (long id) {
+        Map<StitchValue, long[]> expander = new TreeMap<>();
         try {
-            Set<Long> nodes = new TreeSet<>();
-            dfs (nodes, gdb.getNodeById(id), predicate);
-            if (nodes.size() < 2)
-                nodes.clear();
-            
-            return Util.toPrimitive(nodes.toArray(new Long[0]));
+            Node anchor = gdb.getNodeById(id);
+            for (Relationship rel : anchor.getRelationships(Direction.BOTH)) {
+                try {
+                    StitchValue sv = new StitchValue
+                        (StitchKey.valueOf(rel.getType().name()), VALUE,
+                         rel.getProperty(VALUE, null));
+                    Set<Long> nodes = new TreeSet<>();
+                    dfs (nodes, anchor, sv);
+                    expander.put(sv, Util.toPrimitive
+                                 (nodes.toArray(new Long[0])));
+                }
+                catch (IllegalArgumentException ex) {
+                    // not a StitchKey relationship
+                }
+            }
         }
         catch (NotFoundException ex) {
             logger.warning("Node not found: "+id);
         }
-        return null;
+        
+        return expander;
+    }
+
+    public long[] _expand (long id, StitchKey key, Object value) {
+        Set<Long> nodes = new TreeSet<>();
+        Node anchor = gdb.getNodeById(id);
+        dfs (nodes, anchor, new StitchValue (key, VALUE, value));
+        return Util.toPrimitive(nodes.toArray(new Long[0]));
+    }
+
+    public long[] expand (long id, StitchKey key, Object value) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _expand (id, key, value);
+        }
     }
 
     public long[] _neighbors (long id, StitchKey... keys) {

@@ -92,7 +92,7 @@ public class DBTools {
     }
 
     public void cliques () {
-        ef.cliqueEnumeration(clique -> {
+        ef.cliques(clique -> {
                 Util.dump(clique);
                 return true;
             });
@@ -100,10 +100,10 @@ public class DBTools {
 
     public void cliques (StitchKey key, Object value) {
         System.out.println("+++++++ Cliques for "+key+"="+value+" +++++++");
-        ef.cliqueEnumeration(key, value, clique -> {
+        ef.cliques(clique -> {
                 Util.dump(clique);
                 return true;
-            });
+            }, key, value);
     }
 
     public void find (String prop, Object value) {

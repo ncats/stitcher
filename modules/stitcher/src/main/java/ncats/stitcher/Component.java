@@ -37,7 +37,7 @@ public interface Component extends Iterable<Entity> {
             ("cliques() is not supported for this implementation");
     }
 
-    default void cliques (StitchKey key, Object value, CliqueVisitor visitor) {
+    default void cliques (CliqueVisitor visitor, StitchKey key, Object value) {
         throw new UnsupportedOperationException
             ("cliques() is not supported for this implementation");
     }
@@ -86,6 +86,16 @@ public interface Component extends Iterable<Entity> {
      * and this component
      */
     default <T extends Component> T add (T c) {
+        throw new UnsupportedOperationException
+            ("add() is not supported for this implementation");
+    }
+
+    /*
+     * add to this component nodes with specific stitch keys and return
+     * a new component; if no nodes with the given stitch keys are matched,
+     * then this component is returned.
+     */
+    default Component add (long[] nodes, StitchKey... keys) {
         throw new UnsupportedOperationException
             ("add() is not supported for this implementation");
     }

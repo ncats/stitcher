@@ -633,10 +633,14 @@ public class Util {
             Entity e = clique.entities()[0].parent();
             ps.println("parent: " +e.getId()
                                +" ("+e.get(Props.RANK)+")");
-            ps.print("nodes:");
-            for (Entity n : clique)
-                ps.print(" "+n.getId());
-            ps.println();
+            ps.print("nodes: [");
+            int i = 0;
+            for (Entity n : clique) {
+                ps.print(n.getId());
+                if (i+1 < clique.size())
+                    ps.print(",");
+            }
+            ps.println("]");
         }
 
         ps.println("-- stitch keys --");

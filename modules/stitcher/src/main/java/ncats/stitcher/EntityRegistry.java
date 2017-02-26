@@ -435,7 +435,7 @@ public class EntityRegistry extends EntityFactory {
                              * then we only remove water
                              */
                             if (LyChIStandardizer.containMetals(mol)
-                                && LyChIStandardizer.isInorganic(mol)) {
+                                /*&& LyChIStandardizer.isInorganic(mol)*/) {
                                 // remove only water
                                 LyChIStandardizer.dehydrate(mol);
                                 salt = false;

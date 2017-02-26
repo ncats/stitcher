@@ -34,7 +34,6 @@ public class Entity extends CNode {
     public static final Entity[] EMPTY_PATH = new Entity[0];
 
     protected EnumSet<StitchKey> stitches = EnumSet.noneOf(StitchKey.class);
-    protected EntityType type;
 
     public static Entity getEntity (Node node) {
         // TODO: caching..
@@ -59,23 +58,6 @@ public class Entity extends CNode {
     
     protected Entity (Node node) {
         super (node);
-
-        /*
-        for (Iterator<Label> labels = node.getLabels().iterator();
-             labels.hasNext(); ) {
-            Label l = labels.next();
-            try {
-                type = EntityType.valueOf(l.name());
-            }
-            catch (Exception ex) {
-                // not of EntityType
-            }
-        }
-
-        if (type == null)
-            throw new IllegalArgumentException
-                ("Node does not have label of EntityType");
-        */
         
         if (!node.hasProperty(RANK)) {
             // setup node for connected component
@@ -84,8 +66,6 @@ public class Entity extends CNode {
         }           
     }
 
-    public EntityType type () { return type; }
-    
     public Entity parent () {
         try (Transaction tx = gdb.beginTx()) {
             Entity e = new Entity (_parent ());

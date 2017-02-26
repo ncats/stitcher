@@ -15,6 +15,7 @@ import java.util.Comparator;
  * UnionFind algorithm with path compression
  */
 public class UnionFind {
+
     private Map<Long, Long> parent = new HashMap<Long, Long>();
     private Map<Long, Integer> rank = new HashMap<Long, Integer>();
 
@@ -30,8 +31,8 @@ public class UnionFind {
         Long p = parent.get(n);
         if (p != null) {
             while (!n.equals(p)) {
-                n = p;
-                p = parent.get(p);
+                n = p;          
+                p = parent.get(p);              
             }
         }
         else {
@@ -41,8 +42,14 @@ public class UnionFind {
         return n;
     }
 
+    public boolean add (long p) {
+        Long q = getRoot (p);
+        return q.equals(p);
+    }
+    
     public boolean find (long p, long q) {
-        return getRoot(p).equals(getRoot (q));
+        return parent.containsKey(p) && parent.containsKey(q)
+            && getRoot(p).equals(getRoot (q));
     }
 
     public boolean contains (long p) {
