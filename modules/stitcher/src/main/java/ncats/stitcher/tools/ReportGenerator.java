@@ -2,6 +2,10 @@ package ncats.stitcher.tools;
 
 import ncats.stitcher.*;
 import ncats.stitcher.Entity;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.springframework.cglib.core.Local;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +18,6 @@ import java.util.*;
  * Created by williamsmard on 2/22/17.
  */
 public class ReportGenerator {
-
     private static final String FDA = "Drugs@FDA";
     private static final String RANCHO = "Rancho 2017";
     private static final String GSRS = "fullSeedData-2016-06-16.gsrs";
@@ -53,6 +56,9 @@ public class ReportGenerator {
                     break;
                 case MULTILYCHII:
                     rg.generateMultiLychiiReport(file,props);
+                    break;
+                case EARLIEST:
+                    rg.generateEarliestApprovalReport(file, props);
             }
         }
         finally
@@ -83,6 +89,18 @@ public class ReportGenerator {
             }
         }
         printLog(multiLychii,props,output);
+    }
+    private void generateEarliestApprovalReport(File output, Set<String>props)
+    {
+        Map<Entity,LocalDate> dateMap = this.findEarliestApprovalDate(this.findApprovedDrugs());
+        String report ="";
+        for(Map.Entry<Entity,LocalDate> entry : dateMap.entrySet())
+        {
+            report = report+entry.getKey().getStringProp("N_Name").get()+"\t"
+                    +entry.getValue().toString()+"\n";
+        }
+        printLog(report,output);
+
     }
 
 
@@ -147,6 +165,54 @@ public class ReportGenerator {
         }
         return false;
     }
+    private Map<Entity, LocalDate> findEarliestApprovalDate(Set<Entity> Entities)
+    {
+        Map<Entity, LocalDate> dateMap = new HashMap<>();
+        final String EARLIEST = "EarliestDate";
+        Iterator<Entity> components= ef.entities("COMPONENT");
+        List<LocalDate> dates = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        while(components.hasNext())
+        {
+            Entity e = components.next();
+            if(e.datasource().getName().equals(FDA))
+            {
+                Set<Set<String>> dateStringSets = e.getPayloadValuesInCluster(EARLIEST);
+                Iterator<Set<String>> outer = dateStringSets.iterator();
+                while(outer.hasNext())
+                {
+                    Set<String> currentSet = outer.next();
+                    Iterator<String> inner = currentSet.iterator();
+                    while(inner.hasNext())
+                    {
+                        String date = inner.next();
+                        if(date.equals("Not given"))
+                        {
+                            continue;
+                        }
+                        try{
+                            dates.add(formatter.parseLocalDate(date));
+                        }
+                        catch(Exception exception)
+                        {
+                            exception.printStackTrace();
+                        }
+                    }
+                }
+            }
+            //System.out.println("SIZE: "+dates.size());
+            if(!dates.isEmpty())
+            {
+                Collections.sort(dates);
+                dateMap.put(e,dates.get(0));
+                dates.clear();
+            }
+
+        }
+
+
+        return dateMap;
+    }
     private static void printLog(String s, File file)
     {
         try{
@@ -169,16 +235,27 @@ public class ReportGenerator {
         legend = legend+"\n";
         Iterator<Entity> ei =e.iterator();
         String output = legend;
-
+        boolean first;
         while(ei.hasNext())
         {
             count++;
             String line = "";
             Entity entity = ei.next();
             Iterator<String> pi = props.iterator();
+            first = true;
             while(pi.hasNext())
             {
                 String prop = pi.next();
+
+                //We don't generally want multiple values for the first property in the list
+                if(first)
+                {
+                    if(entity.getStringProp(prop).isPresent())
+                    {
+                        line = line + entity.getStringProp(prop).get()+"\t";
+                        continue;
+                    }
+                }
                 Set<String> propVals = getStringPropBroad(entity,prop);
                 if(propVals.size()>1)
                 {
@@ -188,7 +265,6 @@ public class ReportGenerator {
                         sb.append(p).append(",");
                     }
                     line = line+sb.deleteCharAt(sb.length() - 1).toString()+"\t";
-                    //line = line+"MULTIPLE_VALUES"+"\t";
                 }
                 else
                 {
@@ -201,10 +277,10 @@ public class ReportGenerator {
                         line = line +"NONE\t";
                     }
                 }
+                first = false;
             }
             output = output+line+"\n";
         }
-        //System.out.println(output);
         printLog(output,file);
 
     }
@@ -214,55 +290,26 @@ public class ReportGenerator {
         Set<String> propValues = new HashSet<String>();
         if(e.properties().containsKey(s))
         {
-            getStringProp(e,s).ifPresent(prop->{
+            e.getStringProp(s).ifPresent(prop->{
                 propValues.add(prop);
             });
         }
-        else
-        {
-            Entity[] neighbors = e.neighbors();
-            for(Entity neighbor:neighbors)
-            {
-                if(neighbor.properties().containsKey(s))
-                {
-                   if(getStringProp(neighbor,s).isPresent())
-                   {
-                       propValues.add(getStringProp(neighbor,s).get());
-                   }
 
-                }
+        Entity[] neighbors = e.neighbors();
+        for(Entity neighbor:neighbors)
+        {
+            if(neighbor.properties().containsKey(s))
+            {
+               if(neighbor.getStringProp(s).isPresent())
+               {
+                   propValues.add(neighbor.getStringProp(s).get());
+               }
+
             }
         }
+
         return propValues;
 
-    }
-    public static Optional<String> getStringProp(Entity e, String s)
-    {
-        Optional<String> value = Optional.empty();
-        if(e.properties().containsKey(s))
-        {
-            //System.out.println(e.getId()+" has key "+s);
-            Object objVal = e.properties().get(s);
-            if(objVal instanceof  String)
-            {
-                value = Optional.of((String)objVal);
-            }
-            else if(objVal instanceof Object[])
-            {
-                String[] valueList = (String[])objVal;
-                StringBuilder sb = new StringBuilder();
-                if(valueList[0] instanceof String)
-                {
-                    for(String val : valueList)
-                    {
-                        sb.append(val).append(",");
-                    }
-                    value = Optional.of(sb.deleteCharAt(sb.length() - 1).toString());
-
-                }
-            }
-        }
-        return value;
     }
     private static Reports getEnum(String s)
     {
@@ -284,7 +331,7 @@ public class ReportGenerator {
         return report;
     }
     enum Reports {
-        APPROVED,MULTILYCHII
+        APPROVED,MULTILYCHII,EARLIEST
     }
 
 
