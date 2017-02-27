@@ -837,4 +837,90 @@ public class Entity extends CNode {
     public void union (Entity ent) {
         union (_node, ent._node);
     }
+
+    /*
+        Method to return the String value of a given property
+        If there are multiple values for the property, a comma
+        delimited String of the values is returned.  If the
+        Entity does not contain the property, an empty Optional
+        is returned.
+     */
+    public Optional<String> getStringProp(String prop)
+    {
+        Optional<String> value = Optional.empty();
+        if(this.properties().containsKey(prop))
+        {
+            //System.out.println(e.getId()+" has key "+s);
+            Object objVal = this.properties().get(prop);
+            if(objVal instanceof  String)
+            {
+                value = Optional.of((String)objVal);
+            }
+            else if(objVal instanceof Object[])
+            {
+                String[] valueList = (String[])objVal;
+                StringBuilder sb = new StringBuilder();
+                if(valueList[0] instanceof String)
+                {
+                    for(String val : valueList)
+                    {
+                        sb.append(val).append(",");
+                    }
+                    value = Optional.of(sb.deleteCharAt(sb.length() - 1).toString());
+
+                }
+            }
+        }
+        return value;
+    }
+    /*
+        Method returns a Set of Entities which contains the entity that called it
+        as well as all of that entity's neighbors.
+     */
+    public Set<Entity> getCluster() {
+        Set<Entity> cluster = new HashSet<>();
+        cluster.add(this);
+        Collections.addAll(cluster, this.neighbors());
+        return cluster;
+    }
+    /*
+        Given a String (property name), this method will return a Set of String values for the property
+        from the calling entity's payload.
+     */
+    public Set<String> getPayloadValues(String s)
+    {
+        Set<String> values = new HashSet<>();
+        Object obj = this.payload().get(s);
+        if(obj!=null)
+        {
+            if(obj instanceof String[])
+            {
+                String[] array = (String[]) obj;
+                for(String str: array)
+                {
+                    values.add(str);
+                }
+            }
+            else if(obj instanceof String)
+            {
+                values.add((String)obj);
+            }
+        }
+        return values;
+    }
+    /*
+        Given a String (property name), this method will return a Set of all the corresponding
+        values in the payloads of all entities in the calling entity's cluster.
+     */
+    public Set<Set<String>> getPayloadValuesInCluster(String s)
+    {
+        Set<Set<String>> values = new HashSet<>();
+        Set<Entity> cluster = this.getCluster();
+        for(Entity e : cluster) {
+            if (!e.getPayloadValues(s).isEmpty()) {
+                values.add(e.getPayloadValues(s));
+            }
+        }
+        return values;
+    }
 }
