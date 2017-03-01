@@ -2,6 +2,8 @@ package ncats.stitcher;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -22,6 +24,14 @@ public interface Component extends Iterable<Entity> {
      * return the set of node ids
      */
     Set<Long> nodeSet ();
+
+    /*
+     * unique set of values that span the given stitch key
+     */
+    default Object[] values (StitchKey key) {
+        throw new UnsupportedOperationException
+            ("vlaues(key) is not supported for this implementation");
+    }
     
     default long[] nodes () {
         return Util.toPrimitive(nodeSet().toArray(new Long[0]));
@@ -63,6 +73,18 @@ public interface Component extends Iterable<Entity> {
         return false;
     }
 
+    default void depthFirst (long node, Consumer<long[]> consumer,
+                             StitchKey... keys) {
+        depthFirst (node, consumer, null, keys);
+    }
+    
+    default void depthFirst (long node, Consumer<long[]> consumer,
+                             BiPredicate<Long, StitchValue> predicate,
+                             StitchKey... keys) {
+        throw new UnsupportedOperationException
+            ("depthFirst() is not supported for this implementation!");
+    }
+    
     /*
      * create a new component that is the xor of the given component
      * and this component
@@ -95,7 +117,13 @@ public interface Component extends Iterable<Entity> {
      * a new component; if no nodes with the given stitch keys are matched,
      * then this component is returned.
      */
-    default Component add (long[] nodes, StitchKey... keys) {
+     default Component add (long[] nodes, StitchKey... keys) {
+         return add (nodes, null, keys);
+     }
+    
+     default Component add (long[] nodes,
+                            BiPredicate<Long, StitchValue> predicate,
+                            StitchKey... keys) {
         throw new UnsupportedOperationException
             ("add() is not supported for this implementation");
     }

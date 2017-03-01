@@ -209,6 +209,10 @@ public class Util {
         return p;
     }
 
+    public static long[] toArray (Collection<Long> values) {
+        return Util.toPrimitive(values.toArray(new Long[0]));
+    }
+
     public static String toString (Object obj) {
         return toString (obj, 10);
     }
@@ -637,7 +641,7 @@ public class Util {
             int i = 0;
             for (Entity n : clique) {
                 ps.print(n.getId());
-                if (i+1 < clique.size())
+                if (++i < clique.size())
                     ps.print(",");
             }
             ps.println("]");

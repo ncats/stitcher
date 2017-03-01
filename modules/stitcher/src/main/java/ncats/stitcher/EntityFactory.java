@@ -264,7 +264,7 @@ public class EntityFactory implements Props {
     }
 
     static class ComponentImpl implements Component {
-        Set<Long> nodes = new TreeSet<Long>();
+        TreeSet<Long> nodes = new TreeSet<>();
         Entity[] entities;
         String id;
         GraphDatabaseService gdb;
@@ -399,7 +399,9 @@ public class EntityFactory implements Props {
         public String getId () { return id; }
         public Entity[] entities () { return entities; }
         public int size () { return nodes.size(); }
-        public Set<Long> nodeSet () { return nodes; }
+        public Set<Long> nodeSet () {
+            return Collections.unmodifiableSortedSet(nodes);
+        }
         public int hashCode () { return nodes.hashCode(); }
         public boolean equals (Object obj) {
             if (obj instanceof ComponentImpl) {
@@ -418,7 +420,8 @@ public class EntityFactory implements Props {
                 if (this.nodes.contains(id))
                     nodes.add(id);
             }
-            return Util.toPrimitive(nodes.toArray(new Long[0]));
+            
+            return Util.toArray(nodes);
         }
 
         public Map<Object, Integer> stats (StitchKey key) {
@@ -456,18 +459,20 @@ public class EntityFactory implements Props {
         }
         
         Set<Long> getNodes (StitchKey key, Object value) {
-            Set<Long> nodes = new TreeSet<>();
-            Set<Relationship> edges = new HashSet<>();
+            Set<Long> all = new TreeSet<>();
             try (Transaction tx = gdb.beginTx()) {
-                EntityFactory.dfs
-                    (nodes, edges, entities[0]._node(), key, value);
-                nodes.clear();
-                for (Relationship rel : edges) {
-                    nodes.add(rel.getStartNode().getId());
-                    nodes.add(rel.getEndNode().getId());
+                for (Entity e : entities) {
+                    Set<Long> nodes = new TreeSet<>();
+                    Set<Relationship> edges = new HashSet<>();
+                    
+                    EntityFactory.dfs(nodes, edges, e._node(), key, value);
+                    for (Relationship rel : edges) {
+                        all.add(rel.getStartNode().getId());
+                        all.add(rel.getEndNode().getId());
+                    }
                 }
             }
-            return nodes;
+            return all;
         }
         
         @Override
@@ -477,8 +482,7 @@ public class EntityFactory implements Props {
                 Set<Long> nodes = getNodes (key, value);
                 if (!nodes.isEmpty()) {
                     CliqueEnumeration clique = new CliqueEnumeration (gdb, key);
-                    clique.enumerate(Util.toPrimitive
-                                     (nodes.toArray(new Long[0])), visitor);
+                    clique.enumerate(Util.toArray(nodes), visitor);
                 }
             }
         }
@@ -505,18 +509,88 @@ public class EntityFactory implements Props {
                 : new ComponentImpl (ov.toArray(new Entity[0]));
         }
 
+        protected Iterable<Relationship> getRelationships
+            (Node node, StitchKey... keys) {
+            return keys == null || keys.length == 0
+                ? node.getRelationships(Direction.BOTH)
+                : node.getRelationships(Direction.BOTH, keys);
+        }
+
+        protected boolean dfs (Set<Long> visited, LinkedList<Long> path,
+                               Node node, Consumer<long[]> consumer,
+                               BiPredicate<Long, StitchValue> predicate,
+                               StitchKey... keys) {
+            path.push(node.getId());
+            visited.add(node.getId());
+            int v = 0, edges = 0;
+            for (Relationship rel : getRelationships (node, keys)) {
+                Node xn = rel.getOtherNode(node);
+                if (!visited.contains(xn.getId())) {
+                    try {
+                        boolean ok = predicate == null;
+                        if (!ok) {
+                            StitchValue sv = new StitchValue
+                                (StitchKey.valueOf(rel.getType().name()),
+                                 VALUE, rel.getProperty(VALUE, null));
+                            ok = predicate.test(xn.getId(), sv);
+                        }
+                        
+                        if (ok) {
+                            if (dfs (visited, path, xn,
+                                     consumer, predicate, keys))
+                                consumer.accept(Util.toArray(path));
+                            path.pop();
+                        }
+                    }
+                    catch (IllegalArgumentException ex) {
+                        // not a stitch key neighbor
+                    }
+                }
+                else
+                    ++v;
+                ++edges;
+            }
+            
+            return v == edges;
+        }
+        
         @Override
-        public Component add (long[] nodes, StitchKey... keys) {
+        public void depthFirst (long node, Consumer<long[]> consumer,
+                                BiPredicate<Long, StitchValue> predicate,
+                                StitchKey... keys) {
+            try (Transaction tx = gdb.beginTx()) {
+                LinkedList<Long> path = new LinkedList<>();
+                Set<Long> visited = new HashSet<>();
+                dfs (visited, path, gdb.getNodeById(node),
+                     consumer, predicate, keys);
+            }
+        }
+        
+        @Override
+        public Component add (long[] nodes,
+                              BiPredicate<Long, StitchValue> predicate,
+                              StitchKey... keys) {
             try (Transaction tx = gdb.beginTx()) {
                 Set<Long> added = new TreeSet<>(this.nodes);
                 int size = added.size();
                 for (int i = 0; i < nodes.length; ++i) {
                     Node n = gdb.getNodeById(nodes[i]);
-                    for (Relationship rel :
-                             n.getRelationships(Direction.BOTH, keys)) {
-                        Node xn = rel.getOtherNode(n);
-                        if (this.nodes.contains(xn.getId())) {
-                            added.add(nodes[i]);
+                    for (Relationship rel : getRelationships (n, keys)) {
+                        long xid = rel.getOtherNode(n).getId();
+                        if (this.nodes.contains(xid)) {                 
+                            if (predicate != null) {
+                                try {
+                                    StitchValue sv = new StitchValue
+                                        (StitchKey.valueOf(rel.getType().name()),
+                                         VALUE, rel.getProperty(VALUE, null));
+                                    if (predicate.test(xid, sv))
+                                        added.add(nodes[i]);
+                                }
+                                catch (IllegalArgumentException ex) {
+                                }
+                            }
+                            else 
+                                added.add(nodes[i]);
                         }
                     }
                 }
@@ -1250,8 +1324,7 @@ public class EntityFactory implements Props {
                 ids.add(n.getId());
             }
             
-            return cliques
-                (Util.toPrimitive(ids.toArray(new Long[0])), visitor, keys);
+            return cliques (Util.toArray(ids), visitor, keys);
         }
     }
 
@@ -1376,7 +1449,7 @@ public class EntityFactory implements Props {
         for (Iterator<Entity> it = find (gdb, key, value); it.hasNext(); ) {
             nodes.add(it.next().getId());
         }
-        return Util.toPrimitive(nodes.toArray(new Long[0]));
+        return Util.toArray(nodes);
     }
     
     /**
@@ -1446,8 +1519,7 @@ public class EntityFactory implements Props {
                          rel.getProperty(VALUE, null));
                     Set<Long> nodes = new TreeSet<>();
                     dfs (nodes, anchor, sv);
-                    expander.put(sv, Util.toPrimitive
-                                 (nodes.toArray(new Long[0])));
+                    expander.put(sv, Util.toArray(nodes));
                 }
                 catch (IllegalArgumentException ex) {
                     // not a StitchKey relationship
@@ -1465,7 +1537,7 @@ public class EntityFactory implements Props {
         Set<Long> nodes = new TreeSet<>();
         Node anchor = gdb.getNodeById(id);
         dfs (nodes, anchor, new StitchValue (key, VALUE, value));
-        return Util.toPrimitive(nodes.toArray(new Long[0]));
+        return Util.toArray(nodes);
     }
 
     public long[] expand (long id, StitchKey key, Object value) {
@@ -1490,7 +1562,7 @@ public class EntityFactory implements Props {
             if (!nb.isEmpty())
                 nb.add(id);
             
-            return Util.toPrimitive(nb.toArray(new Long[0]));
+            return Util.toArray(nb);
         }
         catch (NotFoundException ex) {
             logger.warning("Node not found: "+id);

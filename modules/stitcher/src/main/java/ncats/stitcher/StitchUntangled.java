@@ -113,7 +113,7 @@ public class StitchUntangled {
         // now assign promiscous nodes
         System.out.println("************** 2. Refined Clusters ****************");
         clumps = uf.components();
-        long[] nodes = Util.toPrimitive(promiscous.toArray(new Long[0]));
+        long[] nodes = Util.toArray(promiscous);
         
         List<Component> components = new ArrayList<>();
         for (int i = 0; i < clumps.length; ++i) {
@@ -126,17 +126,48 @@ public class StitchUntangled {
             components.add(comp.add(nodes, StitchKey.keys(5, 5)));
         }
 
-        for (Component c : components)
+        Set<Long> leftover = new TreeSet<>(component.nodeSet());
+        for (Component c : components) {
             promiscous.removeAll(c.nodeSet());
+            leftover.removeAll(c.nodeSet());
+        }
         
         System.out.println("************** Promicuous ****************");
         System.out.println(promiscous);
 
-        System.out.println("************** Final Components ****************");
-        for (Component c : components)
+        System.out.println("************** Leftover Nodes ******************");
+        System.out.println(leftover);
+        for (Long n : leftover) {
+            System.out.print("+"+n+":");
+            component.depthFirst(n, p -> {
+                    System.out.print("<");
+                    for (int i = 0; i < p.length; ++i)
+                        System.out.print((i==0?"":",")+p[i]);
+                    System.out.print(">");
+                }, H_LyChI_L4, N_Name);
+            System.out.println();   
+        }
+        if (!leftover.isEmpty()) {
+            Component c = ef.component(Util.toArray(leftover));
             Util.dump(c);
+            for (StitchKey k : EnumSet.of(N_Name, H_LyChI_L4)) {
+                for (Object v : c.values(k)) {
+                    System.out.println("   >>> cliques "+k+"="+v+" <<<");
+                    c.cliques(clique -> {
+                            Util.dump(clique);
+                            return true;
+                        }, k, v);
+                }
+            }
+        }
 
+        System.out.println("************** Final Components ****************");
+        for (Component c : components) {
+            Util.dump(c);
+        }
+        
         System.out.println("####### "+components.size()+" components! #######");
+        
         return 0;
     }
 
