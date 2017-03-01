@@ -114,7 +114,8 @@ public class StitchUntangled {
         System.out.println("************** 2. Refined Clusters ****************");
         clumps = uf.components();
         long[] nodes = Util.toArray(promiscous);
-        
+
+        Map<Long, Set<String>> colors = new TreeMap<>();
         List<Component> components = new ArrayList<>();
         for (int i = 0; i < clumps.length; ++i) {
             System.out.print((i+1)+" "+clumps[i].length+": ");
@@ -123,7 +124,17 @@ public class StitchUntangled {
             System.out.println("]");
             
             Component comp = ef.component(clumps[i]);
-            components.add(comp.add(nodes, StitchKey.keys(5, 5)));
+            comp = comp.add(nodes, StitchKey.keys(5, 5));
+            
+            long[] nc = comp.nodes();
+            for (int j = 0; j < nc.length; ++j) {
+                Set<String> c = colors.get(nc[j]);
+                if (c == null)
+                    colors.put(nc[j], c = new HashSet<>());
+                c.add(comp.getId());
+            }
+                
+            components.add(comp);
         }
 
         Set<Long> leftover = new TreeSet<>(component.nodeSet());
@@ -150,14 +161,78 @@ public class StitchUntangled {
         if (!leftover.isEmpty()) {
             Component c = ef.component(Util.toArray(leftover));
             Util.dump(c);
-            for (StitchKey k : EnumSet.of(N_Name, H_LyChI_L4)) {
+            
+            Map<Long, Set<Long>> cands = new TreeMap<>();
+            for (StitchKey k : new StitchKey[]{
+                    // in order of high to low priority
+                    H_LyChI_L4, I_UNII, I_CAS,
+                    N_Name, H_LyChI_L3
+                }) {
                 for (Object v : c.values(k)) {
-                    System.out.println("   >>> cliques "+k+"="+v+" <<<");
+                    System.out.println(">>> cliques for "+k+"="+v+" <<<");
                     c.cliques(clique -> {
-                            Util.dump(clique);
+                            long[] nc = clique.nodes();
+                            Set<Long> unmapped = new TreeSet<>();
+                            Set<Long> mapped = new TreeSet<>();
+                            for (int i = 0; i < nc.length; ++i) {
+                                System.out.print(" "+nc[i]);
+                                Set<String> s = colors.get(nc[i]);
+                                if (s != null) {
+                                    Iterator<String> it = s.iterator();
+                                    System.out.print("["+it.next());
+                                    while (it.hasNext()) {
+                                        System.out.print(","+it.next());
+                                    }
+                                    System.out.print("]");
+                                    mapped.add(nc[i]);
+                                }
+                                else {
+                                    unmapped.add(nc[i]);
+                                }
+                            }
+                            System.out.println();
+
+                            if (mapped.isEmpty()) {
+                                // create a new component
+                                Component comp = ef.component(nc);
+                                Set<String> s =
+                                    Collections.singleton(comp.getId());
+                                for (int i = 0; i < nc.length; ++i)
+                                    colors.put(nc[i], s);
+                            }
+                            else {
+                                // now assign each unmapped node to the best
+                                // component
+                                for (Long n : unmapped) {
+                                    Set<Long> m = cands.get(n);
+                                    if (m != null)
+                                        m.addAll(mapped);
+                                    else
+                                        cands.put(n, mapped);
+                                }
+                            }
+                            
                             return true;
                         }, k, v);
                 }
+            }
+
+            System.out.println("************** Candidate Mapping ****************");
+            for (Map.Entry<Long, Set<Long>> me : cands.entrySet()) {
+                System.out.print(me.getKey()+":");
+                for (Long n : me.getValue()) {
+                    System.out.print(" "+n);
+                    Set<String> s = colors.get(n);
+                    if (s != null) {
+                        Iterator<String> it = s.iterator();
+                        System.out.print("["+it.next());
+                        while (it.hasNext()) {
+                            System.out.print(","+it.next());
+                        }
+                        System.out.print("]");
+                    }
+                }
+                System.out.println();
             }
         }
 
