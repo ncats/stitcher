@@ -923,4 +923,20 @@ public class Entity extends CNode {
         }
         return values;
     }
+    /*
+        Returns the entity of the active moeity of the calling entity, if present.  Works under
+        the assumption that an Entity can only have one active moeity.
+     */
+    public Optional<Entity> _getActiveMoiety()
+    {
+        Optional<Entity> activeMoeity = Optional.empty();
+        for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
+            if(rel.getType().name().equals("T_ActiveMoiety"))
+            {
+                activeMoeity=Optional.ofNullable(new Entity(rel.getEndNode()));
+                break;
+            }
+        }
+        return activeMoeity;
+    }
 }
