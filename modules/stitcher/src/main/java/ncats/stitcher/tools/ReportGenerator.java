@@ -2,14 +2,13 @@ package ncats.stitcher.tools;
 
 import ncats.stitcher.*;
 import ncats.stitcher.Entity;
-import ncats.stitcher.domain.*;
 import ncats.stitcher.Component;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.springframework.cglib.core.Local;
+
+import java.util.Comparator;
+import java.util.function.Function;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 /**
  * Created by williamsmard on 2/22/17.
@@ -78,6 +78,7 @@ public class ReportGenerator {
         ef = new EntityFactory(graphDb);
         dsf = new DataSourceFactory(graphDb);
     }
+
     private void generateDrugPageReport(File output, Set<String>props, GraphDb graphDb)
     {
         //Iterator<Entity> components= ef.entities("COMPONENT");
@@ -94,69 +95,53 @@ public class ReportGenerator {
             Entity[] entityArray = c.entities();
             Set<Entity> entities = new HashSet<>();
             Collections.addAll(entities,entityArray);
-            Set<String> uniis, lychiis, bestUniis;
-            String bestUnii = "NONE";
+            Set<String> uniis, lychiis, activeUniis;
             String earliest = "NONE";
             String highestPhase = "NOTPROVIDED";
+            Optional<LocalDate> earliestDate = findEarliestApprovalDate(entities);
+            if (earliestDate.isPresent()) {
+                earliest = earliestDate.get().toString();
+            }
 
+            for (Entity e : entities) {
+                if (isApproved(e)) {
+                    highestPhase = "APPROVED";
+                    break;
+                }
+            }
+            if (!highestPhase.equals("APPROVED")) {
+                highestPhase = getHighestPhase(entities).name();
+            }
+
+            activeUniis=uniqueSet(findBestUnii(entities));
+            lychiis= uniqueSet(getStringProp(entities,LYCHII));
+            uniis = uniqueSet(getStringProp(entities,UNII));
+            uniis.removeAll(activeUniis);
+            List<String> names = new ArrayList<String>(getStringProp(entities,NAME));
+            Comparator<String> byLength = (e1, e2) -> e1.length() > e2.length() ? -1 : 1;
+            String name = names.stream().sorted(byLength.reversed()).findFirst().get();
+            out = out + name + "\t" + highestPhase + "\t" + earliest + "\t" + commaDelimitedOf(activeUniis) + "\t" + commaDelimitedOf(uniis) + "\t" + commaDelimitedOf(lychiis) + "\n";
         }
-//            while (components.hasNext()) {
-//                String name;
-//                Set<String> uniis, lychiis, bestUniis;
-//                String bestUnii = "NONE";
-//                String earliest = "NONE";
-//                String highestPhase = "NOTPROVIDED";
-//                boolean approved = false;
-//                Entity c = components.next();
-//                Set<Entity> cluster = c.getCluster();
-//                name = c.getStringProp(NAME).get();
-//                Optional<LocalDate> earliestDate = findEarliestApprovaleDate(c);
-//                if (earliestDate.isPresent()) {
-//                    earliest = earliestDate.get().toString();
-//                }
-//
-//
-//                bestUniis = uniqueSet(findBestUnii(cluster, graphDb));
-//                if (bestUniis.size() > 1) {
-//                    bestUnii = "MULTIPLE";
-//                    System.out.println(name);
-//                    bestUniis.forEach(u -> {
-//                        System.out.println(u);
-//                    });
-//                } else if (bestUniis.isEmpty()) {
-//                    //no-op
-//                } else {
-//                    bestUnii = bestUniis.iterator().next();
-//                }
-//                for (Entity e : cluster) {
-//                    if (isApproved(e)) {
-//                        approved = true;
-//                        highestPhase = "APPROVED";
-//                    }
-//
-//                }
-//                if (!highestPhase.equals("APPROVED")) {
-//                    highestPhase = getHighestPhase(cluster).name();
-//                }
-//                lychiis = uniqueSet(getStringPropBroad(c, LYCHII));
-//                uniis = (uniqueSet(getStringPropBroad(c, UNII)));
-//                uniis.removeAll(bestUniis);
-//                out = out + name + "\t" + highestPhase + "\t" + earliest + "\t" + commaDelimitedOf(bestUniis) + "\t" + commaDelimitedOf(uniis) + "\t" + commaDelimitedOf(lychiis) + "\n";
-//                //            if( (highestPhase.equals("APPROVED") ||
-//                //                    //!highestPhase.equals("NOTPROVIDED") &&
-//                //                    //!highestPhase.equals("CLINICAL") &&
-//                //                    highestPhase.equals("WITHDRAWN") ) &&
-//                //                    (earliest.equals("NONE")))
-//                //            {
-//                //                System.out.println(c.getId()+"\t"+name+"\t"+highestPhase+"\t"+earliest);
-//                //            }
-//                //            if(!bestUnii.equals("NONE"))
-//                //            {
-//                //                System.out.println(c.getId()+"\t"+name+"\t"+bestUnii);
-//                //            }
-//            }
-//        }
         printLog(out, output);
+    }
+    private String bestName(Set<Entity> entities)
+    {
+        for(Entity e : entities)
+        {
+            Optional<String> name = e.getStringProp("N_NAME");
+            Optional<String> moiety = e.getStringProp("T_ActiveMoiety");
+            Optional<String> unii = e.getStringProp("I_UNII");
+
+            if(name.isPresent() &&
+                    moiety.isPresent() &&
+                    unii.isPresent()){
+                if(unii.get().equals(moiety.get()))
+                {
+                    return name.get();
+                }
+            }
+        }
+        return null;
     }
     private String commaDelimitedOf(Set<String> set)
     {
@@ -214,16 +199,18 @@ public class ReportGenerator {
     /*
         Currently throwing away the props set and just printing name and earliest approval date
      */
-    private void generateEarliestApprovalReport(File output, Set<String>props)
+    //TODO Refactor this method to work again
+   private void generateEarliestApprovalReport(File output, Set<String>props)
     {
-        Map<Entity,LocalDate> dateMap = this.findEarliestApprovalDate(this.findApprovedDrugs());
-        String report ="";
-        for(Map.Entry<Entity,LocalDate> entry : dateMap.entrySet())
-        {
-            report = report+entry.getKey().getStringProp("N_Name").get()+"\t"
-                    +entry.getValue().toString()+"\n";
-        }
-        printLog(report,output);
+//        Map<Entity,LocalDate> dateMap = this.findEarliestApprovalDate(this.findApprovedDrugs());
+//        String report ="";
+//        for(Map.Entry<Entity,LocalDate> entry : dateMap.entrySet())
+//        {
+//            report = report+entry.getKey().getStringProp("N_Name").get()+"\t"
+//                    +entry.getValue().toString()+"\n";
+//        }
+//        printLog(report,output);
+        System.err.println("THIS REPORT WAS MADE A NO-OP BECAUSE MARK HASN'T REFACTORED IT YET");
     }
 
 
@@ -288,61 +275,29 @@ public class ReportGenerator {
         }
         return false;
     }
-    private Map<Entity, LocalDate> findEarliestApprovalDate(Set<Entity> entities)
+    private Optional<LocalDate> findEarliestApprovalDate(Set<Entity> entities)
     {
-        Map<Entity, LocalDate> dateMap = new HashMap<>();
         final String EARLIEST = "EarliestDate";
-
-        //TODO should be using Entities arg here
-        //Iterator<Entity> components= ef.entities("COMPONENT");
         Iterator<Entity> iter = entities.iterator();
         List<LocalDate> dates = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDate earliest = null;
         while(iter.hasNext())
         {
             Entity e = iter.next();
             Optional<LocalDate> date = findEarliestApprovalDate(e);
             if(date.isPresent())
             {
-                dateMap.put(e,date.get());
+                dates.add(date.get());
             }
-//            if(e.datasource().getName().equals(FDA))
-//            {
-//                Set<Set<String>> dateStringSets = e.getPayloadValuesInCluster(EARLIEST);
-//                Iterator<Set<String>> outer = dateStringSets.iterator();
-//                while(outer.hasNext())
-//                {
-//                    Set<String> currentSet = outer.next();
-//                    Iterator<String> inner = currentSet.iterator();
-//                    while(inner.hasNext())
-//                    {
-//                        String date = inner.next();
-//                        if(date.equals("Not given"))
-//                        {
-//                            continue;
-//                        }
-//                        try{
-//                            dates.add(formatter.parseLocalDate(date));
-//                        }
-//                        catch(Exception exception)
-//                        {
-//                            exception.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-            //System.out.println("SIZE: "+dates.size());
-//            if(!dates.isEmpty())
-//            {
-//                Collections.sort(dates);
-//                dateMap.put(e,dates.get(0));
-//                dates.clear();
-//            }
-
         }
-
-
-        return dateMap;
+        if(!dates.isEmpty())
+        {
+            Collections.sort(dates);
+            earliest=dates.get(0);
+            dates.clear();
+        }
+        return Optional.ofNullable(earliest);
     }
     private Optional<LocalDate> findEarliestApprovalDate(Entity e)
     {
@@ -351,27 +306,19 @@ public class ReportGenerator {
         List<LocalDate> dates = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
-
-        Set<Set<String>> dateStringSets = e.getPayloadValuesInCluster(EARLIEST);
-        Iterator<Set<String>> outer = dateStringSets.iterator();
-        while(outer.hasNext())
+        Set<String> dateSet = e.getPayloadValues(EARLIEST);
+        for(String date : dateSet)
         {
-            Set<String> currentSet = outer.next();
-            Iterator<String> inner = currentSet.iterator();
-            while(inner.hasNext())
+            if(date.equals("Not given"))
             {
-                String date = inner.next();
-                if(date.equals("Not given"))
-                {
-                    continue;
-                }
-                try{
-                    dates.add(formatter.parseLocalDate(date));
-                }
-                catch(Exception exception)
-                {
-                    exception.printStackTrace();
-                }
+                continue;
+            }
+            try{
+                dates.add(formatter.parseLocalDate(date));
+            }
+            catch(Exception exception)
+            {
+                exception.printStackTrace();
             }
         }
         if(!dates.isEmpty())
@@ -379,8 +326,6 @@ public class ReportGenerator {
             Collections.sort(dates);
             earliest = dates.get(0);
         }
-
-
         return Optional.ofNullable(earliest);
     }
     private static String findBestUnii(Entity e)
@@ -432,7 +377,7 @@ public class ReportGenerator {
         Phases highest = Phases.valueOf(strPhase);
         return highest;
     }
-    private Set<String> findBestUnii(Set<Entity> cluster, GraphDb graphDb)
+    private Set<String> findBestUnii(Set<Entity> cluster)
     {
         Set<String> best= new HashSet<>();
         for(Entity e: cluster)
@@ -537,9 +482,20 @@ public class ReportGenerator {
 
             }
         }
-
         return propValues;
-
+    }
+    public static Set<String> getStringProp(Set<Entity> entities,String prop)
+    {
+        Set<String> props = new HashSet<>();
+        for(Entity e : entities)
+        {
+            Optional<String> value = e.getStringProp(prop);
+            if(value.isPresent())
+            {
+                props.add(value.get());
+            }
+        }
+        return props;
     }
     private static Reports getEnum(String s)
     {
