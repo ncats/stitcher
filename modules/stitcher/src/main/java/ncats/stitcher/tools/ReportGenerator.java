@@ -90,7 +90,6 @@ public class ReportGenerator {
         String LYCHII = "H_LyChI_L3";
         //String out ="NAME\tHIGHEST PHASE\tEARLIEST APPROVAL\tACTIVE MOEITY UNIIS\tOTHER UNIIS\tLYCHIIS\n";
         String problem ="";
-        Comparator<String> byLength = (e1, e2) -> e1.length() > e2.length() ? -1 : 1;
 
         Collection<ncats.stitcher.Component> components = ef.components();
         int has = 0;
@@ -164,8 +163,6 @@ public class ReportGenerator {
             printLog(out,output);
             //out = out + name + "\t" + highestPhase + "\t" + earliest + "\t" + commaDelimitedOf(activeUniis) + "\t" + commaDelimitedOf(uniis) + "\t" + commaDelimitedOf(lychiis) + "\n";
         }
-        System.out.println(has+" "+hasNot);
-        //printLog(out, output);
     }
     private String bestName(Set<Entity> entities)
     {
