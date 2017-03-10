@@ -1,18 +1,20 @@
 package ncats.stitcher.tools;
 
+import chemaxon.struc.Molecule;
+import chemaxon.util.MolHandler;
 import ncats.stitcher.*;
 import ncats.stitcher.Entity;
 import ncats.stitcher.Component;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
+import java.io.*;
 import java.util.Comparator;
 import java.util.function.Function;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -81,17 +83,19 @@ public class ReportGenerator {
 
     private void generateDrugPageReport(File output, Set<String>props, GraphDb graphDb)
     {
-        //Iterator<Entity> components= ef.entities("COMPONENT");
         String NAME = "N_Name";
         String PHASE = "HighestPhase";
         String EARLIEST = "EarliestDate";
         String UNII = "I_UNII";
         String LYCHII = "H_LyChI_L3";
-        String out ="NAME\tHIGHEST PHASE\tEARLIEST APPROVAL\tACTIVE MOEITY UNIIS\tOTHER UNIIS\tLYCHIIS\n";
+        //String out ="NAME\tHIGHEST PHASE\tEARLIEST APPROVAL\tACTIVE MOEITY UNIIS\tOTHER UNIIS\tLYCHIIS\n";
         String problem ="";
         Collection<ncats.stitcher.Component> components = ef.components();
+        int has = 0;
+        int hasNot = 0;
         for(Component c : components) {
-            c.iterator();
+            String out = "";
+
             Entity[] entityArray = c.entities();
             Set<Entity> entities = new HashSet<>();
             Collections.addAll(entities,entityArray);
@@ -120,9 +124,46 @@ public class ReportGenerator {
             List<String> names = new ArrayList<String>(getStringProp(entities,NAME));
             Comparator<String> byLength = (e1, e2) -> e1.length() > e2.length() ? -1 : 1;
             String name = names.stream().sorted(byLength.reversed()).findFirst().get();
-            out = out + name + "\t" + highestPhase + "\t" + earliest + "\t" + commaDelimitedOf(activeUniis) + "\t" + commaDelimitedOf(uniis) + "\t" + commaDelimitedOf(lychiis) + "\n";
+            List<Molecule> mols = getMols(entities);
+            if(!mols.isEmpty())
+            {
+                has++;
+                try{
+                    Molecule smallest = mols.stream().min((o1,o2)->o1.getAtomCount()-o2.getAtomCount()).get();
+                    smallest.setProperty("name",name);
+                    smallest.setProperty("highestPhase",highestPhase);
+                    smallest.setProperty("earliestApproval",earliest);
+                    smallest.setProperty("activeUniis",commaDelimitedOf(activeUniis));
+                    smallest.setProperty("otherUniis",commaDelimitedOf(uniis));
+                    smallest.setProperty("lychiis",commaDelimitedOf(lychiis));
+                    //System.out.println(smallest.toFormat("sdf"));
+                    out=out+smallest.toFormat("sdf");
+
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+            }
+            else
+            {
+                Molecule blank = new Molecule();
+                blank.setProperty("name",name);
+                blank.setProperty("highestPhase",highestPhase);
+                blank.setProperty("earliestApproval",earliest);
+                blank.setProperty("activeUniis",commaDelimitedOf(activeUniis));
+                blank.setProperty("otherUniis",commaDelimitedOf(uniis));
+                blank.setProperty("lychiis",commaDelimitedOf(lychiis));
+                out=out+blank.toFormat("sdf");
+
+            }
+            printLog(out,output);
+            //out = out + name + "\t" + highestPhase + "\t" + earliest + "\t" + commaDelimitedOf(activeUniis) + "\t" + commaDelimitedOf(uniis) + "\t" + commaDelimitedOf(lychiis) + "\n";
         }
-        printLog(out, output);
+        System.out.println(has+" "+hasNot);
+        //printLog(out, output);
     }
     private String bestName(Set<Entity> entities)
     {
@@ -142,6 +183,75 @@ public class ReportGenerator {
             }
         }
         return null;
+    }
+    private List<Molecule> getMols (Set<Entity> entities)
+    {
+        List<Molecule> mols = new ArrayList<>();
+        for(Entity e: entities)
+        {
+            Set<String> molSet = e.getPayloadValues("MOLFILE");
+            if(molSet.size()>1)
+            {
+                System.err.println("Multiple mols?");
+            }
+            else if(!molSet.isEmpty())
+            {
+                try
+                {
+                    MolHandler mh = new MolHandler(molSet.iterator().next());
+                    Molecule mol = mh.getMolecule();
+                    mols.add(mol);
+                }
+                catch(Exception ex)
+                {
+                    System.err.println("bad parse");
+                }
+
+            }
+        }
+        return mols;
+    }
+    private Optional<Entity> getMoiety(Set<Entity> entities)
+    {
+        Set<Entity> trueMoieties = new HashSet<>();
+        Set<Entity> otherMoieties = new HashSet<>();
+        Entity moiety = null;
+        GraphDatabaseService db = entities.iterator().next().getGraphDb();
+        try(Transaction tx = db.beginTx())
+        {
+            for(Entity e : entities)
+            {
+                Optional<Entity> am = e._getActiveMoiety();
+                if(am.isPresent())
+                {
+                    if(am.get()._getActiveMoiety().equals(am)){
+                        trueMoieties.add(am.get());
+                    }
+                    else
+                    {
+                        otherMoieties.add(am.get());
+                    }
+                }
+            }
+        }
+        List<String> names = new ArrayList<String>(getStringProp(entities,"N_Name"));
+        Comparator<String> byLength = (e1, e2) -> e1.length() > e2.length() ? -1 : 1;
+        String name = names.stream().sorted(byLength.reversed()).findFirst().get();
+        if(!otherMoieties.isEmpty() || !trueMoieties.isEmpty())
+        {
+            if(trueMoieties.size()>1)
+            {
+                System.out.println("HAS MULTIPLE TRUE MOIETIES");
+                System.out.println(entities.iterator().next().getId()+" "+name+" "+trueMoieties.size()+" "+otherMoieties.size());
+            }
+            if(!otherMoieties.isEmpty())
+            {
+                System.out.println("HAS FALSE MOIETIES");
+                System.out.println(entities.iterator().next().getId()+" "+name+" "+trueMoieties.size()+" "+otherMoieties.size());
+            }
+        }
+
+        return Optional.ofNullable(moiety);
     }
     private String commaDelimitedOf(Set<String> set)
     {
@@ -391,8 +501,9 @@ public class ReportGenerator {
     private static void printLog(String s, File file)
     {
         try{
-            PrintWriter writer = new PrintWriter(file, "UTF-8");
-            writer.println(s);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            writer.write(s);
+            writer.flush();
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
