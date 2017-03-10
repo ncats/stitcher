@@ -36,7 +36,7 @@ public class ReportGenerator {
     public static void main (String[] argv) throws IOException {
 
 
-        if(argv.length<4)
+        if(argv.length<3)
         {
             System.err.println("Usage: "+ReportGenerator.class.getName()
                     +" DB OUTFILE REPORT [...PROPERTIES...]");
@@ -90,6 +90,8 @@ public class ReportGenerator {
         String LYCHII = "H_LyChI_L3";
         //String out ="NAME\tHIGHEST PHASE\tEARLIEST APPROVAL\tACTIVE MOEITY UNIIS\tOTHER UNIIS\tLYCHIIS\n";
         String problem ="";
+        Comparator<String> byLength = (e1, e2) -> e1.length() > e2.length() ? -1 : 1;
+
         Collection<ncats.stitcher.Component> components = ef.components();
         int has = 0;
         int hasNot = 0;
@@ -447,23 +449,33 @@ public class ReportGenerator {
         Phases highest = Phases.valueOf("NOTPROVIDED");
         for(Entity e : entities)
         {
-            Phases current = getHighestPhase(e);
-            if(current.ordinal()<highest.ordinal())
-            {
-                highest=current;
-            }
+            Set<Phases> entityPhases = getHighestPhases(e);
+            for (Phases current: entityPhases)
+                if(current.ordinal()<highest.ordinal())
+                {
+                    highest=current;
+                }
         }
         return highest;
     }
-    private Phases getHighestPhase(Entity e)
+    private Set<Phases> getHighestPhases(Entity e)
     {
-        String strPhase = "NOTPROVIDED";
-        Set<String> highs =e.getPayloadValues("HighestPhase");
-        if(highs.size()>1){
-            System.err.println(e.getId()+" has multiple HighestPhases?  I don't think you know what highest means Neo4J");
-            System.exit(1);
+        String noPhase = "NOTPROVIDED";
+        Set<Phases> highs = new HashSet<Phases>();
+        for (String phaseValue: e.getPayloadValues("HighestPhase")) {
+            phaseValue=phaseValue.toUpperCase().replaceAll("\\s","");
+            for (String phase: phaseValue.split("\\|")) {
+                if(phase.equals("NATURALMETABOLITE")) {
+                    phase="CLINICAL";
+                }
+                try {
+                    highs.add(Phases.valueOf(phase));
+                } catch (Exception ex) {
+                    highs.add(Phases.valueOf(noPhase));
+                }
+            }
         }
-        else if(highs.isEmpty())
+        if(highs.isEmpty())
         {
 
             //TODO find the real names for USAN and JAN used in the db
@@ -472,20 +484,11 @@ public class ReportGenerator {
             Set<String> jan = e.getPayloadValues("JAN");
             if(!inn.isEmpty()||!usan.isEmpty()||!jan.isEmpty())
             {
-                strPhase = "CLINICAL";
+                highs.add(Phases.valueOf("CLINICAL"));
             }
 
         }
-        else
-        {
-            strPhase=highs.iterator().next().toUpperCase().replaceAll("\\s","");
-            if(strPhase.equals("NATURALMETABOLITE"))
-            {
-                strPhase="CLINICAL";
-            }
-        }
-        Phases highest = Phases.valueOf(strPhase);
-        return highest;
+        return highs;
     }
     private Set<String> findBestUnii(Set<Entity> cluster)
     {
@@ -631,7 +634,7 @@ public class ReportGenerator {
         APPROVED,MULTILYCHII,EARLIEST,DRUGPAGE
     }
     enum Phases {
-        APPROVED, WITHDRAWN, PHASEIV, PHASEIII,PHASEII,CLINICAL,PHASEI,PRECLINICAL,BASICRESEARCH,NOTPROVIDED
+        APPROVED, WITHDRAWN, PHASEIV, PHASEIII, PHASEII, CLINICAL, PHASEI, PRECLINICAL, BASICRESEARCH, NOTPROVIDED
     }
 
 
