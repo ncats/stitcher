@@ -1,22 +1,16 @@
 package ncats.stitcher.test;
 
-import java.util.*;
-import java.io.*;
-import java.util.logging.Logger;
-
-import ncats.stitcher.Entity;
-import ncats.stitcher.GraphDb;
-import ncats.stitcher.EntityFactory;
-import ncats.stitcher.EntityRegistry;
-import ncats.stitcher.StitchKey;
-import ncats.stitcher.DataSource;
-import ncats.stitcher.CliqueVisitor;
-import ncats.stitcher.Clique;
+import ncats.stitcher.*;
 import ncats.stitcher.impl.MapEntityFactory;
-
-import org.junit.Test;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
+
+import java.io.File;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertTrue;
 
 public class TestClique {
@@ -82,7 +76,7 @@ public class TestClique {
              * one of size 4 for {I_UNII, N_Synonym, N_Name}
              */
             MyCliqueVisitor visitor = new MyCliqueVisitor ();
-            reg.cliqueEnumeration(visitor);
+            reg.cliques(visitor);
             assertTrue ("There should only be two cliques!",
                         visitor.ncliques == 2);
             assertTrue ("Expecting "+keys.size()+" matching keys, but instead "

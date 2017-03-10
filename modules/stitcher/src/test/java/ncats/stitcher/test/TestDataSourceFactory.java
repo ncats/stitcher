@@ -1,19 +1,18 @@
 package ncats.stitcher.test;
 
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.io.*;
-import java.net.URL;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
 import ncats.stitcher.*;
-import ncats.stitcher.impl.*;
-import org.neo4j.graphdb.GraphDatabaseService;
-
-import org.junit.Test;
+import ncats.stitcher.impl.MoleculeEntityFactory;
+import ncats.stitcher.impl.NPCEntityFactory;
+import ncats.stitcher.impl.SRSJsonEntityFactory;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
+
+import java.io.File;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Logger;
+
 import static org.junit.Assert.assertTrue;
 
 public class TestDataSourceFactory {
@@ -169,7 +168,7 @@ public class TestDataSourceFactory {
         mef.register(getClass().getResource("/aspirin_npc.sdf"));
 
         final List<Entity[]> cliques = new ArrayList<Entity[]>();
-        mef.cliqueEnumeration(new CliqueVisitor () {
+        mef.cliques(new CliqueVisitor () {
                 public boolean clique (Clique clique) {
                     logger.info("+++++ Clique ("+clique.size()
                                 +") found for "+clique.values()+" ++++++");
