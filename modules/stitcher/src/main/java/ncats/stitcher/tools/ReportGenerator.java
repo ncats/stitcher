@@ -12,6 +12,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.function.Function;
 
@@ -92,11 +93,8 @@ public class ReportGenerator {
         String problem ="";
 
         Collection<ncats.stitcher.Component> components = ef.components();
-        int has = 0;
-        int hasNot = 0;
         for(Component c : components) {
             String out = "";
-
             Entity[] entityArray = c.entities();
             Set<Entity> entities = new HashSet<>();
             Collections.addAll(entities,entityArray);
@@ -107,11 +105,25 @@ public class ReportGenerator {
             if (earliestDate.isPresent()) {
                 earliest = earliestDate.get().toString();
             }
-
+            HashMap payloads = new HashMap<>();
             for (Entity e : entities) {
                 if (isApproved(e)) {
                     highestPhase = "APPROVED";
-                    break;
+                }
+
+                for (Map.Entry<String, Object> me: e.payload().entrySet()) {
+                    Object obj = payloads.get(me.getKey());
+                    if (obj == null) {
+                        payloads.put(me.getKey(), obj = new ArrayList());
+                    }
+
+                    if (me.getValue().getClass().isArray()) {
+                        for (int i = 0; i < Array.getLength(me.getValue()); ++i)
+                            ((List)obj).add(Array.get(me.getValue(), i));
+                    }
+                    else {
+                        ((List)obj).add(me.getValue());
+                    }
                 }
             }
             if (!highestPhase.equals("APPROVED")) {
@@ -126,43 +138,62 @@ public class ReportGenerator {
             Comparator<String> byLength = (e1, e2) -> e1.length() > e2.length() ? -1 : 1;
             String name = names.stream().sorted(byLength.reversed()).findFirst().get();
             List<Molecule> mols = getMols(entities);
+            Molecule smallest = new Molecule();
             if(!mols.isEmpty())
             {
-                has++;
                 try{
-                    Molecule smallest = mols.stream().min((o1,o2)->o1.getAtomCount()-o2.getAtomCount()).get();
-                    smallest.setProperty("name",name);
-                    smallest.setProperty("highestPhase",highestPhase);
-                    smallest.setProperty("earliestApproval",earliest);
-                    smallest.setProperty("activeUniis",commaDelimitedOf(activeUniis));
-                    smallest.setProperty("otherUniis",commaDelimitedOf(uniis));
-                    smallest.setProperty("lychiis",commaDelimitedOf(lychiis));
-                    //System.out.println(smallest.toFormat("sdf"));
-                    out=out+smallest.toFormat("sdf");
-
+                    smallest = mols.stream().min((o1,o2)->o1.getAtomCount()-o2.getAtomCount()).get();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
-            else
-            {
-                Molecule blank = new Molecule();
-                blank.setProperty("name",name);
-                blank.setProperty("highestPhase",highestPhase);
-                blank.setProperty("earliestApproval",earliest);
-                blank.setProperty("activeUniis",commaDelimitedOf(activeUniis));
-                blank.setProperty("otherUniis",commaDelimitedOf(uniis));
-                blank.setProperty("lychiis",commaDelimitedOf(lychiis));
-                out=out+blank.toFormat("sdf");
-
+            smallest.setProperty("name",name);
+            smallest.setProperty("highestPhase",highestPhase);
+            smallest.setProperty("earliestApproval",earliest);
+            smallest.setProperty("activeUniis",newLineDelimitedOf(activeUniis));
+            smallest.setProperty("otherUniis",newLineDelimitedOf(uniis));
+            smallest.setProperty("lychiis",newLineDelimitedOf(lychiis));
+            for (Object me : payloads.entrySet()) {
+                StringBuilder sb = new StringBuilder ();
+                List value = (List)((Map.Entry)me).getValue();
+                if(!value.isEmpty())
+                {
+                    sb.append(value.get(0).toString());
+                }
+                for (int i = 1; i < value.size(); ++i)
+                    sb.append("\n"+value.get(i).toString());
+                smallest.setProperty("_"+((Map.Entry)me).getKey(), sb.toString());
             }
+            smallest.setProperty("RuiliCount",String.valueOf(ruiliCount(entities)));
+            smallest.setProperty("ClusterSize",String.valueOf(c.size()));
+            out=smallest.toFormat("sdf");
             printLog(out,output);
-            //out = out + name + "\t" + highestPhase + "\t" + earliest + "\t" + commaDelimitedOf(activeUniis) + "\t" + commaDelimitedOf(uniis) + "\t" + commaDelimitedOf(lychiis) + "\n";
         }
+    }
+    private String findRedFlags(Set<Entity> entities)
+    {
+        StringBuilder sb = new StringBuilder();
+        int ruili = ruiliCount(entities);
+        if(ruili>1){
+            sb.append("multipleRuili: ");
+            sb.append(ruili);
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+    private int ruiliCount(Set<Entity> entities)
+    {
+        int count = 0;
+        for(Entity e: entities)
+        {
+            if(e.datasource().getName().contains("Ruili's"))
+            {
+                count++;
+            }
+        }
+        return count;
     }
     private String bestName(Set<Entity> entities)
     {
@@ -266,6 +297,20 @@ public class ReportGenerator {
         return sb.deleteCharAt(sb.length() - 1).toString();
 
     }
+    private String newLineDelimitedOf(Set<String> set)
+    {
+        if(set.isEmpty())
+        {
+            return "NONE";
+        }
+        StringBuilder sb = new StringBuilder();
+        for(String s : set)
+        {
+            sb.append(s).append("\n");
+        }
+        return sb.deleteCharAt(sb.length() - 1).toString();
+
+    }
     private Set<String> uniqueSet(Set<String> set)
     {
         Set<String> unique = new HashSet<>();
@@ -308,18 +353,19 @@ public class ReportGenerator {
     /*
         Currently throwing away the props set and just printing name and earliest approval date
      */
-    //TODO Refactor this method to work again
    private void generateEarliestApprovalReport(File output, Set<String>props)
     {
-//        Map<Entity,LocalDate> dateMap = this.findEarliestApprovalDate(this.findApprovedDrugs());
-//        String report ="";
-//        for(Map.Entry<Entity,LocalDate> entry : dateMap.entrySet())
-//        {
-//            report = report+entry.getKey().getStringProp("N_Name").get()+"\t"
-//                    +entry.getValue().toString()+"\n";
-//        }
-//        printLog(report,output);
-        System.err.println("THIS REPORT WAS MADE A NO-OP BECAUSE MARK HASN'T REFACTORED IT YET");
+        StringBuffer report = new StringBuffer();
+        Set<Entity> approved = this.findApprovedDrugs();
+        for(Entity entity : approved )
+        {
+            Optional<LocalDate>date = findEarliestApprovalDate(entity);
+            if(date.isPresent())
+            {
+                report.append(entity.getStringProp("N_Name").get()+"\t"+date.get()+"\n");
+            }
+        }
+        printLog(report.toString(),output);
     }
 
 
