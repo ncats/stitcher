@@ -66,7 +66,8 @@ public class DrugsAtFDA extends MapEntityFactory {
         "Pediatric Summary, Clinical Pharmacology Review",
         "REMS",
         "Pediatric Summary, Clinical Pharmacology Review",
-        "Summary Review"
+        "Summary Review",
+            "Federal Register Notice" //dkatzel 2017-04-17- added missing type
     };
 
     // SubmissionClass_Lookup.txt
@@ -111,7 +112,7 @@ public class DrugsAtFDA extends MapEntityFactory {
         ProductRe = p;
     }
 
-    char delimiter = ',';
+    char delimiter = '\t';
     
     public DrugsAtFDA (GraphDb graphDb) throws IOException {
         super (graphDb);
