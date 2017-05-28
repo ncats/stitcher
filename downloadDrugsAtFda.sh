@@ -1,0 +1,1 @@
+curl --insecure https://www.fda.gov/Drugs/InformationOnDrugs/ucm079750.htm | grep "Drugs@FDA Download File\&nbsp"| perl -ne 'print "https://www.fda.gov.$1" if /href=\"(\S+)\"/' | xargs curl --insecure -o drugsAtfda.zip
