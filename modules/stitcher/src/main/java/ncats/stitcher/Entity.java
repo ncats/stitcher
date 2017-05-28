@@ -32,9 +32,56 @@ public class Entity extends CNode {
         .toArray(new EntityType[0]);
     
     public static final Entity[] EMPTY_PATH = new Entity[0];
+    static protected class BFS {
+        final Entity start;
+
+        BFS (Entity start) {
+            this.start = start;
+        }
+
+        public Entity[] traverse (Entity end, StitchKey... keys) {
+            LinkedList<Node> queue = new LinkedList<>();
+            Map<Node, Boolean> visited = new HashMap<>();
+            Map<Node, Node> parent = new HashMap<>();
+            
+            queue.offer(start._node);
+            parent.put(start._node, null);
+            visited.put(start._node, true);
+            
+            //System.out.println("+ "+start.getId());
+            while (!queue.isEmpty()) {
+                Node u = queue.poll();
+                for (Relationship rel :
+                         u.getRelationships(Direction.BOTH, keys)) {
+                    Node v = rel.getOtherNode(u);
+                    if (v.equals(end._node)) {
+                        parent.put(v, u);
+                        break;
+                    }
+                    else if (!visited.containsKey(v) || !visited.get(v)) {
+                        visited.put(v, true);
+                        parent.put(v, u);
+                        //System.out.println("+ "+v.getId());
+                        queue.offer(v);
+                    }
+                }
+            }
+
+            List<Entity> path = new ArrayList<>();
+            path.add(end);
+            for (Node u = end._node, v; (v = parent.get(u)) != start._node; ) {
+                u = v;
+                path.add(_getEntity (v));
+            }
+            path.add(start);
+            Collections.reverse(path);
+            
+            return path.toArray(new Entity[0]);
+        }
+    }
 
     protected EnumSet<StitchKey> stitches = EnumSet.noneOf(StitchKey.class);
-
+    
     public static Entity getEntity (Node node) {
         // TODO: caching..
         try (Transaction tx = node.getGraphDatabase().beginTx()) {
@@ -106,16 +153,29 @@ public class Entity extends CNode {
         }
     }
 
+    public Map<StitchKey, Object> keys (Entity other) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _keys (other);
+        }
+    }
+
     public Map<StitchKey, Object> _keys () {
+        return _keys (null);
+    }
+
+    public Map<StitchKey, Object> _keys (Entity other) {
         EnumMap<StitchKey, Object> keys = new EnumMap<>(StitchKey.class);
         for (StitchKey key : KEYS) {
             Object value = null;
             for (Relationship rel
                      : _node.getRelationships(key, Direction.BOTH)) {
-                Object v = rel.getProperty(VALUE);
-                if (v == null);
-                else if (value == null) value = v;
-                else value = Util.merge(value, v);
+                if (other == null
+                    || other._node.equals(rel.getOtherNode(_node))) {
+                    Object v = rel.getProperty(VALUE);
+                    if (v == null);
+                    else if (value == null) value = v;
+                    else value = Util.merge(value, v);
+                }
             }
             
             if (value != null)
@@ -141,20 +201,44 @@ public class Entity extends CNode {
     public Entity[] _neighbors () {
         return _neighbors (Entity.KEYS);
     }
+
+    protected Entity[] _neighbors (Direction dir, StitchKey... keys) {
+        Set<Entity> neighbors = new TreeSet<Entity>();
+        for (Relationship rel : _node.getRelationships(dir, keys)) {
+            Node n = rel.getOtherNode(_node);
+            neighbors.add(_getEntity (n));
+        }
+        return neighbors.toArray(new Entity[0]);        
+    }
     
     public Entity[] neighbors (StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
-            return _neighbors (keys);
+            return _neighbors (Direction.BOTH, keys);
         }
     }
 
     public Entity[] _neighbors (StitchKey... keys) {
-        Set<Entity> neighbors = new TreeSet<Entity>();
-        for (Relationship rel : _node.getRelationships(Direction.BOTH, keys)) {
-            Node n = rel.getOtherNode(_node);
-            neighbors.add(_getEntity (n));
+        return _neighbors (Direction.BOTH, keys);
+    }
+
+    public Entity[] _inNeighbors (StitchKey... keys) {
+        return _neighbors (Direction.INCOMING, keys);
+    }
+    
+    public Entity[] inNeighbors (StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _inNeighbors (keys);
         }
-        return neighbors.toArray(new Entity[0]);
+    }
+
+    public Entity[] _outNeighbors (StitchKey... keys) {
+        return _neighbors (Direction.OUTGOING, keys);   
+    }
+
+    public Entity[] outNeighbors (StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _neighbors (Direction.OUTGOING, keys);
+        }
     }
 
     public Entity[] neighbors (StitchKey key, Object value) {
@@ -691,22 +775,26 @@ public class Entity extends CNode {
         Index<Node> index = _nodeIndex (node);
         IndexHits<Node> hits = index.get(key.name(), value);
         try {
-            RelationshipIndex relindx = _relationshipIndex (node);
-            if (hits.size() >= 20) {
-                logger.warning("Too many links out ("+hits.size()
-                               +") ... pathologic connection:["
-                               +key.name()+":"+value.toString()+"]");
-            }
-            
-            for (Node n : hits) {
-                Relationship rel = node.createRelationshipTo(n, key);
-                rel.setProperty(CREATED, System.currentTimeMillis());
-                rel.setProperty(VALUE, value); 
-                relindx.add(rel, key.name(), value);
-                union (n, node);
+            long size = hits.size();
+            if (size > 0) {
+                RelationshipIndex relindx = _relationshipIndex (node);
+                if (size >= 200) {
+                    logger.warning("Too many links out ("+size
+                                   +") ... pathologic connection:["
+                                   +key.name()+":"+value.toString()+"]");
+                }
                 
-                logger.info(node.getId()
-                            +" <-["+key+":\""+value+"\"]-> "+n.getId());
+                for (Node n : hits) {
+                    Relationship rel = node.createRelationshipTo(n, key);
+                    rel.setProperty(CREATED, System.currentTimeMillis());
+                    rel.setProperty(VALUE, value); 
+                    relindx.add(rel, key.name(), value);
+                    union (n, node);
+                    /*   
+                         logger.info(node.getId()
+                         +" <-["+key+":\""+value+"\"]-> "+n.getId());*/
+                }
+                logger.info(key+":\""+value+"\" => "+size);
             }
         }
         finally {
@@ -777,6 +865,17 @@ public class Entity extends CNode {
         }
         
         return EMPTY_PATH;
+    }
+
+    public Entity[] _anyPath (Entity end, StitchKey... keys) {
+        BFS bfs = new BFS (this);
+        return bfs.traverse(end, keys);
+    }
+
+    public Entity[] anyPath (Entity end, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            return _anyPath (end, keys);
+        }
     }
 
     public void walk (EntityVisitor visitor) {

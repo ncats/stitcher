@@ -49,24 +49,36 @@ public enum StitchKey implements RelationshipType {
     /*
      * Tag
      */
-    T_ActiveMoiety(5), // active moiety relationship
+    T_ActiveMoiety(5, true), // active moiety relationship (directed)
     T_Keyword // Keyword
     ;
   
     final public Class type;
     final public int priority; // priority 0 (lowest) to 5 (highest)
+    final public boolean directed;
+    
     StitchKey () {
-        this (0, String.class);
+        this (0, String.class, false);
     }
     StitchKey (int priority) {
-        this (priority, String.class);
-    }
-    StitchKey (Class type) {
-        this (0, type);
+        this (priority, String.class, false);
     }
     StitchKey (int priority, Class type) {
+        this (priority, type, false);
+    }
+    StitchKey (int priority, boolean directed) {
+        this (priority, String.class, directed);
+    }
+    StitchKey (Class type) {
+        this (0, type, false);
+    }
+    StitchKey (Class type, boolean directed) {
+        this (0, type, directed);
+    }
+    StitchKey (int priority, Class type, boolean directed) {
         this.type = type;
         this.priority = priority;
+        this.directed = directed;
     }
 
     // return StitchKey based on the priority range (inclusive)

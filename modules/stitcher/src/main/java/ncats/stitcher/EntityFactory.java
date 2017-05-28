@@ -6,9 +6,10 @@ import java.net.URL;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.lang.reflect.Array;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.function.BiPredicate;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -484,6 +485,36 @@ public class EntityFactory implements Props {
                     CliqueEnumeration clique = new CliqueEnumeration (gdb, key);
                     clique.enumerate(Util.toArray(nodes), visitor);
                 }
+            }
+        }
+
+        public void stitches (BiConsumer<Entity, Entity> consumer,
+                              StitchKey... keys) {
+            try (Transaction tx = gdb.beginTx()) {
+                Map<Long, Entity> seen = new HashMap<>();
+                for (int i = 0; i < entities.length; ++i) {
+                    Node n = entities[i]._node();
+                    for (StitchKey key : keys) {
+                        for (Relationship rel :
+                                 n.getRelationships(Direction.BOTH, key)) {
+                            Node m = rel.getOtherNode(n);
+                            Entity e = seen.get(m.getId());
+                            if (e != null) {
+                                if (key.directed) {
+                                    if (rel.getStartNodeId() == n.getId())
+                                        consumer.accept(entities[i], e);
+                                    else
+                                        consumer.accept(e, entities[i]);
+                                }
+                                else {
+                                    consumer.accept(entities[i], e);
+                                }
+                            }
+                        }
+                    }
+                    seen.put(n.getId(), entities[i]);
+                }
+                seen.clear();
             }
         }
 

@@ -51,6 +51,139 @@ public class StitchUntangled {
         ef = new EntityFactory (graphDb);
     }
 
+    protected boolean isActiveMoietyConsistent (Entity entity) {
+        Entity[] nb = entity.outNeighbors(T_ActiveMoiety);
+        if (nb.length > 0) {
+            String lychi = (String) entity.get("lychi");
+            assert lychi != null;
+            
+            Set<String> frags = new HashSet<>();
+            for (String s : lychi.split("\\."))
+                frags.add(s);
+            
+            for (int i = 0; i < nb.length; ++i) {
+                lychi = (String) nb[i].get("lychi");
+                assert lychi != null;
+                
+                for (String f : lychi.split("\\.")) {
+                    // ignore hydrates
+                    if (!"O".equals(f) && !frags.contains(f)) {
+                        /*
+                          logger.warning("Active moiety \""+f
+                          +"\" doesn't exist in entity "
+                          +entity.getId());
+                        */
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    void dump (UnionFind uf) {
+        long[][] components = uf.components();
+        System.out.println("** number of components: "+components.length);
+        for (long[] c : components) {
+            System.out.print(c.length+" [");
+            for (int i = 0; i < c.length; ++i) {
+                System.out.print(c[i]);
+                if (i+1 < c.length)
+                    System.out.print(",");
+            }
+            System.out.println("]");
+        }
+    }
+
+    boolean union (UnionFind uf,  Map<StitchKey, Map<Object, Integer>> stats,
+                   Entity e, Entity[] nb, StitchKey key) {
+        Entity v = null;
+        Integer cmin = null;
+        
+        for (Entity u : nb) {
+            Map<StitchKey, Object> keys = e.keys(u);
+            Integer c = stats.get(key).get(keys.get(key));
+            if (c == null) {
+                logger.warning("** entity "+e.getId()+" "+key+"="+keys.get(key)
+                               +" has no count! ** ");
+            }
+            else if (cmin == null || cmin > c) {
+                v = u;
+                cmin = c;
+            }
+        }
+        
+        // now merge
+        boolean ok = false;
+        if (v != null) {
+            uf.union(e.getId(), v.getId());
+            ok = true;
+        }
+        
+        return ok;
+    }
+        
+    public void untangleCompounds (Component component) {
+        System.out.println("## Active moieties for component ##");
+        System.out.println(component.nodeSet());
+        UnionFind uf = new UnionFind ();
+
+        // collapse based on single/terminal active moieties
+        component.stitches((source, target) -> {
+                Entity[] out = source.outNeighbors(T_ActiveMoiety);
+                Entity[] in = target.inNeighbors(T_ActiveMoiety);
+                System.out.println(" ("+out.length+") "+source.getId()
+                                   +" -> "+target.getId()+" ("+in.length+")");
+                if (out.length == 1) {
+                    // first collapse single/terminal active moieties
+                    uf.union(source.getId(), target.getId());
+                }
+            }, T_ActiveMoiety);
+        
+        dump (uf);
+
+        // collapse based on lychi layer 5
+        component.stitches((source, target) -> {
+                uf.union(source.getId(), target.getId());
+            }, H_LyChI_L5);
+        dump (uf);
+
+        Map<StitchKey, Map<Object, Integer>> stats = new HashMap<>();
+        for (StitchKey key : Entity.KEYS) {
+            stats.put(key, component.stats(key));
+        }
+        
+        // now find all unmapped nodes
+        for (Entity e : component) {
+            if (!uf.contains(e.getId())) {
+                Entity[] nb = e.outNeighbors(T_ActiveMoiety);
+                if (nb.length > 0) { // should not be nb.length == 1
+                    assert nb.length != 1;
+                    
+                    // node with multiple active moieties; we pick one with
+                    // the smaller cardinality
+                    if (!union (uf, stats, e, nb, T_ActiveMoiety)) {
+                        logger.warning("** unmapped entity "+e.getId()+": "
+                                       +e.keys());              
+                    }
+                }
+                // try lychi layer 4
+                else if (!union (uf, stats, e,
+                                 e.neighbors(H_LyChI_L4), H_LyChI_L4)) {
+                    logger.warning("** unmapped entity "+e.getId()+": "
+                                   +e.keys());          
+                }
+            }
+        }
+        dump (uf);
+    }
+    
+    public void untangleCompounds (long id) {
+        untangleCompounds (ef.component(id));
+    }
+    
+    
     public int untangle (Component component) {
         Util.dump(component);
         UnionFind uf = new UnionFind ();
@@ -169,8 +302,9 @@ public class StitchUntangled {
                     N_Name, H_LyChI_L3
                 }) {
                 for (Object v : c.values(k)) {
-                    System.out.println(">>> cliques for "+k+"="+v+" <<<");
                     c.cliques(clique -> {
+                            System.out.println
+                                (">>> cliques for "+k+"="+v+" <<<");
                             long[] nc = clique.nodes();
                             Set<Long> unmapped = new TreeSet<>();
                             Set<Long> mapped = new TreeSet<>();
@@ -250,6 +384,25 @@ public class StitchUntangled {
         return untangle (ef.component(id));
     }
 
+    public void anyPath (long start, long end) {
+        Entity s = ef.entity(start);
+        Entity e = ef.entity(end);
+        if (s != null && e != null) {
+            Entity[] path = s.anyPath(e, StitchKey.T_ActiveMoiety,
+                                      StitchKey.H_LyChI_L4);
+            System.out.print(path.length+" [");
+            for (int i = 0; i < path.length; ++i) {
+                System.out.print(path[i].getId());
+                if (i+1 < path.length) System.out.print(",");
+            }
+            System.out.println("]");
+        }
+    }
+
+    public void dump (long id) {
+        Util.dump(ef.component(id));
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+StitchUntangled.class.getName()
@@ -260,9 +413,12 @@ public class StitchUntangled {
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
         try {
             StitchUntangled su = new StitchUntangled (graphDb);
+            
             for (int i = 1; i < argv.length; ++i) {
-                su.untangle(Long.parseLong(argv[i]));
+                su.untangleCompounds(Long.parseLong(argv[i]));
+                //su.dump(Long.parseLong(argv[i]));
             }
+            //su.anyPath(387861l, 684375l);
         }
         finally {
             graphDb.shutdown();

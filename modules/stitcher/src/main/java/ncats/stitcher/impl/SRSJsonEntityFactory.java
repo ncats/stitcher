@@ -45,6 +45,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         int count = 0, ln = 0;
         Map<String, Entity> activeMoieties = new HashMap<>();
         Map<String, Set<Entity>> unresolved = new HashMap<>();
+        //PrintWriter pw = new PrintWriter (new FileWriter ("gsrs-dump.sdf"));
         for (String line; (line = br.readLine()) != null; ++ln) {
             System.out.println("+++++ "+(count+1)+"/"+(ln+1)+" +++++");
             String[] toks = line.split("\t");
@@ -68,7 +69,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         }
                         else if (activeMoieties.containsKey(a)) {
                             Entity e = activeMoieties.get(a);
-                            // create manual stitch from e -> ent
+                            // create manual stitch from ent -> e
                             if (!ent.equals(e))
                                 ent.stitch(e, T_ActiveMoiety, a);
                         }
@@ -80,10 +81,13 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         }
                     }
                 }
+
+                //pw.print(mol.toFormat("sdf"));
                 ++count;
             }
         }
         br.close();
+        //pw.close();     
 
         logger.info("## "+unresolved.size()+" unresolved active moieties!");
         for (Map.Entry<String, Set<Entity>> me : unresolved.entrySet()) {

@@ -2,6 +2,7 @@ package ncats.stitcher;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -55,6 +56,12 @@ public interface Component extends Iterable<Entity> {
     default Map<Object, Integer> stats (StitchKey key) {
         throw new UnsupportedOperationException
             ("stats() is not supported for this implementation");       
+    }
+
+    default void stitches (BiConsumer<Entity, Entity> consumer,
+                           StitchKey... keys) {
+        throw new UnsupportedOperationException
+            ("stitches() is not supported for this implementation");
     }
     
     /*

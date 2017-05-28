@@ -31,6 +31,8 @@ import chemaxon.util.MolHandler;
 import lychi.LyChIStandardizer;
 import lychi.util.ChemUtil;
 
+import static ncats.stitcher.StitchKey.*;
+
 public class EntityRegistry extends EntityFactory {
     static final Logger logger =
         Logger.getLogger(EntityRegistry.class.getName());
@@ -389,7 +391,7 @@ public class EntityRegistry extends EntityFactory {
                     Object val = m.getValue();
                     if (val == null) {
                     }
-                    else if (m.getKey() == StitchKey.T_Keyword) {
+                    else if (m.getKey() == T_Keyword) {
                         if (val.getClass().isArray()) {
                             int len = Array.getLength(val);
                             for (int i = 0; i < len; ++i) {
@@ -464,19 +466,62 @@ public class EntityRegistry extends EntityFactory {
 
     protected void lychify (Entity ent, Molecule mol) {
         try {
-            Molecule stdmol = mol.cloneMolecule();
-            String[] hk = lychify (stdmol, true);
-            if (hk != null) {
-                ent._set(StitchKey.H_LyChI_L3, new StitchValue (hk[2]));
-                ent._set(StitchKey.H_LyChI_L4, new StitchValue (hk[3]));
-                ent._snapshot(LYCHI, hk[4]); // store the lychi smiles
+            Molecule clone = mol.cloneMolecule();
+            Set<String> l3 = new TreeSet<>();
+            Map<String, Molecule> l4 = new TreeMap<>();
+            boolean lychify;
+            for (Molecule f : clone.convertToFrags()) {
+                lychify = true;
+                if (f.getAtomCount() == 1) {
+                    // organic ion salt.. 
+                    switch (f.getAtom(0).getAtno()) {
+                    case 6: // C
+                    case 7: // N
+                    case 8: // O
+                    case 9: // F
+                    case 15: // P
+                    case 16: // S
+                    case 17: // Cl
+                    case 35: // Br
+                    case 53: // I
+                        lychify = false;
+                        break;
+                    }
+                }
+                
+                if (lychify) {
+                    String[] hk = lychify (f, false);
+                    logger.info(hk[3]+": "+hk[4]);
+                    f.setProperty(H_LyChI_L4.name(), hk[3]);
+                    f.setProperty(LYCHI, hk[4]);
+                    l3.add(hk[2]);
+                    l4.put(hk[3], f);
+                }
+            }
+
+            if (!l3.isEmpty()) {
+                ent._set(H_LyChI_L3,
+                         new StitchValue (l3.toArray(new String[0])));
+            }
+
+            if (!l4.isEmpty()) {
+                String[] hk = new String[l4.size()];
+                String[] ly = new String[l4.size()];
+                int i = 0;
+                for (Molecule f : l4.values()) {
+                    hk[i] = f.getProperty(H_LyChI_L4.name());
+                    ly[i] = f.getProperty(LYCHI);
+                    ++i;
+                }
+                ent._set(H_LyChI_L4, new StitchValue (hk));
+                ent._snapshot(LYCHI, ly); // store the lychi smiles
             }
             
             // with salt + solvent
-            stdmol = mol.cloneMolecule();
-            hk = lychify (stdmol, false);
+            clone = mol.cloneMolecule();
+            String[] hk = lychify (clone, false);
             if (hk != null)
-                ent._set(StitchKey.H_LyChI_L5, new StitchValue (hk[3]));
+                ent._set(H_LyChI_L5, new StitchValue (hk[3]));
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't generate LyChI hash for entity "
