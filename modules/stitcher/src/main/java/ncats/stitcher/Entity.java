@@ -778,12 +778,6 @@ public class Entity extends CNode {
             long size = hits.size();
             if (size > 0) {
                 RelationshipIndex relindx = _relationshipIndex (node);
-                if (size >= 200) {
-                    logger.warning("Too many links out ("+size
-                                   +") ... pathologic connection:["
-                                   +key.name()+":"+value.toString()+"]");
-                }
-                
                 for (Node n : hits) {
                     Relationship rel = node.createRelationshipTo(n, key);
                     rel.setProperty(CREATED, System.currentTimeMillis());

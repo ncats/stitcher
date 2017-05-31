@@ -475,15 +475,19 @@ public class EntityRegistry extends EntityFactory {
                 if (f.getAtomCount() == 1) {
                     // organic ion salt.. 
                     switch (f.getAtom(0).getAtno()) {
+                        /*
                     case 6: // C
                     case 7: // N
+                        */
                     case 8: // O
+                        /*
                     case 9: // F
                     case 15: // P
                     case 16: // S
                     case 17: // Cl
                     case 35: // Br
                     case 53: // I
+                        */
                         lychify = false;
                         break;
                     }
@@ -515,6 +519,12 @@ public class EntityRegistry extends EntityFactory {
                 }
                 ent._set(H_LyChI_L4, new StitchValue (hk));
                 ent._snapshot(LYCHI, ly); // store the lychi smiles
+            }
+            else {
+                clone = mol.cloneMolecule();
+                String[] hk = lychify (clone, false);
+                ent._set(H_LyChI_L4, new StitchValue (hk[3]));
+                ent._snapshot(LYCHI, hk[4]);
             }
             
             // with salt + solvent
