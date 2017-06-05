@@ -518,6 +518,36 @@ public class EntityFactory implements Props {
             }
         }
 
+        public void stitches (StitchVisitor visitor, StitchKey... keys) {
+            try (Transaction tx = gdb.beginTx()) {
+                Map<Long, Entity> seen = new HashMap<>();
+                for (int i = 0; i < entities.length; ++i) {
+                    Node n = entities[i]._node();
+                    for (Relationship rel : n.getRelationships(keys)) {
+                        Node m = rel.getOtherNode(n);
+                        Entity e = seen.get(m.getId());
+                        if (e != null) {
+                            Map<StitchKey, Object> values = new TreeMap<>();
+                            for (Relationship r : m.getRelationships(keys)) {
+                                StitchKey key =
+                                    StitchKey.valueOf(r.getType().name());
+                                if (r.getOtherNode(m).equals(n)) {
+                                    Object v = r.getProperty(VALUE);
+                                    Object val = values.get(key);
+                                    if (v == null);
+                                    else if (val == null) values.put(key, v);
+                                    else values.put(key, Util.merge(val, v));
+                                }
+                            }
+                            visitor.visit(entities[i], e, values);
+                        }
+                    }
+                    seen.put(n.getId(), entities[i]);
+                }
+                seen.clear();
+            }
+        }
+
         protected List<Entity> ov (Component comp) {
             List<Entity> ov = new ArrayList<Entity>();
             for (Entity e : comp) {

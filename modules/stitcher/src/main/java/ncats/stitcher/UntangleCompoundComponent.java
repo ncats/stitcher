@@ -20,6 +20,116 @@ public class UntangleCompoundComponent {
     final UnionFind uf = new UnionFind ();
     final Map<StitchKey, Map<Object, Integer>> stats;
     final Map<Object, Entity> moieties = new HashMap<>();
+
+    class TransitiveClosure {
+        Entity emin;
+        Object vmin;
+        Integer cmin;
+        
+        final Map<Object, Integer> counts;
+        final Entity e;
+        final Entity[] nb;
+        final StitchKey key;
+        final Set kvals;
+        
+        TransitiveClosure (Entity e, StitchKey key) {
+            this (e, e.neighbors(key), key);
+        }
+        
+        TransitiveClosure (Entity e, Entity[] nb, StitchKey key) {
+            this.e = e;
+            this.nb = nb;
+            this.key = key;
+            
+            kvals = Util.toSet(e.get(key));
+            counts = stats.get(key);
+        }
+
+        void updateIfCompatible (Entity u, Object v) {
+            Integer c = null;
+            if (v.getClass().isArray()) {
+                for (int i = 0; i < Array.getLength(v); ++i) {
+                    Integer n = counts.get(Array.get(v, i));
+                    if (c == null || n < c)
+                        c = n;
+                }
+            }
+            else
+                c = counts.get(v);
+            
+            /*
+              if (moieties.containsKey(v)) {
+              if (vmin == null || !moieties.containsKey(vmin)
+                        || (vmin.toString().endsWith("-S")
+                            && !v.toString().endsWith("-S"))
+                        || c < counts.get(vmin)) {
+                        vmin = v;
+                        emin = u;
+                        cmin = 0; // merge by active moiety
+                        }
+                        }
+                else*/
+            if (cmin == null || cmin > c) {
+                Set set = Util.toSet(u.get(key));
+                set.removeAll(Util.toSet(v));
+                
+                boolean update = true;
+                for (Object sv : set) {
+                    if (!sv.toString().endsWith("-S")) {
+                        update = false;
+                        break;
+                    }
+                }
+                
+                if (update) {
+                    set = new HashSet (kvals);
+                    set.removeAll(Util.toSet(v));
+                    for (Object sv : set) {
+                        if (!sv.toString().endsWith("-S")) {
+                            update = false;
+                            break;
+                        }
+                    }
+                }
+                
+                if (update) {
+                    emin = u;
+                    cmin = c;
+                    vmin = v;
+                }
+            }
+        }
+        
+        public boolean closure () {
+            for (Entity u : nb) {
+                Object value = e.keys(u).get(key);
+                if (value != null) {
+                    updateIfCompatible (u, value);
+                }
+            }
+        
+            // now merge
+            boolean ok = false;
+            if (emin != null) {
+                if (uf.contains(emin.getId())) {
+                    if (cmin < 1000) {
+                        logger.info(".."+e.getId()+" <-["+key+"="
+                                    +vmin+":"+cmin+"]-> "+emin.getId());
+                        uf.union(e.getId(), emin.getId());
+                        ok = true;
+                    }
+                }
+                else {
+                    logger.info(".."+e.getId()+" <-["+key+"="
+                                +vmin+":"+cmin+"]-> "+emin.getId());
+                    uf.union(e.getId(), emin.getId());
+                    ok = true;
+                }
+            }
+            
+            return ok;
+        } // closure
+    } // TransitiveClosure
     
     public UntangleCompoundComponent (Component component) {
         stats = new HashMap<>();
@@ -50,6 +160,7 @@ public class UntangleCompoundComponent {
         System.out.println(component.nodeSet());
 
         // collapse based on single/terminal active moieties
+        List<Entity> unsure = new ArrayList<>();
         component.stitches((source, target) -> {
                 Entity[] out = source.outNeighbors(T_ActiveMoiety);
                 Entity[] in = target.inNeighbors(T_ActiveMoiety);
@@ -59,6 +170,9 @@ public class UntangleCompoundComponent {
                     // first collapse single/terminal active moieties
                     uf.union(source.getId(), target.getId());
                 }
+                else if (out.length > 1) {
+                    unsure.add(source);
+                }
 
                 for (Entity e : in) {
                     Object value = e.get(H_LyChI_L4.name());
@@ -66,9 +180,11 @@ public class UntangleCompoundComponent {
                         String key = toString (value, ':');
                         Entity old = moieties.put(key, e);
                         if (old != null) {
+                            /*
                             logger.warning("** "+H_LyChI_L4+"="+key+" maps to "
                                            +"active moieties "+e.getId()
                                            +" and "+old.getId()+" **");
+                            */
                         }
                     }
                     else {
@@ -90,112 +206,43 @@ public class UntangleCompoundComponent {
                 uf.union(source.getId(), target.getId());
             }, H_LyChI_L5);
         dump (H_LyChI_L5+" stitching");
-        
-        // now find all unmapped nodes
+
         int count = 0;
+        for (Entity e : unsure) {
+            if (!closure (e, e.outNeighbors(T_ActiveMoiety), T_ActiveMoiety)) {
+                logger.warning("** unmapped entity "+e.getId()+": "
+                               +e.keys());
+                ++count;
+            }
+        }
+        dump ("Stitching "+unsure.size()
+              +" nodes with multiple active moieties");
+
+        // now find all remaining unmapped nodes
+        int processed = 0, total = component.size();
         for (Entity e : component) {
             if (!uf.contains(e.getId())) {
-                Entity[] nb = e.outNeighbors(T_ActiveMoiety);
-                if (nb.length > 1) {
-                    if (!union (e, nb, T_ActiveMoiety)) {
-                        logger.warning("** unmapped entity "+e.getId()+": "
-                                       +e.keys());
-                        ++count;
-                    }
-                }
-                // try lychi layer 4
-                else if (nb.length == 0
-                         && !union (e, e.neighbors(H_LyChI_L4), H_LyChI_L4)) {
+                System.out.println("++++++++++++++ " +processed
+                                   +"/"+total+" ++++++++++++++");
+                if (!closure (e, H_LyChI_L4)) {
                     logger.warning("** unmapped entity "+e.getId()+": "
                                    +e.keys());
                     ++count;
                 }
             }
+            ++processed;
         }
         dump ("unmapped nodes");
-        
+
         logger.info("### "+count+" unstitched entities!");
     }
 
-    boolean union (Entity e, Entity[] nb, StitchKey key) {
-        Entity emin = null;
-        Object vmin = null;
-        Integer cmin = null;
-        
-        for (Entity u : nb) {
-            Map<StitchKey, Object> keys = e.keys(u);
-            
-            Object value = keys.get(key);
-            if (value != null && value.getClass().isArray()) {
-                int len = Array.getLength(value);
-                if (len == 0) {
-                    value = null;
-                }
-                else if (len > 1) { // multiple values stitched
-                    for (int i = 0; i < len; ++i) {
-                        Object v = Array.get(value, i);
-                        if (moieties.containsKey(v)) {
-                            if (vmin == null || !moieties.containsKey(vmin)
-                                || (stats.get(key).get(v)
-                                    < stats.get(key).get(vmin))) {
-                                vmin = v;
-                                emin = u;
-                                cmin = 0;
-                            }
-                        }
-                        /*
-                        else {
-                            Integer c = stats.get(key).get(v);
-                            if (cmin == null || cmin > c) {
-                                emin = u;
-                                cmin = c;
-                                vmin = v;
-                            }
-                        }
-                        */
-                    }
-                    value = null;
-                }
-                else {
-                    value = Array.get(value, 0);
-                }
-            }
+    boolean closure (Entity e, StitchKey key) {
+        return new TransitiveClosure(e, key).closure();
+    }
 
-            if (value != null) {
-                Integer c = stats.get(key).get(value);
-                if (c == null) {
-                    logger.warning("** entity "+e.getId()
-                                   +" "+key+"="+value
-                                   +" has no count! ** ");
-                }
-                else if (cmin == null || cmin > c) {
-                    emin = u;
-                    cmin = c;
-                    vmin = value;
-                }
-            }
-        }
-        
-        // now merge
-        boolean ok = false;
-        if (emin != null) {
-            if (uf.contains(emin.getId())) {
-                if (cmin < 1000) {
-                    logger.info(".."+e.getId()+" <-["+key+"="
-                                +vmin+":"+cmin+"]-> "+emin.getId());
-                    uf.union(e.getId(), emin.getId());
-                    ok = true;
-                }
-            }
-            else {
-                logger.info(".."+e.getId()+" <-["+key+"="
-                            +vmin+":"+cmin+"]-> "+emin.getId());
-                uf.union(e.getId(), emin.getId());
-                ok = true;
-            }
-        }
-        
-        return ok;
+    boolean closure (Entity e, Entity[] nb, StitchKey key) {
+        return new TransitiveClosure (e, nb, key).closure();
     }
 
     void dump (String mesg) {

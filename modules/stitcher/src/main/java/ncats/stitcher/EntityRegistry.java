@@ -28,7 +28,10 @@ import com.typesafe.config.ConfigObject;
 
 import chemaxon.struc.Molecule;
 import chemaxon.util.MolHandler;
+
 import lychi.LyChIStandardizer;
+import lychi.SaltIdentifier;
+import lychi.ElementData;
 import lychi.util.ChemUtil;
 
 import static ncats.stitcher.StitchKey.*;
@@ -452,12 +455,29 @@ public class EntityRegistry extends EntityFactory {
                         ("molecule has "+mol.getAtomCount()
                          +" atoms; no standardization performed!");
                     }
+
                     String[] hk = LyChIStandardizer.hashKeyArray(mol);
                     String[] re = new String[hk.length+1];
-                    for (int i = 0; i < hk.length; ++i)
-                        re[i] = hk[i];
                     re[hk.length] = ChemUtil.canonicalSMILES(mol);
-                    
+
+                    String kind;  // metal (M), salt/solvent (S), other (A)
+                    if (mol.getAtomCount() == 1) {
+                        kind = ElementData.isMetal
+                            (mol.getAtom(0).getAtno()) ? "M" : "N";
+                    }
+                    else if (SaltIdentifier
+                             .getInstance().isSaltOrSolvent(mol)) {
+                        kind = "S";
+                    }
+                    else {
+                        kind = "N";
+                    }
+
+                    // hk[0..3] hash keys
+                    // hk[4] standardized smiles
+                    for (int i = 0; i < hk.length; ++i)
+                        re[i] = hk[i] + "-" +kind;
+
                     return re;
                 }
             });
@@ -475,19 +495,17 @@ public class EntityRegistry extends EntityFactory {
                 if (f.getAtomCount() == 1) {
                     // organic ion salt.. 
                     switch (f.getAtom(0).getAtno()) {
-                        /*
+                    case 1: // H
                     case 6: // C
                     case 7: // N
-                        */
                     case 8: // O
-                        /*
                     case 9: // F
+                    case 11: // Na
                     case 15: // P
                     case 16: // S
                     case 17: // Cl
                     case 35: // Br
                     case 53: // I
-                        */
                         lychify = false;
                         break;
                     }
@@ -499,7 +517,7 @@ public class EntityRegistry extends EntityFactory {
                     f.setProperty(H_LyChI_L4.name(), hk[3]);
                     f.setProperty(LYCHI, hk[4]);
                     l3.add(hk[2]);
-                    l4.put(hk[3], f);
+                    l4.put(hk[hk.length-1], f);
                 }
             }
 

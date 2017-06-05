@@ -63,6 +63,11 @@ public interface Component extends Iterable<Entity> {
         throw new UnsupportedOperationException
             ("stitches() is not supported for this implementation");
     }
+
+    default void stitches (StitchVisitor visitor, StitchKey... keys) {
+        throw new UnsupportedOperationException
+            ("stitches() is not supported for this implementation");
+    }
     
     /*
      * return all entities for this component.

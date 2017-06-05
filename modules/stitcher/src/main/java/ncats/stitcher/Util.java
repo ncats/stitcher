@@ -268,6 +268,33 @@ public class Util {
         }
     }
 
+    public static Set toSet (Object value) {
+        Set set = new HashSet ();
+        if (value != null) {
+            if (value.getClass().isArray())
+                for (int i = 0; i < Array.getLength(value); ++i)
+                    set.add(Array.get(value, i));
+            else
+                set.add(value);
+        }
+        return set;
+    }
+
+    public static Object[] toArray (Object value) {
+        Object[] array = {};
+        if (value != null) {
+            if (value.getClass().isArray()) {
+                array = new Object[Array.getLength(value)];
+                for (int i = 0; i < array.length; ++i)
+                    array[i] = Array.get(value, i);
+            }
+            else {
+                array = new Object[]{value};
+            }
+        }
+        return array;
+    }
+    
     public static Object merge (Object... values) {
         Class type = null;
         Set unique = new HashSet ();
