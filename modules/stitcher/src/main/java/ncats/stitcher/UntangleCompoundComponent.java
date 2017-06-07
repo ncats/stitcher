@@ -19,7 +19,7 @@ public class UntangleCompoundComponent {
     final Component component;
     final UnionFind uf = new UnionFind ();
     final Map<StitchKey, Map<Object, Integer>> stats;
-    final Map<Object, Entity> moieties = new HashMap<>();
+    final Map<Object, Set<Entity>> moieties = new TreeMap<>();
 
     class TransitiveClosure {
         Entity emin;
@@ -30,7 +30,7 @@ public class UntangleCompoundComponent {
         final Entity e;
         final Entity[] nb;
         final StitchKey key;
-        final Set kvals;
+        final Object kval;
         
         TransitiveClosure (Entity e, StitchKey key) {
             this (e, e.neighbors(key), key);
@@ -41,8 +41,53 @@ public class UntangleCompoundComponent {
             this.nb = nb;
             this.key = key;
             
-            kvals = Util.toSet(e.get(key));
+            kval = e.get(key);
             counts = stats.get(key);
+        }
+
+        boolean checkNoExt (Object value, Set except, String ext) {
+            Set set = Util.toSet(value);
+            if (except != null)
+                set.removeAll(except);
+            
+            for (Object sv : set) {
+                if (!sv.toString().endsWith(ext))
+                    return false;
+            }
+            return true;
+        }
+
+        boolean checkExt (Object value, String ext) {
+            Set set = Util.toSet(value);
+            for (Object sv : set) {
+                if (sv.toString().endsWith(ext))
+                    return true;
+            }
+            return false;
+        }
+
+        boolean checkActiveMoiety (Entity u, Object value) {
+            Set<Entity> su = moieties.get
+                (valueToString (u.get(H_LyChI_L4), ':'));
+            if (su != null) {
+                Set<Entity> v = moieties.get(valueToString (value, ':'));
+                if (v != null)
+                    for (Entity z : v)
+                        if (su.contains(z))
+                            return true;
+                
+                // try individual values?
+                if (value.getClass().isArray()) {
+                    for (int i = 0; i < Array.getLength(value); ++i) {
+                        v = moieties.get
+                            (valueToString(Array.get(value, i), ':'));
+                        if (v != null && su.containsAll(v))
+                            return true;
+                    }
+                }
+            }
+            
+            return su == null;
         }
 
         void updateIfCompatible (Entity u, Object v) {
@@ -56,41 +101,21 @@ public class UntangleCompoundComponent {
             }
             else
                 c = counts.get(v);
+
+            boolean hasMetal = false;
+            Set vset = Util.toSet(v);
+            for (Object sv : vset) {
+                if (sv.toString().endsWith("-M")) {
+                    hasMetal = true;
+                    break;
+                }
+            }
             
-            /*
-              if (moieties.containsKey(v)) {
-              if (vmin == null || !moieties.containsKey(vmin)
-                        || (vmin.toString().endsWith("-S")
-                            && !v.toString().endsWith("-S"))
-                        || c < counts.get(vmin)) {
-                        vmin = v;
-                        emin = u;
-                        cmin = 0; // merge by active moiety
-                        }
-                        }
-                else*/
-            if (cmin == null || cmin > c) {
-                Set set = Util.toSet(u.get(key));
-                set.removeAll(Util.toSet(v));
-                
-                boolean update = true;
-                for (Object sv : set) {
-                    if (!sv.toString().endsWith("-S")) {
-                        update = false;
-                        break;
-                    }
-                }
-                
-                if (update) {
-                    set = new HashSet (kvals);
-                    set.removeAll(Util.toSet(v));
-                    for (Object sv : set) {
-                        if (!sv.toString().endsWith("-S")) {
-                            update = false;
-                            break;
-                        }
-                    }
-                }
+            if (cmin == null
+                || (cmin > c && !checkExt (vmin, "-M")) || hasMetal) {
+                boolean update = checkNoExt (u.get(key), vset, "-S")
+                    && checkNoExt (kval, vset, "-S")
+                    && checkActiveMoiety (u, v);
                 
                 if (update) {
                     emin = u;
@@ -139,13 +164,18 @@ public class UntangleCompoundComponent {
         this.component = component;
     }
 
-    static String toString (Object value, char sep) {
+    static String valueToString (Object value, char sep) {
         StringBuilder sb = new StringBuilder ();
         if (value.getClass().isArray()) {
-            for (int i = 0; i < Array.getLength(value); ++i) {
+            String[] ary = new String[Array.getLength(value)];
+            for (int i = 0; i < ary.length; ++i)
+                ary[i] = Array.get(value, i).toString();
+
+            Arrays.sort(ary);
+            for (int i = 0; i < ary.length; ++i) {
                 if (sb.length() > 0)
                     sb.append(sep);
-                sb.append(Array.get(value, i).toString());
+                sb.append(ary[i]);
             }
         }
         else {
@@ -177,15 +207,11 @@ public class UntangleCompoundComponent {
                 for (Entity e : in) {
                     Object value = e.get(H_LyChI_L4.name());
                     if (value != null) {
-                        String key = toString (value, ':');
-                        Entity old = moieties.put(key, e);
-                        if (old != null) {
-                            /*
-                            logger.warning("** "+H_LyChI_L4+"="+key+" maps to "
-                                           +"active moieties "+e.getId()
-                                           +" and "+old.getId()+" **");
-                            */
-                        }
+                        String key = valueToString (value, ':');
+                        Set<Entity> set = moieties.get(key);
+                        if (set == null)
+                            moieties.put(key, set = new TreeSet<>());
+                        set.add(target);
                     }
                     else {
                         logger.warning("** No "+H_LyChI_L4
@@ -195,10 +221,14 @@ public class UntangleCompoundComponent {
                 
                 Object value = target.get(H_LyChI_L4.name());
                 if (value != null) {
-                    String key = toString (value, ':');
-                    moieties.put(key, target);
+                    String key = valueToString (value, ':');
+                    Set<Entity> set = moieties.get(key);
+                    if (set == null)
+                        moieties.put(key, set = new TreeSet<>());
+                    set.add(target);
                 }
             }, T_ActiveMoiety);
+        dumpActiveMoieties ();
         dump ("Active moiety stitching");
 
         // collapse based on lychi layer 5
@@ -209,7 +239,25 @@ public class UntangleCompoundComponent {
 
         int count = 0;
         for (Entity e : unsure) {
-            if (!closure (e, e.outNeighbors(T_ActiveMoiety), T_ActiveMoiety)) {
+            Entity[] nb = e.outNeighbors(T_ActiveMoiety);
+            assert nb.length > 1: "Expecting active moiety "
+                +"neighbors > 1 but instead got "+nb.length+"!";
+            
+            Entity u = null;
+            Integer best = null;
+            for (Entity n : nb) {
+                Object kv = e.keys(n).get(T_ActiveMoiety);
+                Integer c = stats.get(T_ActiveMoiety).get(kv);
+                if (u == null || best > c) {
+                    u = n;
+                    best = c;
+                }
+            }
+            
+            if (u != null) {
+                uf.union(e.getId(), u.getId());
+            }
+            else {
                 logger.warning("** unmapped entity "+e.getId()+": "
                                +e.keys());
                 ++count;
@@ -257,6 +305,24 @@ public class UntangleCompoundComponent {
                     System.out.print(",");
             }
             System.out.println("]");
+        }
+    }
+
+    void dumpActiveMoieties () {
+        try {
+            FileOutputStream fos = new FileOutputStream
+                ("Component_"+component.getId()+"_activemoieties.txt");
+            PrintStream ps = new PrintStream (fos);
+            for (Map.Entry<Object, Set<Entity>> me : moieties.entrySet()) {
+                ps.print(me.getKey());
+                for (Entity e : me.getValue())
+                    ps.print(" "+e.getId());
+                ps.println();
+            }
+            ps.close();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
