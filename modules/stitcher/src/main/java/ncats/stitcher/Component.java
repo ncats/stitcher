@@ -25,6 +25,14 @@ public interface Component extends Iterable<Entity> {
      * return the set of node ids
      */
     Set<Long> nodeSet ();
+    
+    default boolean contains (Entity e) {
+        return nodeSet().contains(e.getId());
+    }
+    
+    default boolean contains (long id) {
+        return nodeSet().contains(id);
+    }
 
     /*
      * unique set of values that span the given stitch key

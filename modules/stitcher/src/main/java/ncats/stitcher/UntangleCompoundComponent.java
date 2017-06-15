@@ -155,6 +155,95 @@ public class UntangleCompoundComponent {
             return ok;
         } // closure
     } // TransitiveClosure
+
+    class CliqueClosure {
+        final Entity entity;
+        final StitchKey[] keys;
+        final Map<StitchKey, Object> values;
+        final boolean anyvalue; // single valued?
+
+        Clique bestClique; // best clique so far
+
+        CliqueClosure (Entity entity, StitchKey... keys) {
+            this (entity, true, keys);
+        }
+        
+        CliqueClosure (Entity entity, boolean anyvalue, StitchKey... keys) {
+            this.entity = entity;
+            this.keys = keys;
+            this.anyvalue = anyvalue;
+            values = entity.keys();
+        }
+
+        public boolean closure () {
+            for (StitchKey k : keys) {
+                Object value = values.get(k);
+                if (value != null) {
+                    logger.info("***** searching for clique (e="
+                                +entity.getId()+") "
+                                +k+"="+Util.toString(value));
+                    if (value.getClass().isArray()) {
+                        int len = Array.getLength(value);
+                        if (anyvalue || len == 1) {
+                            for (int i = 0; i < len; ++i) {
+                                Object val = Array.get(value, i);
+                                findClique (k, val);
+                            }
+                        }
+                    }
+                    else {
+                        findClique (k, value);
+                    }
+                }
+            }
+
+            // now merge all nodes in the clique!
+            if (bestClique != null) {
+                long[] nodes = bestClique.nodes();
+                for (int i = 1; i < nodes.length; ++i)
+                    uf.union(nodes[i], nodes[i-1]);
+            }
+
+            return bestClique != null;
+        }
+
+        void findClique (StitchKey key, Object value) {
+            Integer count = stats.get(key).get(value);
+            component.cliques(clique -> {
+                    logger.info("$$ found clique "+key+"="
+                                +Util.toString(value)
+                                +" ("+count+") => ");
+                    Util.dump(clique);
+                    
+                    if (count == (clique.size() * (clique.size() -1)/2)) {
+                        // collapse components
+                        if (clique.contains(entity)) {
+                            Set<Long> classes = new TreeSet<>();
+                            for (Long n : clique.nodeSet()) {
+                                Long c = uf.root(n);
+                                logger.info(" .. "+n+" => "+ c);
+                                if (c != null)
+                                    classes.add(c);
+                            }
+                            
+                            if (classes.size() < 2
+                                && (bestClique == null
+                                    || bestClique.size() < clique.size())) {
+                                bestClique = clique;
+                                logger.info("## best clique updated: "
+                                            +clique.getId()+" key="+key
+                                            +" value="+Util.toString(value));
+                            }
+                        }
+                    }
+                    else {
+                        logger.warning("** might be spurious clique **");
+                    }
+            
+                    return true;
+                }, key, value);
+        }
+    } // CliqueClosure
     
     public UntangleCompoundComponent (Component component) {
         stats = new HashMap<>();
@@ -190,7 +279,7 @@ public class UntangleCompoundComponent {
         System.out.println(component.nodeSet());
 
         // collapse based on single/terminal active moieties
-        List<Entity> unsure = new ArrayList<>();
+        Set<Entity> unsure = new TreeSet<>();
         component.stitches((source, target) -> {
                 Entity[] out = source.outNeighbors(T_ActiveMoiety);
                 Entity[] in = target.inNeighbors(T_ActiveMoiety);
@@ -237,7 +326,35 @@ public class UntangleCompoundComponent {
             }, H_LyChI_L5);
         dump (H_LyChI_L5+" stitching");
 
-        int count = 0;
+        int count = 0;        
+        // now find all remaining unmapped nodes
+        int processed = 0, total = component.size();
+        for (Entity e : component) {
+            if (unsure.contains(e)) {
+            }
+            else if (!uf.contains(e.getId())) {
+                System.out.println("++++++++++++++ " +processed
+                                   +"/"+total+" ++++++++++++++");
+                if (transitive (e, H_LyChI_L4)) {
+                    // 
+                }
+                else if (clique (e, N_Name, I_CAS)) {
+                }
+                else if (clique (e, false, H_LyChI_L3)) {
+                    // desparate, last resort but require large min clique
+                }
+                else {
+                    logger.warning("** unmapped entity "+e.getId()+": "
+                                   +e.keys());
+                    
+                    ++count;
+                }
+            }
+            ++processed;
+        }
+        dump ("unmapped nodes");
+
+        /*
         for (Entity e : unsure) {
             Entity[] nb = e.outNeighbors(T_ActiveMoiety);
             assert nb.length > 1: "Expecting active moiety "
@@ -265,32 +382,25 @@ public class UntangleCompoundComponent {
         }
         dump ("Stitching "+unsure.size()
               +" nodes with multiple active moieties");
-
-        // now find all remaining unmapped nodes
-        int processed = 0, total = component.size();
-        for (Entity e : component) {
-            if (!uf.contains(e.getId())) {
-                System.out.println("++++++++++++++ " +processed
-                                   +"/"+total+" ++++++++++++++");
-                if (!closure (e, H_LyChI_L4)) {
-                    logger.warning("** unmapped entity "+e.getId()+": "
-                                   +e.keys());
-                    ++count;
-                }
-            }
-            ++processed;
-        }
-        dump ("unmapped nodes");
-
+        */
+        
         logger.info("### "+count+" unstitched entities!");
     }
 
-    boolean closure (Entity e, StitchKey key) {
+    boolean transitive (Entity e, StitchKey key) {
         return new TransitiveClosure(e, key).closure();
     }
 
-    boolean closure (Entity e, Entity[] nb, StitchKey key) {
-        return new TransitiveClosure (e, nb, key).closure();
+    boolean transitive (Entity e, Entity[] nb, StitchKey key) {
+        return new TransitiveClosure(e, nb, key).closure();
+    }
+
+    boolean clique (Entity e, StitchKey... keys) {
+        return new CliqueClosure(e, keys).closure();
+    }
+    
+    boolean clique (Entity e, boolean anyvalue, StitchKey... keys) {
+        return new CliqueClosure(e, anyvalue, keys).closure();
     }
 
     void dump (String mesg) {

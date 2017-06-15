@@ -460,10 +460,17 @@ public class EntityRegistry extends EntityFactory {
                     String[] re = new String[hk.length+1];
                     re[hk.length] = ChemUtil.canonicalSMILES(mol);
 
-                    String kind;  // metal (M), salt/solvent (S), other (A)
-                    if (mol.getAtomCount() == 1) {
-                        kind = ElementData.isMetal
-                            (mol.getAtom(0).getAtno()) ? "M" : "N";
+                    boolean metal = false;
+                    for (int i = 0; i < mol.getAtomCount(); ++i) {
+                        if (ElementData.isMetal(mol.getAtom(i).getAtno())) {
+                            metal = true;
+                            break;
+                        }
+                    }
+
+                    String kind;  // metal (M), salt/solvent (S), other (N)
+                    if (metal) {
+                        kind = "M";
                     }
                     else if (SaltIdentifier
                              .getInstance().isSaltOrSolvent(mol)) {

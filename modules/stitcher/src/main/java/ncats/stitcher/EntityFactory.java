@@ -434,7 +434,7 @@ public class EntityFactory implements Props {
                     for (Relationship rel :
                              n.getRelationships(Direction.BOTH, key)) {
                         if (!seen.contains(rel.getId())) {
-                            Node xn = rel.getOtherNode(n);
+                            //Node xn = rel.getOtherNode(n);
                             Object val = rel.getProperty(VALUE, null);
                             if (val != null) {
                                 Integer c = stats.get(val);
@@ -461,17 +461,11 @@ public class EntityFactory implements Props {
         
         Set<Long> getNodes (StitchKey key, Object value) {
             Set<Long> all = new TreeSet<>();
-            try (Transaction tx = gdb.beginTx()) {
-                for (Entity e : entities) {
-                    Set<Long> nodes = new TreeSet<>();
-                    Set<Relationship> edges = new HashSet<>();
-                    
-                    EntityFactory.dfs(nodes, edges, e._node(), key, value);
-                    for (Relationship rel : edges) {
-                        all.add(rel.getStartNode().getId());
-                        all.add(rel.getEndNode().getId());
-                    }
-                }
+            for (Iterator<Entity> it = find (gdb, key.name(), value);
+                 it.hasNext(); ) {
+                Entity e = it.next();
+                if (nodes.contains(e.getId()))
+                    all.add(e.getId());
             }
             return all;
         }
@@ -789,12 +783,14 @@ public class EntityFactory implements Props {
             for (Map.Entry<Object, Integer> me : counts.entrySet()) {
                 Integer c = me.getValue();
                 if (c == total) {
-                    value = me.getKey();
-                    break;
+                    value = value == null ? me.getKey()
+                        : Util.merge(value, me.getKey());
                 }
                 else /*if (c > 1)*/ { // multiple values for this stitchkey
+                    /*
                     value = value == null
                         ? me.getKey() : Util.merge(value, me.getKey());
+                    */
                 }
             }
 
@@ -876,10 +872,10 @@ public class EntityFactory implements Props {
                     if (e.getValue().getClass().isArray())
                         keys.add(e.getKey());
                 }
-                
+                /*
                 for (StitchKey k : keys)
                     values.remove(k);
-                
+                */
                 if (!values.isEmpty() && !visitor.clique(clique))
                     return false;
             }
