@@ -15,8 +15,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Array;
 
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.typesafe.config.ConfigFactory;
@@ -44,7 +44,6 @@ public class EntityRegistry extends EntityFactory {
         new PropertyChangeSupport (this);
 
     protected DataSource source;
-    protected DataSourceFactory dsf;
     protected String idField;
     protected String strucField;
     
@@ -65,7 +64,6 @@ public class EntityRegistry extends EntityFactory {
     
     public EntityRegistry (GraphDb graphDb) {
         super (graphDb);
-        dsf = new DataSourceFactory (graphDb);
         init ();
     }
 
@@ -399,11 +397,11 @@ public class EntityRegistry extends EntityFactory {
                             int len = Array.getLength(val);
                             for (int i = 0; i < len; ++i) {
                                 Object t = Array.get(val, i);
-                                ent._addLabel(DynamicLabel.label(t.toString()));
+                                ent._addLabel(Label.label(t.toString()));
                             }
                         }
                         else
-                            ent._addLabel(DynamicLabel.label(val.toString()));
+                            ent._addLabel(Label.label(val.toString()));
                     }
                     else {
                         ent._add(m.getKey(),
@@ -585,7 +583,7 @@ public class EntityRegistry extends EntityFactory {
         }
         
         Node node = gdb.createNode(AuxNodeType.ENTITY,
-                                   DynamicLabel.label(source.getName()));
+                                   Label.label(source.getName()));
         node.setProperty(SOURCE, source.getKey());
         return node;
     }

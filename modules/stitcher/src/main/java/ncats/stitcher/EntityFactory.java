@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import java.util.function.BiPredicate;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -17,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Resource;
@@ -269,6 +269,7 @@ public class EntityFactory implements Props {
         Entity[] entities;
         String id;
         GraphDatabaseService gdb;
+        Entity root;
 
         ComponentImpl () {
         }
@@ -281,12 +282,12 @@ public class EntityFactory implements Props {
             gdb = node.getGraphDatabase();
             try (Transaction tx = gdb.beginTx()) {
                 if (!node.hasLabel(AuxNodeType.COMPONENT)
-                    || !node.hasProperty(CNode.RANK))
+                    || !node.hasProperty(RANK))
                     throw new IllegalArgumentException
                         ("Not a valid component node: "+node.getId());
                 traverse (node);
 
-                Integer rank = (Integer)node.getProperty(CNode.RANK);
+                Integer rank = (Integer)node.getProperty(RANK);
                 if (rank != nodes.size()) {
                     logger.warning("Node #"+node.getId()
                                    +": Rank is "+rank+" but there are "
@@ -295,8 +296,13 @@ public class EntityFactory implements Props {
                 
                 entities = new Entity[nodes.size()];
                 int i = 0;
-                for (Long id : nodes)
-                    entities[i++] = Entity._getEntity(gdb.getNodeById(id));
+                for (Long id : nodes) {
+                    entities[i] = Entity._getEntity(gdb.getNodeById(id));
+                    if (id.equals(node.getId())) {
+                        root = entities[i];
+                    }
+                    ++i;
+                }
                 
                 tx.success();
             }
@@ -316,8 +322,15 @@ public class EntityFactory implements Props {
         ComponentImpl (GraphDatabaseService gdb, long[] nodes) {
             try (Transaction tx = gdb.beginTx()) {
                 entities = new Entity[nodes.length];
+                int rank = 0;
                 for (int i = 0; i < nodes.length; ++i) {
-                    entities[i] = Entity._getEntity(gdb.getNodeById(nodes[i]));
+                    Node n = gdb.getNodeById(nodes[i]);
+                    entities[i] = Entity._getEntity(n);
+                    Integer r = (Integer)n.getProperty(RANK, 0);
+                    if (r > rank || root == null) {
+                        rank = r;
+                        root = entities[i];
+                    }
                     this.nodes.add(nodes[i]);
                 }
                 id = Util.sha1(this.nodes).substring(0, 9);
@@ -326,20 +339,20 @@ public class EntityFactory implements Props {
         }
 
         ComponentImpl (GraphDatabaseService gdb, Long... nodes) {
-            try (Transaction tx = gdb.beginTx()) {
-                entities = new Entity[nodes.length];
-                for (int i = 0; i < nodes.length; ++i) {
-                    entities[i] = Entity._getEntity(gdb.getNodeById(nodes[i]));
-                    this.nodes.add(nodes[i]);
-                }
-                id = Util.sha1(this.nodes).substring(0, 9);
-            }
-            this.gdb = gdb;         
+            this (gdb, Util.toPrimitive(nodes));
         }
 
         ComponentImpl (Component... comps) {
             Set<Entity> entities = new TreeSet<Entity>();
-            for (Component c : comps)
+            int rank = 0;
+            for (Component c : comps) {
+                Integer r = (Integer)c.root()
+                    ._node().getProperty(RANK, 0);
+                if (r > rank || root == null) {
+                    rank = r;
+                    root = c.root();
+                }
+                
                 for (Entity e : c) {
                     if (gdb == null) {
                         // this assumes that all entities come from the same
@@ -350,21 +363,62 @@ public class EntityFactory implements Props {
                     entities.add(e);
                     nodes.add(e.getId());
                 }
+            }
 
             this.entities = entities.toArray(new Entity[0]);
             id = Util.sha1(nodes).substring(0, 9);
         }
 
         ComponentImpl (Entity... entities) {
+            int rank = 0;
             for (Entity e : entities) {
                 if (gdb == null)
                     gdb = e.getGraphDb();
+                Integer r = (Integer)e._node().getProperty(RANK, 0);
+                if (r > rank || root == null) {
+                    rank = r;
+                    root = e;
+                }
                 nodes.add(e.getId());
             }
             this.entities = entities;
             id = Util.sha1(nodes).substring(0, 9);
         }
 
+        protected void setRoot (Long root) {
+            if (root == null)
+                throw new IllegalArgumentException
+                    ("Can't set root entity to null");
+            
+            for (Entity e : entities) {
+                if (e.getId() == root) {
+                    this.root = e;
+                    return;
+                }
+            }
+            
+            throw new IllegalArgumentException
+                ("Entity "+root+" isn't part of component "+id);
+        }
+        
+        protected void setRoot (Entity root) {
+            if (root == null)
+                throw new IllegalArgumentException
+                    ("Can't set root entity to null");
+            
+            for (Entity e : entities) {
+                if (e.equals(root)) {
+                    this.root = e;
+                    return;
+                }
+            }
+            
+            throw new IllegalArgumentException
+                ("Entity "+root.getId()+" isn't part of component "+id);
+        }
+
+        public Entity root () { return root; }
+        
         /*
          * unique set of values that span the given stitch key
          */
@@ -695,7 +749,7 @@ public class EntityFactory implements Props {
                     throw new IllegalArgumentException
                         ("Not a valid component node: "+node.getId());
                 
-                rank = (Integer)node.getProperty(CNode.RANK);
+                rank = (Integer)node.getProperty(RANK);
                 if (rank == null)
                     throw new IllegalArgumentException
                         ("Node does not contain rank");
@@ -867,15 +921,17 @@ public class EntityFactory implements Props {
                 // filter out any clique that has multiple values for
                 //   a particular stitch key
                 Map<StitchKey, Object> values = clique.values();
+                /*
                 EnumSet<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
                 for (Map.Entry<StitchKey, Object> e : values.entrySet()) {
                     if (e.getValue().getClass().isArray())
                         keys.add(e.getKey());
                 }
-                /*
+                
                 for (StitchKey k : keys)
                     values.remove(k);
                 */
+                
                 if (!values.isEmpty() && !visitor.clique(clique))
                     return false;
             }
@@ -1003,6 +1059,7 @@ public class EntityFactory implements Props {
     protected final GraphDb graphDb;
     protected final GraphDatabaseService gdb;
     protected final TimelineIndex<Node> timeline;
+    protected final DataSourceFactory dsf;
     
     public EntityFactory (String dir) throws IOException {
         this (GraphDb.getInstance(dir));
@@ -1019,14 +1076,15 @@ public class EntityFactory implements Props {
     public EntityFactory (GraphDb graphDb) {
         if (graphDb == null)
             throw new IllegalArgumentException ("GraphDb instance is null!");
-        
-        this.graphDb = graphDb;
-        this.gdb = graphDb.graphDb();
+
+        this.gdb = graphDb.graphDb();   
         try (Transaction tx = gdb.beginTx()) {
             this.timeline = new LuceneTimeline
                 (gdb, gdb.index().forNodes(CNode.NODE_TIMELINE));
             tx.success();
         }
+        this.graphDb = graphDb;
+        this.dsf = new DataSourceFactory (graphDb);
     }
 
     static void dfs (Set<Long> nodes, Set<Relationship> edges,
@@ -1176,7 +1234,7 @@ public class EntityFactory implements Props {
         if (labels != null && labels.length > 0) {
             l = new Label[labels.length];
             for (int i = 0; i < labels.length; ++i)
-                l[i] = DynamicLabel.label(labels[i]);
+                l[i] = Label.label(labels[i]);
         }
         return getStitchedValueDistribution (key, l);
     }
@@ -1255,10 +1313,10 @@ public class EntityFactory implements Props {
                 source = DataSourceFactory.sourceKey(source);
                 n = index.get(KEY, source).getSingle();
             }
-            
+
             if (n != null) {
-                Label label = DynamicLabel.label(source);
-                for (Iterator<Node> it = gdb.findNodes(label);
+                Label label = Label.label((String)n.getProperty(NAME));
+                for (Iterator<Node> it = gdb.findNodes(label, KEY, source);
                      it.hasNext(); ) {
                     Node node = it.next();
                     Entity._getEntity(node).delete();
@@ -1316,7 +1374,7 @@ public class EntityFactory implements Props {
     }
 
     public Entity[] entities (String label, int skip, int top) {
-        return entities (DynamicLabel.label(label), skip, top);
+        return entities (Label.label(label), skip, top);
     }
     
     public Entity[] entities (Label label, int skip, int top) {
@@ -1357,7 +1415,7 @@ public class EntityFactory implements Props {
 
     public boolean cliques (String label, CliqueVisitor visitor) {
         return label != null ? 
-            cliques (DynamicLabel.label(label), visitor, Entity.KEYS)
+            cliques (Label.label(label), visitor, Entity.KEYS)
             : cliques (visitor, Entity.KEYS);
     }
     
@@ -1367,7 +1425,7 @@ public class EntityFactory implements Props {
             keys = Entity.KEYS;
         
         return label != null ?
-            cliques (DynamicLabel.label(label), visitor, keys)
+            cliques (Label.label(label), visitor, keys)
             : cliques (visitor, keys);
     }
 
@@ -1402,7 +1460,7 @@ public class EntityFactory implements Props {
                  it.hasNext();) {
                 Node node = it.next();
                 
-                Integer rank = (Integer)node.getProperty(CNode.RANK);
+                Integer rank = (Integer)node.getProperty(RANK);
                 if (rank == null)
                     throw new RuntimeException ("Component node "+node.getId()
                                                 +" has no rank!");
@@ -1465,6 +1523,14 @@ public class EntityFactory implements Props {
         return false;
     }
 
+    public void untangle (UntangleComponent uc) {
+        uc.untangle((root, member) -> {
+                ComponentImpl comp = new ComponentImpl (gdb, member);
+                if (root != null)
+                    comp.setRoot(root);
+                
+            });
+    }
 
     public static Iterator<Entity> find (GraphDatabaseService gdb,
                                          String key, Object value) {
@@ -1519,7 +1585,7 @@ public class EntityFactory implements Props {
     public Iterator<Entity> entities (String label) {
         try (Transaction tx = gdb.beginTx()) {
             return new EntityIterator
-                (gdb, gdb.findNodes(DynamicLabel.label(label)));
+                (gdb, gdb.findNodes(Label.label(label)));
         }
     }
 
@@ -1684,33 +1750,104 @@ public class EntityFactory implements Props {
     }
 
     public Entity createStitch (DataSource source, long[] component) {
+        Component comp = new ComponentImpl (gdb, component);
         try (Transaction tx = gdb.beginTx()) {
-            Entity ent = _createStitch (source, component);
+            Entity ent = _createStitch (source, comp);
             tx.success();
             return ent;
-        }       
-    }
-    
-    public Entity _createStitch (DataSource source, long[] component) {
-        return _createStitch (source, new ComponentImpl (gdb, component));
+        }
     }
     
     public Entity _createStitch (DataSource source, Component component) {
-        Node node = gdb.createNode(AuxNodeType.STITCHED,
-                                   DynamicLabel.label(source._getKey()));
-        node.setProperty(SOURCE, source._getKey());
-        node.setProperty(SCORE, component.score());
+        Entity entity = _createEntityIfAbsent(ID, component.getId(), () -> {
+                Node node = gdb.createNode(AuxNodeType.SGROUP,
+                                           AuxNodeType.ENTITY,
+                                           Label.label(source.getName()));
+                node.setProperty(ID, component.getId());
+                node.setProperty(SOURCE, source._getKey());
+                node.setProperty(RANK, component.size());
+                
+                for (Entity e : component) {
+                    Node n = e._node();
+                    String s = (String)n.getProperty(SOURCE);
+                    DataSource ds = dsf._getDataSourceByKey(s);
+                    try {
+                        // link to the source's payload
+                        Relationship rel = n.getSingleRelationship
+                            (AuxRelType.PAYLOAD, Direction.INCOMING);
+                        Node p = rel.getOtherNode(n);
+                        
+                        rel = node.createRelationshipTo(p, AuxRelType.STITCH);
+                        if (e.equals(component.root())) {
+                            rel.setProperty(KIND, "ROOT");
+                        }
+                        
+                        if (ds != null) {
+                            String name =
+                                (String)ds._node().getProperty(NAME, null);
+                            node.addLabel(Label.label(name));
+                            rel.setProperty(SOURCE, name);
+                        }
+                        else {
+                            logger.warning("Bogus data source: "+s);
+                        }
+                    }
+                    catch (Exception ex) {
+                        logger.warning("Entity "+n.getId()
+                                       +" has multiple payload!");
+                    }
+                }
+                
+                return node;
+            });
 
-        Set<String> sources = new HashSet<String>();
-        for (Entity e : component) {
-            sources.add((String)e._node.getProperty(SOURCE));
-        }
-        for (String s : sources)
-            node.addLabel(DynamicLabel.label(s));
-        
-        return Entity._getEntity(node);
+        return entity;
     }
 
+    public void createStitch (DataSource source, long[][]components) {
+        for (long[] cc : components) {
+            createStitch (source, cc);
+        }
+    }
+
+    public void createStitch (String source, long[][] components) {
+        createStitch (dsf.register(source), components);
+    }
+
+    public Entity _createEntityIfAbsent
+        (String key, Object value, Supplier<Node> supplier) {
+        Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());
+        try (IndexHits<Node> hits = index.get(key, value)) {
+            Node node = hits.getSingle();
+            
+            if (node == null) {
+                node = supplier.get();
+                for (Map.Entry<String, Object> me
+                         : node.getAllProperties().entrySet()) {
+                    key = me.getKey();
+                    value = me.getValue();
+                    if (value.getClass().isArray()) {
+                        try {
+                            int len = Array.getLength(value);
+                            for (int i = 0; i < len; ++i) {
+                                Object v = Array.get(value, i);
+                                index.add(node, key, v);
+                            }
+                        }
+                        catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    else {
+                        index.add(node, key, value);
+                    }
+                }
+            }
+            
+            return Entity._getEntity(node);
+        }
+    }
+    
     // return the last k updated entities
     public Entity[] getLastUpdatedEntities (int k) {
         try (Transaction tx = gdb.beginTx()) {

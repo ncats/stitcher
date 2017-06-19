@@ -174,18 +174,21 @@ public class DataSourceFactory implements Props {
         }
     }
 
+    public DataSource _getDataSourceByKey (String key) {
+        Index<Node> index = gdb.index().forNodes
+            (DataSource.nodeIndexName());
+        
+        DataSource ds = null;
+        Node n = index.get(KEY, key).getSingle();
+        if (n != null) {
+            ds = DataSource._getDataSource(n);
+        }
+        return ds;
+    }
+        
     public DataSource getDataSourceByKey (String key) {
         try (Transaction tx = gdb.beginTx()) {
-            Index<Node> index = gdb.index().forNodes
-                (DataSource.nodeIndexName());
-
-            DataSource ds = null;
-            Node n = index.get(KEY, key).getSingle();
-            if (n != null) {
-                ds = DataSource._getDataSource(n);
-            }
-            tx.success();
-            return ds;
+            return _getDataSourceByKey (key);
         }
     }
 

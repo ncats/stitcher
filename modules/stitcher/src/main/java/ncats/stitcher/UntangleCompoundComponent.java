@@ -2,23 +2,19 @@ package ncats.stitcher;
 
 import java.util.*;
 import java.io.*;
-import java.net.URL;
+
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.lang.reflect.Array;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
+import java.util.function.BiConsumer;
+
 import org.neo4j.graphdb.GraphDatabaseService;
-import ncats.stitcher.graph.UnionFind;
 import static ncats.stitcher.StitchKey.*;
 
-public class UntangleCompoundComponent {
+public class UntangleCompoundComponent extends UntangleComponent {
     static final Logger logger = Logger.getLogger
         (UntangleCompoundComponent.class.getName());
 
-    final Component component;
-    final UnionFind uf = new UnionFind ();
-    final Map<StitchKey, Map<Object, Integer>> stats;
     final Map<Object, Set<Entity>> moieties = new TreeMap<>();
 
     class TransitiveClosure {
@@ -207,6 +203,34 @@ public class UntangleCompoundComponent {
             return bestClique != null;
         }
 
+        boolean containsExactly (Component comp, StitchKey key, Object value) {
+            for (Entity e : comp) {
+                Object dif = Util.delta(e.get(key), value);
+                if (dif == Util.NO_CHANGE) {
+                    return false;
+                }
+                else if (dif != null) {
+                    switch (key) {
+                    case H_LyChI_L3:
+                    case H_LyChI_L4:
+                    case H_LyChI_L5:
+                        // if the remaining entries are salt/solvent, then
+                        // it's still ok?
+                        for (int i = 0; i < Array.getLength(dif); ++i) {
+                            String v = (String) Array.get(dif, i);
+                            if (v.endsWith("-N") || v.endsWith("-M"))
+                                return false;
+                        }
+                        break;
+                        
+                    default:
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         void findClique (StitchKey key, Object value) {
             Integer count = stats.get(key).get(value);
             component.cliques(clique -> {
@@ -227,6 +251,8 @@ public class UntangleCompoundComponent {
                             }
                             
                             if (classes.size() < 2
+                                && (anyvalue
+                                    || containsExactly (clique, key, value))
                                 && (bestClique == null
                                     || bestClique.size() < clique.size())) {
                                 bestClique = clique;
@@ -246,35 +272,11 @@ public class UntangleCompoundComponent {
     } // CliqueClosure
     
     public UntangleCompoundComponent (Component component) {
-        stats = new HashMap<>();
-        for (StitchKey key : Entity.KEYS) {
-            stats.put(key, component.stats(key));
-        }
-        this.component = component;
+        super (component);
     }
 
-    static String valueToString (Object value, char sep) {
-        StringBuilder sb = new StringBuilder ();
-        if (value.getClass().isArray()) {
-            String[] ary = new String[Array.getLength(value)];
-            for (int i = 0; i < ary.length; ++i)
-                ary[i] = Array.get(value, i).toString();
-
-            Arrays.sort(ary);
-            for (int i = 0; i < ary.length; ++i) {
-                if (sb.length() > 0)
-                    sb.append(sep);
-                sb.append(ary[i]);
-            }
-        }
-        else {
-            sb.append(value.toString());
-        }
-
-        return sep == ',' ? "["+sb+"]" : sb.toString();
-    }
-
-    public void untangle () {
+    @Override
+    public void untangle (BiConsumer<Long, long[]> consumer) {
         System.out.println("## Active moieties for component ##");
         System.out.println(component.nodeSet());
 
@@ -344,6 +346,7 @@ public class UntangleCompoundComponent {
                     // desparate, last resort but require large min clique
                 }
                 else {
+                    uf.add(e.getId());
                     logger.warning("** unmapped entity "+e.getId()+": "
                                    +e.keys());
                     
@@ -355,6 +358,8 @@ public class UntangleCompoundComponent {
         dump ("unmapped nodes");
 
         /*
+        // now handle unresolved nodes with multiple active moieties and
+        // assign to the class with less references 
         for (Entity e : unsure) {
             Entity[] nb = e.outNeighbors(T_ActiveMoiety);
             assert nb.length > 1: "Expecting active moiety "
@@ -383,8 +388,17 @@ public class UntangleCompoundComponent {
         dump ("Stitching "+unsure.size()
               +" nodes with multiple active moieties");
         */
-        
+
         logger.info("### "+count+" unstitched entities!");
+        
+        // now generate untangled compoennts..
+        for (long[] comp : uf.components()) {
+            consumer.accept(getRoot (comp), comp);
+        }
+    }
+
+    Long getRoot (long[] component) {
+        return null;
     }
 
     boolean transitive (Entity e, StitchKey key) {
@@ -401,21 +415,6 @@ public class UntangleCompoundComponent {
     
     boolean clique (Entity e, boolean anyvalue, StitchKey... keys) {
         return new CliqueClosure(e, anyvalue, keys).closure();
-    }
-
-    void dump (String mesg) {
-        long[][] components = uf.components();
-        System.out.println("** "+mesg+": number of components: "
-                           +components.length);
-        for (long[] c : components) {
-            System.out.print(c.length+" [");
-            for (int i = 0; i < c.length; ++i) {
-                System.out.print(c[i]);
-                if (i+1 < c.length)
-                    System.out.print(",");
-            }
-            System.out.println("]");
-        }
     }
 
     void dumpActiveMoieties () {
@@ -456,9 +455,7 @@ public class UntangleCompoundComponent {
                 fos.close();
                 
                 logger.info("Stitching component "+comp.getId());
-                UntangleCompoundComponent ucc =
-                    new UntangleCompoundComponent (comp);
-                ucc.untangle();
+                ef.untangle(new UntangleCompoundComponent (comp));
             }
         }
         finally {

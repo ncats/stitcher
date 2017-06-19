@@ -8,8 +8,7 @@ import org.neo4j.graphdb.Label;
 public enum AuxNodeType implements Label {
     SNAPSHOT,
     SINGLETON,
-    GROUP,
-    STITCHED,
+    SGROUP,
     COMPONENT,
     DATA,
     ENTITY,

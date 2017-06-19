@@ -53,7 +53,8 @@ public class DBTools {
             ds.delete();
         }
         else {
-            System.err.println("Datasource "+source+" not available!");
+            ef.delete(source);
+            //System.err.println("Datasource "+source+" not available!");
         }
     }
 

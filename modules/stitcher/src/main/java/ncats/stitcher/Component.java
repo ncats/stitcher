@@ -76,6 +76,11 @@ public interface Component extends Iterable<Entity> {
         throw new UnsupportedOperationException
             ("stitches() is not supported for this implementation");
     }
+
+    /*
+     * root entity of this component
+     */
+    default Entity root () { return null; }
     
     /*
      * return all entities for this component.

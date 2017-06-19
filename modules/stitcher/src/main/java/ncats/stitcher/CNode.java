@@ -18,7 +18,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.RelationshipIndex;
@@ -113,7 +112,7 @@ public class CNode implements Props, Comparable<CNode> {
 
     public void _addLabel (String... labels) {
         for (String l : labels) {
-            _node.addLabel(DynamicLabel.label(l));
+            _node.addLabel(Label.label(l));
         }
     }
 
@@ -147,7 +146,7 @@ public class CNode implements Props, Comparable<CNode> {
     }
 
     public boolean _is (String label) {
-        return _node.hasLabel(DynamicLabel.label(label));
+        return _node.hasLabel(Label.label(label));
     }
 
     public boolean is (String label) {
@@ -228,9 +227,9 @@ public class CNode implements Props, Comparable<CNode> {
 
         for (Relationship rel : node.getRelationships()) {
             Node xn = rel.getOtherNode(node);
+            rel.delete();
             if (xn.hasLabel(AuxNodeType.SNAPSHOT)
                 || rel.isType(AuxRelType.PAYLOAD)) {
-                rel.delete();
                 xn.delete();
             }
         }
