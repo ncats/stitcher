@@ -1109,6 +1109,7 @@ public class EntityFactory implements Props {
     public void setCache (String cache) throws IOException {
         graphDb.setCache(CacheFactory.getInstance(cache));
     }
+    public DataSourceFactory getDataSourceFactory () { return dsf; }
     
     public long getLastUpdated () { return graphDb.getLastUpdated(); }
     
@@ -1316,12 +1317,13 @@ public class EntityFactory implements Props {
 
             if (n != null) {
                 Label label = Label.label((String)n.getProperty(NAME));
-                for (Iterator<Node> it = gdb.findNodes(label, KEY, source);
+                for (Iterator<Node> it = gdb.findNodes(label, SOURCE, source);
                      it.hasNext(); ) {
                     Node node = it.next();
                     Entity._getEntity(node).delete();
                     ++count;
                 }
+                logger.info(count+" entities deleted for \""+source+"\"");
             }
             else {
                 logger.warning("Can't find data source: "+source);
@@ -1528,7 +1530,7 @@ public class EntityFactory implements Props {
                 ComponentImpl comp = new ComponentImpl (gdb, member);
                 if (root != null)
                     comp.setRoot(root);
-                
+                createStitch (uc.getDataSource(), comp);
             });
     }
 
@@ -1759,11 +1761,12 @@ public class EntityFactory implements Props {
     }
     
     public Entity _createStitch (DataSource source, Component component) {
-        Entity entity = _createEntityIfAbsent(ID, component.getId(), () -> {
+        final String key = source.getKey()+"-"+component.getId();
+        Entity entity = _createEntityIfAbsent(ID, key, () -> {
                 Node node = gdb.createNode(AuxNodeType.SGROUP,
                                            AuxNodeType.ENTITY,
                                            Label.label(source.getName()));
-                node.setProperty(ID, component.getId());
+                node.setProperty(ID, key);
                 node.setProperty(SOURCE, source._getKey());
                 node.setProperty(RANK, component.size());
                 
@@ -1789,7 +1792,9 @@ public class EntityFactory implements Props {
                             rel.setProperty(SOURCE, name);
                         }
                         else {
-                            logger.warning("Bogus data source: "+s);
+                            logger.warning("Bogus data source ("
+                                           +s+") referenced by node "
+                                           +n.getId());
                         }
                     }
                     catch (Exception ex) {
@@ -1835,7 +1840,10 @@ public class EntityFactory implements Props {
                             }
                         }
                         catch (Exception ex) {
-                            ex.printStackTrace();
+                            logger.log(Level.SEVERE,
+                                       "Can't add index for entity "
+                                       +node.getId()+": key="+key
+                                       +" value="+value, ex);
                         }
                     }
                     else {

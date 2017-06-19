@@ -15,30 +15,36 @@ public abstract class UntangleComponent {
     static final Logger logger = Logger.getLogger
         (UntangleComponent.class.getName());
 
+    final protected DataSource dsource;
     final protected Component component;
     final protected UnionFind uf = new UnionFind ();
     final protected Map<StitchKey, Map<Object, Integer>> stats;
 
-    protected UntangleComponent (Component component) {
+    protected UntangleComponent (DataSource dsource, Component component) {
         stats = new HashMap<>();
         for (StitchKey key : Entity.KEYS) {
             stats.put(key, component.stats(key));
         }
         this.component = component;
+        this.dsource = dsource;
     }
 
     protected void dump (String mesg) {
+        dump (System.out, mesg);
+    }
+    
+    protected void dump (PrintStream ps, String mesg) {
         long[][] components = uf.components();
-        System.out.println("** "+mesg+": number of components: "
-                           +components.length);
+        ps.println("** "+mesg+": number of components: "
+                   +components.length);
         for (long[] c : components) {
-            System.out.print(c.length+" [");
+            ps.print(c.length+" [");
             for (int i = 0; i < c.length; ++i) {
-                System.out.print(c[i]);
+                ps.print(c[i]);
                 if (i+1 < c.length)
-                    System.out.print(",");
+                    ps.print(",");
             }
-            System.out.println("]");
+            ps.println("]");
         }
     }
 
@@ -65,5 +71,5 @@ public abstract class UntangleComponent {
     
     public abstract void untangle (BiConsumer<Long, long[]> consumer);
     public Component component () { return component; }
-    public long[][] getComponents () { return uf.components(); }    
+    public DataSource getDataSource () { return dsource; }
 }

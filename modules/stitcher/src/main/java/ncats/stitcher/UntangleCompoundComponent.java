@@ -271,8 +271,9 @@ public class UntangleCompoundComponent extends UntangleComponent {
         }
     } // CliqueClosure
     
-    public UntangleCompoundComponent (Component component) {
-        super (component);
+    public UntangleCompoundComponent (DataSource dsource,
+                                      Component component) {
+        super (dsource, component);
     }
 
     @Override
@@ -436,17 +437,18 @@ public class UntangleCompoundComponent extends UntangleComponent {
     }
 
     public static void main (String[] argv) throws Exception {
-        if (argv.length < 2) {
+        if (argv.length < 3) {
             System.err.println("Usage: "
                                +UntangleCompoundComponent.class.getName()
-                               +" DB COMPONENTS...");
+                               +" DB DATASOURCE COMPONENTS...");
             System.exit(1);
         }
 
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
         try {
-            EntityFactory ef = new EntityFactory (graphDb);         
-            for (int i = 1; i < argv.length; ++i) {
+            EntityFactory ef = new EntityFactory (graphDb);
+            DataSource dsource = ef.getDataSourceFactory().register(argv[1]);
+            for (int i = 2; i < argv.length; ++i) {
                 Component comp = ef.component(Long.parseLong(argv[i]));
                 logger.info("Dumping component "+comp.getId());         
                 FileOutputStream fos = new FileOutputStream
@@ -455,7 +457,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 fos.close();
                 
                 logger.info("Stitching component "+comp.getId());
-                ef.untangle(new UntangleCompoundComponent (comp));
+                ef.untangle(new UntangleCompoundComponent (dsource, comp));
             }
         }
         finally {
