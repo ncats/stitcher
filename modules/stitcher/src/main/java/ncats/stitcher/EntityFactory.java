@@ -1309,6 +1309,7 @@ public class EntityFactory implements Props {
             Index<Node> index = gdb.index().forNodes
                 (DataSource.nodeIndexName());
 
+            Label label = Label.label(source);
             Node n = index.get(KEY, source).getSingle();
             if (n == null) {
                 source = DataSourceFactory.sourceKey(source);
@@ -1316,18 +1317,20 @@ public class EntityFactory implements Props {
             }
 
             if (n != null) {
-                Label label = Label.label((String)n.getProperty(NAME));
-                for (Iterator<Node> it = gdb.findNodes(label, SOURCE, source);
-                     it.hasNext(); ) {
-                    Node node = it.next();
-                    Entity._getEntity(node).delete();
-                    ++count;
-                }
-                logger.info(count+" entities deleted for \""+source+"\"");
+                label = Label.label((String)n.getProperty(NAME));
             }
             else {
                 logger.warning("Can't find data source: "+source);
             }
+
+            for (Iterator<Node> it = gdb.findNodes(label, SOURCE, source);
+                 it.hasNext(); ) {
+                Node node = it.next();
+                Entity._getEntity(node).delete();
+                ++count;
+            }
+            logger.info(count+" entities deleted for \""+source+"\"");
+            
             tx.success();
         }
         return count;
@@ -1352,7 +1355,8 @@ public class EntityFactory implements Props {
     public void components (Consumer<Component> consumer) {
         try (Transaction tx = gdb.beginTx()) {
             gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
-                    consumer.accept(new ComponentLazy (node));
+                    //consumer.accept(new ComponentLazy (node));
+                    consumer.accept(new ComponentImpl (node));
                 });
         }
     }
@@ -1530,7 +1534,9 @@ public class EntityFactory implements Props {
                 ComponentImpl comp = new ComponentImpl (gdb, member);
                 if (root != null)
                     comp.setRoot(root);
-                createStitch (uc.getDataSource(), comp);
+                DataSource dsource = uc.getDataSource();
+                createStitch (dsource, comp);
+                
             });
     }
 
@@ -1769,7 +1775,7 @@ public class EntityFactory implements Props {
                 node.setProperty(ID, key);
                 node.setProperty(SOURCE, source._getKey());
                 node.setProperty(RANK, component.size());
-                
+                Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());                
                 for (Entity e : component) {
                     Node n = e._node();
                     String s = (String)n.getProperty(SOURCE);
@@ -1779,10 +1785,11 @@ public class EntityFactory implements Props {
                         Relationship rel = n.getSingleRelationship
                             (AuxRelType.PAYLOAD, Direction.INCOMING);
                         Node p = rel.getOtherNode(n);
-                        
+
                         rel = node.createRelationshipTo(p, AuxRelType.STITCH);
                         if (e.equals(component.root())) {
-                            rel.setProperty(KIND, "ROOT");
+                            rel.setProperty(KIND, "PARENT");
+                            node.setProperty(PARENT, p.getId());
                         }
                         
                         if (ds != null) {
@@ -1796,6 +1803,9 @@ public class EntityFactory implements Props {
                                            +s+") referenced by node "
                                            +n.getId());
                         }
+
+                        // index all payload properties for this stitch
+                        Util.index(index, node, p); 
                     }
                     catch (Exception ex) {
                         logger.warning("Entity "+n.getId()
@@ -1803,20 +1813,13 @@ public class EntityFactory implements Props {
                     }
                 }
                 
+                Integer count = (Integer) source.get(INSTANCES);
+                source.set(INSTANCES, count == null ? 1 : count+1);
+                
                 return node;
             });
 
         return entity;
-    }
-
-    public void createStitch (DataSource source, long[][]components) {
-        for (long[] cc : components) {
-            createStitch (source, cc);
-        }
-    }
-
-    public void createStitch (String source, long[][] components) {
-        createStitch (dsf.register(source), components);
     }
 
     public Entity _createEntityIfAbsent
@@ -1827,29 +1830,7 @@ public class EntityFactory implements Props {
             
             if (node == null) {
                 node = supplier.get();
-                for (Map.Entry<String, Object> me
-                         : node.getAllProperties().entrySet()) {
-                    key = me.getKey();
-                    value = me.getValue();
-                    if (value.getClass().isArray()) {
-                        try {
-                            int len = Array.getLength(value);
-                            for (int i = 0; i < len; ++i) {
-                                Object v = Array.get(value, i);
-                                index.add(node, key, v);
-                            }
-                        }
-                        catch (Exception ex) {
-                            logger.log(Level.SEVERE,
-                                       "Can't add index for entity "
-                                       +node.getId()+": key="+key
-                                       +" value="+value, ex);
-                        }
-                    }
-                    else {
-                        index.add(node, key, value);
-                    }
-                }
+                Util.index(index, node, node);
             }
             
             return Entity._getEntity(node);

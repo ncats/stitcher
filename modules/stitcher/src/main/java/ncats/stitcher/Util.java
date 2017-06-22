@@ -25,6 +25,8 @@ import chemaxon.struc.Molecule;
 import chemaxon.util.MolHandler;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class Util {
@@ -691,5 +693,34 @@ public class Util {
             ps.println();
         }
         ps.println();
+    }
+
+    public static <T extends org.neo4j.graphdb.Entity>
+        void index (Index<T> index, T entity, String key, Object value) {
+        if (value.getClass().isArray()) {
+            try {
+                int len = Array.getLength(value);
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(value, i);
+                    index.add(entity, key, v);
+                }
+            }
+            catch (Exception ex) {
+                logger.log(Level.SEVERE,
+                           "Can't add index for entity "
+                           +entity.getId()+": key="+key
+                           +" value="+value, ex);
+            }
+        }
+        else {
+            index.add(entity, key, value);
+        }
+    }
+
+    public static <T extends org.neo4j.graphdb.Entity>
+        void index (Index<T> index, T entity, PropertyContainer props) {
+        for (Map.Entry<String, Object> me
+                 : props.getAllProperties().entrySet())
+            Util.index(index, entity, me.getKey(), me.getValue());
     }
 }

@@ -403,22 +403,7 @@ public class Entity extends CNode {
          *
          * match (n:`jsonDump2015-11-24.txt.gz`)-[r]-(m:`jsonDump2015-11-24.txt.gz`) where type(r)='I_CAS' AND r._value='39421-75-5' return n,r,m limit 25
          */
-        Index<Node> index = _nodeIndex ();
-        if (value.getClass().isArray()) {
-            try {
-                int len = Array.getLength(value);
-                for (int i = 0; i < len; ++i) {
-                    Object v = Array.get(value, i);
-                    index.add(_node, name, v);
-                }
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        else {
-            index.add(_node, name, value);
-        }
+        Util.index(_nodeIndex (), _node, name, value);
     }
 
     public Entity set (StitchKey key, Stitchable value) {

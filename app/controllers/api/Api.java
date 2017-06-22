@@ -90,16 +90,6 @@ public class Api extends Controller {
             node.put("count", (Integer)ds.get(Props.INSTANCES));
             node.put("sha1", (String)ds.get(Props.SHA1));
             node.put("size", (Long)ds.get(Props.SIZE));
-            String[] stitches = (String[])ds.get(Props.STITCHES);
-            if (stitches != null) {
-                ObjectNode sn = mapper.createObjectNode();
-                for (String s : stitches) {
-                    String[] props = (String[])ds.get(s);
-                    if (props != null)
-                        sn.put(s, mapper.valueToTree(props));
-                }
-                node.put("stitches", sn);
-            }
             String[] props = (String[])ds.get(Props.PROPERTIES);
             if (props != null)
                 node.put("properties", mapper.valueToTree(props));

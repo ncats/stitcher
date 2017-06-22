@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
 import ncats.stitcher.graph.UnionFind;
 import static ncats.stitcher.StitchKey.*;
 
-public abstract class UntangleComponent {
+public abstract class UntangleComponent implements Props {
     static final Logger logger = Logger.getLogger
         (UntangleComponent.class.getName());
 
@@ -24,6 +24,19 @@ public abstract class UntangleComponent {
         stats = new HashMap<>();
         for (StitchKey key : Entity.KEYS) {
             stats.put(key, component.stats(key));
+        }
+        
+        long created = (Long) dsource.get(CREATED);
+        for (Entity e : component) {
+            long c = (Long) e.get(CREATED);
+            if (c > created) {
+                throw new IllegalArgumentException
+                    ("Can't use DataSource \""+dsource.getName()+"\" ("
+                     +dsource.getKey()+") "
+                     +"as reference to untangle component "
+                     +component.getId()+" because data has changed "
+                     +"since it was last created!");
+            }
         }
         this.component = component;
         this.dsource = dsource;

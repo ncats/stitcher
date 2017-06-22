@@ -356,7 +356,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
             }
             ++processed;
         }
-        dump ("unmapped nodes");
+        dump ("handle unmapped nodes");
 
         /*
         // now handle unresolved nodes with multiple active moieties and
@@ -398,7 +398,20 @@ public class UntangleCompoundComponent extends UntangleComponent {
         }
     }
 
-    Long getRoot (long[] component) {
+    /*
+     * TODO: find the root active moiety and if exists return it
+     */
+    Long getRoot (long[] comp) {
+        Entity[] entities = component.entities(comp);
+        if (entities.length != comp.length)
+            logger.warning("There are missing entities in component!");
+        
+        for (Entity e : entities) {
+            Entity[] nb = e.inNeighbors(T_ActiveMoiety);
+            if (nb.length > 0)
+                return e.getId();
+        }
+        
         return null;
     }
 
@@ -436,6 +449,25 @@ public class UntangleCompoundComponent extends UntangleComponent {
         }
     }
 
+    static void dumpComponents (EntityFactory ef) throws IOException {
+        PrintStream ps = new PrintStream
+            (new FileOutputStream ("components.txt"));
+        Map<Integer, Integer> hist = new TreeMap<>();
+        ef.components(component -> {
+                Entity root = component.root();
+                Integer rank = (Integer) root.get(Props.RANK);
+                ps.println(root.getId()+"\t"+rank);
+                Integer c = hist.get(rank);
+                hist.put(rank, c == null ? 1 : c+1);
+            });
+        ps.close();
+        
+        System.out.println("Component rank histogram:");
+        for (Map.Entry<Integer, Integer> me : hist.entrySet()) {
+            System.out.println(me.getKey()+"\t"+me.getValue());
+        }
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 3) {
             System.err.println("Usage: "
@@ -446,7 +478,9 @@ public class UntangleCompoundComponent extends UntangleComponent {
 
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
         try {
-            EntityFactory ef = new EntityFactory (graphDb);
+            EntityFactory ef = new EntityFactory (graphDb);         
+            dumpComponents (ef);
+            
             DataSource dsource = ef.getDataSourceFactory().register(argv[1]);
             for (int i = 2; i < argv.length; ++i) {
                 Component comp = ef.component(Long.parseLong(argv[i]));

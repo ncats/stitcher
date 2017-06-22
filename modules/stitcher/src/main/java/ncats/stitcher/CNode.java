@@ -71,7 +71,9 @@ public class CNode implements Props, Comparable<CNode> {
             node.setProperty(CREATED, created);
             node.setProperty(UPDATED, lastUpdated);
             node.setProperty(KIND, getClass().getName());
-            node.setProperty(PARENT, node.getId()); // self
+            if (!node.hasProperty(PARENT)) {
+                node.setProperty(PARENT, node.getId()); // self
+            }
             timeline.add(node, created);
         }
         _node = node;
@@ -461,6 +463,17 @@ public class CNode implements Props, Comparable<CNode> {
         List<Relationship> snapshots = new ArrayList<Relationship>();
         Node parent = null;
         Node payload = null;
+        
+        ObjectNode stitches = null;
+        if (_node.hasLabel(AuxNodeType.SGROUP)) {
+            stitches = mapper.createObjectNode();
+            stitches.put("id", (String) _node.getProperty(ID, null));
+            stitches.put("size", (Integer)_node.getProperty(RANK, 0));
+            stitches.put("members", mapper.createArrayNode());
+            stitches.put("parent", (Long)_node.getProperty(PARENT, null));
+            node.put("stitch", stitches);
+        }
+        
         for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
             Node n = rel.getOtherNode(_node);
             if (n.hasLabel(AuxNodeType.SNAPSHOT)) {
@@ -470,6 +483,10 @@ public class CNode implements Props, Comparable<CNode> {
                      || _node.hasLabel(AuxNodeType.DATA)) {
                 // there should only be one edge for snapshot node!
                 parent = n;
+            }
+            else if (rel.isType(AuxRelType.STITCH)) {
+                ((ArrayNode)stitches.get("members"))
+                    .add(mapper.valueToTree(n.getId()));
             }
             else if (n.hasLabel(AuxNodeType.DATA)) {
                 payload = n;

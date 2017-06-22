@@ -89,8 +89,11 @@ public class DataSourceFactory implements Props {
 
     public DataSource register (String source) {
         try (Transaction tx = gdb.beginTx()) {
-            DataSource ds = _register (sourceKey (source), source);
-            tx.success();
+            DataSource ds = _getDataSourceByName (source);
+            if (ds == null) {
+                ds =_register (sourceKey (source), source);
+                tx.success();
+            }
             return ds;
         }
     }
@@ -148,31 +151,33 @@ public class DataSourceFactory implements Props {
 
     public DataSource getDataSourceByName (String source) {
         try (Transaction tx = gdb.beginTx()) {
-            Index<Node> index = gdb.index().forNodes
-                (DataSource.nodeIndexName());
-            
-            IndexHits<Node> hits = index.get(NAME, source);
-            try {
-                if (hits.size() > 1) {
-                    logger.warning("Data source name \""
-                                   +source+"\" matches "+hits.size()
-                                   +"multiple node!");
-                }
-                
-                // simply return the first one
-                DataSource ds = null;
-                for (Node n : hits) {
-                    ds = DataSource._getDataSource(n);
-                    break;
-                }
-                tx.success();
-                return ds;
-            }
-            finally {
-                hits.close();
-            }
+            DataSource ds = _getDataSourceByName (source);
+            tx.success();
+            return ds;
         }
     }
+
+    public DataSource _getDataSourceByName (String source) {
+        Index<Node> index = gdb.index().forNodes
+            (DataSource.nodeIndexName());
+        
+        try (IndexHits<Node> hits = index.get(NAME, source)) {
+            if (hits.size() > 1) {
+                logger.warning("Data source name \""
+                               +source+"\" matches "+hits.size()
+                               +"multiple node!");
+            }
+            
+            // simply return the first one
+            DataSource ds = null;
+            for (Node n : hits) {
+                ds = DataSource._getDataSource(n);
+                break;
+            }
+            
+            return ds;
+        }
+    }   
 
     public DataSource _getDataSourceByKey (String key) {
         Index<Node> index = gdb.index().forNodes

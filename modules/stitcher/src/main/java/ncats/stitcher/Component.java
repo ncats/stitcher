@@ -1,6 +1,9 @@
 package ncats.stitcher;
 
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -86,6 +89,19 @@ public interface Component extends Iterable<Entity> {
      * return all entities for this component.
      */
     Entity[] entities ();
+
+    default Entity[] entities (long[] ids) {
+        Map<Long, Entity> map = new HashMap<>();
+        for (Entity e : entities ())
+            map.put(e.getId(), e);
+        List<Entity> ents = new ArrayList<>();
+        for (int i = 0; i < ids.length; ++i) {
+            Entity e = map.get(ids[i]);
+            if (e != null)
+                ents.add(e);
+        }
+        return ents.toArray(new Entity[0]);
+    }
 
     /*
      * determine if the given component overlaps with this component
