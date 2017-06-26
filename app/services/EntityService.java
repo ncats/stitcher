@@ -104,9 +104,9 @@ public class EntityService {
             catch (Exception ex) {
                 //ex.printStackTrace();
                 //Logger.error("Unknown entity label \""+label+"\"!");
-                return getEntityFactory().entities(label, skip, top);
+                return getEntityFactory().entities(skip, top, label);
             }
         }
-        return getEntityFactory().entities(type, skip, top);
+        return getEntityFactory().entities(skip, top, type);
     }
 }

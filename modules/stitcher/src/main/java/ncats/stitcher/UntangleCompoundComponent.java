@@ -320,7 +320,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                     set.add(target);
                 }
             }, T_ActiveMoiety);
-        dumpActiveMoieties ();
+        //dumpActiveMoieties ();
         dump ("Active moiety stitching");
 
         // collapse based on lychi layer 5
@@ -469,29 +469,50 @@ public class UntangleCompoundComponent extends UntangleComponent {
     }
 
     public static void main (String[] argv) throws Exception {
-        if (argv.length < 3) {
+        if (argv.length < 2) {
             System.err.println("Usage: "
                                +UntangleCompoundComponent.class.getName()
-                               +" DB DATASOURCE COMPONENTS...");
+                               +" DB DATASOURCE [COMPONENTS...]");
             System.exit(1);
         }
 
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
         try {
-            EntityFactory ef = new EntityFactory (graphDb);         
-            dumpComponents (ef);
+            EntityFactory ef = new EntityFactory (graphDb);     
+            //dumpComponents (ef);
             
             DataSource dsource = ef.getDataSourceFactory().register(argv[1]);
-            for (int i = 2; i < argv.length; ++i) {
-                Component comp = ef.component(Long.parseLong(argv[i]));
-                logger.info("Dumping component "+comp.getId());         
-                FileOutputStream fos = new FileOutputStream
-                    ("Component_"+comp.getId()+".txt");
-                Util.dump(fos, comp);
-                fos.close();
-                
-                logger.info("Stitching component "+comp.getId());
-                ef.untangle(new UntangleCompoundComponent (dsource, comp));
+            if (argv.length == 2) {
+                // do all components
+                logger.info("Untangle all components...");
+                List<Long> components = new ArrayList<>();
+                ef.components(component -> {
+                        /*
+                        logger.info("Component "+component.getId()+"...");
+                        ef.untangle(new UntangleCompoundComponent
+                                    (dsource, component));
+                        */
+                        components.add(component.root().getId());
+                    });
+                logger.info("### "+components.size()+" components!");
+                for (Long cid : components) {
+                    logger.info("########### Untangle component "+cid+"...");
+                    ef.untangle(new UntangleCompoundComponent
+                                (dsource, ef.component(cid)));
+                }
+            }
+            else {
+                for (int i = 2; i < argv.length; ++i) {
+                    Component comp = ef.component(Long.parseLong(argv[i]));
+                    logger.info("Dumping component "+comp.getId());         
+                    FileOutputStream fos = new FileOutputStream
+                        ("Component_"+comp.getId()+".txt");
+                    Util.dump(fos, comp);
+                    fos.close();
+                    
+                    logger.info("Stitching component "+comp.getId());
+                    ef.untangle(new UntangleCompoundComponent (dsource, comp));
+                }
             }
         }
         finally {

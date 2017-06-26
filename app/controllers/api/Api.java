@@ -210,24 +210,7 @@ public class Api extends Controller {
         return internalServerError ("Unable to delete payload "+key);
     }
 
-    public Result entities (String label, Integer skip, Integer top) {
-        if ("@labels".equalsIgnoreCase(label)) {
-            return ok ((JsonNode)mapper.valueToTree
-                       (EnumSet.allOf(AuxNodeType.class)));
-        }
-        try {
-            long id = Long.parseLong(label);
-            Entity e = es.getEntity(id);
-            return e != null ? ok (e.toJson())
-                : notFound ("No such entity id "+id);
-        }
-        catch (NumberFormatException ex) {
-            // not id..
-        }
-        int s = skip != null ? skip : 0;
-        int t = top != null ? Math.min(top,1000) : 10;
-        
-        Entity[] entities = es.entities(label, s, t);
+    ObjectNode toJson (int s, int t, Entity... entities) {
         ArrayNode page = mapper.createArrayNode();
         for (Entity e : entities) {
             page.add(e.toJson());
@@ -240,6 +223,103 @@ public class Api extends Controller {
         result.put("uri", request().uri());
         result.put("contents", page);
         
-        return ok (result);
+        return result;
+    }
+
+    public Result getStitch (String unii) {
+        Entity e = null;
+        try {
+            long id = Long.parseLong(unii);
+            e = es.getEntityFactory().entity(id);
+            if (!e.is(AuxNodeType.SGROUP))
+                e = null;
+        }
+        catch (NumberFormatException ex) {
+            Entity[] entities = es.getEntityFactory()
+                .filter("UNII", "'"+unii+"'", AuxNodeType.SGROUP);
+            if (entities.length > 0)
+                e = entities[0];
+        }
+        
+        return e != null ? ok (e.toJson())
+            : notFound ("Unknown stitch key: "+unii);
+    }
+    
+    public Result stitches (Integer skip, Integer top) {
+        Map<String, String[]> params = request().queryString();
+        if (params.isEmpty())
+            return entities (AuxNodeType.SGROUP.name(), skip, top);
+
+        /*
+         * /stitches?filter=@label1&filter=@label2&filter=name/value
+         */
+        List<String> labels = new ArrayList<>();
+        labels.add(AuxNodeType.SGROUP.name());
+
+        String key = null, value = null;
+        for (Map.Entry<String, String[]> me : params.entrySet()) {
+            if ("filter".equals(me.getKey())) {
+                for (String p : me.getValue()) {
+                    if (p.charAt(0) == '@') { // label
+                        labels.add(p.substring(1));
+                    }
+                    else {
+                        int pos = p.indexOf('/');
+                        if (pos > 0) {
+                            key = p.substring(0, pos);
+                            value = "'"+p.substring(pos+1)+"'";
+                        }
+                    }
+                }
+            }
+        }
+
+        Entity[] entities;
+        int s, t;
+        if (key != null) {
+            entities = es.getEntityFactory().filter
+                (key, value, labels.toArray(new String[0]));
+            s = 0;
+            t = entities.length;
+        }
+        else {
+            s = skip != null ? skip : 0;
+            t = top != null ? Math.min(top,1000) : 10;
+            
+            entities = es.getEntityFactory()
+                .entities(s, t, labels.toArray(new String[0]));
+        }
+        
+        return ok (toJson (s, t, entities));
+    }
+    
+    public Result entities (String label, Integer skip, Integer top) {
+        if ("@labels".equalsIgnoreCase(label)) {
+            return ok ((JsonNode)mapper.valueToTree
+                       (es.getEntityFactory().labels()));
+        }
+        else if ("@properties".equalsIgnoreCase(label)) {
+            return ok ((JsonNode)mapper.valueToTree
+                       (es.getEntityFactory().properties()));
+        }
+        else if ("@relationships".equalsIgnoreCase(label)) {
+            return ok ((JsonNode)mapper.valueToTree
+                       (es.getEntityFactory().relationships()));            
+        }
+        
+        try {
+            long id = Long.parseLong(label);
+            Entity e = es.getEntity(id);
+            return e != null ? ok (e.toJson())
+                : notFound ("No such entity id "+id);
+        }
+        catch (NumberFormatException ex) {
+            // not id..
+        }
+        
+        int s = skip != null ? skip : 0;
+        int t = top != null ? Math.min(top,1000) : 10;
+        
+        return ok (toJson (s, t, es.entities(label, s, t)));
     }
 }

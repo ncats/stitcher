@@ -84,10 +84,10 @@ public class EntityFactory implements Props {
     }
 
     static class EntityIterator implements Iterator<Entity> {
-        final Iterator<Node> iter;
+        final ResourceIterator<Node> iter;
         final GraphDatabaseService gdb;
 
-        EntityIterator (GraphDatabaseService gdb, Iterator<Node> iter) {
+        EntityIterator (GraphDatabaseService gdb, ResourceIterator<Node> iter) {
             this.iter = iter;
             this.gdb = gdb;
         }
@@ -1379,21 +1379,27 @@ public class EntityFactory implements Props {
         }
     }
 
-    public Entity[] entities (String label, int skip, int top) {
-        return entities (Label.label(label), skip, top);
+    public Entity[] entities (int skip, int top, String... labels) {
+        return entities (skip, top, Arrays.stream(labels)
+                         .map(l -> Label.label(l)).toArray(Label[]::new));
     }
     
-    public Entity[] entities (Label label, int skip, int top) {
+    public Entity[] entities (int skip, int top, Label... labels) {
         List<Entity> page = new ArrayList<Entity>();
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("skip", skip);
         params.put("top", top);
 
+        StringBuilder query = new StringBuilder ("match(n");
+        for (Label l : labels) {
+            query.append(":`"+l+"`");
+        }
+        query.append(":"+AuxNodeType.ENTITY
+                     +") return n skip {skip} limit {top}");
+
         //System.out.println("components: skip="+skip+" top="+top);
         try (Transaction tx = gdb.beginTx();
-             Result result = gdb.execute
-             ("match(n:`"+label+"`) return n skip {skip} limit {top}", params)
-             ) {
+             Result result = gdb.execute(query.toString(), params)) {
             while (result.hasNext()) {
                 Map<String, Object> row = result.next();
                 //System.out.println("  rows: "+row);
@@ -1566,6 +1572,44 @@ public class EntityFactory implements Props {
         return iterator;
     }
 
+    public Entity[] filter (String key, Object value, String... labels) {
+        return filter (key, value, Arrays.stream(labels)
+                       .map(l -> Label.label(l)).toArray(Label[]::new));
+    }
+
+    public Entity[] filter (String key, Object value, Label... labels) {
+        if (key == null)
+            throw new IllegalArgumentException
+                ("Can't filter with key is null!");
+        
+        StringBuilder query = new StringBuilder
+            ("START n=node:`"+Entity.nodeIndexName()+"`(`"
+             +key+"`="+value+") with n MATCH(n");
+        if (labels != null) {
+            for (Label l : labels)
+                query.append(":`"+l+"`");
+        }
+        query.append(") return n");
+        logger.info("QUERY: "+query);
+        
+        try (Transaction tx = gdb.beginTx();
+             Result result = gdb.execute(query.toString())) {
+            List<Entity> entities = new ArrayList<>();
+            while (result.hasNext()) {
+                try {
+                    Map<String, Object> row = result.next();
+                    //logger.info(">>> "+row);
+                    entities.add(Entity._getEntity((Node)row.get("n")));
+                }
+                catch (Exception ex) {
+                }
+            }
+            result.close();
+            
+            return entities.toArray(new Entity[0]);
+        }
+    }
+
     public Iterator<Entity> find (String key, Object value) {
         return find (gdb, key, value);
     }
@@ -1582,7 +1626,29 @@ public class EntityFactory implements Props {
         }
         return Util.toArray(nodes);
     }
-    
+
+    public String[] labels () {
+        try (Transaction tx = gdb.beginTx()) {
+            return gdb.getAllLabelsInUse().stream()
+                .map(l -> l.name())
+                .toArray(String[]::new);
+        }
+    }
+
+    public String[] relationships () {
+        try (Transaction tx = gdb.beginTx()) {
+            return gdb.getAllRelationshipTypes().stream()
+                .map(l -> l.name())
+                .toArray(String[]::new);
+        }
+    }
+
+    public String[] properties () {
+        try (Transaction tx = gdb.beginTx()) {
+            return gdb.getAllPropertyKeys().stream().toArray(String[]::new);
+        }
+    }
+        
     /**
      * iterate over entities of a particular data source
      */
@@ -1767,7 +1833,7 @@ public class EntityFactory implements Props {
     }
     
     public Entity _createStitch (DataSource source, Component component) {
-        final String key = source.getKey()+"-"+component.getId();
+        final String key = source.getKey()+component.getId();
         Entity entity = _createEntityIfAbsent(ID, key, () -> {
                 Node node = gdb.createNode(AuxNodeType.SGROUP,
                                            AuxNodeType.ENTITY,
