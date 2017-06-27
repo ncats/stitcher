@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.TreeMap;
+import java.util.HashMap;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -473,7 +475,9 @@ public class CNode implements Props, Comparable<CNode> {
             stitches.put("parent", (Long)_node.getProperty(PARENT, null));
             node.put("stitch", stitches);
         }
-        
+
+        Map<String, Object> properties = new TreeMap<>();
+        Map<Object, Long> refs = new HashMap<>();
         for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
             Node n = rel.getOtherNode(_node);
             if (n.hasLabel(AuxNodeType.SNAPSHOT)) {
@@ -485,8 +489,28 @@ public class CNode implements Props, Comparable<CNode> {
                 parent = n;
             }
             else if (rel.isType(AuxRelType.STITCH)) {
-                ((ArrayNode)stitches.get("members"))
-                    .add(mapper.valueToTree(n.getId()));
+                ObjectNode member = mapper.createObjectNode();
+                member.put("id", n.getId());
+                member.put(SOURCE, (String)rel.getProperty(SOURCE));
+                for (Map.Entry<String, Object> me
+                         : n.getAllProperties().entrySet()) {
+                    if (me.getValue().getClass().isArray()) {
+                        int len = Array.getLength(me.getValue());
+                        for (int i = 0; i < len; ++i)
+                            refs.put(Array.get(me.getValue(), i), n.getId());
+                    }
+                    else {
+                        refs.put(me.getValue(), n.getId());
+                    }
+                    
+                    Object value = properties.get(me.getKey());
+                    if (value != null)
+                        properties.put
+                            (me.getKey(), Util.merge(value, me.getValue()));
+                    else
+                        properties.put(me.getKey(), me.getValue());
+                }
+                ((ArrayNode)stitches.get("members")).add(member);               
             }
             else if (n.hasLabel(AuxNodeType.DATA)) {
                 payload = n;
@@ -505,6 +529,33 @@ public class CNode implements Props, Comparable<CNode> {
                 }
                 neighbors.add(nb);
             }
+        }
+
+        if (!properties.isEmpty()) {
+            for (Map.Entry<String, Object> me : properties.entrySet()) {
+                Object value = me.getValue();
+                if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    Object[] vals = new Object[len];
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(value, i);
+                        Map m = new TreeMap ();
+                        m.put("value", v);
+                        m.put("node", refs.get(v));
+                        vals[i] = m;
+                    }
+                    value = vals;
+                }
+                else {
+                    Map m = new TreeMap ();
+                    m.put("value", value);
+                    m.put("node", refs.get(value));
+                    value = m;
+                }
+                me.setValue(value);
+            }
+            
+            stitches.put("properties", mapper.valueToTree(properties));
         }
             
         if (neighbors.size() > 0)
