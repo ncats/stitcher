@@ -1,14 +1,6 @@
 package ncats.stitcher;
 
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.TreeMap;
-import java.util.HashMap;
-import java.util.Comparator;
-import java.util.Collections;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.concurrent.Callable;
@@ -473,7 +465,7 @@ public class CNode implements Props, Comparable<CNode> {
             stitches.put("size", (Integer)_node.getProperty(RANK, 0));
             stitches.put("members", mapper.createArrayNode());
             stitches.put("parent", (Long)_node.getProperty(PARENT, null));
-            node.put("stitch", stitches);
+            node.put("sgroup", stitches);
         }
 
         Map<String, Object> properties = new TreeMap<>();
@@ -510,6 +502,27 @@ public class CNode implements Props, Comparable<CNode> {
                     else
                         properties.put(me.getKey(), me.getValue());
                 }
+                
+                Relationship payrel = n.getSingleRelationship
+                    (AuxRelType.PAYLOAD, Direction.OUTGOING);
+                if (payrel != null) {
+                    Node sn = payrel.getOtherNode(n);
+                    Map<String, Object> map = new TreeMap<>();
+                    for (Relationship srel : sn.getRelationships
+                             (EnumSet.allOf(StitchKey.class)
+                              .toArray(new StitchKey[0]))) {
+                        Object value = map.get(srel.getType().name());
+                        if (value != null) {
+                            value = Util.merge
+                                (value, srel.getProperty("value"));
+                        }
+                        else
+                            value = srel.getProperty("value");
+                        map.put(srel.getType().name(), value);
+                    }
+                    member.put("stitches", mapper.valueToTree(map));
+                }
+                
                 ((ArrayNode)stitches.get("members")).add(member);               
             }
             else if (n.hasLabel(AuxNodeType.DATA)) {

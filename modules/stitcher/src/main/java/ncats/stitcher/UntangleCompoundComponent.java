@@ -356,41 +356,34 @@ public class UntangleCompoundComponent extends UntangleComponent {
             }
             ++processed;
         }
-        dump ("handle unmapped nodes");
+        //dump ("handle unmapped nodes");
 
-        /*
         // now handle unresolved nodes with multiple active moieties and
         // assign to the class with less references 
         for (Entity e : unsure) {
             Entity[] nb = e.outNeighbors(T_ActiveMoiety);
-            assert nb.length > 1: "Expecting active moiety "
-                +"neighbors > 1 but instead got "+nb.length+"!";
-            
-            Entity u = null;
-            Integer best = null;
-            for (Entity n : nb) {
-                Object kv = e.keys(n).get(T_ActiveMoiety);
-                Integer c = stats.get(T_ActiveMoiety).get(kv);
-                if (u == null || best > c) {
-                    u = n;
-                    best = c;
+            if (nb.length > 1 && !uf.contains(e.getId())) {
+                Map<Long, Integer> votes = new HashMap<>();
+                for (Entity u : nb) {
+                    for (Object v : Util.toSet(u.get(H_LyChI_L4))) {
+                        if (v.toString().endsWith("-M")
+                            || v.toString().endsWith("-N")) {
+                            Integer c = votes.get(u.getId());
+                            votes.put(u.getId(), c==null?1:c+1);
+                        }
+                    }
+                }
+
+                if (votes.size() == 1) {
+                    Long id = votes.keySet().iterator().next();
+                    uf.union(e.getId(), id);
+                }
+                else {
+                    uf.add(e.getId()); // its own component
                 }
             }
-            
-            if (u != null) {
-                uf.union(e.getId(), u.getId());
-            }
-            else {
-                logger.warning("** unmapped entity "+e.getId()+": "
-                               +e.keys());
-                ++count;
-            }
         }
-        dump ("Stitching "+unsure.size()
-              +" nodes with multiple active moieties");
-        */
-
-        logger.info("### "+count+" unstitched entities!");
+        dump ("nodes with multiple active moieties");
         
         // now generate untangled compoennts..
         for (long[] comp : uf.components()) {
@@ -472,16 +465,31 @@ public class UntangleCompoundComponent extends UntangleComponent {
         if (argv.length < 2) {
             System.err.println("Usage: "
                                +UntangleCompoundComponent.class.getName()
-                               +" DB DATASOURCE [COMPONENTS...]");
+                               +" DB VERSION [COMPONENTS...]");
+            System.exit(1);
+        }
+        
+        Integer version = 0;
+        try {
+            version = Integer.parseInt(argv[1]);
+            if (version == 0) {
+                System.err.println("VERSION can't be 0");
+                System.exit(1);
+            }
+        }
+        catch (NumberFormatException ex) {
+            System.err.println("VERSION must be numerical, e.g., 1, 2,...");
             System.exit(1);
         }
 
         GraphDb graphDb = GraphDb.getInstance(argv[0]);
         try {
-            EntityFactory ef = new EntityFactory (graphDb);     
+            EntityFactory ef = new EntityFactory (graphDb);
             //dumpComponents (ef);
+
+            DataSource dsource =
+                ef.getDataSourceFactory().register("stitch_v"+version);
             
-            DataSource dsource = ef.getDataSourceFactory().register(argv[1]);
             if (argv.length == 2) {
                 // do all components
                 logger.info("Untangle all components...");

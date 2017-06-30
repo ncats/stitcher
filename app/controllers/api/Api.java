@@ -226,35 +226,39 @@ public class Api extends Controller {
         return result;
     }
 
-    public Result getStitch (String unii) {
+    Entity getStitchEntity (Integer ver, String id) {
         Entity e = null;
         try {
-            long id = Long.parseLong(unii);
-            e = es.getEntityFactory().entity(id);
+            long n = Long.parseLong(id);
+            e = es.getEntityFactory().entity(n);
             if (!e.is(AuxNodeType.SGROUP))
                 e = null;
         }
         catch (NumberFormatException ex) {
             Entity[] entities = es.getEntityFactory()
-                .filter("UNII", "'"+unii+"'", AuxNodeType.SGROUP);
+                .filter("UNII", "'"+id+"'", "stitch_v"+ver);
             if (entities.length > 0)
                 e = entities[0];
         }
-        
-        return e != null ? ok (e.toJson())
-            : notFound ("Unknown stitch key: "+unii);
+        return e;
     }
     
-    public Result stitches (Integer skip, Integer top) {
+    public Result getStitch (Integer ver, String id) {
+        Entity e = getStitchEntity (ver, id);
+        return e != null ? ok (e.toJson())
+            : notFound ("Unknown stitch key: "+id);
+    }
+    
+    public Result stitches (Integer ver, Integer skip, Integer top) {
         Map<String, String[]> params = request().queryString();
         if (params.isEmpty())
-            return entities (AuxNodeType.SGROUP.name(), skip, top);
+            return entities ("stitch_v"+ver, skip, top);
 
         /*
          * /stitches?filter=@label1&filter=@label2&filter=name/value
          */
         List<String> labels = new ArrayList<>();
-        labels.add(AuxNodeType.SGROUP.name());
+        labels.add("stitch_v"+ver);
 
         String key = null, value = null;
         for (Map.Entry<String, String[]> me : params.entrySet()) {
