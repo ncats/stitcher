@@ -482,8 +482,9 @@ public class CNode implements Props, Comparable<CNode> {
             }
             else if (rel.isType(AuxRelType.STITCH)) {
                 ObjectNode member = mapper.createObjectNode();
-                member.put("id", n.getId());
+                member.put("node", n.getId());
                 member.put(SOURCE, (String)rel.getProperty(SOURCE));
+                                
                 for (Map.Entry<String, Object> me
                          : n.getAllProperties().entrySet()) {
                     if (me.getValue().getClass().isArray()) {
@@ -507,6 +508,34 @@ public class CNode implements Props, Comparable<CNode> {
                     (AuxRelType.PAYLOAD, Direction.OUTGOING);
                 if (payrel != null) {
                     Node sn = payrel.getOtherNode(n);
+                    
+                    String src = (String) sn.getProperty(SOURCE, null);
+                    ds = dsf.getDataSourceByKey(src);
+                    if (ds != null) {
+                        String field = (String) ds.get("IdField");
+                        if (field != null) {
+                            Object val = n.getProperty(field, null);
+                            if (val != null) {
+                                if (val.getClass().isArray())
+                                    val = Array.get(val, 0);
+                                member.put("id", mapper.valueToTree(val));
+                            }
+                        }
+                        
+                        field = (String) ds.get("NameField");
+                        if (field != null) {
+                            Object val = n.getProperty(field, null);
+                            if (val != null) {
+                                if (val.getClass().isArray())
+                                    val = Array.get(val, 0);
+                                member.put("name", mapper.valueToTree(val));
+                            }
+                        }
+                    }
+                    else {
+                        logger.warning("Unknown data source: "+src);
+                    }
+                    
                     Map<String, Object> map = new TreeMap<>();
                     for (Relationship srel : sn.getRelationships
                              (EnumSet.allOf(StitchKey.class)

@@ -3,6 +3,7 @@ package ncats.stitcher.impl;
 import java.io.*;
 import java.util.*;
 import java.net.URL;
+import java.lang.reflect.Array;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.security.DigestInputStream;
@@ -15,6 +16,10 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static final Logger logger =
         Logger.getLogger(SRSJsonEntityFactory.class.getName());
 
+    Map<String, Entity> activeMoieties = new HashMap<>();
+    Map<String, Set<Entity>> unresolved = new HashMap<>();
+    int count = 0;
+    
     public SRSJsonEntityFactory (String dir) throws IOException {
         super (dir);
     }
@@ -30,7 +35,8 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setId ("UNII");
+        setIdField ("UNII");
+        setNameField ("PreferredName");
         setUseName (false);
         add (N_Name, "Synonyms")
             .add (I_CAS, "CAS")
@@ -39,34 +45,65 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
             ;
     }
 
-    @Override
-    public int register (InputStream is) throws IOException {
-        BufferedReader br = new BufferedReader (new InputStreamReader (is));
-        int count = 0, ln = 0;
-        Map<String, Entity> activeMoieties = new HashMap<>();
-        Map<String, Set<Entity>> unresolved = new HashMap<>();
-        //PrintWriter pw = new PrintWriter (new FileWriter ("gsrs-dump.sdf"));
-        for (String line; (line = br.readLine()) != null; ++ln) {
-            System.out.println("+++++ "+(count+1)+"/"+(ln+1)+" +++++");
-            String[] toks = line.split("\t");
-            if (toks.length < 2) {
-                logger.warning(ln+": Expecting 3 fields, but instead got "
-                               +toks.length+";\n"+line);
-                continue;
+    void register (String line, int total) {
+        System.out.println("+++++ "+(count+1)+"/"+total+" +++++");
+        String[] toks = line.split("\t");
+        if (toks.length < 2) {
+            logger.warning(total+": Expecting 3 fields, but instead got "
+                           +toks.length+";\n"+line);
+            return;
+        }
+            
+        //logger.info("JSON: "+toks[2]);
+        Object vobj = Util.fromJson(toks[2]);
+        if (vobj == null) {
+            logger.warning("Can't parse json: "+toks[2]);
+        }
+        else if (vobj instanceof Molecule) {
+            Molecule mol = (Molecule)vobj;
+            for (int i = 0; i < mol.getPropertyCount(); ++i) {
+                String prop = mol.getPropertyKey(i);
+                properties.add(prop);
             }
             
-            //logger.info("JSON: "+toks[2]);
-            Molecule mol = Util.fromJson(toks[2]);
-            if (mol != null) {
-                Entity ent = register (mol);
-                
-                String moieties = mol.getProperty("ActiveMoieties");
-                if (moieties != null) {
-                    String[] actives = moieties.split("\n");
-                    for (String a : actives) {
-                        if (a.equals(mol.getProperty("UNII"))) {
+            Entity ent = register (mol);
+            String moieties = mol.getProperty("ActiveMoieties");
+            if (moieties != null) {
+                String[] actives = moieties.split("\n");
+                for (String a : actives) {
+                    if (a.equals(mol.getProperty("UNII"))) {
+                        activeMoieties.put(a, ent);
+                    }
+                    else if (activeMoieties.containsKey(a)) {
+                        Entity e = activeMoieties.get(a);
+                        // create manual stitch from ent -> e
+                        if (!ent.equals(e))
+                            ent.stitch(e, T_ActiveMoiety, a);
+                    }
+                    else {
+                        Set<Entity> ents = unresolved.get(a);
+                        if (ents == null)
+                            unresolved.put(a, ents = new HashSet<>());
+                        ents.add(ent);
+                    }
+                }
+            }
+
+            ++count;
+        }
+        else { // not chemical
+            Map<String, Object> map = (Map)vobj;
+            properties.addAll(map.keySet());
+            
+            Entity ent = register (map);
+            vobj = map.get("ActiveMoieties");
+            if (vobj != null) {
+                String unii = (String)map.get("UNII");
+                if (vobj.getClass().isArray()) {
+                    for (int i = 0; i < Array.getLength(vobj); ++i) {
+                        String a = (String)Array.get(vobj, i);
+                        if (unii.equals(a))
                             activeMoieties.put(a, ent);
-                        }
                         else if (activeMoieties.containsKey(a)) {
                             Entity e = activeMoieties.get(a);
                             // create manual stitch from ent -> e
@@ -81,13 +118,46 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         }
                     }
                 }
+                else if (unii.equals(vobj)) {
+                    activeMoieties.put(unii, ent);
+                }
+                else {
+                    unii = (String)vobj;
+                    if (activeMoieties.containsKey(unii)) {
+                        Entity e = activeMoieties.get(unii);
+                        // create manual stitch from ent -> e
+                        if (!ent.equals(e))
+                            ent.stitch(e, T_ActiveMoiety, unii);
+                    }
+                    else {
+                        Set<Entity> ents = unresolved.get(unii);
+                        if (ents == null)
+                            unresolved.put(unii, ents = new HashSet<>());
+                        ents.add(ent);
+                    }
+                }
+            }
+            ++count;
+        }
+    }
 
-                //pw.print(mol.toFormat("sdf"));
-                ++count;
+    @Override
+    public int register (InputStream is) throws IOException {
+        count = 0;
+        unresolved.clear();
+        activeMoieties.clear();
+        
+        BufferedReader br = new BufferedReader (new InputStreamReader (is));
+        int ln = 0;
+        for (String line; (line = br.readLine()) != null; ++ln) {
+            try {
+                register (line, ln+1);
+            }
+            catch (Exception ex) {
+                logger.log(Level.SEVERE, "can't register entry: "+line, ex);
             }
         }
         br.close();
-        //pw.close();     
 
         logger.info("## "+unresolved.size()+" unresolved active moieties!");
         for (Map.Entry<String, Set<Entity>> me : unresolved.entrySet()) {

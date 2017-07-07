@@ -404,108 +404,210 @@ public class Util {
         }
         return array;
     }
+
+    static Molecule parseChemical (JsonNode node) throws Exception {
+        JsonNode struc = node.get("structure");
+        if (struc == null) {
+            logger.warning("No \"structure\" found in json!");
+            return null;
+        }
+        
+        JsonNode molfile = struc.get("molfile");
+        if (molfile == null) {
+            logger.warning("No \"molfile\" found in \"structure\"!");
+            return null;
+        }
+            
+        MolHandler mh = new MolHandler (molfile.asText());
+        Molecule mol = mh.getMolecule();
+                    
+        JsonNode unii = node.get("approvalID");
+        if (unii != null) {
+            mol.setProperty("UNII", unii.asText());
+            mol.setName(unii.asText());
+        }
+                    
+        JsonNode names = node.get("names");
+        if (names != null && names.isArray()) {
+            int size = names.size();
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = names.get(i);
+                String name = n.get("name").asText();
+                if (sb.length() > 0) sb.append("\n");
+                sb.append(name);
+
+                if (n.get("preferred").asBoolean()) {
+                    mol.setProperty("PreferredName", name);
+                }
+            }
+                        
+            mol.setProperty("Synonyms", sb.toString());
+        }
+                    
+        JsonNode codes = node.get("codes");
+        if (codes != null && codes.isArray()) {
+            int size = codes.size();
+            Map<String, StringBuilder> buf =
+                new HashMap<String, StringBuilder>();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = codes.get(i);
+                if ("PRIMARY".equals(n.get("type").asText())) {
+                    String sys = n.get("codeSystem").asText();
+                    StringBuilder sb = buf.get(sys);
+                    if (sb == null) {
+                        buf.put(sys, sb = new StringBuilder ());
+                    }
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(n.get("code").asText());
+                }
+            }
+                        
+            for (Map.Entry<String, StringBuilder> me
+                     : buf.entrySet()) {
+                mol.setProperty(me.getKey(),
+                                me.getValue().toString());
+            }
+        }
+
+        JsonNode refs = node.get("references");
+        if (refs != null && refs.isArray()) {
+            int size = refs.size();
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = refs.get(i);
+                if (sb.length() > 0) sb.append("\n");
+                sb.append(n.get("citation").asText());
+            }
+            mol.setProperty("References", sb.toString());
+        }
+
+        JsonNode rels = node.get("relationships");
+        if (rels != null && rels.isArray()) {
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < rels.size(); ++i) {
+                JsonNode n = rels.get(i);
+                String type = n.get("type").asText();
+                if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
+                    String id = n.get("relatedSubstance")
+                        .get("approvalID").asText();
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(id);
+                }
+            }
+                        
+            if (sb.length() > 0)
+                mol.setProperty("ActiveMoieties", sb.toString());
+        }
+        
+        return mol;
+    }
+
+    static Map<String, Object> parseSubstance (JsonNode node) {
+        Map<String, Object> map = new TreeMap<>();
+        JsonNode unii = node.get("approvalID");
+        if (unii != null) {
+            map.put("UNII", unii.asText());
+        }
+                    
+        JsonNode names = node.get("names");
+        if (names != null && names.isArray()) {
+            int size = names.size();
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = names.get(i);
+                String name = n.get("name").asText();
+                Object val = map.get("Synonyms");
+                if (val != null)
+                    val = Util.merge(val, name);
+                else
+                    val = name;
+                map.put("Synonyms", val);
+
+                if (n.get("preferred").asBoolean()) {
+                    map.put("PreferredName", name);
+                }
+            }
+        }
+                    
+        JsonNode codes = node.get("codes");
+        if (codes != null && codes.isArray()) {
+            int size = codes.size();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = codes.get(i);
+                if ("PRIMARY".equals(n.get("type").asText())) {
+                    String sys = n.get("codeSystem").asText();
+                    Object val = map.get(sys);
+                    String code = n.get("code").asText();
+                    if (val != null)
+                        val = Util.merge(val, code);
+                    else
+                        val = code;
+                    map.put(sys, val);
+                }
+            }
+        }
+
+        JsonNode refs = node.get("references");
+        if (refs != null && refs.isArray()) {
+            int size = refs.size();
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = refs.get(i);
+                String cite = n.get("citation").asText();
+                Object val = map.get("References");
+                if (val != null)
+                    val = Util.merge(val, cite);
+                else
+                    val = cite;
+                map.put("References", val);
+            }
+        }
+
+        JsonNode rels = node.get("relationships");
+        if (rels != null && rels.isArray()) {
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < rels.size(); ++i) {
+                JsonNode n = rels.get(i);
+                String type = n.get("type").asText();
+                if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
+                    String id = n.get("relatedSubstance")
+                        .get("approvalID").asText();
+                    Object val = map.get("ActiveMoieties");
+                    if (val != null)
+                        val = Util.merge(val, id);
+                    else
+                        val = id;
+                    map.put("ActiveMoieties", val);
+                }
+            }
+        }
+        
+        return map;
+    }
     
     /*
      * parse SRS json into a Molecule
      */
-    public static Molecule fromJson (String json) {
-        ObjectMapper mapper = new ObjectMapper ();
-        Molecule mol = null;
+    public static Object fromJson (String json) {
+        Object retobj = null;
         try {
+            ObjectMapper mapper = new ObjectMapper ();      
             JsonNode node = mapper.readTree(json);
-            JsonNode struc = node.get("structure");
-            if (struc != null) {
-                JsonNode molfile = struc.get("molfile");
-                if (molfile != null) {
-                    MolHandler mh = new MolHandler (molfile.asText());
-                    mol = mh.getMolecule();
-                    
-                    JsonNode unii = node.get("approvalID");
-                    if (unii != null) {
-                        mol.setProperty("UNII", unii.asText());
-                        mol.setName(unii.asText());
-                    }
-                    
-                    JsonNode names = node.get("names");
-                    if (names != null && names.isArray()) {
-                        int size = names.size();
-                        StringBuilder sb = new StringBuilder ();
-                        for (int i = 0; i < size; ++i) {
-                            JsonNode n = names.get(i);
-                            String name = n.get("name").asText();
-                            if (sb.length() > 0) sb.append("\n");
-                            sb.append(name);
-                        }
-                        
-                        mol.setProperty("Synonyms", sb.toString());
-                    }
-                    
-                    JsonNode codes = node.get("codes");
-                    if (codes != null && codes.isArray()) {
-                        int size = codes.size();
-                        Map<String, StringBuilder> buf =
-                            new HashMap<String, StringBuilder>();
-                        for (int i = 0; i < size; ++i) {
-                            JsonNode n = codes.get(i);
-                            if ("PRIMARY".equals(n.get("type").asText())) {
-                                String sys = n.get("codeSystem").asText();
-                                StringBuilder sb = buf.get(sys);
-                                if (sb == null) {
-                                    buf.put(sys, sb = new StringBuilder ());
-                                }
-                                if (sb.length() > 0) sb.append("\n");
-                                sb.append(n.get("code").asText());
-                            }
-                        }
-                        
-                        for (Map.Entry<String, StringBuilder> me
-                                 : buf.entrySet()) {
-                            mol.setProperty(me.getKey(),
-                                            me.getValue().toString());
-                        }
-                    }
+            String cls = node.get("substanceClass").asText();
+            switch (cls) {
+            case "chemical":
+                retobj = parseChemical (node);
+                break;
 
-                    JsonNode refs = node.get("references");
-                    if (refs != null && refs.isArray()) {
-                        int size = refs.size();
-                        StringBuilder sb = new StringBuilder ();
-                        for (int i = 0; i < size; ++i) {
-                            JsonNode n = refs.get(i);
-                            if (sb.length() > 0) sb.append("\n");
-                            sb.append(n.get("citation").asText());
-                        }
-                        mol.setProperty("References", sb.toString());
-                    }
-
-                    JsonNode rels = node.get("relationships");
-                    if (rels != null && rels.isArray()) {
-                        StringBuilder sb = new StringBuilder ();
-                        for (int i = 0; i < rels.size(); ++i) {
-                            JsonNode n = rels.get(i);
-                            String type = n.get("type").asText();
-                            if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
-                                String id = n.get("relatedSubstance")
-                                    .get("approvalID").asText();
-                                if (sb.length() > 0) sb.append("\n");
-                                sb.append(id);
-                            }
-                        }
-                        
-                        if (sb.length() > 0)
-                            mol.setProperty("ActiveMoieties", sb.toString());
-                    }
-                }
-                else
-                    logger.warning("No \"molfile\" found in \"structure\"!");
-            }
-            else {
-                logger.warning("No \"structure\" found in json!");
+            default:
+                retobj = parseSubstance (node);
             }
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't parse json", ex);
         }
-        return mol;
+        return retobj;
     }
 
     public static JsonNode toJsonNode (String...values) {

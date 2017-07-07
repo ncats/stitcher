@@ -230,7 +230,7 @@ public class GinasLoader extends MoleculeEntityFactory {
         gl.add(StitchKey.N_Name, StitchKey.N_Name.name());
         gl.add(StitchKey.I_CAS, StitchKey.I_CAS.name());
         gl.add(StitchKey.T_Keyword, StitchKey.T_Keyword.name());
-        gl.setId(StitchKey.I_UNII.name());
+        gl.setIdField(StitchKey.I_UNII.name());
         RelationshipType[] types = {PredicateType.ActiveMoiety, PredicateType.HasComponent, PredicateType.ConceptOf};
         
         HashMap<String, Long> loaded = new HashMap<>();

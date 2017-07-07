@@ -60,7 +60,7 @@ public class MoleculeRegistrationJob extends RegistrationJob {
                 // ignore
             }
             else if (ID.equals(me.getKey())) {
-                mef.setId(value.toString());
+                mef.setIdField(value.toString());
             }
             else {
                 try {

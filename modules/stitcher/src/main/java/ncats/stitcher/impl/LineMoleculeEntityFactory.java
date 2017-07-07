@@ -18,6 +18,10 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
     static final Logger logger =
         Logger.getLogger(LineMoleculeEntityFactory.class.getName());
 
+    String[] header;
+    int count, molcol;
+    MolHandler mh = new MolHandler ();
+    
     public LineMoleculeEntityFactory (String dir) throws IOException {
         super (dir);
     }
@@ -52,79 +56,88 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
         }
         else {
             instances = register (this.source.openStream(), delim, molcol);
+            updateMeta (this.source);       
             this.source.set(INSTANCES, instances);
-            updateMeta (this.source);
-            logger.info("$$$ "+instances+" entities registered for "+this.source);
+            logger.info
+                ("$$$ "+instances+" entities registered for "+this.source);
         }
         return this.source;
     }
 
+    void register (int line, String[] row) {
+        if (header == null) {
+            int pos = row[0].indexOf('#');
+            if (pos >= 0)
+                row[0] = row[0].substring(pos);
+            header = row;
+        }
+        else {
+            if (header.length != row.length) {
+                logger.warning("Line "+line
+                               +": columns mismatch; "
+                               +"expecting "+header.length
+                               +" columns but instead got "+row.length);
+            }
+            int ncols = Math.min(header.length, row.length);
+            Map<String, Object> props = new HashMap<String, Object>();
+            Molecule mol = null;
+            for (int c = 0; c < ncols; ++c) {
+                if (row[c] != null && (molcol < 0 || molcol == c)
+                    && (strucField == null
+                        || (strucField.length() > 0
+                            && header[c].equals(strucField)))) {
+                    try {
+                        mh.setMolecule(row[c]);                         
+                        if (molcol < 0) {
+                            molcol = c;
+                            logger.info("## Column "+(c+1)
+                                        +" is designated as mol column!");
+                        }
+                        mol = mh.getMolecule();
+                    }
+                    catch (Exception ex) {
+                        if (molcol >= 0)
+                            logger.warning
+                                ("Line "+line+", column "+(c+1)
+                                 +": bogus molecule "
+                                 +ex.getMessage());
+                    }
+                }
+                props.put(header[c], row[c]); 
+            }
+
+            Entity e = null;
+            if (mol != null) {
+                for (Map.Entry<String, Object> me : props.entrySet())
+                    mol.setProperty(me.getKey(), (String)me.getValue());
+                e = register (mol);
+            }
+            else {
+                // otherwise just register the Map..
+                e = register (props);
+            }
+                
+            if (e != null)
+                ++count;
+        }
+    }
+    
     public int register (InputStream is, String delim, int molcol)
         throws IOException {
-        String[] header = null;
-        MolHandler mh = new MolHandler ();
-
-        int count = 0; // entity count
+        header = null;
+        count = 0;
+        molcol = -1;
+        
         LineTokenizer tokenizer = new LineTokenizer (delim.charAt(0));
         tokenizer.setInputStream(is);
         while (tokenizer.hasNext()) {
-            String[] row = tokenizer.next();
-
-            if (header == null) {
-                int pos = row[0].indexOf('#');
-                if (pos >= 0)
-                    row[0] = row[0].substring(pos);
-                header = row;
+            try {
+                String[] row = tokenizer.next();
+                register (tokenizer.getLineCount(), row);
             }
-            else {
-                if (header.length != row.length) {
-                    logger.warning("Line "+tokenizer.getLineCount()
-                                   +": columns mismatch; "
-                                   +"expecting "+header.length
-                                   +" columns but instead got "+row.length);
-                }
-                int ncols = Math.min(header.length, row.length);
-                Map<String, Object> props = new HashMap<String, Object>();
-                Molecule mol = null;
-                for (int c = 0; c < ncols; ++c) {
-                    if (row[c] != null && (molcol < 0 || molcol == c)
-                        && (strucField == null
-                            || (strucField.length() > 0
-                                && header[c].equals(strucField)))) {
-                        try {
-                            mh.setMolecule(row[c]);                         
-                            if (molcol < 0) {
-                                molcol = c;
-                                logger.info("## Column "+(c+1)
-                                            +" is designated as mol column!");
-                            }
-                            mol = mh.getMolecule();
-                        }
-                        catch (Exception ex) {
-                            if (molcol >= 0)
-                                logger.warning
-                                    ("Line "+tokenizer.getLineCount()
-                                     +", column "+(c+1)
-                                     +": bogus molecule "
-                                     +ex.getMessage());
-                        }
-                    }
-                    props.put(header[c], row[c]); 
-                }
-
-                Entity e = null;
-                if (mol != null) {
-                    for (Map.Entry<String, Object> me : props.entrySet())
-                        mol.setProperty(me.getKey(), (String)me.getValue());
-                    e = register (mol);
-                }
-                else {
-                    // otherwise just register the Map..
-                    e = register (props);
-                }
-                
-                if (e != null)
-                    ++count;
+            catch (Exception ex) {
+                logger.log(Level.SEVERE, "can't register at line "
+                           +tokenizer.getLineCount(), ex);
             }
         }
         return count;

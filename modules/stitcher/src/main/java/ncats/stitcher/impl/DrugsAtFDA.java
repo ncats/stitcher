@@ -134,7 +134,9 @@ public class DrugsAtFDA extends MapEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setId("ApplNo").add(StitchKey.N_Name, "ActiveIngredient");
+        setIdField("ApplNo")
+            .setNameField("ActiveIngredient")
+            .add(StitchKey.N_Name, "ActiveIngredient");
     }
 
     protected String[] prodKeys = {"DrugName", "MarketingStatus", "SponsorName", "ApplType",

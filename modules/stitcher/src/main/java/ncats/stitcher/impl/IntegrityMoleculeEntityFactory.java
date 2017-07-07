@@ -53,7 +53,8 @@ public class IntegrityMoleculeEntityFactory extends MoleculeEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setId ("Prous_Science_Entry_Number");
+        setIdField ("Prous_Science_Entry_Number");
+        setNameField ("Drug_Name");
         setUseName (false);
         add (StitchKey.T_Keyword, "Highest_Phase");
         add ("CAS", new KeyMapper (StitchKey.I_CAS));

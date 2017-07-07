@@ -87,7 +87,7 @@ public class NCGCLoader extends MoleculeEntityFactory {
         try {
             Transaction tx = nl.gdb.beginTx();
             nl.add(StitchKey.N_Name, StitchKey.N_Name.name());
-            nl.setId("name");
+            nl.setIdField("name");
             //nl.add(StitchKey.T_Keyword, StitchKey.T_Keyword.name());
 
             try {

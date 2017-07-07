@@ -27,7 +27,7 @@ public class NPCEntityFactory extends MoleculeEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setId("ID").
+        setIdField("ID").
             add(StitchKey.I_CAS, "CAS").
             add(StitchKey.N_Name, "Synonyms").
             add(StitchKey.I_UNII, "CompoundUNII").

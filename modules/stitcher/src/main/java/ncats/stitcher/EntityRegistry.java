@@ -44,7 +44,8 @@ public class EntityRegistry extends EntityFactory {
         new PropertyChangeSupport (this);
 
     protected DataSource source;
-    protected String idField;
+    protected String idField; // id field
+    protected String nameField; // preferred name field
     protected String strucField;
     
     protected EnumMap<StitchKey, Set<String>> stitches;
@@ -79,10 +80,24 @@ public class EntityRegistry extends EntityFactory {
         return this;
     }
     
-    public EntityRegistry setId (String idField) {
+    public EntityRegistry setIdField (String idField) {
         this.idField = idField;
         return this;
     }
+    public String getIdField () { return idField; }
+    
+    public EntityRegistry setNameField (String nameField) {
+        this.nameField = nameField;
+        return this;
+    }
+    public String getNameField () { return nameField; }
+
+    public EntityRegistry setStrucField (String strucField) {
+        this.strucField = strucField;
+        return this;
+    }
+    public String getStrucField () { return strucField; }
+    
     public void clear () { stitches.clear(); }    
     public EntityRegistry add (StitchKey key, String property) {
         Set<String> props = stitches.get(key);
@@ -134,7 +149,11 @@ public class EntityRegistry extends EntityFactory {
 
         idField = null;
         if (source.hasPath("idf"))
-            setId (source.getString("idf"));
+            setIdField (source.getString("idf"));
+
+        nameField = null;
+        if (source.hasPath("namef"))
+            setNameField (source.getString("namef"));
 
         strucField = null;
         if (source.hasPath("structure")) {
@@ -287,11 +306,18 @@ public class EntityRegistry extends EntityFactory {
     }
     
     public Entity register (final Map<String, Object> map) {
+        /*
         return execute (new Callable<Entity> () {
                 public Entity call () throws Exception {
                     return _register (map);
                 }
             }, true);
+        */
+        try (Transaction tx = gdb.beginTx()) {
+            Entity ent = _register (map);
+            tx.success();
+            return ent;
+        }
     }
 
     protected Entity _register (Map<String, Object> map) {
@@ -605,6 +631,12 @@ public class EntityRegistry extends EntityFactory {
         for (Map.Entry<StitchKey, Set<String>> me : stitchMappers.entrySet()) {
             ds.set(me.getKey().name(), me.getValue().toArray(new String[0]));
         }
+        if (idField != null)
+            ds.set("IdField", idField);
+        if (nameField != null)
+            ds.set("NameField", nameField);
+        if (strucField != null)
+            ds.set("StrucField", strucField);
     }
     
     public DataSourceFactory getDataSourceFactory () { return dsf; }

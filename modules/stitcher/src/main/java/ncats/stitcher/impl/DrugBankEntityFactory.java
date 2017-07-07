@@ -55,7 +55,8 @@ public class DrugBankEntityFactory extends MoleculeEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setId ("DRUGBANK_ID");
+        setIdField ("DRUGBANK_ID");
+        setNameField ("GENERIC_NAME");
         setUseName (false);
         add (StitchKey.H_InChIKey, "INCHI_KEY");
         add (StitchKey.N_Name, "GENERIC_NAME");
