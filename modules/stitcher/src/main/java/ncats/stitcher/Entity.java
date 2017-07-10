@@ -23,6 +23,8 @@ import org.neo4j.index.lucene.TimelineIndex;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.traversal.*;
 
+import chemaxon.struc.Molecule;
+
 public class Entity extends CNode {
     static final Logger logger = Logger.getLogger(Entity.class.getName());
     

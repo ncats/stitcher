@@ -123,9 +123,12 @@ public class DataSource extends CNode {
             if (_node.hasProperty(name)) {
                 value = _node.getProperty(name);
             }
-            tx.success();
             return value;
         }
+    }
+
+    public Object _get (String name) {
+        return _node.getProperty(name, null);
     }
 
     public String getName () {

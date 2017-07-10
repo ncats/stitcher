@@ -1379,6 +1379,26 @@ public class EntityFactory implements Props {
         }
     }
 
+    public Long count (Label... labels) {
+        StringBuilder q = new StringBuilder ("match(n");
+        if (labels != null) {
+            for (Label l : labels)
+                q.append(":`"+l+"`");
+        }
+        q.append(") return count(n) as count");
+        
+        Long count = null;
+        try (Transaction tx = gdb.beginTx();
+             Result result = gdb.execute(q.toString())) {
+            if (result.hasNext()) {
+                Map<String, Object> row = result.next();
+                count = (Long)row.get("count");
+            }
+            result.close();
+        }
+        return count;
+    }
+    
     public Entity[] entities (int skip, int top, String... labels) {
         return entities (skip, top, Arrays.stream(labels)
                          .map(l -> Label.label(l)).toArray(Label[]::new));

@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import chemaxon.struc.Molecule;
+import chemaxon.util.MolHandler;
+
 public class CNode implements Props, Comparable<CNode> {
     static final Logger logger = Logger.getLogger(CNode.class.getName());
 
@@ -461,7 +464,7 @@ public class CNode implements Props, Comparable<CNode> {
         ObjectNode stitches = null;
         if (_node.hasLabel(AuxNodeType.SGROUP)) {
             stitches = mapper.createObjectNode();
-            stitches.put("id", (String) _node.getProperty(ID, null));
+            stitches.put("hash", (String) _node.getProperty(ID, null));
             stitches.put("size", (Integer)_node.getProperty(RANK, 0));
             stitches.put("members", mapper.createArrayNode());
             stitches.put("parent", (Long)_node.getProperty(PARENT, null));
@@ -675,5 +678,60 @@ public class CNode implements Props, Comparable<CNode> {
                          mapper.valueToTree(_node.getProperty(NEWVAL)));
         }
         return node;
+    }
+
+    static protected Molecule getMol (String molfile) {
+        try {
+            MolHandler mh = new MolHandler (molfile);
+            return mh.getMolecule();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            logger.warning("Not a valid molfile: "+molfile);
+        }
+        return null;
+    }
+
+    static protected Molecule getMol (Node node) {
+        try (Transaction tx = node.getGraphDatabase().beginTx()) {
+            String molfile = (String) node.getProperty("MOLFILE", null);
+            if (molfile != null)
+                return getMol (molfile);
+
+            molfile = (String) node.getProperty("SMILES", null);
+            if (molfile != null)
+                return getMol (molfile);            
+        }
+        return null;
+    }
+    
+    public Molecule mol () {
+        Molecule mol = getMol (_node);
+        if (mol == null) {      
+            try (Transaction tx = gdb.beginTx()) {
+                if (_node.hasLabel(AuxNodeType.ENTITY)) {
+                    // check for payload node
+                    Relationship rel = _node.getSingleRelationship
+                        (AuxRelType.PAYLOAD, Direction.INCOMING);
+                    if (rel != null) {
+                        Node xn = rel.getOtherNode(_node);
+                        if (_node.hasProperty(SOURCE)) {
+                            DataSource ds =  dsf.getDataSourceByKey
+                                ((String)_node.getProperty(SOURCE));
+                            String field = (String) ds._get("StrucField");
+                            if (field != null) {
+                                String value =
+                                    (String)xn.getProperty(field, null);
+                                if (value != null)
+                                    mol = getMol (value);
+                            }
+                        }
+                        if (mol == null)
+                            mol = getMol (xn);
+                    }
+                }
+            }
+        }
+        return mol;
     }
 }

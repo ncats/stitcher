@@ -7,6 +7,8 @@ POST	/upload		controllers.app.App.upload
 GET	/payload	controllers.app.App.payload
 GET	/payload/:key	controllers.app.App.getPayload(key: String)
 GET	/setup		controllers.app.App.setup
-GET	/index		controllers.app.App.dashboard
+GET	/index		controllers.app.App.index
+GET	/dashboard	controllers.app.App.dashboard
+GET	/stitches/v$version<[1-9]+>	controllers.app.App.stitches(version: Int, q: String ?= null, rows: Int ?= 5, page: Int ?= 1)
 DELETE	/payload		controllers.app.App.delete(key: String)
 

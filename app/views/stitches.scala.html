@@ -1,0 +1,51 @@
+@import ncats.stitcher.Stitch
+@import ncats.stitcher.Props
+
+@(app: controllers.app.App, version: Int, q: String, pages: Array[Int],
+page: Int, rows: Int, total: Int, stitches: Array[Stitch])
+
+@display(s: Stitch) = {
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">@s.name (@s.size)</h3>
+  </div>
+  <div class="panel-body">
+    <div class="col-md-4">
+      <img src='@api.routes.Api.structure(s.getId,"svg",150)'>
+    </div>
+    <div class="col-md-8">
+    @for((k,v) <- s.datasources){
+      <a href="#"><span class="badge">@v</span> @k</a>
+      }
+    </div>
+  </div>
+</div>
+}
+
+@main("Stitches"){
+<div class="container-fluid">
+  <div class="page-header">
+    @if(q != null){
+      <h1>Query: <code>@q</code>
+    }
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-9">
+      @if(total > 0) {
+        @pagination(version, q, page, rows, total, pages)
+      }
+      <div class="panel panel-default"
+	   style="border:0; box-shadow:none;">
+	@for(s <- stitches) {
+	  @display(s)
+        }
+      </div>
+      @if(total > 0) {
+        @pagination(version, q, page, rows, total, pages)
+      }
+    </div>
+  </div>
+</div>
+}(HtmlFormat.empty)

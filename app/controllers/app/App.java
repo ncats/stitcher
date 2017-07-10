@@ -19,6 +19,10 @@ import services.SchedulerService;
 import services.CoreService;
 import services.jobs.*;
 
+import controllers.Util;
+import org.neo4j.graphdb.Label;
+import chemaxon.struc.Molecule;
+
 import ncats.stitcher.*;
 import static ncats.stitcher.BuildInfo.*;
 import models.*;
@@ -99,6 +103,10 @@ public class App extends Controller {
         return ok (payloadsetup.render(this));
     }
 
+    public Result index () {
+        return redirect (routes.App.stitches(1, null, 5, 0));
+    }
+    
     public Result dashboard () {
         return ok (dashboard.render(this));
     }
@@ -109,5 +117,33 @@ public class App extends Controller {
             flash ("message", "Successfully deleted payload "+payload.sha1());
         }
         return redirect (routes.App.payload());
+    }
+
+    public Result stitches (Integer version, String q,
+                            Integer rows, Integer page) {
+        Label[] labels = {
+            AuxNodeType.SGROUP,
+            Label.label("stitch_v"+version)
+        };
+        String uri = routes.App.stitches(version, q, rows, page).url();
+        Logger.debug(uri);
+        
+        Long total = es.getEntityFactory().count(labels);
+        if (total == null) {
+            return ok (error.render(this, "Internal server error: "+uri));
+        }
+        else if (total == 0) {
+            return ok (notfound.render(uri));
+        }
+        else {
+            int[] pages = Util.paging(rows, page, total.intValue());
+            Entity[] entities = es.getEntityFactory()
+                .entities((page-1)*rows, rows, labels);
+            
+            return ok (stitches.render
+                       (this, version, q, pages, page, rows, total.intValue(),
+                        Arrays.stream(entities).map(e -> Stitch.getStitch(e))
+                        .toArray(Stitch[]::new)));
+        }
     }
 }

@@ -30,6 +30,8 @@ import services.jobs.*;
 
 import ncats.stitcher.*;
 import models.*;
+import controllers.Util;
+import chemaxon.struc.Molecule;
 
 public class Api extends Controller {
 
@@ -325,5 +327,55 @@ public class Api extends Controller {
         int t = top != null ? Math.min(top,1000) : 10;
         
         return ok (toJson (s, t, es.entities(label, s, t)));
+    }
+
+    public Result structure (Long id, String format, Integer size) {
+        String uri = routes.Api.structure(id, format, size).url();
+
+        Entity e = es.getEntityFactory().entity(id);
+        if (e != null) {
+            Molecule mol = e.mol();
+            
+            if (mol == null && e.is(AuxNodeType.SGROUP))
+                mol = Stitch.getStitch(e).mol();
+
+            if (mol != null) {
+                switch (format) {
+                case "svg":
+                    try {
+                        return ok (Util.renderMol(mol, format, size, null))
+                            .as("image/svg+xml");
+                    }
+                    catch (Exception ex) {
+                        return internalServerError
+                            ("Can't generate structure format "+format);
+                    }
+                    
+                case "png":
+                    try {
+                        return ok (Util.renderMol(mol, format, size, null))
+                            .as("image/png");
+                    }
+                    catch (Exception ex) {
+                        return internalServerError
+                            ("Can't generate structure format "+format);
+                    }
+                    
+                case "mol":
+                case "sdf":
+                case "smi":
+                case "smiles":
+                case "mrv":
+                    return ok (mol.toFormat(format));
+                    
+                default:
+                    return badRequest (uri+": Unknown format: "+format);
+                }
+            }
+            else
+                return badRequest (uri+": Entity "+id+" has no structure!");
+        }
+        
+        return notFound (uri+": Unknown entity: "+id);
     }
 }

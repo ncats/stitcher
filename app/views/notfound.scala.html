@@ -1,0 +1,12 @@
+
+@(url: String)
+
+@main("Resource Not Found: "+url){
+<div class="container-fluid">
+  <div class="jumbotron">
+    <h1>Status: 404</h1>
+    <p>Much like the mythical unicorn, the requested
+      resource <code>@url</code> has yet to be discovered.
+  </div>
+</div>
+}(HtmlFormat.empty)

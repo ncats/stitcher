@@ -41,7 +41,12 @@ lazy val commonDependencies = Seq(
   "org.webjars" % "html5shiv" % "3.7.3",
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars" % "respond" % "1.4.2",
-  "org.webjars" % "morrisjs" % "0.5.1"
+  "org.webjars" % "morrisjs" % "0.5.1",
+  "org.freehep" % "freehep-graphicsbase" % "2.4",
+  "org.freehep" % "freehep-vectorgraphics" % "2.4",
+  "org.freehep" % "freehep-graphicsio" % "2.4",
+  "org.freehep" % "freehep-graphicsio-svg" % "2.4",
+  "org.freehep" % "freehep-graphics2d" % "2.4"
 )
 
 lazy val root = (project in file("."))
@@ -83,3 +88,6 @@ lazy val stitcher = (project in file("modules/stitcher"))
     libraryDependencies += "com.typesafe" % "config" % "1.2.0",
     javacOptions ++= javaBuildOptions
 ).dependsOn(buildinfo).aggregate(buildinfo)
+
+
+fork in run := true

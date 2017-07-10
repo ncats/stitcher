@@ -1,0 +1,66 @@
+@import controllers.Util
+
+@(version: Int, q: String, current: Int,
+rows: Int, total: Int, pages: Array[Int])
+
+@item(page: Int) = {
+<li><a href="@app.routes.App.stitches(version,q,rows,page)">
+    <span aria-hidden="true">@Util.format(page)</span>
+</a></li>
+}
+
+<nav>
+  <div class="btn-toolbar" role="toolbar">
+    <div class="btn-group" role="group">
+      <h3><span class="label label-primary">@Util.format(Math.max(0,current-1)*rows+1)/@Util.format(total)</span></h3>
+    </div>
+    @if(pages.length > 1) {
+    <div class="btn-group" role="group">
+      <ul class="pagination">
+      @if(current <= 1) {
+        <li class="disabled">
+         <a href='@app.routes.App.stitches(version,q,rows,current)' aria-label="Previous">
+	   <span aria-hidden="true" class="fa fa-angle-double-left"></span>   
+         </a>
+        </li>
+      } else {
+        <li>
+            <a href='@app.routes.App.stitches(version,q,rows, current-1)' aria-label="Previous">
+              <span aria-hidden="true" class="fa fa-angle-double-left"></span>
+            </a>
+        </li>
+      }
+      @for(i <- pages) {
+        @if(i == 0) {
+           <li class="disabled">
+             <a href="#"><span><i class="fa fa-ellipsis-h"></i></span></a>
+           </li>
+        } else {
+           @if(i == current) {
+              <li class="active">
+                <a href='@app.routes.App.stitches(version,q,rows,current)'>@Util.format(current)</a>
+              </li>
+           } else {
+              @item(i)
+           }
+        }
+      }
+      @if(current >= pages(pages.length-1)) {                  
+         <li class="disabled">
+           <a href='@app.routes.App.stitches(version,q,rows,current)' aria-label="Next">
+             <span aria-hidden="true" class="fa fa-angle-double-right"></span>
+           </a>
+         </li>
+      } else {
+         <li>
+           <a href='@app.routes.App.stitches(version,q,rows,current+1)' aria-label="Next">
+             <span aria-hidden="true" class="fa fa-angle-double-right"></span>
+           </a>
+         </li>
+      }
+      </ul>
+    </div>
+  }
+  </div>
+</nav>
+
