@@ -84,20 +84,31 @@ public class Stitch extends Entity {
         return size != null ? size : -1;
     }
 
-    public String name () {
-        DataSource ds = members.get(parent);    
+    String getField (String name, Node node) {
+        DataSource ds = members.get(node);    
         if (ds != null) {
-            String field = (String) ds.get("NameField");
+            String field = (String) ds.get(name);
             if (field != null) {
                 try (Transaction tx = gdb.beginTx()) {
-                    Object value = parent.getProperty(field, null);
+                    Object value = node.getProperty(field, null);
                     if (value != null && value.getClass().isArray())
                         value = Array.get(value, 0);
                     return (String)value;
                 }
             }
         }
-        return null;
+        return null;    
+    }
+
+    @Override
+    public String name () {
+        return (String) getField ("NameField", parent);
+    }
+
+    public String source () {
+        try (Transaction tx = gdb.beginTx()) {
+            return new CNode(parent).source();
+        }
     }
 
     public Map<DataSource, Integer> datasources () {
@@ -113,18 +124,23 @@ public class Stitch extends Entity {
     public Molecule mol () {
         Molecule mol = getMol (parent);
         if (mol == null) {
-            DataSource ds = members.get(parent);
-            if (ds != null) {
-                String field = (String) ds.get("StrucField");
-                if (field != null) {
-                    try (Transaction tx = gdb.beginTx()) {
-                        String value = (String) parent.getProperty(field, null);
-                        if (value != null)
-                            return getMol (value);
-                    }
-                }
-            }
+            String molfile = (String) getField ("StrucField", parent);
+            if (molfile != null)
+                return getMol (molfile);
         }
         return mol;
+    }
+
+    public Map[] members () {
+        List<Map> mb = new ArrayList<>();
+        for (Map.Entry<Node, DataSource> me : members.entrySet()) {
+            Map m = new TreeMap ();
+            m.put("id", me.getKey().getId());
+            m.put("srcid", getField ("IdField", me.getKey()));
+            m.put("name", getField ("NameField", me.getKey()));
+            m.put("datasource", me.getValue().getName());
+            mb.add(m);
+        }
+        return mb.toArray(new Map[0]);
     }
 }

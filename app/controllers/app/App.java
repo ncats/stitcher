@@ -141,9 +141,28 @@ public class App extends Controller {
                 .entities((page-1)*rows, rows, labels);
             
             return ok (stitches.render
-                       (this, version, q, pages, page, rows, total.intValue(),
+                       (version, q, pages, page, rows, total.intValue(),
                         Arrays.stream(entities).map(e -> Stitch.getStitch(e))
                         .toArray(Stitch[]::new)));
         }
+    }
+
+    public Result stitch (Integer version, String name) {
+        String uri = routes.App.stitch(version, name).url();
+        Stitch stitch = null;
+        try {
+            long pid = Long.parseLong(name);
+            Entity e = es.getEntityFactory().entity(pid);
+            if (!e.is(AuxNodeType.SGROUP))
+                return ok (notfound.render("Entity "+name
+                                           +" is not of type stitch!"));
+
+            return ok (stitchdetails.render
+                       (this, version, Stitch.getStitch(e)));
+        }
+        catch (NumberFormatException ex) {
+            // now try looking by name or id
+        }
+        return ok (error.render(this, uri+": can find entity "+name));
     }
 }

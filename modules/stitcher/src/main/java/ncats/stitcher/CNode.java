@@ -683,7 +683,10 @@ public class CNode implements Props, Comparable<CNode> {
     static protected Molecule getMol (String molfile) {
         try {
             MolHandler mh = new MolHandler (molfile);
-            return mh.getMolecule();
+            Molecule mol = mh.getMolecule();
+            if (mol.getDim() < 2)
+                mol.clean(2, null);
+            return mol;
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -704,34 +707,83 @@ public class CNode implements Props, Comparable<CNode> {
         }
         return null;
     }
+
+    protected String getField (String name) {
+        Relationship rel = _node.getSingleRelationship
+            (AuxRelType.PAYLOAD, Direction.INCOMING);
+        
+        if (rel != null) {
+            Node xn = rel.getOtherNode(_node);
+            if (_node.hasProperty(SOURCE)) {
+                DataSource ds =  dsf.getDataSourceByKey
+                    ((String)_node.getProperty(SOURCE));
+                String field = (String) ds._get(name);
+                if (field != null) {
+                    String value =
+                        (String)xn.getProperty(field, null);
+                    return value;
+                }
+            }
+        }
+        
+        return null;
+    }
     
     public Molecule mol () {
         Molecule mol = getMol (_node);
         if (mol == null) {      
             try (Transaction tx = gdb.beginTx()) {
                 if (_node.hasLabel(AuxNodeType.ENTITY)) {
-                    // check for payload node
-                    Relationship rel = _node.getSingleRelationship
-                        (AuxRelType.PAYLOAD, Direction.INCOMING);
-                    if (rel != null) {
-                        Node xn = rel.getOtherNode(_node);
-                        if (_node.hasProperty(SOURCE)) {
-                            DataSource ds =  dsf.getDataSourceByKey
-                                ((String)_node.getProperty(SOURCE));
-                            String field = (String) ds._get("StrucField");
-                            if (field != null) {
-                                String value =
-                                    (String)xn.getProperty(field, null);
-                                if (value != null)
-                                    mol = getMol (value);
-                            }
-                        }
-                        if (mol == null)
-                            mol = getMol (xn);
-                    }
+                    String molfile = getField ("StrucField");
+                    if (molfile != null)
+                        mol = getMol (molfile);
                 }
             }
         }
         return mol;
+    }
+
+    public String name () {
+        String name = "";
+        try (Transaction tx = gdb.beginTx()) {
+            Object value = _node.getProperty(NAME, null);
+            if (value != null) {
+                if (value.getClass().isArray())
+                    value = Array.get(value, 0);
+                name = (String)value;
+            }
+            else if (_node.hasLabel(AuxNodeType.ENTITY)) {
+                name = getField ("NameField");
+            }
+        }
+        return name;
+    }
+
+    public String source () {
+        String source = "";
+        try (Transaction tx = gdb.beginTx()) {
+            if (_node.hasLabel(AuxNodeType.DATA)) {
+                Relationship rel = _node.getSingleRelationship
+                    (AuxRelType.PAYLOAD, Direction.OUTGOING);
+                if (rel != null) {
+                    Node xn = rel.getOtherNode(_node);
+                    DataSource ds = dsf.getDataSourceByKey
+                        ((String)xn.getProperty(SOURCE, ""));
+                    String field = (String) ds._get("IdField");
+                    if (field != null) {
+                        Object value = _node.getProperty(field, null);
+                        if (value != null) {
+                            if (value.getClass().isArray())
+                                value = Array.get(value, 0);
+                            source = (String) value;
+                        }
+                    }
+                }
+            }
+            else {
+                source = getField ("IdField");
+            }
+        }
+        return source;
     }
 }

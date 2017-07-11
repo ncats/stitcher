@@ -1,0 +1,44 @@
+@import ncats.stitcher.Stitch
+@import ncats.stitcher.Entity
+
+@(app: controllers.app.App, version: Int, stitch: Stitch)
+
+@thumbnail(e: Map[String,Object]) = {
+<div class="col-xs-6 col-md-4">
+  <div class="thumbnail">
+    <a href='#'>
+      <img src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",150)' alt='Structure for @e.get("srcid")'>
+      <div class="caption">
+	<p>@e.get("srcid")
+	<p>@e.get("name")
+	<p><code>@e.get("datasource")</code>
+      </div>
+    </a>
+  </div>
+</div>
+}
+
+@main(stitch.name){
+<div class="container-fluid">
+  <h1 class="page-header">@stitch.name</h1>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="panel panel-default">
+	<div class="panel-body">
+	  <img class="img-responsive" src='@api.routes.Api.structure(stitch.getId,"svg",300)'>	  
+	</div>
+	<div class="panel-footer">
+	  @stitch.source
+	</div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="row" style="max-height:600px;overflow-y:auto;">
+	@for(e <- stitch.members) {
+	  @thumbnail(e.asInstanceOf[Map[String,Object]])
+	}
+      </div>
+    </div>
+  </div>
+</div>
+}(HtmlFormat.empty)
