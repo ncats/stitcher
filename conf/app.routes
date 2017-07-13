@@ -1,6 +1,5 @@
 
 ########## APP
-GET	/build	    controllers.app.App.build
 GET	/console/:key	controllers.app.App.console(key: String)
 GET	/upload		controllers.app.App.uploadForm
 POST	/upload		controllers.app.App.upload

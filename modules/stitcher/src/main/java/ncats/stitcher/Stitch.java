@@ -100,6 +100,47 @@ public class Stitch extends Entity {
         return null;    
     }
 
+    Map<String, Object> getProperties (Node node) {
+        Map<String, Object> properties = new TreeMap<>();
+        try (Transaction tx = gdb.beginTx()) {
+            for (Map.Entry<String, Object> me
+                     : node.getAllProperties().entrySet()) {
+                Object value = properties.get(me.getKey());
+                if (value != null)
+                    properties.put
+                        (me.getKey(), Util.merge(value, me.getValue()));
+                else
+                    properties.put(me.getKey(), me.getValue());
+            }
+        }
+        return properties;
+    }
+
+    Map<String, Object> getStitches (Node node) {
+        Map<String, Object> stitches = new TreeMap<>();
+        try (Transaction tx = gdb.beginTx()) {
+            // node is a DATA node
+            Relationship rel = node.getSingleRelationship
+                (AuxRelType.PAYLOAD, Direction.OUTGOING);
+            if (rel != null) {
+                Node xn = rel.getOtherNode(node);
+                for (Relationship srel : xn.getRelationships
+                         (EnumSet.allOf(StitchKey.class)
+                          .toArray(new StitchKey[0]))) {
+                    Object value = stitches.get(srel.getType().name());
+                    if (value != null) {
+                        value = Util.merge
+                            (value, srel.getProperty("value"));
+                    }
+                    else
+                        value = srel.getProperty("value");
+                    stitches.put(srel.getType().name(), value);
+                }
+            }
+        }
+        return stitches;
+    }
+
     @Override
     public String name () {
         return (String) getField ("NameField", parent);
@@ -139,6 +180,8 @@ public class Stitch extends Entity {
             m.put("srcid", getField ("IdField", me.getKey()));
             m.put("name", getField ("NameField", me.getKey()));
             m.put("datasource", me.getValue().getName());
+            m.put("properties", getProperties (me.getKey()));
+            m.put("stitches", getStitches (me.getKey()));
             mb.add(m);
         }
         return mb.toArray(new Map[0]);

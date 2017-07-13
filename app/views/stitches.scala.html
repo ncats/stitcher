@@ -4,7 +4,8 @@
 @(version: Int, q: String, pages: Array[Int],
 page: Int, rows: Int, total: Int, stitches: Array[Stitch])
 
-@display(s: Stitch) = {
+@display(pos: Int) = {
+@defining(stitches(pos)){ s =>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title"><a href='@app.routes.App.stitch(version,""+s.getId)'>@s.name</a> (@s.size)</h3>
@@ -26,6 +27,7 @@ page: Int, rows: Int, total: Int, stitches: Array[Stitch])
   </div>
 </div>
 }
+}
 
 @main("Stitches"){
 <div class="container-fluid">
@@ -43,8 +45,8 @@ page: Int, rows: Int, total: Int, stitches: Array[Stitch])
       }
       <div class="panel panel-default"
 	   style="border:0; box-shadow:none;">
-	@for(s <- stitches) {
-	  @display(s)
+	@for(i <- 0 until stitches.length) {
+	  @display(i)
         }
       </div>
       @if(total > 0) {

@@ -38,9 +38,11 @@ public class App extends Controller {
 
     public controllers.WebJarAssets webjars () { return webJarAssets; }    
 
+    /*
     public Result build () {
         return ok(welcome.render("Build: "+TIME+" ("+BRANCH+"-"+COMMIT+")"));
     }
+    */
 
     public Result console (String key) {
         return ok (console.render(this, key));
