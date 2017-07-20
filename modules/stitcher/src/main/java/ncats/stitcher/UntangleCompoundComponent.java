@@ -400,8 +400,10 @@ public class UntangleCompoundComponent extends UntangleComponent {
             logger.warning("There are missing entities in component!");
         
         for (Entity e : entities) {
-            Entity[] nb = e.inNeighbors(T_ActiveMoiety);
-            if (nb.length > 0)
+            Entity[] in = e.inNeighbors(T_ActiveMoiety);
+            Entity[] out = e.outNeighbors(T_ActiveMoiety);
+            
+            if (in.length > 0 && out.length == 0)
                 return e.getId();
         }
         

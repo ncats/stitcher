@@ -162,7 +162,7 @@ public class SchedulerService {
         scheduler.start(); // now start the scheduler
         
         // setup startup jobs
-        startupJobs ();
+        //startupJobs ();
         
         Logger.debug(getJobCount()+" job(s) stored in queue!");
         for (JobKey job :

@@ -108,11 +108,11 @@ public class Entity extends CNode {
     protected Entity (Node node) {
         super (node);
         
-        if (!node.hasProperty(RANK)) {
+        if (!node.hasProperty(RANK) && node.hasLabel(AuxNodeType.ENTITY)) {
             // setup node for connected component
             node.setProperty(RANK, 1);
             node.addLabel(AuxNodeType.COMPONENT);
-        }           
+        }
     }
 
     public Entity parent () {

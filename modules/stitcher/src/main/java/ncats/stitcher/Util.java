@@ -434,11 +434,13 @@ public class Util {
             for (int i = 0; i < size; ++i) {
                 JsonNode n = names.get(i);
                 String name = n.get("name").asText();
-                if (sb.length() > 0) sb.append("\n");
-                sb.append(name);
+                if (name.length() > 3) {
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(name);
 
-                if (n.get("preferred").asBoolean()) {
-                    mol.setProperty("PreferredName", name);
+                    if (n.get("preferred").asBoolean()) {
+                        mol.setProperty("PreferredName", name);
+                    }
                 }
             }
                         
@@ -517,15 +519,18 @@ public class Util {
             for (int i = 0; i < size; ++i) {
                 JsonNode n = names.get(i);
                 String name = n.get("name").asText();
-                Object val = map.get("Synonyms");
-                if (val != null)
-                    val = Util.merge(val, name);
-                else
-                    val = name;
-                map.put("Synonyms", val);
-
-                if (n.get("preferred").asBoolean()) {
-                    map.put("PreferredName", name);
+                // make sure the synonym must be more than 3 characters!
+                if (name.length() > 3) {
+                    Object val = map.get("Synonyms");
+                    if (val != null)
+                        val = Util.merge(val, name);
+                    else
+                        val = name;
+                    map.put("Synonyms", val);
+                    
+                    if (n.get("preferred").asBoolean()) {
+                        map.put("PreferredName", name);
+                    }
                 }
             }
         }

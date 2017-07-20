@@ -50,7 +50,8 @@
         <button type="button" class="close"
                 data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id='stitch-modal-label-@e.get("id")'><em>@e.get("name")</em><span class="pull-right"><code>@e.get("datasource")</code></span></h4>
+        <h4 class="modal-title" id='stitch-modal-label-@e.get("id")'>
+	    <a href='@api.routes.Api.getNode(e.get("id").asInstanceOf[Long])'><i class="fa fa-code"></i></a> <em>@e.get("name")</em><span class="pull-right"><code>@e.get("datasource")</code></span></h4>
       </div>
       <div class="modal-body">
 	<div class="row">

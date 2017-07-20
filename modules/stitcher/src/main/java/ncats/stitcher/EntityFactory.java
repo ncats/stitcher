@@ -1856,7 +1856,6 @@ public class EntityFactory implements Props {
         final String key = source.getKey()+component.getId();
         Entity entity = _createEntityIfAbsent(ID, key, () -> {
                 Node node = gdb.createNode(AuxNodeType.SGROUP,
-                                           AuxNodeType.ENTITY,
                                            Label.label(source.getName()));
                 node.setProperty(ID, key);
                 node.setProperty(SOURCE, source._getKey());
