@@ -12,6 +12,6 @@ sbt stitcher/"runMain ncats.stitcher.impl.DrugBankEntityFactory stitch.db cache=
 
 sbt stitcher/"runMain ncats.stitcher.impl.IntegrityMoleculeEntityFactory stitch.db cache=data/hash.db ../inxight-planning/files/integr.sdf.gz"
 
-sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory stitch.db data/tocris.conf"
+#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory stitch.db data/tocris.conf"
 
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory stitch.db data/ruili.conf"

@@ -766,14 +766,17 @@ public class Entity extends CNode {
             if (size > 0) {
                 RelationshipIndex relindx = _relationshipIndex (node);
                 for (Node n : hits) {
-                    Relationship rel = node.createRelationshipTo(n, key);
-                    rel.setProperty(CREATED, System.currentTimeMillis());
-                    rel.setProperty(VALUE, value); 
-                    relindx.add(rel, key.name(), value);
-                    union (n, node);
-                    /*   
-                         logger.info(node.getId()
-                         +" <-["+key+":\""+value+"\"]-> "+n.getId());*/
+                    // can't have self-link
+                    if (!node.equals(n)) {
+                        Relationship rel = node.createRelationshipTo(n, key);
+                        rel.setProperty(CREATED, System.currentTimeMillis());
+                        rel.setProperty(VALUE, value); 
+                        relindx.add(rel, key.name(), value);
+                        union (n, node);
+                        /*   
+                             logger.info(node.getId()
+                             +" <-["+key+":\""+value+"\"]-> "+n.getId());*/
+                    }
                 }
                 logger.info(key+":\""+value+"\" => "+size);
             }

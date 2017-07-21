@@ -5,11 +5,14 @@ import java.util.logging.Level;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import ncats.stitcher.GraphDb;
 import ncats.stitcher.StitchKey;
 import ncats.stitcher.Util;
 import ncats.stitcher.Entity;
+import ncats.stitcher.DataSource;
+import ncats.stitcher.EntityRegistry;
 import static ncats.stitcher.StitchKey.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +27,8 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
     int count;
     Base64.Encoder base64 = Base64.getEncoder();
     ObjectMapper mapper = new ObjectMapper ();
+    Set<String> props = new TreeSet<>();
+    Pattern casregex = Pattern.compile("([0-9^\\-]+)-([0-9]{2})-([0-9]{1})");
 
     public PharmManuEncyl3rdEntityFactory (String dir) throws IOException {
         super (dir);
@@ -49,7 +54,6 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
             ;
     }
     
-    @Override
     public int register (InputStream is) throws IOException {
         JsonNode root = mapper.readTree(is);
         count = 0;
@@ -89,8 +93,11 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
                 }
                 else
                     val = n.asText();
-                if (buf.length() > 0) buf.append("\n");
-                buf.append(val);
+                
+                if (val.length() > 3) {
+                    if (buf.length() > 0) buf.append("\n");
+                    buf.append(val);
+                }
             }
 
             value = value != null ? Util.merge(value, buf.toString())
@@ -98,9 +105,31 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
             map.put(name, value);
         }
         else {
-            value = value != null ? Util.merge(value, node.asText())
-                : node.asText();
-            map.put(name, value);
+            String text = node.asText();
+            if (text.length() > 3) {
+                if (name.equals("UNII")
+                    && ("NOT FOUND".equalsIgnoreCase(text)
+                        || "MIXTURE".equalsIgnoreCase(text))) {
+                    return;
+                }
+                else if (name.equals("Common Name")) {
+                    for (String n : text.split(";")) {
+                        value = value != null
+                            ? Util.merge(value, n.trim()) : n.trim();
+                    }
+                }
+                else if (name.equals("CAS")) {
+                    Matcher m = casregex.matcher(text);
+                    while (m.find()) {
+                        String cas = m.group(1) + "-"+m.group(2)+"-"+m.group(3);
+                        value = value != null ? Util.merge(value, cas) : cas;
+                    }
+                }
+                else {
+                    value = value != null ? Util.merge(value, text) : text;
+                }
+                map.put(name, value);           
+            }
         }
     }
     
@@ -116,18 +145,44 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
             set (map, name, n);
             if (name.equals("Drug Products")) {
                 for (int i = 0; i < n.size(); ++i) {
-                    JsonNode p = node.get(i);
-                    if (p.has("Product"))
-                        products.add(p.get("Product").asText());
+                    JsonNode p = n.get(i);
+                    if (p.has("Product")) {
+                        String pn = p.get("Product").asText();
+                        if (pn.length() > 3)
+                            products.add(pn);
+                    }
                 }
             }
         }
+        props.addAll(map.keySet());
 
+        /*
         if (!products.isEmpty())
             map.put("Products", products.toArray(new String[0]));
+        */
         
         Entity ent = register (map);
         ++count;
+    }
+
+    @Override
+    public DataSource register (File file) throws IOException {
+        DataSource ds = super.register(file);
+        Integer instances = (Integer) ds.get(INSTANCES);
+        if (instances != null) {
+            logger.warning("### Data source "+ds.getName()
+                           +" has already been registered with "+instances
+                           +" entities!");
+        }
+        else {
+            instances = register (ds.openStream());
+            if (!props.isEmpty())
+                ds.set(PROPERTIES, props.toArray(new String[0]));
+            ds.set(INSTANCES, instances);
+            updateMeta (ds);
+            logger.info("$$$ "+instances+" entities registered for "+ds);
+        }
+        return ds;
     }
 
     public static void main (String[] argv) throws Exception {
