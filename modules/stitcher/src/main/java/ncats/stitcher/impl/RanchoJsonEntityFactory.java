@@ -59,14 +59,15 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
     @Override
     public int register (InputStream is) throws IOException {
         JsonNode root;
+        BufferedInputStream bis = new BufferedInputStream (is, 4096);
         try {
-            is.mark(1024);
-            root = mapper.readTree(new GZIPInputStream (is));
+            bis.mark(1024);
+            root = mapper.readTree(new GZIPInputStream (bis));
         }
         catch (Exception ex) {
-            is.reset();
+            bis.reset();
             // probably not gzip stream
-            root = mapper.readTree(is);
+            root = mapper.readTree(bis);
         }
         
         count = 0;
