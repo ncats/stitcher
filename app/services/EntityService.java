@@ -18,7 +18,7 @@ public class EntityService {
     static public final String DATASOURCE = "IX Data Source";
         
     // unique data source associated with this instance
-    protected DataSource datasource;
+    //protected DataSource datasource;
     protected GraphDb graphDb;
     protected CoreService service;
     protected EntityFactory efac;
@@ -33,6 +33,7 @@ public class EntityService {
                                           service.getCacheFactory());
 
             dsfac = new DataSourceFactory (graphDb);
+            /*
             datasource = dsfac.getDataSourceByName(DATASOURCE);
             if (datasource == null) {
                 // no data source ..
@@ -41,6 +42,7 @@ public class EntityService {
                     ("Data source "+datasource
                      +" ("+datasource.getId()+") registered...");
             }
+            */
             efac = new EntityFactory (graphDb);     
         }
         catch (IOException ex) {

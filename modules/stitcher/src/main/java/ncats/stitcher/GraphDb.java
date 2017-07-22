@@ -118,18 +118,22 @@ public class GraphDb extends TransactionEventHandler.Adapter
     }
 
     public CNode getNode (long id) {
+        CNode cnode = null;
         try (Transaction tx = gdb.beginTx()) {
             Node node = gdb.getNodeById(id);
             if (node != null) {
                 for (EntityType t : EnumSet.allOf(EntityType.class)) {
-                    if (node.hasLabel(t))
-                        return Entity._getEntity(node);
+                    if (node.hasLabel(t)) {
+                        cnode = Entity._getEntity(node);
+                        break;
+                    }
                 }
-                return new CNode (node);
+                if (cnode == null)
+                    cnode = new CNode (node);
             }
             tx.success();
         }
-        return null;
+        return cnode;
     }
 
     /*

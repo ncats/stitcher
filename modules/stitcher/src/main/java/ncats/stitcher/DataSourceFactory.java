@@ -83,6 +83,7 @@ public class DataSourceFactory implements Props {
                 Node node = it.next();
                 sources.add(DataSource._getDataSource(node));
             }
+            tx.success();
             return sources;
         }
     }
@@ -92,8 +93,8 @@ public class DataSourceFactory implements Props {
             DataSource ds = _getDataSourceByName (source);
             if (ds == null) {
                 ds =_register (sourceKey (source), source);
-                tx.success();
             }
+            tx.success();           
             return ds;
         }
     }
@@ -192,9 +193,12 @@ public class DataSourceFactory implements Props {
     }
         
     public DataSource getDataSourceByKey (String key) {
+        DataSource ds = null;
         try (Transaction tx = gdb.beginTx()) {
-            return _getDataSourceByKey (key);
+            ds = _getDataSourceByKey (key);
+            tx.success();
         }
+        return ds;
     }
 
     public DataSource getDataSource (String name) {

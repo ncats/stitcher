@@ -323,11 +323,11 @@ public class UntangleCompoundComponent extends UntangleComponent {
         //dumpActiveMoieties ();
         dump ("Active moiety stitching");
 
-        // collapse based on lychi layer 5
+        // collapse based on trusted stitch keys; e.g., lychi layer 5, unii
         component.stitches((source, target) -> {
                 uf.union(source.getId(), target.getId());
-            }, H_LyChI_L5);
-        dump (H_LyChI_L5+" stitching");
+            }, H_LyChI_L5, I_UNII);
+        dump ("trusted keys stitching");
 
         int count = 0;        
         // now find all remaining unmapped nodes

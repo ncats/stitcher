@@ -1431,8 +1431,7 @@ public class EntityFactory implements Props {
         for (Label l : labels) {
             query.append(":`"+l+"`");
         }
-        query.append(":"+AuxNodeType.ENTITY
-                     +") return n skip {skip} limit {top}");
+        query.append(") return n skip {skip} limit {top}");
 
         //System.out.println("components: skip="+skip+" top="+top);
         try (Transaction tx = gdb.beginTx();
