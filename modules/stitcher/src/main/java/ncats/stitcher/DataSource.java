@@ -123,6 +123,7 @@ public class DataSource extends CNode {
             if (_node.hasProperty(name)) {
                 value = _node.getProperty(name);
             }
+            tx.success();
             return value;
         }
     }

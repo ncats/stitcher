@@ -125,19 +125,25 @@ public class Entity extends CNode {
     
     public Object get (StitchKey key) {
         try (Transaction tx = gdb.beginTx()) {
-            return _get (key);
+            Object ret = _get (key);
+            tx.success();
+            return ret;
         }
     }
 
     public Object get (String name) {
         try (Transaction tx = gdb.beginTx()) {
-            return _get (name);
+            Object ret =  _get (name);
+            tx.success();
+            return ret;
         }
     }
 
     public boolean neighbor (Entity entity) {
         try (Transaction tx = gdb.beginTx()) {
-            return _neighbor (entity);
+            boolean nb = _neighbor (entity);
+            tx.success();
+            return nb;
         }
     }
 
@@ -151,13 +157,17 @@ public class Entity extends CNode {
 
     public Map<StitchKey, Object> keys () {
         try (Transaction tx = gdb.beginTx()) {
-            return _keys ();
+            Map<StitchKey,Object> keys = _keys ();
+            tx.success();
+            return keys;
         }
     }
 
     public Map<StitchKey, Object> keys (Entity other) {
         try (Transaction tx = gdb.beginTx()) {
-            return _keys (other);
+            Map<StitchKey,Object> keys = _keys (other);
+            tx.success();
+            return keys;
         }
     }
 
@@ -192,7 +202,9 @@ public class Entity extends CNode {
 
     public Map<String, Object> properties () {
         try (Transaction tx = gdb.beginTx()) {
-            return _properties ();
+            Map<String,Object> props = _properties ();
+            tx.success();
+            return props;
         }
     }
     
@@ -215,7 +227,9 @@ public class Entity extends CNode {
     
     public Entity[] neighbors (StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
-            return _neighbors (Direction.BOTH, keys);
+            Entity[] nb = _neighbors (Direction.BOTH, keys);
+            tx.success();
+            return nb;
         }
     }
 
@@ -229,7 +243,9 @@ public class Entity extends CNode {
     
     public Entity[] inNeighbors (StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
-            return _inNeighbors (keys);
+            Entity[] nb = _inNeighbors (keys);
+            tx.success();
+            return nb;
         }
     }
 
@@ -239,13 +255,17 @@ public class Entity extends CNode {
 
     public Entity[] outNeighbors (StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
-            return _neighbors (Direction.OUTGOING, keys);
+            Entity[] nb = _neighbors (Direction.OUTGOING, keys);
+            tx.success();
+            return nb;
         }
     }
 
     public Entity[] neighbors (StitchKey key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
-            return _neighbors (key, value);
+            Entity[] nb = _neighbors (key, value);
+            tx.success();
+            return nb;
         }
     }
     
@@ -264,7 +284,9 @@ public class Entity extends CNode {
 
     public boolean contains (StitchKey key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
-            return _contains (key, value);
+            boolean ret = _contains (key, value);
+            tx.success();
+            return ret;
         }
     }
 
@@ -359,7 +381,9 @@ public class Entity extends CNode {
     
     public Map<String, Object> payload () {
         try (Transaction tx = gdb.beginTx()) {
-            return _payload ();
+            Map<String, Object> py = _payload ();
+            tx.success();
+            return py;
         }
     }
 
@@ -794,7 +818,9 @@ public class Entity extends CNode {
     
     public Entity[] pathTo (Entity end, StitchKey key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
-            return _pathTo (end, key, value);
+            Entity[] path = _pathTo (end, key, value);
+            tx.success();
+            return path;
         }
     }
 
@@ -858,13 +884,16 @@ public class Entity extends CNode {
 
     public Entity[] anyPath (Entity end, StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
-            return _anyPath (end, keys);
+            Entity[] path = _anyPath (end, keys);
+            tx.success();
+            return path;
         }
     }
 
     public void walk (EntityVisitor visitor) {
         try (Transaction tx = gdb.beginTx()) {
             _walk (visitor);
+            tx.success();
         }
     }
 
@@ -904,7 +933,9 @@ public class Entity extends CNode {
 
     public Map<String, Object> payload (Entity entity) {
         try (Transaction tx = gdb.beginTx()) {
-            return _payload (entity);
+            Map<String, Object> py =  _payload (entity);
+            tx.success();
+            return py;
         }
     }
 

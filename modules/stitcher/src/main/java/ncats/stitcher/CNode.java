@@ -136,7 +136,9 @@ public class CNode implements Props, Comparable<CNode> {
 
     public Set<String> labels () {
         try (Transaction tx = gdb.beginTx()) {
-            return _labels ();
+            Set<String> labels = _labels ();
+            tx.success();
+            return labels;
         }
     }
 
@@ -150,24 +152,30 @@ public class CNode implements Props, Comparable<CNode> {
 
     public boolean is (String label) {
         try (Transaction tx = _node.getGraphDatabase().beginTx()) {
-            return _is (label);
+            boolean is = _is (label);
+            tx.success();
+            return is;
         }
     }
 
     public boolean is (Label label) {
         try (Transaction tx = _node.getGraphDatabase().beginTx()) {
-            return _is (label);
+            boolean is = _is (label);
+            tx.success();
+            return is;
         }
     }
     
     public DataSource datasource () {
+        DataSource source = null;
         try (Transaction tx = gdb.beginTx()) {
             if (_node.hasProperty(SOURCE)) {
-                return dsf.getDataSourceByKey
+                source = dsf.getDataSourceByKey
                     ((String)_node.getProperty(SOURCE));
             }
+            tx.success();
         }
-        return null;
+        return source;
     }
     
     public void _snapshot (String key, Object value) {
@@ -181,6 +189,7 @@ public class CNode implements Props, Comparable<CNode> {
     public void snapshot (String key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
             _snapshot (key, value);
+            tx.success();
         }
     }
     
@@ -282,7 +291,9 @@ public class CNode implements Props, Comparable<CNode> {
      */
     public boolean connected (long id) {
         try (Transaction tx = gdb.beginTx()) {
-            return connected (gdb.getNodeById(id));
+            boolean connected = connected (gdb.getNodeById(id));
+            tx.success();
+            return connected;
         }
     }
 
@@ -411,13 +422,17 @@ public class CNode implements Props, Comparable<CNode> {
     
     public CNode getLastUpdatedNode () {
         try (Transaction tx = gdb.beginTx()) {
-            return _getLastUpdatedNode ();
+            CNode node = _getLastUpdatedNode ();
+            tx.success();
+            return node;
         }
     }
 
     public JsonNode toJson () {
         try (Transaction tx = gdb.beginTx()) {
-            return _toJson ();
+            JsonNode json = _toJson ();
+            tx.success();
+            return json;
         }
     }
     
@@ -696,16 +711,19 @@ public class CNode implements Props, Comparable<CNode> {
     }
 
     static protected Molecule getMol (Node node) {
+        Molecule mol = null;
         try (Transaction tx = node.getGraphDatabase().beginTx()) {
             String molfile = (String) node.getProperty("MOLFILE", null);
             if (molfile != null)
-                return getMol (molfile);
-
-            molfile = (String) node.getProperty("SMILES", null);
-            if (molfile != null)
-                return getMol (molfile);            
+                mol = getMol (molfile);
+            else {
+                molfile = (String) node.getProperty("SMILES", null);
+                if (molfile != null)
+                    mol = getMol (molfile);
+            }
+            tx.success();
         }
-        return null;
+        return mol;
     }
 
     protected String getField (String name) {
@@ -738,6 +756,7 @@ public class CNode implements Props, Comparable<CNode> {
                     if (molfile != null)
                         mol = getMol (molfile);
                 }
+                tx.success();
             }
         }
         return mol;
@@ -755,6 +774,7 @@ public class CNode implements Props, Comparable<CNode> {
             else if (_node.hasLabel(AuxNodeType.ENTITY)) {
                 name = getField ("NameField");
             }
+            tx.success();
         }
         return name;
     }
@@ -783,6 +803,7 @@ public class CNode implements Props, Comparable<CNode> {
             else {
                 source = getField ("IdField");
             }
+            tx.success();
         }
         return source;
     }

@@ -94,7 +94,9 @@ public class EntityFactory implements Props {
 
         public boolean hasNext () {
             try (Transaction tx = gdb.beginTx()) {
-                return iter.hasNext();
+                boolean next = iter.hasNext();
+                tx.success();
+                return next;
             }
         }
         
@@ -334,6 +336,7 @@ public class EntityFactory implements Props {
                     this.nodes.add(nodes[i]);
                 }
                 id = Util.sha1(this.nodes).substring(0, 9);
+                tx.success();
             }
             this.gdb = gdb;         
         }
@@ -431,6 +434,7 @@ public class EntityFactory implements Props {
                         if (rel.hasProperty(VALUE))
                             values.add(rel.getProperty(VALUE));
                     }
+                    tx.success();
                 }
             }
             return values.toArray(new Object[0]);
@@ -438,7 +442,9 @@ public class EntityFactory implements Props {
         
         public Component filter (StitchKey key, Object value) {
             try (Transaction tx = gdb.beginTx()) {
-                return _filter (key, value);
+                Component comp = _filter (key, value);
+                tx.success();
+                return comp;
             }
         }
 
@@ -498,6 +504,7 @@ public class EntityFactory implements Props {
                         }
                     }
                 }
+                tx.success();
             }
             
             return stats;
@@ -510,6 +517,7 @@ public class EntityFactory implements Props {
                     (gdb, keys == null || keys.length == 0
                      ? Entity.KEYS : keys);
                 clique.enumerate(nodes (), visitor);
+                tx.success();
             }
         }
         
@@ -533,6 +541,7 @@ public class EntityFactory implements Props {
                     CliqueEnumeration clique = new CliqueEnumeration (gdb, key);
                     clique.enumerate(Util.toArray(nodes), visitor);
                 }
+                tx.success();
             }
         }
 
@@ -563,6 +572,7 @@ public class EntityFactory implements Props {
                     seen.put(n.getId(), entities[i]);
                 }
                 seen.clear();
+                tx.success();
             }
         }
 
@@ -593,6 +603,7 @@ public class EntityFactory implements Props {
                     seen.put(n.getId(), entities[i]);
                 }
                 seen.clear();
+                tx.success();
             }
         }
 
@@ -672,6 +683,7 @@ public class EntityFactory implements Props {
                 Set<Long> visited = new HashSet<>();
                 dfs (visited, path, gdb.getNodeById(node),
                      consumer, predicate, keys);
+                tx.success();
             }
         }
         
@@ -708,6 +720,7 @@ public class EntityFactory implements Props {
                 if (added.size() > size) {
                     comp = new ComponentImpl (gdb, added.toArray(new Long[0]));
                 }
+                tx.success();
                 
                 return comp;
             }
@@ -1358,6 +1371,7 @@ public class EntityFactory implements Props {
                     //consumer.accept(new ComponentLazy (node));
                     consumer.accept(new ComponentImpl (node));
                 });
+            tx.success();
         }
     }
 
@@ -1375,7 +1389,9 @@ public class EntityFactory implements Props {
 
     public Component component (long[] nodes) {
         try (Transaction tx = gdb.beginTx()) {
-            return new ComponentImpl (gdb, nodes);
+            Component comp = new ComponentImpl (gdb, nodes);
+            tx.success();
+            return comp;
         }
     }
 
@@ -1395,6 +1411,7 @@ public class EntityFactory implements Props {
                 count = (Long)row.get("count");
             }
             result.close();
+            tx.success();
         }
         return count;
     }
@@ -1471,7 +1488,10 @@ public class EntityFactory implements Props {
                 ids.add(n.getId());
             }
             
-            return cliques (Util.toArray(ids), visitor, keys);
+            boolean ret = cliques (Util.toArray(ids), visitor, keys);
+            tx.success();
+            
+            return ret;
         }
     }
 
@@ -1486,7 +1506,8 @@ public class EntityFactory implements Props {
         }
         return true;
         */
-        
+
+        boolean ret = true;
         try (Transaction tx = gdb.beginTx()) {
             for (Iterator<Node> it = gdb.findNodes(AuxNodeType.COMPONENT);
                  it.hasNext();) {
@@ -1498,13 +1519,16 @@ public class EntityFactory implements Props {
                                                 +" has no rank!");
                 if (rank >= CLIQUE_MINSIZE) {
                     Component comp = new ComponentImpl (node);
-                    if (!cliques (comp.nodes(), visitor, keys))
-                        return false;
+                    if (!cliques (comp.nodes(), visitor, keys)) {
+                        ret = false;
+                        break;
+                    }
                 }
             }
+            tx.success();
         }
         
-        return true;
+        return ret;
     }
 
     public boolean cliques (long[] nodes, CliqueVisitor visitor) {
@@ -1518,7 +1542,10 @@ public class EntityFactory implements Props {
             for (int i = 0; i < nodes.length; ++i)
                 nodes[i] = entities[i].getId();
             
-            return cliques (nodes, visitor, keys);
+            boolean ret = cliques (nodes, visitor, keys);
+            tx.success();
+            
+            return ret;
         }
     }
     
@@ -1587,6 +1614,8 @@ public class EntityFactory implements Props {
             if (iterator == null)
                 iterator = new EntityIterator
                     (gdb, index.get(key, value).iterator());
+            
+            tx.success();
         }
         
         return iterator;
@@ -1626,7 +1655,10 @@ public class EntityFactory implements Props {
             }
             result.close();
             
-            return entities.toArray(new Entity[0]);
+            Entity[] ents = entities.toArray(new Entity[0]);
+            tx.success();
+            
+            return ents;
         }
     }
 
@@ -1649,23 +1681,31 @@ public class EntityFactory implements Props {
 
     public String[] labels () {
         try (Transaction tx = gdb.beginTx()) {
-            return gdb.getAllLabelsInUse().stream()
+            String[] labels = gdb.getAllLabelsInUse().stream()
                 .map(l -> l.name())
                 .toArray(String[]::new);
+            tx.success();
+            
+            return labels;
         }
     }
 
     public String[] relationships () {
         try (Transaction tx = gdb.beginTx()) {
-            return gdb.getAllRelationshipTypes().stream()
+            String[] rels = gdb.getAllRelationshipTypes().stream()
                 .map(l -> l.name())
                 .toArray(String[]::new);
+            tx.success();
+            return rels;
         }
     }
 
     public String[] properties () {
         try (Transaction tx = gdb.beginTx()) {
-            return gdb.getAllPropertyKeys().stream().toArray(String[]::new);
+            String[] props = gdb.getAllPropertyKeys()
+                .stream().toArray(String[]::new);
+            tx.success();
+            return props;
         }
     }
         
@@ -1678,14 +1718,18 @@ public class EntityFactory implements Props {
 
     public Iterator<Entity> entities (String label) {
         try (Transaction tx = gdb.beginTx()) {
-            return new EntityIterator
+            Iterator<Entity> iter = new EntityIterator
                 (gdb, gdb.findNodes(Label.label(label)));
+            tx.success();
+            return iter;
         }
     }
 
     public Entity[] entities (long[] ids) {
         try (Transaction tx = gdb.beginTx()) {
-            return _entities (ids);
+            Entity[] ents = _entities (ids);
+            tx.success();
+            return ents;
         }
     }
 
@@ -1698,7 +1742,9 @@ public class EntityFactory implements Props {
 
     public Entity entity (long id) {
         try (Transaction tx = gdb.beginTx()) {
-            return _entity (id);
+            Entity ent = _entity (id);
+            tx.success();
+            return ent;
         }
     }
 
@@ -1721,7 +1767,9 @@ public class EntityFactory implements Props {
 
     public Map<StitchValue, long[]> expand (long id) {
         try (Transaction tx = gdb.beginTx()) {
-            return _expand (id);
+            Map<StitchValue,long[]> ret = _expand (id);
+            tx.success();
+            return ret;
         }
     }
     
@@ -1759,7 +1807,9 @@ public class EntityFactory implements Props {
 
     public long[] expand (long id, StitchKey key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
-            return _expand (id, key, value);
+            long[] ret = _expand (id, key, value);
+            tx.success();
+            return ret;
         }
     }
 
@@ -1789,7 +1839,9 @@ public class EntityFactory implements Props {
 
     public long[] neighbors (long id, StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
-            return _neighbors (id, keys);
+            long[] nb = _neighbors (id, keys);
+            tx.success();
+            return nb;
         }
     }
     
@@ -1798,7 +1850,10 @@ public class EntityFactory implements Props {
      */
     public Iterator<Entity> entities () {
         try (Transaction tx = gdb.beginTx()) {
-            return new EntityIterator (gdb, gdb.findNodes(AuxNodeType.ENTITY));
+            Iterator<Entity> iter = new EntityIterator
+                (gdb, gdb.findNodes(AuxNodeType.ENTITY));
+            tx.success();
+            return iter;
         }
     }
     
@@ -1894,7 +1949,8 @@ public class EntityFactory implements Props {
                     }
                     catch (Exception ex) {
                         logger.warning("Entity "+n.getId()
-                                       +" has multiple payload!");
+                                       +" has multiple payload: "
+                                       +ex.getMessage());
                     }
                 }
                 
@@ -1925,7 +1981,9 @@ public class EntityFactory implements Props {
     // return the last k updated entities
     public Entity[] getLastUpdatedEntities (int k) {
         try (Transaction tx = gdb.beginTx()) {
-            return _getLastUpdatedEntities (k);
+            Entity[] ret = _getLastUpdatedEntities (k);
+            tx.success();
+            return ret;
         }
     }
     

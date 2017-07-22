@@ -8,7 +8,7 @@ sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db cache=data/hash.db ../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
 
-sbt stitcher/"runMain ncats.stitcher.impl.PharmMenuEncyl3rdEntityFactory $db ../inxight-planning/files/PharmManuEncycl3rdEd.json"
+sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db ../inxight-planning/files/PharmManuEncycl3rdEd.json"
 
 sbt stitcher/"runMain ncats.stitcher.impl.DrugBankEntityFactory $db cache=data/hash.db ../inxight-planning/files/drugbank-full-annotated.sdf"
 

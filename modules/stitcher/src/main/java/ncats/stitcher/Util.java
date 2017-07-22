@@ -809,6 +809,8 @@ public class Util {
                 int len = Array.getLength(value);
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(value, i);
+                    if ((v instanceof String) && ((String)v).length() > 4000)
+                        continue;
                     index.add(entity, key, v);
                 }
             }
@@ -819,9 +821,10 @@ public class Util {
                            +" value="+value, ex);
             }
         }
-        else {
+        else if ((value instanceof String) && ((String)value).length() > 4000)
+            ;
+        else
             index.add(entity, key, value);
-        }
     }
 
     public static <T extends org.neo4j.graphdb.Entity>
