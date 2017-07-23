@@ -85,7 +85,8 @@ public class Stitch extends Entity {
     }
 
     String getField (String name, Node node) {
-        DataSource ds = members.get(node);    
+        DataSource ds = members.get(node);
+        String val = null;
         if (ds != null) {
             String field = (String) ds.get(name);
             if (field != null) {
@@ -93,11 +94,18 @@ public class Stitch extends Entity {
                     Object value = node.getProperty(field, null);
                     if (value != null && value.getClass().isArray())
                         value = Array.get(value, 0);
-                    return (String)value;
+                    val = (String)value;
+                    tx.success();
+                }
+            }
+            else {
+                try (Transaction tx = gdb.beginTx()) {
+                    val = (String) node.getProperty(NAME, null);
+                    tx.success();
                 }
             }
         }
-        return null;    
+        return val;
     }
 
     Map<String, Object> getProperties (Node node) {
@@ -143,7 +151,7 @@ public class Stitch extends Entity {
 
     @Override
     public String name () {
-        return (String) getField ("NameField", parent);
+        return getField ("NameField", parent);
     }
 
     public String source () {

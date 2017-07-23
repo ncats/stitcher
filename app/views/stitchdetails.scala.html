@@ -6,7 +6,7 @@
 
 @name(e:Map[String,Object],max: Int = 30) = {
   @defining(e.get("name").asInstanceOf[String]) { n =>
-    @if(n.length > max) {
+    @if(n != null && n.length > max) {
      <span data-trigger="hover" data-toggle="tooltip" title="@n">@n.substring(0,max)...</span>
      } else {
      @n

@@ -159,6 +159,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
         final boolean anyvalue; // single valued?
 
         Clique bestClique; // best clique so far
+        Map<Long, Integer> nodes = new HashMap<>();
 
         CliqueClosure (Entity entity, StitchKey... keys) {
             this (entity, true, keys);
@@ -199,8 +200,40 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 for (int i = 1; i < nodes.length; ++i)
                     uf.union(nodes[i], nodes[i-1]);
             }
+            else if (!nodes.isEmpty()) {
+                // find labeled nodes that maximally span multiple cliques
+                Integer max = Collections.max(nodes.values());
+                Map<Long, Set<Long>> map = new TreeMap<>();
+                for (Map.Entry<Long, Integer> me : nodes.entrySet()) {
+                    if (me.getValue() == max) {
+                        Long cls = uf.root(me.getKey());
+                        Set<Long> set = map.get(cls);
+                        if (set == null)
+                            map.put(cls, set = new HashSet<>());
+                        set.add(me.getKey());
+                    }
+                }
 
-            return bestClique != null;
+                logger.info("No best clique found, so resort to "
+                            +"maximal clique span heuristic: "+map);
+                
+                // find label with maximum members
+                Set<Long> best = null;
+                for (Map.Entry<Long, Set<Long>> me : map.entrySet()) {
+                    int size = me.getValue().size();
+                    if (best == null || best.size() < size) {
+                        best = me.getValue();
+                    }
+                    else if (best.size() == size)
+                        return false; // not unanimous
+                }
+
+                logger.info("## resolving "+entity.getId()+" => "+best);
+                for (Long n : best)
+                    uf.union(entity.getId(), n);
+            }
+
+            return !nodes.isEmpty();
         }
 
         boolean containsExactly (Component comp, StitchKey key, Object value) {
@@ -242,12 +275,20 @@ public class UntangleCompoundComponent extends UntangleComponent {
                     if (count == (clique.size() * (clique.size() -1)/2)) {
                         // collapse components
                         if (clique.contains(entity)) {
-                            Set<Long> classes = new TreeSet<>();
+                            Map<Long, Integer> classes = new HashMap<>();
+                            int unmapped = 0;
                             for (Long n : clique.nodeSet()) {
                                 Long c = uf.root(n);
                                 logger.info(" .. "+n+" => "+ c);
-                                if (c != null)
-                                    classes.add(c);
+                                if (c != null) {
+                                    Integer cnt = classes.get(c);
+                                    classes.put(c, cnt == null ? 1 :cnt+1);
+                                    // keeping track of labeled nodes in cliques
+                                    cnt = nodes.get(n);
+                                    nodes.put(n, cnt == null ? 1 : cnt+1);
+                                }
+                                else
+                                    ++unmapped;
                             }
                             
                             if (classes.size() < 2

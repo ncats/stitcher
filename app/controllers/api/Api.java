@@ -290,7 +290,18 @@ public class Api extends Controller {
         }
         else {
             s = skip != null ? skip : 0;
-            t = top != null ? Math.min(top,1000) : 10;
+            t = top != null ? Math.min(top,1000) : 5;
+
+            String page = request().getQueryString("page");
+            if (page != null) {
+                try {
+                    skip = (Integer.parseInt(page)-1)*t;
+                    s = Math.max(0, skip);
+                }
+                catch (NumberFormatException ex) {
+                    Logger.error("Bogus page number: "+page, ex);
+                }
+            }
             
             entities = es.getEntityFactory()
                 .entities(s, t, labels.toArray(new String[0]));

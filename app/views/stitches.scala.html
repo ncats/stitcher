@@ -8,7 +8,7 @@ page: Int, rows: Int, total: Int, stitches: Array[Stitch])
 @defining(stitches(pos)){ s =>
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title"><a href='@app.routes.App.stitch(version,""+s.getId)'>@s.name</a> (@s.size)</h3>
+    <h3 class="panel-title"><a href='@app.routes.App.stitch(version,""+s.getId)'>@if(s.name != null) {@s.name}else{@s.getId}</a> (@s.size)</h3>
   </div>
   <div class="panel-body">
     <div class="col-md-4">
