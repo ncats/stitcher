@@ -52,7 +52,7 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
         add (N_Name, "CompoundName")
             .add (N_Name, "CompoundSynonym")
             .add (I_CAS, "Cas")
-            .add (I_UNII, "Unii")
+            //.add (I_UNII, "Unii")
             ;
     }
 
