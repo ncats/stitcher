@@ -1599,15 +1599,23 @@ public class EntityFactory implements Props {
             Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());
             if (value.getClass().isArray()) {
                 int len = Array.getLength(value);
+                IndexHits<Node> best = null;
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(value, i);
                     IndexHits<Node> hits = index.get(key, v);
                     // return on the first non-empty hits
-                    if (hits.size() > 0) {
-                        iterator = new EntityIterator (gdb, hits.iterator());
-                        break;
+                    if (best == null || hits.size() < best.size()) {
+                        if (best != null)
+                            best.close();
+                        best = hits;
                     }
+                    else
+                        hits.close();
                 }
+                
+                if (best != null) {
+                    iterator = new EntityIterator (gdb, best.iterator());
+                }                   
             }
 
             if (iterator == null)
@@ -1955,7 +1963,9 @@ public class EntityFactory implements Props {
                 
                 Integer count = (Integer) source.get(INSTANCES);
                 source.set(INSTANCES, count == null ? 1 : count+1);
-                
+
+                logger.info("## New stitch node "+node.getId()+" created: "
+                            +component);
                 return node;
             });
 

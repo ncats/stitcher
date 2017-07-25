@@ -370,6 +370,19 @@ public class UntangleCompoundComponent extends UntangleComponent {
             }, H_LyChI_L5, I_UNII);
         dump ("trusted keys stitching");
 
+        // merge disconnected labeled nodes
+        component.stitches((source, target) -> {
+                Long s = uf.root(source.getId());
+                Long t = uf.root(target.getId());
+                if (s != null && t != null && !s.equals(t)) {
+                    Object sv = source.get(H_LyChI_L4);
+                    Object tv = target.get(H_LyChI_L4);
+                    if (Util.delta(sv, tv) == null) {
+                        uf.union(s, t); // same
+                    }
+                }
+            }, H_LyChI_L4);
+        
         int count = 0;        
         // now find all remaining unmapped nodes
         int processed = 0, total = component.size();
@@ -398,7 +411,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
             ++processed;
         }
         //dump ("handle unmapped nodes");
-
+        
         // now handle unresolved nodes with multiple active moieties and
         // assign to the class with less references 
         for (Entity e : unsure) {
@@ -436,16 +449,21 @@ public class UntangleCompoundComponent extends UntangleComponent {
      * TODO: find the root active moiety and if exists return it
      */
     Long getRoot (long[] comp) {
-        Entity[] entities = component.entities(comp);
-        if (entities.length != comp.length)
-            logger.warning("There are missing entities in component!");
-        
-        for (Entity e : entities) {
-            Entity[] in = e.inNeighbors(T_ActiveMoiety);
-            Entity[] out = e.outNeighbors(T_ActiveMoiety);
+        if (comp.length == 1)
+            return comp[0];
+
+        if (comp.length > 0) {
+            Entity[] entities = component.entities(comp);
+            if (entities.length != comp.length)
+                logger.warning("There are missing entities in component!");
             
-            if (in.length > 0 && out.length == 0)
-                return e.getId();
+            for (Entity e : entities) {
+                Entity[] in = e.inNeighbors(T_ActiveMoiety);
+                Entity[] out = e.outNeighbors(T_ActiveMoiety);
+                
+                if (in.length > 0 && out.length == 0)
+                    return e.getId();
+            }
         }
         
         return null;
