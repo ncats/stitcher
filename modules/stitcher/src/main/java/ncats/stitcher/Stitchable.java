@@ -1,6 +1,10 @@
 package ncats.stitcher;
 
 public interface Stitchable {
+    static public final int ALL = 0;
+    static public final int ANY = 1;
+    static public final int SINGLE = 2;
+
     /**
      * The propery name of associated with the stitching value
      */

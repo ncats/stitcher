@@ -59,7 +59,14 @@ public interface Component extends Iterable<Entity> {
             ("cliques() is not supported for this implementation");
     }
 
-    default void cliques (CliqueVisitor visitor, StitchKey key, Object value) {
+    
+    default public void cliques (CliqueVisitor visitor,
+                         StitchKey key, Object value) {
+        cliques (visitor, key, value, Stitchable.ANY);
+    }
+
+    default void cliques (CliqueVisitor visitor, StitchKey key, 
+                          Object value, int selection) {
         throw new UnsupportedOperationException
             ("cliques() is not supported for this implementation");
     }

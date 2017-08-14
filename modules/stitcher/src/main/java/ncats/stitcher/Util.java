@@ -788,7 +788,9 @@ public class Util {
                  : clique.values().entrySet()) {
             ps.print(me.getKey()+":");
             Object val = me.getValue();
-            if (val.getClass().isArray()) {
+            if (val == null)
+                ;
+            else if (val.getClass().isArray()) {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
                     ps.print(" "+Array.get(val, i));

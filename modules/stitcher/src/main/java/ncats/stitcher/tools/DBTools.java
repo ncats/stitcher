@@ -119,6 +119,27 @@ public class DBTools {
         System.out.println("### "+count+" entities found!");
     }
 
+    public void stats (long id) {
+        Component comp = ef.component(id);
+        for (StitchKey key : EnumSet.allOf(StitchKey.class)) {
+            Map<Object, Integer> stats = comp.stats(key);
+            if (stats.size() > 0) {
+                System.out.println("+++++++++++ "+key+" +++++++++++");
+                for (Map.Entry<Object, Integer> me : stats.entrySet()) {
+                    if (me.getValue() > 1) {
+                        System.out.println(">> cliques for "
+                                           +me.getKey()+"="+me.getValue());
+                        ef.cliques(clique -> {
+                                Util.dump(clique);
+                                return true;
+                            }, key, me.getKey());
+                        System.out.println("<<"+me.getKey());
+                    }
+                }
+            }
+        }
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+DBTools.class.getName()
@@ -175,6 +196,14 @@ public class DBTools {
                 }
                 else {
                     System.err.println("No property and value specified!");
+                }
+            }
+            else if ("stats".equalsIgnoreCase(cmd)) {
+                if (argv.length > 2) {
+                    dbt.stats(Long.parseLong(argv[2]));
+                }
+                else {
+                    System.err.println("No component specified!");
                 }
             }
             else

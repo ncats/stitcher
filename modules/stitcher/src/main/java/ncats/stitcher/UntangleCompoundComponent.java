@@ -319,16 +319,15 @@ public class UntangleCompoundComponent extends UntangleComponent {
 
     @Override
     public void untangle (BiConsumer<Long, long[]> consumer) {
-        System.out.println("## Active moieties for component ##");
-        System.out.println(component.nodeSet());
+        logger.info("####### Untangling component: "+component);
 
         // collapse based on single/terminal active moieties
         Set<Entity> unsure = new TreeSet<>();
         component.stitches((source, target) -> {
                 Entity[] out = source.outNeighbors(T_ActiveMoiety);
                 Entity[] in = target.inNeighbors(T_ActiveMoiety);
-                System.out.println(" ("+out.length+") "+source.getId()
-                                   +" -> "+target.getId()+" ("+in.length+")");
+                logger.info(" ("+out.length+") "+source.getId()
+                            +" -> "+target.getId()+" ("+in.length+")");
                 if (out.length == 1) {
                     // first collapse single/terminal active moieties
                     uf.union(source.getId(), target.getId());
@@ -371,18 +370,47 @@ public class UntangleCompoundComponent extends UntangleComponent {
         dump ("trusted keys stitching");
 
         // merge disconnected labeled nodes
+        Set<Object> lychi = new HashSet<>();
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
                 Long t = uf.root(target.getId());
                 if (s != null && t != null && !s.equals(t)) {
                     Object sv = source.get(H_LyChI_L4);
                     Object tv = target.get(H_LyChI_L4);
-                    if (Util.delta(sv, tv) == null) {
-                        uf.union(s, t); // same
+                    // only handle single values for now
+                    if (sv != null && tv != null) {
+                        if (sv.getClass().isArray() && Array.getLength(sv) > 0)
+                            sv = Array.get(sv, 0);
+                        if (tv.getClass().isArray() && Array.getLength(tv) > 0)
+                            tv = Array.get(tv, 0);
+
+                        if (sv.equals(tv) && !lychi.contains(tv)) {
+                            logger.info("## merging "+source.getId()+" ["+s+"]"
+                                        +" <-["+tv+"]-> "+target.getId()
+                                        +" ["+t+"]");
+                            component.cliques(clique -> {
+                                    Map<Long, Integer> labels = new HashMap<>();
+                                    for (Long n : clique.nodeSet()) {
+                                        Long l = uf.root(n);
+                                        if (l != null) {
+                                            Integer c = labels.get(l);
+                                            labels.put(l, c == null ? 1:c+1);
+                                        }
+                                    }
+                                    logger.info("..clique of size "
+                                                +clique.size()+" found: "
+                                                +clique.nodeSet()
+                                                +" =>\n"+labels.size()
+                                                +" "+labels);
+                                    return true;
+                                }, H_LyChI_L4, sv, Stitchable.ALL);
+                            lychi.add(sv);
+                            //uf.union(source.getId(), target.getId()); // same
+                        }
                     }
                 }
             }, H_LyChI_L4);
-        
+
         int count = 0;        
         // now find all remaining unmapped nodes
         int processed = 0, total = component.size();
@@ -440,7 +468,10 @@ public class UntangleCompoundComponent extends UntangleComponent {
         dump ("nodes with multiple active moieties");
         
         // now generate untangled compoennts..
-        for (long[] comp : uf.components()) {
+        long[][]components = uf.components();
+        for (int i = 0; i < components.length; ++i) {
+            long[] comp = components[i];
+            logger.info("generating component "+(i+1)+"/"+components.length+"...");
             consumer.accept(getRoot (comp), comp);
         }
     }
@@ -573,12 +604,14 @@ public class UntangleCompoundComponent extends UntangleComponent {
             else {
                 for (int i = 2; i < argv.length; ++i) {
                     Component comp = ef.component(Long.parseLong(argv[i]));
+                    /*
                     logger.info("Dumping component "+comp.getId());         
                     FileOutputStream fos = new FileOutputStream
                         ("Component_"+comp.getId()+".txt");
                     Util.dump(fos, comp);
                     fos.close();
-                    
+                    */
+
                     logger.info("Stitching component "+comp.getId());
                     ef.untangle(new UntangleCompoundComponent (dsource, comp));
                 }

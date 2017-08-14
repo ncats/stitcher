@@ -522,8 +522,12 @@ public class EntityFactory implements Props {
         }
         
         Set<Long> getNodes (StitchKey key, Object value) {
+            return getNodes (key, value, Stitchable.ANY);
+        }
+
+        Set<Long> getNodes (StitchKey key, Object value, int inclusion) {
             Set<Long> all = new TreeSet<>();
-            for (Iterator<Entity> it = find (gdb, key.name(), value);
+            for (Iterator<Entity> it = find (gdb, key.name(), value, inclusion);
                  it.hasNext(); ) {
                 Entity e = it.next();
                 if (nodes.contains(e.getId()))
@@ -531,12 +535,12 @@ public class EntityFactory implements Props {
             }
             return all;
         }
-        
+
         @Override
         public void cliques (CliqueVisitor visitor,
-                             StitchKey key, Object value) {
+                             StitchKey key, Object value, int inclusion) {
             try (Transaction tx = gdb.beginTx()) {
-                Set<Long> nodes = getNodes (key, value);
+                    Set<Long> nodes = getNodes (key, value, inclusion);
                 if (!nodes.isEmpty()) {
                     CliqueEnumeration clique = new CliqueEnumeration (gdb, key);
                     clique.enumerate(Util.toArray(nodes), visitor);
@@ -749,7 +753,7 @@ public class EntityFactory implements Props {
             return getClass().getName()+"{id="+id+",size="
                 +nodes.size()+",nodes="+nodes+"}";
         }
-    }
+    } // ComponentImpl
 
     static class ComponentLazy extends ComponentImpl {
         final Node seed;
@@ -1594,28 +1598,60 @@ public class EntityFactory implements Props {
 
     public static Iterator<Entity> find (GraphDatabaseService gdb,
                                          String key, Object value) {
+        return find (gdb, key, value, Stitchable.ANY);
+    }
+
+    public static Iterator<Entity> find (GraphDatabaseService gdb,
+                                         String key, Object value, 
+                                         int inclusion) {
         Iterator<Entity> iterator = null;
         try (Transaction tx = gdb.beginTx()) {
             Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());
-            if (value.getClass().isArray()) {
+            if (value.getClass().isArray() && inclusion != Stitchable.SINGLE) {
                 int len = Array.getLength(value);
-                IndexHits<Node> best = null;
-                for (int i = 0; i < len; ++i) {
-                    Object v = Array.get(value, i);
-                    IndexHits<Node> hits = index.get(key, v);
-                    // return on the first non-empty hits
-                    if (best == null || hits.size() < best.size()) {
-                        if (best != null)
-                            best.close();
-                        best = hits;
+                if (inclusion == Stitchable.ANY) {
+                    IndexHits<Node> best = null;
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(value, i);
+                        IndexHits<Node> hits = index.get(key, v);
+                        // return on the first non-empty hits
+                        if (best == null || hits.size() < best.size()) {
+                            if (best != null)
+                                best.close();
+                            best = hits;
+                        }
+                        else
+                            hits.close();
                     }
-                    else
-                        hits.close();
-                }
                 
-                if (best != null) {
-                    iterator = new EntityIterator (gdb, best.iterator());
-                }                   
+                    if (best != null) {
+                        iterator = new EntityIterator (gdb, best.iterator());
+                    }       
+                }
+                else if (inclusion == Stitchable.ALL) {
+                    Set<Node> nodes = null;
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(value, i);
+                        IndexHits<Node> hits = index.get(key, v);
+                        Set<Node> nn = new HashSet<>();
+                        for (Node n : hits)
+                            nn.add(n);
+                        if (nodes == null)
+                            nodes = nn;
+                        else
+                            nodes.retainAll(nn);
+
+                        hits.close();
+                    }
+
+                    if (nodes != null) {
+                        iterator = nodes.stream()
+                            .map(n -> Entity.getEntity(n)).iterator();
+                    }
+                }
+                else {
+                    logger.warning("Unknown inclusion value: "+inclusion);
+                }
             }
 
             if (iterator == null)
