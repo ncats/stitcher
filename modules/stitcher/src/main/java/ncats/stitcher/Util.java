@@ -793,8 +793,8 @@ public class Util {
             else if (val.getClass().isArray()) {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
-                    ps.print(" "+Array.get(val, i));
                     if (i > 0) ps.print(",");
+                    ps.print(" \""+Array.get(val, i)+"\"");
                 }
             }
             else

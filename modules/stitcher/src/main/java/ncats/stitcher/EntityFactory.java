@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.Function;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -827,6 +828,11 @@ public class EntityFactory implements Props {
 
                 for (StitchKey key : keys)
                     update (nodes, key);
+
+                if (values.isEmpty()) {
+                    logger.warning("Clique has no defining key span!\n"+this.nodes);
+                }
+
                 tx.success();
             }
             id = Util.sha1(nodes).substring(0, 9);
@@ -865,25 +871,27 @@ public class EntityFactory implements Props {
                 }
             }
 
-            if (value != null && value.getClass().isArray()) {
-                // make sure it's sorted from most frequent to least
-                Object[] sorted = new Object[Array.getLength(value)];
-                for (int i = 0; i < sorted.length; ++i)
-                    sorted[i] = Array.get(value, i);
-                
-                Arrays.sort(sorted, new Comparator () {
-                        public int compare (Object o1, Object o2) {
-                            Integer c1 = counts.get(o1);
-                            Integer c2 = counts.get(o2);
-                            return c2 - c1;
-                        }
-                    });
-                
-                for (int i = 0; i < sorted.length; ++i)
-                    Array.set(value, i, sorted[i]);
-            }
+            if (value != null) {
+                if (value.getClass().isArray()) {
+                    // make sure it's sorted from most frequent to least
+                    Object[] sorted = new Object[Array.getLength(value)];
+                    for (int i = 0; i < sorted.length; ++i)
+                        sorted[i] = Array.get(value, i);
+                    
+                    Arrays.sort(sorted, new Comparator () {
+                            public int compare (Object o1, Object o2) {
+                                Integer c1 = counts.get(o1);
+                                Integer c2 = counts.get(o2);
+                                return c2 - c1;
+                            }
+                        });
+                    
+                    for (int i = 0; i < sorted.length; ++i)
+                        Array.set(value, i, sorted[i]);
+                }
 
-            values.put(key, value);
+                values.put(key, value);
+            }
         }
         
         public Map<StitchKey, Object> values () { return values; }
@@ -2059,5 +2067,95 @@ public class EntityFactory implements Props {
     public Entity getLastUpdatedEntity () {
         Entity[] ent = getLastUpdatedEntities (1);
         return ent != null && ent.length > 0 ? ent[0] : null;
+    }
+
+    public void export (OutputStream os, Long... components) {
+        export (os, v -> v, e -> e, components);
+    }
+
+    public void export (OutputStream os, Function<String, String> vertex, 
+                        Function<String, String> edge, Long... components) {
+        PrintStream ps = new PrintStream (os);
+        Set<Component> comps = new HashSet<>();
+
+        // do a first pass to make sure we have unique components
+        for (Long c : components)
+            comps.add(component (c));
+
+        // now count
+        int nv = 0;
+        Set<String> edges = new TreeSet<>();
+        for (Component c : comps) {
+            nv += c.size();
+            c.stitches((a,b,v) -> {
+                    if (a.getId() > b.getId()) {
+                        Entity e = a;
+                        a = b;
+                        b = e;
+                    }
+                    String id = a.getId()+"."+b.getId();
+                    edges.add(id);
+                }, Entity.KEYS);
+        }
+        int ne = edges.size();
+        ps.println(nv+" "+ne);
+
+        // do vertex
+        Set<Entity> vertices = new TreeSet<>();
+        for (Component c : comps)
+            for (Entity e : c.entities())
+                vertices.add(e);
+
+        for (Entity e: vertices) {
+            ps.print(e.getId());
+            for (String l : e.labels()) {
+                String v = vertex.apply(l);
+                if (v != null)
+                    ps.print(" "+v);
+            }
+            ps.println();
+        }
+
+        // do edge
+        for (Component c : comps) {
+            c.stitches((a,b,s) -> {
+                    if (a.getId() > b.getId()) {
+                        Entity e = a;
+                        a = b;
+                        b = e;
+                    }
+
+                    String id = a.getId()+"."+b.getId();
+                    if (edges.contains(id)) {
+                        Set<String> labels = new TreeSet<>();
+                        for (Map.Entry<StitchKey, Object> me : s.entrySet()) {
+                            Object v = me.getValue();
+
+                            String sv = edge.apply(me.getKey().name());
+                            if (sv != null)
+                                labels.add(sv);
+
+                            if (v.getClass().isArray()) {
+                                for (int i = 0; i < Array.getLength(v); ++i) {
+                                    sv = edge.apply((String) Array.get(v, i));
+                                    if (sv != null)
+                                        labels.add(sv);
+                                }
+                            }
+                            else {
+                                sv = edge.apply((String)v);
+                                if (sv != null)
+                                    labels.add(sv);
+                            }
+                        }
+
+                        ps.print(a.getId() +" "+b.getId());
+                        for (String l : labels)
+                            ps.print(" "+l);
+                        ps.println();
+                        edges.remove(id);
+                    }
+                }, Entity.KEYS);
+        }
     }
 }

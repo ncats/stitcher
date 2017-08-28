@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import ncats.stitcher.EntityFactory;
 import ncats.stitcher.Entity;
@@ -25,6 +26,58 @@ public class DBTools {
 
     final EntityFactory ef;
     final DataSourceFactory dsf;
+
+    static class LabelMapper implements Function<String, String> {
+        Map<String, String> mapper = new TreeMap<>();
+        final String prefix;
+
+        protected LabelMapper (String prefix) {
+            if (prefix == null)
+                throw new IllegalArgumentException ("Prefix can't be null");
+            this.prefix = prefix;
+        }
+
+        public String apply (String label) {
+            String m = mapper.get(label);
+            if (m == null) {
+                m = String.format(prefix+"%1$03d", mapper.size()+1);
+                mapper.put(label, m);
+            }
+            return m;
+        }
+
+        public void dumpkeys (OutputStream os) {
+            PrintStream ps = new PrintStream (os);
+            TreeSet<Map.Entry<String, String>> keys = new TreeSet<>((a,b) -> {
+                    return a.getValue().compareTo(b.getValue());
+                });
+            keys.addAll(mapper.entrySet());
+            for (Map.Entry<String, String> me : keys)
+                ps.println(me.getValue()+"\t"+me.getKey());
+        }
+    }
+
+    static class EdgeLabelMapper extends LabelMapper {
+        Random rand = new Random (12345l);
+        public EdgeLabelMapper () {
+            super ("E");
+        }
+        /*
+        @Override
+        public String apply (String label) {
+            String map = super.apply(label);
+            if (Math.abs(rand.nextGaussian()) > .9)
+                map = null;
+            return map;
+        }
+        */
+    }
+
+    static class VertexLabelMapper extends LabelMapper {
+        public VertexLabelMapper () {
+            super ("V");
+        }
+    }
     
     public DBTools (GraphDb graphDb) {
         ef = new EntityFactory (graphDb);
@@ -119,25 +172,63 @@ public class DBTools {
         System.out.println("### "+count+" entities found!");
     }
 
-    public void stats (long id) {
+    public void stats (long id) throws IOException {
         Component comp = ef.component(id);
+        Set<Clique> cliques = new TreeSet<>((a,b) -> {
+                int d = b.size() - a.size();
+                for (int i = 0; i < a.size() && d == 0; ++i) {
+                    if (a.nodes()[i] < b.nodes()[i]) d = -1;
+                    else if (a.nodes()[i] > b.nodes()[i]) d = 1;
+                }
+                return d;
+            });
+        logger.info("## dumping component "+id+"...");
+        PrintStream ps = new PrintStream (new FileOutputStream ("comp_"+id+".txt"));
         for (StitchKey key : EnumSet.allOf(StitchKey.class)) {
             Map<Object, Integer> stats = comp.stats(key);
             if (stats.size() > 0) {
-                System.out.println("+++++++++++ "+key+" +++++++++++");
-                for (Map.Entry<Object, Integer> me : stats.entrySet()) {
-                    if (me.getValue() > 1) {
-                        System.out.println(">> cliques for "
-                                           +me.getKey()+"="+me.getValue());
+                ps.println("\n[***************** "+key+" *****************]");
+                Set sorted = new TreeSet ((a,b) -> {
+                        int d = stats.get(b) - stats.get(a);
+                        if (d == 0)
+                            d = ((Comparable)a).compareTo((Comparable)b);
+                        return d;
+                    });
+                sorted.addAll(stats.keySet());
+                for (Object k : sorted) {
+                    Integer count = stats.get(k);
+                    ps.println("## "+k+": "+count);
+                    if (count > 1) {
                         ef.cliques(clique -> {
-                                Util.dump(clique);
+                                Util.dump(ps, clique);
+                                cliques.add(clique);
                                 return true;
-                            }, key, me.getKey());
-                        System.out.println("<<"+me.getKey());
+                            }, key, k);
                     }
                 }
             }
         }
+
+        ps.println("\n[**************** CLIQUES ******************]");
+        for (Clique c : cliques)
+            Util.dump(ps, c);
+
+        ps.close();
+    }
+
+    public void export (String name, List<Long> comps) throws IOException {
+        logger.info("Exporting graphs to "+name+"...");
+        VertexLabelMapper vm = new VertexLabelMapper ();
+        EdgeLabelMapper em = new EdgeLabelMapper ();
+        FileOutputStream fos = new FileOutputStream (name+".txt");
+        ef.export(fos, vm, em, comps.toArray(new Long[0]));
+        fos.close();
+        fos = new FileOutputStream (name+".vkeys");
+        vm.dumpkeys(fos);
+        fos.close();
+        fos = new FileOutputStream (name+".ekeys");
+        em.dumpkeys(fos);
+        fos.close();
     }
 
     public static void main (String[] argv) throws Exception {
@@ -200,7 +291,21 @@ public class DBTools {
             }
             else if ("stats".equalsIgnoreCase(cmd)) {
                 if (argv.length > 2) {
-                    dbt.stats(Long.parseLong(argv[2]));
+                    for (int i = 2; i < argv.length; ++i) {
+                        dbt.stats(Long.parseLong(argv[i]));
+                    }
+                }
+                else {
+                    System.err.println("No component specified!");
+                }
+            }
+            else if ("export".equalsIgnoreCase(cmd)) {
+                if (argv.length > 2) {
+                    List<Long> comps = new ArrayList<>();
+                    for (int i = 2; i < argv.length; ++i)
+                        comps.add(Long.parseLong(argv[i]));
+                    System.out.println("loading "+comps.size()+" components for export...");
+                    dbt.export("graph_"+argv[2], comps);
                 }
                 else {
                     System.err.println("No component specified!");
