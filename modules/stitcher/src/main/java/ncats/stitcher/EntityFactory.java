@@ -1594,13 +1594,18 @@ public class EntityFactory implements Props {
     }
 
     public void untangle (UntangleComponent uc) {
+        untangle (uc, null);
+    }
+
+    public void untangle (UntangleComponent uc, Consumer<Stitch> consumer) {
         uc.untangle((root, member) -> {
                 ComponentImpl comp = new ComponentImpl (gdb, member);
                 if (root != null)
                     comp.setRoot(root);
                 DataSource dsource = uc.getDataSource();
-                createStitch (dsource, comp);
-                
+                Stitch stitch = createStitch (dsource, comp);
+                if (consumer != null)
+                    consumer.accept(stitch);
             });
     }
 
@@ -1941,32 +1946,33 @@ public class EntityFactory implements Props {
         return result;  
     }
 
-    public Entity createStitch (DataSource source, Component component) {
+    public Stitch createStitch (DataSource source, Component component) {
         try (Transaction tx = gdb.beginTx()) {
-            Entity ent = _createStitch (source, component);
+            Stitch ent = _createStitch (source, component);
             tx.success();
             return ent;
         }
     }
 
-    public Entity createStitch (DataSource source, long[] component) {
+    public Stitch createStitch (DataSource source, long[] component) {
         Component comp = new ComponentImpl (gdb, component);
         try (Transaction tx = gdb.beginTx()) {
-            Entity ent = _createStitch (source, comp);
+            Stitch ent = _createStitch (source, comp);
             tx.success();
             return ent;
         }
     }
     
-    public Entity _createStitch (DataSource source, Component component) {
+    public Stitch _createStitch (DataSource source, Component component) {
         final String key = source.getKey()+component.getId();
-        Entity entity = _createEntityIfAbsent(ID, key, () -> {
+         Node stitch = getNode (ID, key, () -> {
                 Node node = gdb.createNode(AuxNodeType.SGROUP,
                                            Label.label(source.getName()));
                 node.setProperty(ID, key);
                 node.setProperty(SOURCE, source._getKey());
                 node.setProperty(RANK, component.size());
-                Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());                
+                Index<Node> index = 
+                    gdb.index().forNodes(Entity.nodeIndexName());
                 for (Entity e : component) {
                     Node n = e._node();
                     String s = (String)n.getProperty(SOURCE);
@@ -2013,11 +2019,10 @@ public class EntityFactory implements Props {
                 return node;
             });
 
-        return entity;
+         return new Stitch (stitch);
     }
 
-    public Entity _createEntityIfAbsent
-        (String key, Object value, Supplier<Node> supplier) {
+    protected Node getNode (String key, Object value, Supplier<Node> supplier) {
         Index<Node> index = gdb.index().forNodes(Entity.nodeIndexName());
         try (IndexHits<Node> hits = index.get(key, value)) {
             Node node = hits.getSingle();
@@ -2027,8 +2032,13 @@ public class EntityFactory implements Props {
                 Util.index(index, node, node);
             }
             
-            return Entity._getEntity(node);
+            return node;
         }
+    }
+
+    public Entity _createEntityIfAbsent
+        (String key, Object value, Supplier<Node> supplier) {
+        return Entity._getEntity(getNode (key, value, supplier));
     }
     
     // return the last k updated entities
