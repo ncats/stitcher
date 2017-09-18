@@ -217,6 +217,49 @@ public class CNode implements Props, Comparable<CNode> {
         timeline.add(_node, lastUpdated);
     }
 
+    public Object get (String name) {
+        Object value = null;
+        try (Transaction tx = getGraphDb().beginTx()) {
+            if (_node.hasProperty(name)) {
+                value = _node.getProperty(name);
+            }
+            tx.success();
+            return value;
+        }
+    }
+
+    public Object _get (String name) {
+        return _node.getProperty(name, null);
+    }
+
+    public void set (String name, Object value) {
+        set (name, value, false);
+    }
+    
+    public void set (String name, Object value, boolean index) {
+        try (Transaction tx = getGraphDb().beginTx()) {
+            if (_node.hasProperty(name)) {
+                Object old = _node.getProperty(name);
+                if (!value.equals(old)) {
+                    _snapshot (name, old, value);
+                    if (index) {
+                        gdb.index().forNodes
+                            (AuxNodeType.class.getName())
+                            .add(_node, name, value);
+                    }
+                }
+            }
+            else {
+                _snapshot (name, null, value);
+                if (index) {
+                    gdb.index().forNodes
+                        (AuxNodeType.class.getName()).add(_node, name, value);
+                }
+            }
+            tx.success();
+        }
+    }
+
     public GraphDatabaseService getGraphDb () { return gdb; }
 
     public void _delete () {
@@ -440,6 +483,7 @@ public class CNode implements Props, Comparable<CNode> {
         ObjectNode node = mapper.createObjectNode();
         node.put("id", _node.getId());
 
+        /*
         if (_node.hasProperty(KIND))
             node.put(KIND, (String)_node.getProperty(KIND));
         
@@ -452,6 +496,10 @@ public class CNode implements Props, Comparable<CNode> {
         node.put(CREATED, (Long)_node.getProperty(CREATED));
         if (_node.hasProperty(UPDATED))
             node.put(UPDATED, (Long)_node.getProperty(UPDATED));
+        */
+        for (Map.Entry<String, Object> me : _node.getAllProperties().entrySet()) {
+            Util.setJson(node, me.getKey(), me.getValue());
+        }
 
         DataSource ds = datasource ();
         if (ds != null) {

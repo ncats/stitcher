@@ -124,11 +124,11 @@ public class DBTools {
     public void components () {
         AtomicInteger ai = new AtomicInteger (0);
         ef.components(c -> {
-                int score = c.score().intValue();               
-                if (score > 100) {
+                //int score = c.score().intValue();               
+                if (c.size() > 10) {
                     System.out.println("++++++++++++ Component "
-                                       +ai.get()+" ++++++++++++");
-                    System.out.println("score: "+score);
+                                       +c.root().getId()+" ++++++++++++");
+                    //System.out.println("score: "+score);
                     System.out.println("size: "+c.size());
                 }
                 ai.getAndIncrement();

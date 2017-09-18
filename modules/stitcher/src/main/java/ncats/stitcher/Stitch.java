@@ -156,8 +156,29 @@ public class Stitch extends Entity {
 
     public String source () {
         try (Transaction tx = gdb.beginTx()) {
-            return new CNode(parent).source();
+            String source = new CNode(parent).source();
+            tx.success();
+            return source;
         }
+    }
+
+    public Map<String, Object> payload (String source) {
+        Map<String, Object> payload = null;
+        try (Transaction tx = gdb.beginTx()) {
+            for (Relationship rel : _node.getRelationships
+                     (Direction.BOTH, AuxRelType.STITCH)) {
+                if (source.equals(rel.getProperty(SOURCE, null))) {
+                    Node n = rel.getOtherNode(_node);
+                    payload = new TreeMap<>();
+                    for (String key : n.getPropertyKeys()) {
+                        payload.put(key, n.getProperty(key, null));
+                    }
+                    break;
+                }
+            }
+            tx.success();
+        }
+        return payload;
     }
 
     public Map<DataSource, Integer> datasources () {

@@ -42,36 +42,13 @@ public class DataSource extends CNode {
         super (node);
     }
 
-    public void set (String name, Object value) {
-        set (name, value, false);
-    }
-    
+    @Override
     public void set (String name, Object value, boolean index) {
         if (KEY.equals(name))
             throw new IllegalArgumentException
                 ("Property \""+name+"\" is read-only!");
-        
-        try (Transaction tx = getGraphDb().beginTx()) {
-            if (_node.hasProperty(name)) {
-                Object old = _node.getProperty(name);
-                if (!value.equals(old)) {
-                    _snapshot (name, old, value);
-                    if (index) {
-                        gdb.index().forNodes
-                            (AuxNodeType.class.getName())
-                            .add(_node, name, value);
-                    }
-                }
-            }
-            else {
-                _snapshot (name, null, value);
-                if (index) {
-                    gdb.index().forNodes
-                        (AuxNodeType.class.getName()).add(_node, name, value);
-                }
-            }
-            tx.success();
-        }
+
+        super.set(name, value, index);
     }
 
     public URI toURI () {
@@ -115,21 +92,6 @@ public class DataSource extends CNode {
             is = getInputStream ();
         }
         return is;
-    }
-
-    public Object get (String name) {
-        Object value = null;
-        try (Transaction tx = getGraphDb().beginTx()) {
-            if (_node.hasProperty(name)) {
-                value = _node.getProperty(name);
-            }
-            tx.success();
-            return value;
-        }
-    }
-
-    public Object _get (String name) {
-        return _node.getProperty(name, null);
     }
 
     public String getName () {

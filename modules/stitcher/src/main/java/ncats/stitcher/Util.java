@@ -835,4 +835,46 @@ public class Util {
                  : props.getAllProperties().entrySet())
             Util.index(index, entity, me.getKey(), me.getValue());
     }
+
+    public static boolean setJson (ObjectNode node, String name, Object value) {
+        if (value == null) return false;
+        if (value instanceof String[]) {
+            ArrayNode a = node.arrayNode();
+            for (int i = 0; i < Array.getLength(value); ++i) {
+                a.add((String)Array.get(value, i));
+            }
+            node.put(name, a);
+        }
+        else if (value instanceof int[]) {
+            ArrayNode a = node.arrayNode();
+            for (int i = 0; i < Array.getLength(value); ++i) {
+                a.add((Integer)Array.get(value, i));
+            }
+            node.put(name, a);
+        }
+        else if (value instanceof double[]) {
+            ArrayNode a = node.arrayNode();
+            for (int i = 0; i < Array.getLength(value); ++i) {
+                a.add((Double)Array.get(value, i));
+            }
+            node.put(name, a);      
+        }
+        else if (value instanceof String) {
+            node.put(name, (String)value);
+        }
+        else if (value instanceof Integer) {
+            node.put(name, (Integer)value);
+        }
+        else if (value instanceof Double) {
+            node.put(name, (Double)value);
+        }
+        else if (value instanceof Boolean) {
+            node.put(name, (Boolean)value);
+        }
+        else {
+            logger.warning("Don't know how to set json value: "
+                           +value+" ["+value.getClass()+"]");
+        }
+        return true;
+    }
 }
