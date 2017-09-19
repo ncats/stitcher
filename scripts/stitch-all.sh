@@ -1,6 +1,6 @@
 #!/bin/sh
 
-db="stitch_v2.db"
+db="stitchv1.db"
 
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db jsonDump2016-08-05.gsrs"
 

@@ -168,7 +168,6 @@ public class CompoundStitcher implements Consumer<Stitch> {
     static class PharmManuApprovalParser extends ApprovalParser {
         final ObjectMapper mapper = new ObjectMapper ();
         final Base64.Decoder decoder = Base64.getDecoder();
-        final SimpleDateFormat sdf = new SimpleDateFormat ("yyyy");
             
         public PharmManuApprovalParser () {
             super ("PharmManuEncycl3rdEd.json");
@@ -182,28 +181,28 @@ public class CompoundStitcher implements Consumer<Stitch> {
                 try {
                     for (String c : content.split("\n")) {
                         JsonNode node = mapper.readTree(decoder.decode(c));
-                        if (node.isArray()) {
-                            for (int i = 0; i < node.size(); ++i) {
-                                JsonNode n = node.get(i);
-                                if (n.has("Year Introduced")) {
-                                    String year = n.get("Year Introduced").asText();
-                                    try {
-                                        Date date = sdf.parse(year);
-                                        if (approval == null 
-                                            || approval.date.after(date))
-                                            approval = new Approval (date);
-                                    }
-                                    catch (Exception ex) {
-                                        logger.log(Level.SEVERE, 
-                                                   "Can't parse date: "+year, ex);
-                                    }
-                                }
+                        if (node.has("Year Introduced")) {
+                            String year = node.get("Year Introduced").asText();
+                            try {
+                                Calendar cal = Calendar.getInstance();
+                                cal.set(Calendar.YEAR, 
+                                        Integer.parseInt(year));
+                                Date date = cal.getTime();
+                                if (approval == null 
+                                    || approval.date == null
+                                    || approval.date.after(date))
+                                    approval = new Approval (date);
+                            }
+                            catch (Exception ex) {
+                                logger.log(Level.SEVERE, 
+                                           "Can't parse date: "+year, ex);
                             }
                         }
                     }
                 }
                 catch (Exception ex) {
-                    logger.log(Level.SEVERE, "Can't parse json: '"+content+"'", ex);
+                    logger.log(Level.SEVERE, 
+                               "Can't parse json: '"+content+"'", ex);
                 }
             }
                 
@@ -229,7 +228,8 @@ public class CompoundStitcher implements Consumer<Stitch> {
                         }
                     }
                 }
-                else if (((String)content).toLowerCase().indexOf("approved") >= 0) 
+                else if (((String)content)
+                         .toLowerCase().indexOf("approved") >= 0) 
                     approval = new Approval (true);
             }
             return approval;
@@ -261,10 +261,12 @@ public class CompoundStitcher implements Consumer<Stitch> {
                     Approval a = ap.getApproval(payload);
                     if (a == null) {
                     }
-                    else if (approval == null || approval.date == null 
-                             || (a.date != null && approval.date.after(a.date))) {
-                        logger.info(ap.name+": approved="+a.approved+" date="+a.date);
-                        approval = a;
+                    else {
+                        logger.info(ap.name+": approved="+a.approved
+                                    +" date="+a.date);
+                        if (approval == null || approval.date == null 
+                            || (a.date != null && approval.date.after(a.date)))
+                            approval = a;
                     }
                 }
             }
