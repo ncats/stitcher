@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.regex.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
@@ -20,6 +21,7 @@ import java.util.logging.Level;
 import java.security.DigestInputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -71,6 +73,11 @@ public class DailyMedEntityFactory extends EntityRegistry {
         public String amount;
         public Substance substance;
     }
+
+    static class Package {
+        public String ndc;
+        public String form;
+    }
     
     static class Product {
         public String name;
@@ -80,8 +87,10 @@ public class DailyMedEntityFactory extends EntityRegistry {
         public String approvalId;
         public String approvalAuthority;
         public String marketStatus;
-        public LocalDate marketDate;
+        public Calendar marketDate;
+        public String equivNDC;
         public List<Ingredient> ingredients = new ArrayList<>();
+        public List<Package> packages = new ArrayList<>();
     }
 
     static class Section {
@@ -92,11 +101,14 @@ public class DailyMedEntityFactory extends EntityRegistry {
 
     static class DrugLabel {
         public String id;      
-        public String title;
-        public int initialApprovalYear;
+        public Integer initialApprovalYear;
         public List<Product> products = new ArrayList<>();
         public List<Section> sections = new ArrayList<>();
     }
+
+    ObjectWriter writer;
+    File outdir;
+    Set<String> tags = new TreeSet<>();
 
     public DailyMedEntityFactory (String dir) throws IOException {
         super (dir);
@@ -110,6 +122,16 @@ public class DailyMedEntityFactory extends EntityRegistry {
         super (graphDb);
     }
 
+    protected void init () {
+        super.init();
+        ObjectMapper mapper = new ObjectMapper ();   
+        writer = mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .writer(new SimpleDateFormat ("yyyy-MM-dd"))
+            .withDefaultPrettyPrinter()
+            .withoutFeatures(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
+            ;
+    }
+    
     protected int registerXml0 (InputStream is) throws Exception {
         XMLEventReader events =
             XMLInputFactory.newInstance().createXMLEventReader(is);
@@ -169,38 +191,43 @@ public class DailyMedEntityFactory extends EntityRegistry {
         for (int i = 0; i < children.getLength(); ++i) {
             Node n = children.item(i);
             switch (n.getNodeType()) {
-                /*
             case Node.TEXT_NODE:
-                { Node p = n.getParentNode();
-                    if (p.getNodeType() == Node.ELEMENT_NODE
-                        && (((Element)p).getTagName().equals("title")
-                            || ((Element)p).getTagName().equals("content")))
-                        text.append(n.getTextContent());
-                }
-                break;*/
-                
-            case Node.ELEMENT_NODE:
-                { String tag = ((Element)n).getTagName();
-                    if ("br".equals(tag)) {
-                        text.append("\n");
+                if (n.getParentNode().getNodeType() == Node.ELEMENT_NODE) {
+                    Element p = (Element)n.getParentNode();
+                    String value = n.getNodeValue();
+                    if (value != null && value.length() > 0) {
+                        switch (p.getTagName()) {
+                        case "content": case "item":
+                            text.append(value);
+                            break;
+                            
+                        case "title":
+                            text.append(value.replaceAll("[\\s\\n]+",""));
+                            break;
+                            
+                        case "paragraph": 
+                            text.append(value.replaceAll("[\\s\\n]+"," "));
+                            break;
+                        }
                     }
-                    else if ("title".equals(tag)
-                             || "content".equals(tag)) {
-                        text.append(n.getTextContent());
-                    }
-                    else if ("paragraph".equals(tag)) {
-                        text.append(n.getTextContent()+"\n");
-                    }
-                    else if ("item".equals(tag)) {
-                        text.append("+ "+n.getTextContent()+"\n");
-                    }
-                    else
-                        getText (text, n);
                 }
                 break;
-                
+
+            case Node.ELEMENT_NODE:
+                if ("linkHtml".equals(((Element)n).getTagName())) {
+                    break;
+                }
+                // fall through
+                    
             default:
                 getText (text, n);
+                if (n.getNodeType() == Node.ELEMENT_NODE) {
+                    switch (((Element)n).getTagName()) {
+                    case "paragraph": case "item": case "br":
+                        text.append("\n");
+                        break;
+                    }
+                }
             }
         }
     }
@@ -274,7 +301,9 @@ public class DailyMedEntityFactory extends EntityRegistry {
                                 String denu = n.getAttributes()
                                     .getNamedItem("unit").getTextContent();
                                 ingre.amount = String.format("%1$.1f", num/den)
-                                    +" "+numu+"/"+denu;
+                                    +" "+numu;
+                                if (!denu.equals("1"))
+                                    ingre.amount += "/"+denu;
                             }
                         }
                     }
@@ -288,6 +317,45 @@ public class DailyMedEntityFactory extends EntityRegistry {
         }
         
         return ingre;
+    }
+
+    void parsePackages (List<Package> packages, Node node) {
+        NodeList children = node.getChildNodes();
+        Package pkg = null;
+        for (int i = 0; i < children.getLength(); ++i) {
+            Node n = children.item(i);
+            if (n.getNodeType() == Node.ELEMENT_NODE) {
+                Element child = (Element)n;
+                switch (child.getTagName()) {
+                case "code":
+                    { Node item = child.getAttributes()
+                            .getNamedItem("codeSystem");
+                        if (item != null && "2.16.840.1.113883.6.69".equals
+                            (item.getTextContent())) {
+                            item = child.getAttributes().getNamedItem("code");
+                            if (item != null) {
+                                pkg = new Package ();
+                                pkg.ndc = item.getTextContent();
+                            }
+                        }
+                    }
+                    break;
+                    
+                case "formCode":
+                    if (pkg != null && "2.16.840.1.113883.3.26.1.1".equals
+                        (child.getAttributes().getNamedItem("codeSystem")
+                         .getTextContent())) {
+                        pkg.form = child.getAttributes()
+                            .getNamedItem("displayName").getTextContent();
+                        packages.add(pkg);
+                    }
+                    break;
+
+                default:
+                    parsePackages (packages, child);
+                }
+            }
+        }
     }
     
     Product parseProduct (Element el) {
@@ -325,6 +393,24 @@ public class DailyMedEntityFactory extends EntityRegistry {
                         product.genericName = nl.item(0).getTextContent();
                 }
                 break;
+
+            case "asEquivalentEntity":
+                { NodeList nl = child.getElementsByTagName("code");
+                    for (int j = 0; j < nl.getLength(); ++j) {
+                        Node n = nl.item(j);
+                        Node cs = n.getAttributes().getNamedItem("codeSystem");
+                        if (cs != null  && "2.16.840.1.113883.6.69"
+                            .equals(cs.getTextContent())) {
+                            product.equivNDC = n.getAttributes()
+                                .getNamedItem("code").getTextContent();
+                        }
+                    }
+                }
+                break;
+                
+            case "asContent":
+                parsePackages (product.packages, child);
+                break;
             }
         }
         return product;
@@ -340,8 +426,23 @@ public class DailyMedEntityFactory extends EntityRegistry {
                 if (product.name != null) {
                     NodeList nl = approval.getElementsByTagName("id");
                     if (nl.getLength() > 0) {
-                        product.approvalId = nl.item(0).getAttributes()
-                            .getNamedItem("extension").getTextContent();
+                        Node n = nl.item(0).getAttributes()
+                            .getNamedItem("extension");
+                        if (n != null)
+                            product.approvalId = n.getTextContent();
+                        else {
+                            nl = approval.getChildNodes();
+                            for (int j = 0; j < nl.getLength(); ++j) {
+                                n = nl.item(j);
+                                if (n.getNodeType() == Node.ELEMENT_NODE
+                                    && ((Element)n).getTagName()
+                                    .equals("code")) {
+                                    product.approvalId = n.getAttributes()
+                                        .getNamedItem("displayName")
+                                        .getTextContent();
+                                }
+                            }
+                        }
                     }
 
                     nl = approval.getElementsByTagName("territory");
@@ -367,9 +468,13 @@ public class DailyMedEntityFactory extends EntityRegistry {
                     
                     nl = marketingAct.getElementsByTagName("low");
                     if (nl.getLength() > 0) {
-                        product.marketDate = LocalDate.parse
+                        LocalDate date = LocalDate.parse
                             (nl.item(0).getAttributes().getNamedItem("value")
-                             .getTextContent(), DTF);
+                            .getTextContent(), DTF);
+                        product.marketDate = Calendar.getInstance();
+                        product.marketDate.set(date.getYear(),
+                                               date.getMonthValue()-1,
+                                               date.getDayOfMonth());
                     }
                     
                     label.products.add(product);
@@ -451,7 +556,6 @@ public class DailyMedEntityFactory extends EntityRegistry {
                         else {
                             //System.out.println("!!!"+text+"!!!");
                         }
-                        label.title = text;
                     }
                     break;
                     
@@ -463,22 +567,44 @@ public class DailyMedEntityFactory extends EntityRegistry {
             }
         }
     }
+
+    void tags (Element node) {
+        tags.add(node.getTagName());
+        NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); ++i) {
+            Node n = children.item(i);
+            if (n.getNodeType() == Node.ELEMENT_NODE) {
+                tags ((Element)n);
+            }
+        }
+    }
+
+    public Set<String> tags () { return tags; }
     
     protected int registerXml (InputStream is) throws Exception {
         DocumentBuilder builder =
             DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Element doc = builder.parse(is).getDocumentElement();
-
+        tags (doc);
+        
         DrugLabel label = new DrugLabel ();
         parsePreamble (label, doc.getChildNodes());
         parseProducts (label, doc.getElementsByTagName("manufacturedProduct"));
         parseSections (label, doc.getElementsByTagName("section"));
 
-        ObjectMapper mapper = new ObjectMapper ();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .writer().withDefaultPrettyPrinter()
-            .withoutFeatures(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
-            .writeValue(System.out, label);
+        if (outdir != null) {
+            logger.info(label.id+(label.initialApprovalYear != null
+                                  ? label.initialApprovalYear.toString() : ""));
+            File out = new File (outdir, label.id+".json");
+            try {
+                FileOutputStream fos = new FileOutputStream (out);
+                writer.writeValue(fos, label);
+                fos.close();
+            }
+            catch (IOException ex) {
+                logger.log(Level.SEVERE, "Can't write file: "+out, ex);
+            }
+        }
         
         return 0;
     }    
@@ -551,6 +677,14 @@ public class DailyMedEntityFactory extends EntityRegistry {
         return nb;
     }
 
+    public void setOutDir (File outdir) {
+        if (!outdir.exists())
+            outdir.mkdirs();
+        this.outdir = outdir;
+    }
+
+    public File getOutDir () { return outdir; }
+    
     @Override
     public DataSource register (File file) throws IOException {
         this.source = getDataSourceFactory().register(file);
@@ -581,16 +715,29 @@ public class DailyMedEntityFactory extends EntityRegistry {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println
-                ("Usage: ncats.stitcher.impl.DailyMedEntityFactory DB FILE...");
+                ("Usage: ncats.stitcher.impl.DailyMedEntityFactory DB [OutDir=OUTPUT] FILE...");
             System.exit(1);
         }
         
         DailyMedEntityFactory daily = new DailyMedEntityFactory (argv[0]);
         for (int i = 1; i < argv.length; ++i) {
-            logger.info("***** registering "+argv[i]+" ******");
-            //daily.register(new File (argv[i]));
-            daily.register(new FileInputStream (argv[i]));
+            int pos = argv[i].indexOf('=');
+            if (pos > 0) {
+                if ("outdir".equalsIgnoreCase(argv[i].substring(0, pos))) {
+                    File outdir = new File (argv[i].substring(pos+1));
+                    daily.setOutDir(outdir);
+                }
+                else {
+                    System.err.println("Unknown option: "+argv[i]);
+                }
+            }
+            else {
+                logger.info("***** registering "+argv[i]+" ******");
+                //daily.register(new File (argv[i]));
+                daily.register(new FileInputStream (argv[i]));
+            }
         }
+        System.out.println("TAGS: "+daily.tags());
         daily.shutdown();
     }
 }
