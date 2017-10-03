@@ -1,4 +1,4 @@
-package ncats.stitcher.impl;
+package ncats.stitcher.dailymed;
 
 import java.io.*;
 import java.util.*;
@@ -29,9 +29,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import ncats.stitcher.*;
-import static ncats.stitcher.StitchKey.*;
-
 /* extracting from dailymed xml
    Active/inactive
    UNII
@@ -45,9 +42,9 @@ import static ncats.stitcher.StitchKey.*;
    Parent NDC (if possible)
    Indication section text
  */
-public class DailyMedEntityFactory extends EntityRegistry {
+public class DailyMedParser {
     static final Logger logger =
-        Logger.getLogger(DailyMedEntityFactory.class.getName());
+        Logger.getLogger(DailyMedParser.class.getName());
 
     static final QName AttrCodeSystem = new QName ("codeSystem");
     static final QName AttrCode = new QName ("code");
@@ -62,24 +59,24 @@ public class DailyMedEntityFactory extends EntityRegistry {
     static final DateTimeFormatter DTF =
         DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    static class Substance {
+    static public class Substance {
         public String name;
         public String unii;
         public List<Substance> activeMoieties = new ArrayList<>();
     }
     
-    static class Ingredient {
+    static public class Ingredient {
         public String code;
         public String amount;
         public Substance substance;
     }
 
-    static class Package {
+    static public class Package {
         public String ndc;
         public String form;
     }
     
-    static class Product {
+    static public class Product {
         public String name;
         public String genericName;
         public String formulation;
@@ -88,42 +85,30 @@ public class DailyMedEntityFactory extends EntityRegistry {
         public String approvalAuthority;
         public String marketStatus;
         public Calendar marketDate;
+        public String ndc;
         public String equivNDC;
         public List<Ingredient> ingredients = new ArrayList<>();
         public List<Package> packages = new ArrayList<>();
     }
 
-    static class Section {
+    static public class Section {
         public String id;
         public String name;
         public String text;
     }
 
-    static class DrugLabel {
+    static public class DrugLabel {
         public String id;      
         public Integer initialApprovalYear;
         public List<Product> products = new ArrayList<>();
         public List<Section> sections = new ArrayList<>();
     }
 
-    ObjectWriter writer;
+    final ObjectWriter writer;
     File outdir;
     Set<String> tags = new TreeSet<>();
 
-    public DailyMedEntityFactory (String dir) throws IOException {
-        super (dir);
-    }
-    
-    public DailyMedEntityFactory (File dir) throws IOException {
-        super (dir);
-    }
-    
-    public DailyMedEntityFactory (GraphDb graphDb) throws IOException {
-        super (graphDb);
-    }
-
-    protected void init () {
-        super.init();
+    public DailyMedParser () {
         ObjectMapper mapper = new ObjectMapper ();   
         writer = mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .writer(new SimpleDateFormat ("yyyy-MM-dd"))
@@ -132,7 +117,7 @@ public class DailyMedEntityFactory extends EntityRegistry {
             ;
     }
     
-    protected int registerXml0 (InputStream is) throws Exception {
+    protected int parseXml0 (InputStream is) throws Exception {
         XMLEventReader events =
             XMLInputFactory.newInstance().createXMLEventReader(is);
         
@@ -369,6 +354,13 @@ public class DailyMedEntityFactory extends EntityRegistry {
             Element child = (Element)node;
             switch (child.getTagName()) {
             case "code":
+                { Node n = child.getAttributes().getNamedItem("codeSystem");
+                    if (n != null && "2.16.840.1.113883.6.69"
+                        .equals(n.getTextContent())) {
+                        product.ndc = child.getAttributes()
+                            .getNamedItem("code").getTextContent();
+                    }
+                }
                 break;
                 
             case "name":
@@ -455,9 +447,12 @@ public class DailyMedEntityFactory extends EntityRegistry {
                                 .getTextContent();
                     }
                     
-                    if (route != null)
-                        product.route = route.getAttributes()
-                            .getNamedItem("displayName").getTextContent();
+                    if (route != null) {
+                        Node n = route.getAttributes()
+                            .getNamedItem("displayName");
+                        if (n != null)
+                            product.route = n.getTextContent();
+                    }
                     
                     nl = marketingAct.getElementsByTagName("statusCode");
                     if (nl.getLength() > 0) {
@@ -468,13 +463,19 @@ public class DailyMedEntityFactory extends EntityRegistry {
                     
                     nl = marketingAct.getElementsByTagName("low");
                     if (nl.getLength() > 0) {
-                        LocalDate date = LocalDate.parse
-                            (nl.item(0).getAttributes().getNamedItem("value")
-                            .getTextContent(), DTF);
-                        product.marketDate = Calendar.getInstance();
-                        product.marketDate.set(date.getYear(),
-                                               date.getMonthValue()-1,
-                                               date.getDayOfMonth());
+                        String low = nl.item(0).getAttributes()
+                            .getNamedItem("value").getTextContent();
+                        try {
+                            LocalDate date = LocalDate.parse(low, DTF);
+                            product.marketDate = Calendar.getInstance();
+                            product.marketDate.set(date.getYear(),
+                                                   date.getMonthValue()-1,
+                                                   date.getDayOfMonth());
+                        }
+                        catch (Exception ex) {
+                            logger.log(Level.SEVERE, "Bogus date format: "
+                                       +low, ex);
+                        }
                     }
                     
                     label.products.add(product);
@@ -581,16 +582,45 @@ public class DailyMedEntityFactory extends EntityRegistry {
 
     public Set<String> tags () { return tags; }
     
-    protected int registerXml (InputStream is) throws Exception {
+    protected int parseXml (InputStream is) throws Exception {
         DocumentBuilder builder =
             DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Element doc = builder.parse(is).getDocumentElement();
-        tags (doc);
+        //tags (doc);
         
         DrugLabel label = new DrugLabel ();
         parsePreamble (label, doc.getChildNodes());
         parseProducts (label, doc.getElementsByTagName("manufacturedProduct"));
         parseSections (label, doc.getElementsByTagName("section"));
+
+        Set<String> seen = new HashSet<>();
+        for (Product p : label.products) {
+            String marketDate = p.marketDate != null ? String.format
+                ("%1$04d-%2$02d-%3$02d", p.marketDate.get(Calendar.YEAR),
+                 p.marketDate.get(Calendar.MONTH)+1, 
+                 p.marketDate.get(Calendar.DAY_OF_MONTH))
+                :"";
+
+            for (Ingredient i : p.ingredients) {
+                if (i.code.startsWith("ACTI") 
+                    && !seen.contains(i.substance.unii)) {
+                    System.out.println
+                        (i.substance.unii+"\t"
+                         +marketDate+"\t"
+                         +(label.initialApprovalYear != null 
+                          ? label.initialApprovalYear : "")+"\t"
+                         +i.code +"\t"+(p.approvalId!=null?p.approvalId:"")+"\t"
+                         +(p.equivNDC!=null?p.equivNDC:"")+"\t"
+                         +(p.ndc!=null?p.ndc:"")+"\t"
+                         +"\""+i.substance.name
+                         .replaceAll("\n","").toUpperCase().trim()
+                         +"\""+"\t\""+p.genericName
+                         .replaceAll("\n","").toUpperCase().trim()
+                         +"\"");
+                    //seen.add(i.substance.unii);
+                }
+            }
+        }
 
         if (outdir != null) {
             logger.info(label.id+(label.initialApprovalYear != null
@@ -612,16 +642,18 @@ public class DailyMedEntityFactory extends EntityRegistry {
     InputStream getInputStream (ZipInputStream zis, ZipEntry ze)
         throws IOException {
         logger.info("$$ "+ze.getName()+" "+ze.getSize());
-        
-        byte[] buf = new byte[(int)ze.getSize()];
-        for (int nb, tb = 0;
-             (nb = zis.read(buf, tb, buf.length-tb)) > 0; tb += nb)
-            ;
-                
-        return new ByteArrayInputStream (buf);
+        if (ze.getSize() > 0l) {        
+            byte[] buf = new byte[(int)ze.getSize()];
+            for (int nb, tb = 0;
+                 (nb = zis.read(buf, tb, buf.length-tb)) > 0; tb += nb)
+                ;
+            
+            return new ByteArrayInputStream (buf);
+        }
+        return null;
     }
 
-    protected int registerZip (InputStream is) throws Exception {
+    protected int parseZip (InputStream is) throws Exception {
         ZipInputStream zis = new ZipInputStream (is);
         for (ZipEntry ze; zis.available() > 0; ) {
             ze = zis.getNextEntry();
@@ -629,10 +661,14 @@ public class DailyMedEntityFactory extends EntityRegistry {
                 String name = ze.getName();
                 
                 if (name.endsWith(".zip")) {
-                    registerZip (getInputStream (zis, ze));
+                    is = getInputStream (zis, ze);
+                    if (is != null)
+                        parseZip (is);
                 }
                 else if (name.endsWith(".xml")) {
-                    registerXml (getInputStream (zis, ze));
+                    is = getInputStream (zis, ze);
+                    if (is != null)
+                        parseXml (is);
                 }
                 else { // ignore
                 }
@@ -643,7 +679,7 @@ public class DailyMedEntityFactory extends EntityRegistry {
         return 0;
     }
     
-    public int register (InputStream is) throws Exception {
+    public int parse (InputStream is) throws Exception {
         BufferedInputStream bis = new BufferedInputStream (is);
         bis.mark(1024);
 
@@ -663,10 +699,10 @@ public class DailyMedEntityFactory extends EntityRegistry {
                 (magic[2] & 0xff) == 0x03 &&
                 (magic[3] & 0xff) == 0x04) {
                 // zip file
-                nb = registerZip (bis);
+                nb = parseZip (bis);
             }
             else { // assume xml
-                nb = registerXml (bis);
+                nb = parseXml (bis);
             }
         }
         else {
@@ -685,42 +721,25 @@ public class DailyMedEntityFactory extends EntityRegistry {
 
     public File getOutDir () { return outdir; }
     
-    @Override
-    public DataSource register (File file) throws IOException {
-        this.source = getDataSourceFactory().register(file);
-        
-        Integer instances = (Integer) this.source.get(INSTANCES);
-        if (instances != null) {
-            logger.warning("### Data source "+this.source.getName()
-                           +" has already been registered with "+instances
-                           +" entities!");
-        }
-        else {
-            try {
-                instances = register (this.source.openStream());
-                updateMeta (this.source);
-                this.source.set(INSTANCES, instances);
-                logger.info
-                    ("$$$ "+instances+" entities registered for "+this.source);
-            }
-            catch (Exception ex) {
-                logger.log(Level.SEVERE, "Can't register data source: "+file,
-                           ex);
-            }
-        }
-        
-        return this.source;     
-    }
-    
     public static void main (String[] argv) throws Exception {
-        if (argv.length < 2) {
+        if (argv.length == 0) {
             System.err.println
-                ("Usage: ncats.stitcher.impl.DailyMedEntityFactory DB [OutDir=OUTPUT] FILE...");
+                ("Usage: ncats.stitcher.dailymed.DailyMedParser [OutDir=OUTPUT] FILE...");
             System.exit(1);
         }
+
+        System.out.println("UNII\t"+
+                           "MarketDate\t"+
+                           "InitialYearApproval\t"+
+                           "ActiveCode\t"+
+                           "ApprovalAppId\t"+
+                           "Equiv NDC\t"+
+                           "NDC\t"+
+                           "ActiveMoietyName\t"+
+                           "GenericProductName");
         
-        DailyMedEntityFactory daily = new DailyMedEntityFactory (argv[0]);
-        for (int i = 1; i < argv.length; ++i) {
+        DailyMedParser daily = new DailyMedParser ();
+        for (int i = 0; i < argv.length; ++i) {
             int pos = argv[i].indexOf('=');
             if (pos > 0) {
                 if ("outdir".equalsIgnoreCase(argv[i].substring(0, pos))) {
@@ -732,12 +751,9 @@ public class DailyMedEntityFactory extends EntityRegistry {
                 }
             }
             else {
-                logger.info("***** registering "+argv[i]+" ******");
-                //daily.register(new File (argv[i]));
-                daily.register(new FileInputStream (argv[i]));
+                logger.info("***** parsing "+argv[i]+" ******");
+                daily.parse(new FileInputStream (argv[i]));
             }
         }
-        System.out.println("TAGS: "+daily.tags());
-        daily.shutdown();
     }
 }

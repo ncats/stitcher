@@ -89,5 +89,13 @@ lazy val stitcher = (project in file("modules/stitcher"))
     javacOptions ++= javaBuildOptions
 ).dependsOn(buildinfo).aggregate(buildinfo)
 
+lazy val dailymed = (project in file("modules/dailymed"))
+  .settings(commonSettings: _*)
+  .settings(name := "stitcher-dailymed",
+    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.1",
+    libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.1",
+    javacOptions ++= javaBuildOptions
+)
+
 
 fork in run := true
