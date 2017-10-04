@@ -1596,7 +1596,16 @@ public class EntityFactory implements Props {
     public void untangle (UntangleComponent uc) {
         untangle (uc, null);
     }
-
+    
+    /**
+     * Untangles {@link UntangleComponent} and registers the {@link Stitch} into
+     * the datasource. If postProcess is specified, perform that operation on
+     * the stitch as well.
+     * 
+     * 
+     * @param uc
+     * @param consumer
+     */
     public void untangle (UntangleComponent uc, Consumer<Stitch> consumer) {
         uc.untangle((root, member) -> {
                 ComponentImpl comp = new ComponentImpl (gdb, member);
