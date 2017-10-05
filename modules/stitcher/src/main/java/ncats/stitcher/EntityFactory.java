@@ -1993,30 +1993,44 @@ public class EntityFactory implements Props {
                     DataSource ds = dsf._getDataSourceByKey(s);
                     try {
                         // link to the source's payload
-                        Relationship rel = n.getSingleRelationship
-                            (AuxRelType.PAYLOAD, Direction.INCOMING);
-                        Node p = rel.getOtherNode(n);
-
-                        rel = node.createRelationshipTo(p, AuxRelType.STITCH);
-                        if (e.equals(component.root())) {
-                            rel.setProperty(KIND, "PARENT");
-                            node.setProperty(PARENT, p.getId());
+                        Relationship rel = null;
+                        for (Relationship r : n.getRelationships
+                                 (Direction.INCOMING, AuxRelType.PAYLOAD)) {
+                            if (s.equals(r.getProperty(SOURCE))) {
+                                rel = r;
+                                break;
+                            }
                         }
                         
-                        if (ds != null) {
-                            String name =
-                                (String)ds._node().getProperty(NAME, null);
-                            node.addLabel(Label.label(name));
-                            rel.setProperty(SOURCE, name);
+                        if (rel != null) {
+                            Node p = rel.getOtherNode(n);
+                            
+                            rel = node.createRelationshipTo
+                                (p, AuxRelType.STITCH);
+                            if (e.equals(component.root())) {
+                                rel.setProperty(KIND, "PARENT");
+                                node.setProperty(PARENT, p.getId());
+                            }
+                            
+                            if (ds != null) {
+                                String name =
+                                    (String)ds._node().getProperty(NAME, null);
+                                node.addLabel(Label.label(name));
+                                rel.setProperty(SOURCE, name);
+                            }
+                            else {
+                                logger.warning("Bogus data source ("
+                                               +s+") referenced by node "
+                                               +n.getId());
+                            }
+                            
+                            // index all payload properties for this stitch
+                            Util.index(index, node, p);
                         }
                         else {
-                            logger.warning("Bogus data source ("
-                                           +s+") referenced by node "
-                                           +n.getId());
+                            logger.warning("Entity "+n.getId()+" doesn't have "
+                                           +"matching payload!");
                         }
-
-                        // index all payload properties for this stitch
-                        Util.index(index, node, p); 
                     }
                     catch (Exception ex) {
                         logger.warning("Entity "+n.getId()

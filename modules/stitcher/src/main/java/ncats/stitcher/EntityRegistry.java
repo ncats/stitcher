@@ -40,6 +40,12 @@ public class EntityRegistry extends EntityFactory {
     static final Logger logger =
         Logger.getLogger(EntityRegistry.class.getName());
 
+    static class Reference {
+        public DataSource ds;
+        public StitchKey key;
+        public String id;
+    }
+
     protected final PropertyChangeSupport pcs =
         new PropertyChangeSupport (this);
 
@@ -52,7 +58,7 @@ public class EntityRegistry extends EntityFactory {
     protected Map<String, StitchKeyMapper> mappers;
     // stitch key due to mappers
     protected EnumMap<StitchKey, Set<String>> stitchMappers;
-    protected Map<DataSource, StitchKey> references = new HashMap<>();
+    protected List<Reference> references = new ArrayList<>();
     
     public EntityRegistry (String dir) throws IOException {
         this (GraphDb.getInstance(dir));
@@ -275,21 +281,21 @@ public class EntityRegistry extends EntityFactory {
                 conf.getObjectList("references");
             for (ConfigObject obj : list) {
                 Config cf = obj.toConfig();
-                if (cf.hasPath("name")) {
+                if (!cf.hasPath("name")) {
                     logger.warning
                         ("Reference doesn't have \"name\" defined!");
                     continue;
                 }
                 
-                if (cf.hasPath("key")) {
+                if (!cf.hasPath("key")) {
                     logger.warning
                         ("Reference doesn't have \"key\" defined!");
                 }
-                
-                String name = cf.getString("name");                 
-                StitchKey key;
+
+                Reference ref = new Reference ();
+                String name = cf.getString("name");
                 try {
-                    key = StitchKey.valueOf(cf.getString("key"));
+                    ref.key = StitchKey.valueOf(cf.getString("key"));
                 }
                 catch (Exception ex) {
                     logger.warning("Invalid StitchKey value: "
@@ -297,15 +303,24 @@ public class EntityRegistry extends EntityFactory {
                     continue;
                 }
                 
-                DataSource ds = dsf.getDataSourceByName(name);
-                if (ds == null) {
+                ref.ds = dsf.getDataSourceByName(name);
+                if (ref.ds == null) {
                     logger.warning("Can't locate data source \""+
                                    name+"\"");
                     continue;
                 }
-                references.put(ds, key);
+                
+                ref.id = cf.getString("id");
+                if (ref.id == null)
+                    ref.id = idField;
+                
+                references.add(ref);
             }
         } // references
+
+        if (stitches.isEmpty() && mappers.isEmpty() && references.isEmpty()) {
+            logger.log(Level.SEVERE, "No stitches or references defined!");
+        }
     }
     
     protected DataSource registerFromConfig (File base, Config conf)
@@ -344,41 +359,46 @@ public class EntityRegistry extends EntityFactory {
     /**
      * attach payload to an existing entity
      */
-    public int attach (final Map<String, Object> map) {
+    public Entity attach (final Map<String, Object> map) {
         try (Transaction tx = gdb.beginTx()) {
-            int cnt = _attach (map);
+            Entity e = _attach (map);
             tx.success();
-            return cnt;
+            return e;
         }
     }
 
-    public int _attach (final Map<String, Object> map) {
-        int cnt = -1;    
+    public Entity _attach (final Map<String, Object> map) {
+        Entity ent = null;
+        int cnt = 0;
+        
         Object id = map.get(idField);
-        if (id != null) {
-            cnt = 0;
-            for (Map.Entry<DataSource, StitchKey> me : references.entrySet()) {
-                DataSource ds = me.getKey();
-                Entity[] entities =
-                    filter (me.getKey().name(), id, ds.getName());
-                for (Entity e : entities) {
-                    e._add(new DefaultPayload (ds, id));
-                    e._addLabel(ds.getName());
+        for (Reference ref : references) {
+            Object rid = map.get(ref.id);
+            if (rid != null) {
+                Iterator<Entity> iter = find (ref.key, rid);
+                while (iter.hasNext()) {
+                    Entity e = iter.next();
+                    if (e._is(ref.ds.getName())) {
+                        DefaultPayload payload =
+                            new DefaultPayload (source, id);
+                        payload.putAll(map);
+                        e._add(payload);
+                        e._addLabel(source.getName());
+                        if (ent == null)
+                            ent = e;
+                        logger.info
+                            ("... attaching "+id+" to entity "+e.getId());
+                        ++cnt;
+                    }
                 }
-                cnt += entities.length;
             }
         }
-        return cnt;
+        logger.info(id+" maps to "+cnt+" entities!");
+        
+        return ent;
     }
     
     public Entity register (final Map<String, Object> map) {
-        /*
-        return execute (new Callable<Entity> () {
-                public Entity call () throws Exception {
-                    return _register (map);
-                }
-            }, true);
-        */
         try (Transaction tx = gdb.beginTx()) {
             Entity ent = _register (map);
             tx.success();
@@ -387,43 +407,52 @@ public class EntityRegistry extends EntityFactory {
     }
 
     protected Entity _register (Map<String, Object> map) {
-        Entity ent = Entity._getEntity(_createNode ());
-        String id = null;
-        if (idField != null && map.containsKey(idField))
-            id = map.get(idField).toString();
-
-        DefaultPayload payload = new DefaultPayload (getDataSource ());
-        payload.putAll(map);
-
-        if (strucField != null) {
-            Object value = map.get(strucField);
-            if (value != null) {
-                if (value instanceof Molecule) {
-                    lychify (ent, (Molecule)value);
-                }
-                else {
-                    try {
-                        MolHandler mh = new MolHandler (value.toString());
-                        lychify (ent, mh.getMolecule());
+        Entity ent;
+        
+        if (stitches.isEmpty() && mappers.isEmpty()) {
+            ent = _attach (map);
+        }
+        else {
+            ent = Entity._getEntity(_createNode ());
+            String id = null;
+            if (idField != null && map.containsKey(idField))
+                id = map.get(idField).toString();
+            
+            DefaultPayload payload = new DefaultPayload (getDataSource ());
+            payload.putAll(map);
+            
+            if (strucField != null) {
+                Object value = map.get(strucField);
+                if (value != null) {
+                    if (value instanceof Molecule) {
+                        lychify (ent, (Molecule)value);
                     }
-                    catch (Exception ex) {
-                        logger.warning(id+": Can't parse structure: "+value);
+                    else {
+                        try {
+                            MolHandler mh = new MolHandler (value.toString());
+                            lychify (ent, mh.getMolecule());
+                        }
+                        catch (Exception ex) {
+                            logger.warning
+                                (id+": Can't parse structure: "+value);
+                        }
                     }
                 }
             }
-        }
-        
-        for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
-            for (String prop : me.getValue()) {
-                if (!mappers.containsKey(prop)) { // deal with mappers later
-                    Object value  = normalize (me.getKey(), map.get(prop));
-                    ent._add(me.getKey(), new StitchValue (prop, value));
+            
+            for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
+                for (String prop : me.getValue()) {
+                    if (!mappers.containsKey(prop)) { // deal with mappers later
+                        Object value  = normalize (me.getKey(), map.get(prop));
+                        ent._add(me.getKey(), new StitchValue (prop, value));
+                    }
                 }
             }
+            mapValues (ent, map);
+            
+            ent._add(payload);
         }
-        mapValues (ent, map);
         
-        ent._add(payload);
         return ent;
     }
 
