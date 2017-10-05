@@ -52,6 +52,7 @@ public class EntityRegistry extends EntityFactory {
     protected Map<String, StitchKeyMapper> mappers;
     // stitch key due to mappers
     protected EnumMap<StitchKey, Set<String>> stitchMappers;
+    protected Map<DataSource, StitchKey> references = new HashMap<>();
     
     public EntityRegistry (String dir) throws IOException {
         this (GraphDb.getInstance(dir));
@@ -266,10 +267,45 @@ public class EntityRegistry extends EntityFactory {
                     add (key, property);
                 }
             }
-        }
-        else {
-            logger.warning("No \"stitches\" value defined!");
-        }
+        } // stitches
+        
+        // references data sources
+        if (conf.hasPath("references")) {
+            List<? extends ConfigObject> list =
+                conf.getObjectList("references");
+            for (ConfigObject obj : list) {
+                Config cf = obj.toConfig();
+                if (cf.hasPath("name")) {
+                    logger.warning
+                        ("Reference doesn't have \"name\" defined!");
+                    continue;
+                }
+                
+                if (cf.hasPath("key")) {
+                    logger.warning
+                        ("Reference doesn't have \"key\" defined!");
+                }
+                
+                String name = cf.getString("name");                 
+                StitchKey key;
+                try {
+                    key = StitchKey.valueOf(cf.getString("key"));
+                }
+                catch (Exception ex) {
+                    logger.warning("Invalid StitchKey value: "
+                                   +cf.getString("key"));
+                    continue;
+                }
+                
+                DataSource ds = dsf.getDataSourceByName(name);
+                if (ds == null) {
+                    logger.warning("Can't locate data source \""+
+                                   name+"\"");
+                    continue;
+                }
+                references.put(ds, key);
+            }
+        } // references
     }
     
     protected DataSource registerFromConfig (File base, Config conf)
@@ -303,6 +339,36 @@ public class EntityRegistry extends EntityFactory {
             ds.setName(source.getString("name"));
         
         return ds;
+    }
+
+    /**
+     * attach payload to an existing entity
+     */
+    public int attach (final Map<String, Object> map) {
+        try (Transaction tx = gdb.beginTx()) {
+            int cnt = _attach (map);
+            tx.success();
+            return cnt;
+        }
+    }
+
+    public int _attach (final Map<String, Object> map) {
+        int cnt = -1;    
+        Object id = map.get(idField);
+        if (id != null) {
+            cnt = 0;
+            for (Map.Entry<DataSource, StitchKey> me : references.entrySet()) {
+                DataSource ds = me.getKey();
+                Entity[] entities =
+                    filter (me.getKey().name(), id, ds.getName());
+                for (Entity e : entities) {
+                    e._add(new DefaultPayload (ds, id));
+                    e._addLabel(ds.getName());
+                }
+                cnt += entities.length;
+            }
+        }
+        return cnt;
     }
     
     public Entity register (final Map<String, Object> map) {
@@ -653,7 +719,7 @@ public class EntityRegistry extends EntityFactory {
     public DataSource register (URL url) throws IOException {
         return source = getDataSourceFactory().register(url);
     }
-    
+
     public static <T extends EntityRegistry>
         void register (String[] argv, Class<T> cls)
         throws Exception {

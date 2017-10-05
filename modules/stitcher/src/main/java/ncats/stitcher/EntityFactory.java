@@ -313,12 +313,17 @@ public class EntityFactory implements Props {
         }
 
         void traverse (Node node) {
-            nodes.add(node.getId());
-            for (Relationship rel :
-                     node.getRelationships(Direction.BOTH, Entity.KEYS)) {
-                Node xn = rel.getOtherNode(node);
-                if (!nodes.contains(xn.getId()))
-                    traverse (xn);
+            LinkedList<Node> stack = new LinkedList<>();
+            stack.push(node);
+            while (!stack.isEmpty()) {
+                Node n = stack.pop();
+                nodes.add(n.getId());
+                for (Relationship rel :
+                         n.getRelationships(Direction.BOTH, Entity.KEYS)) {
+                    Node xn = rel.getOtherNode(n);
+                    if (!nodes.contains(xn.getId()))
+                        stack.push(xn);
+                }
             }
         }
 
