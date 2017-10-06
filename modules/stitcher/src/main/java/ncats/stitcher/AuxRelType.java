@@ -7,5 +7,6 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public enum AuxRelType implements RelationshipType {
     PAYLOAD,
-    STITCH
+    STITCH,
+    EVENT
 }

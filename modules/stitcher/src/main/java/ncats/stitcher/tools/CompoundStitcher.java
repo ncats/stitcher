@@ -28,12 +28,8 @@ public class CompoundStitcher implements Consumer<Stitch> {
     public CompoundStitcher (String db)  throws Exception {
         ef = new EntityFactory (GraphDb.getInstance(db));
         dsf = ef.getDataSourceFactory();
-        
-        calculators.add(new ApprovalCalculator());
-        
+        calculators.add(new ApprovalCalculator (ef));
     }
-
-
 
     public void shutdown () {
         ef.shutdown();
@@ -95,18 +91,18 @@ public class CompoundStitcher implements Consumer<Stitch> {
      */
     
     public CompoundStitcher addCalculator(StitchCalculator calc){
-    	this.calculators.add(calc);
-    	
-    	return this;
+        this.calculators.add(calc);
+        
+        return this;
     }
 
 
     //Perform all calculator options
-	@Override
-	public void accept(Stitch t) {
-		calculators.stream()
-		           .forEach(c->{
-		        	   c.accept(t);
-		           });
-	}
+        @Override
+        public void accept(Stitch t) {
+                calculators.stream()
+                           .forEach(c->{
+                                   c.accept(t);
+                           });
+        }
 }

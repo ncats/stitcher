@@ -118,7 +118,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         }
                     }
                 }
-                else if (unii.equals(vobj)) {
+                else if (unii != null && unii.equals(vobj)) {
                     activeMoieties.put(unii, ent);
                 }
                 else {

@@ -315,6 +315,51 @@ public class Entity extends CNode {
         return this;
     }
 
+    public Entity add (String type, Map<String, Object> props, 
+                       Map<String, Object> data) {
+        try (Transaction tx = gdb.beginTx()) {
+            _add (type, props, data);
+            tx.success();
+        }
+        return this;
+    }
+
+    /**
+     * attach abritrary data to this entity. type is the relationship type.
+     * props - properties associated with the edge
+     * data - data
+     */
+    public Entity _add (String type, Map<String, Object> props, 
+                        Map<String, Object> data) {
+        if (!props.containsKey(ID) || !props.containsKey(SOURCE)) {
+            throw new IllegalArgumentException
+                ("props must contain "+ID+" and "+SOURCE+" properties!");
+        }
+
+        Object id = props.get(ID);
+        if (id == null)
+            throw new IllegalArgumentException (ID+" property can't be null!");
+
+        String source = (String)props.get(SOURCE);
+        if (source == null)
+            throw new IllegalArgumentException
+                (SOURCE+" property can't be null!");
+
+        Node node = gdb.createNode(AuxNodeType.DATA);
+        node.setProperty(CREATED, System.currentTimeMillis());
+        for (Map.Entry<String, Object> me : data.entrySet())
+            node.setProperty(me.getKey(), me.getValue());
+
+        Relationship rel = node.createRelationshipTo
+            (_node, RelationshipType.withName(type));
+        rel.setProperty(SOURCE, source);
+        rel.setProperty(ID, id);
+        for (Map.Entry<String, Object> me : props.entrySet())
+            rel.setProperty(me.getKey(), me.getValue());
+
+        return this;
+    }
+
     public Entity _add (Payload payload) {
         DataSource source = payload.getSource();
         

@@ -461,7 +461,7 @@ public class Util {
                 new HashMap<String, StringBuilder>();
             for (int i = 0; i < size; ++i) {
                 JsonNode n = codes.get(i);
-                if ("PRIMARY".equals(n.get("type").asText())) {
+                if (n.has("type") && "PRIMARY".equals(n.get("type").asText())) {
                     String sys = n.get("codeSystem").asText();
                     StringBuilder sb = buf.get(sys);
                     if (sb == null) {
@@ -486,7 +486,8 @@ public class Util {
             for (int i = 0; i < size; ++i) {
                 JsonNode n = refs.get(i);
                 if (sb.length() > 0) sb.append("\n");
-                sb.append(n.get("citation").asText());
+                if (n.has("citation"))
+                    sb.append(n.get("citation").asText());
             }
             mol.setProperty("References", sb.toString());
         }
@@ -590,14 +591,17 @@ public class Util {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
                 if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
-                    String id = n.get("relatedSubstance")
-                        .get("approvalID").asText();
-                    Object val = map.get("ActiveMoieties");
-                    if (val != null)
-                        val = Util.merge(val, id);
-                    else
-                        val = id;
-                    map.put("ActiveMoieties", val);
+                    JsonNode rel = n.get("relatedSubstance")
+                        .get("approvalID");
+                    if (rel != null) {
+                        String id = rel.asText();
+                        Object val = map.get("ActiveMoieties");
+                        if (val != null)
+                            val = Util.merge(val, id);
+                        else
+                            val = id;
+                        map.put("ActiveMoieties", val);
+                    }
                 }
             }
         }
