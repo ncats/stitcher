@@ -379,6 +379,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                     Object tv = target.get(H_LyChI_L4);
                     // only handle single values for now
                     if (sv != null && tv != null) {
+                        /*
                         if (sv.getClass().isArray() && Array.getLength(sv) > 0)
                             sv = Array.get(sv, 0);
                         if (tv.getClass().isArray() && Array.getLength(tv) > 0)
@@ -406,6 +407,12 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                 }, H_LyChI_L4, sv, Stitchable.ALL);
                             lychi.add(sv);
                             //uf.union(source.getId(), target.getId()); // same
+                        }
+                        */
+                        
+                        Object dif = Util.delta(sv, tv);
+                        if (dif == null || dif == Util.NO_CHANGE) {
+                            uf.union(source.getId(), target.getId());
                         }
                     }
                 }
