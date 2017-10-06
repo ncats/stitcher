@@ -411,7 +411,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                         */
                         
                         Object dif = Util.delta(sv, tv);
-                        if (dif == null || dif == Util.NO_CHANGE) {
+                        if (dif == null) {
                             uf.union(source.getId(), target.getId());
                         }
                     }

@@ -422,9 +422,16 @@ public class Util {
         Molecule mol = mh.getMolecule();
                     
         JsonNode unii = node.get("approvalID");
+        if (unii == null) {
+            unii = node.get("UNII");
+        }
+
         if (unii != null) {
             mol.setProperty("UNII", unii.asText());
             mol.setName(unii.asText());
+        }
+        else {
+            logger.warning("No UNII found!");
         }
                     
         JsonNode names = node.get("names");
@@ -508,8 +515,15 @@ public class Util {
     static Map<String, Object> parseSubstance (JsonNode node) {
         Map<String, Object> map = new TreeMap<>();
         JsonNode unii = node.get("approvalID");
+        if (unii == null) {
+            unii = node.get("UNII");
+        }
+
         if (unii != null) {
             map.put("UNII", unii.asText());
+        }
+        else {
+            logger.warning("No UNII found!");
         }
                     
         JsonNode names = node.get("names");
