@@ -643,6 +643,26 @@ public class Util {
         return array;
     }
 
+    public static ObjectNode toJsonNode (PropertyContainer container) {
+        ObjectMapper mapper = new ObjectMapper ();
+        return toJsonNode (mapper, mapper.createObjectNode(), container);
+    }
+
+    public static ObjectNode toJsonNode (ObjectNode node,
+                                         PropertyContainer container) {
+        return toJsonNode (new ObjectMapper (), node, container);
+    }
+    
+    public static ObjectNode toJsonNode (ObjectMapper mapper, ObjectNode node,
+                                         PropertyContainer container) {
+        for (Map.Entry<String, Object> me :
+                 container.getAllProperties().entrySet()) {
+            Object value = me.getValue();
+            node.put(me.getKey(), mapper.valueToTree(value));
+        }
+        return node;
+    }
+
     public static String[] tokenizer (String line, String delim) {
         return delim.length() == 1 ? tokenizer (line, delim.charAt(0))
             : line.split(delim);

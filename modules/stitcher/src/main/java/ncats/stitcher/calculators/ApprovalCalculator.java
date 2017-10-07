@@ -39,8 +39,8 @@ public class ApprovalCalculator implements StitchCalculator {
         for (Approval a : approvals) {
             Map<String, Object> props = new HashMap<>();
             props.put(ID, a.id);
-            DataSource source = dsf.getDataSourceByName(a.source);
-            props.put(SOURCE, source.getKey());
+            props.put(SOURCE, a.source);
+            props.put(KIND, "APPROVAL");
 
             Map<String, Object> data = new HashMap<>();
             if (a.approval != null) {
@@ -54,7 +54,7 @@ public class ApprovalCalculator implements StitchCalculator {
                 data.put("marketedDate", SDF.format(a.marketed));
                 marketed = true;
             }
-            
+
             // now add event to this stitch node
             stitch.add(AuxRelType.EVENT.name(), props, data);
         }

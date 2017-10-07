@@ -482,22 +482,9 @@ public class CNode implements Props, Comparable<CNode> {
     public JsonNode _toJson () {
         ObjectNode node = mapper.createObjectNode();
         node.put("id", _node.getId());
-
-        /*
-        if (_node.hasProperty(KIND))
-            node.put(KIND, (String)_node.getProperty(KIND));
         
-        if (_node.hasProperty(NAME))
-            node.put(NAME, (String)_node.getProperty(NAME));
-        
-        if (_node.hasProperty(KEY))
-            node.put(KEY, (String)_node.getProperty(KEY));
-            
-        node.put(CREATED, (Long)_node.getProperty(CREATED));
-        if (_node.hasProperty(UPDATED))
-            node.put(UPDATED, (Long)_node.getProperty(UPDATED));
-        */
-        for (Map.Entry<String, Object> me : _node.getAllProperties().entrySet()) {
+        for (Map.Entry<String, Object> me :
+                 _node.getAllProperties().entrySet()) {
             Util.setJson(node, me.getKey(), me.getValue());
         }
 
@@ -522,7 +509,6 @@ public class CNode implements Props, Comparable<CNode> {
         ArrayNode neighbors = mapper.createArrayNode();
         List<Relationship> snapshots = new ArrayList<Relationship>();
         Node parent = null;
-        Node payload = null;
         
         ObjectNode stitches = null;
         if (_node.hasLabel(AuxNodeType.SGROUP)) {
@@ -536,6 +522,8 @@ public class CNode implements Props, Comparable<CNode> {
 
         Map<String, Object> properties = new TreeMap<>();
         Map<Object, Long> refs = new HashMap<>();
+        List<JsonNode> payloads = new ArrayList<>();
+        List<JsonNode> events = new ArrayList<>();
         for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
             Node n = rel.getOtherNode(_node);
             if (n.hasLabel(AuxNodeType.SNAPSHOT)) {
@@ -616,12 +604,35 @@ public class CNode implements Props, Comparable<CNode> {
                         map.put(srel.getType().name(), value);
                     }
                     member.put("stitches", mapper.valueToTree(map));
+
+                    ArrayNode data = mapper.createArrayNode();
+                    for (Relationship srel :
+                             sn.getRelationships(AuxRelType.PAYLOAD)) {
+                        Node py = srel.getOtherNode(sn);
+                        if (!py.equals(n)) {
+                            ObjectNode on = Util.toJsonNode(py);
+                            String source = (String)srel.getProperty(SOURCE);
+                            on.put(SOURCE, dsf.getDataSourceByKey
+                                   (source).getName());
+                            data.add(on);
+                        }
+                    }
+                    
+                    if (data.size() > 0)
+                        member.put("data", data);
                 }
                 
                 ((ArrayNode)stitches.get("members")).add(member);               
             }
-            else if (n.hasLabel(AuxNodeType.DATA)) {
-                payload = n;
+            else if (rel.isType(AuxRelType.PAYLOAD)) {
+                ObjectNode on = Util.toJsonNode(rel);
+                Util.toJsonNode(on, n);
+                payloads.add(on);
+            }
+            else if (rel.isType(AuxRelType.EVENT)) {
+                ObjectNode on = Util.toJsonNode(rel);
+                Util.toJsonNode(on, n);
+                events.add(on);
             }
             else if (n.hasLabel(AuxNodeType.COMPONENT)) {
                 // should do something here..
@@ -669,17 +680,20 @@ public class CNode implements Props, Comparable<CNode> {
         if (neighbors.size() > 0)
             node.put("neighbors", neighbors);
             
-        if (payload != null) {
-            ObjectNode pl = mapper.createObjectNode();
-            for (Map.Entry<String, Object> me :
-                     payload.getAllProperties().entrySet()) {
-                Object value = me.getValue();
-                pl.put(me.getKey(), mapper.valueToTree(value));
+        if (!payloads.isEmpty()) {
+            ArrayNode ary = mapper.createArrayNode();
+            for (JsonNode n : payloads) {
+                ary.add(n);
             }
-            ObjectNode load = mapper.createObjectNode();
-            load.put("id", payload.getId());
-            load.put("content", pl);
-            node.put("payload", load);
+            node.put("payload", ary);
+        }
+
+        if (!events.isEmpty()) {
+            ArrayNode ary = mapper.createArrayNode();
+            for (JsonNode n : events) {
+                ary.add(n);
+            }
+            node.put("events", ary);        
         }
             
         if (!snapshots.isEmpty()) {

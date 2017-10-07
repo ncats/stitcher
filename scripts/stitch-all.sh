@@ -19,3 +19,7 @@ sbt stitcher/"runMain ncats.stitcher.impl.DrugBankEntityFactory $db cache=data/h
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/tocris.conf"
 
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
+
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrx.conf"
+
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
