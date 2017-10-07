@@ -29,6 +29,7 @@ import services.WebSocketEchoActor;
 import services.jobs.*;
 
 import ncats.stitcher.*;
+import ncats.stitcher.calculators.CalculatorFactory;
 import models.*;
 import controllers.Util;
 import chemaxon.struc.Molecule;
@@ -249,6 +250,19 @@ public class Api extends Controller {
         Entity e = getStitchEntity (ver, id);
         return e != null ? ok (e.toJson())
             : notFound ("Unknown stitch key: "+id);
+    }
+
+    public Result updateStitch(Integer ver, String id) {
+        Entity e = getStitchEntity(ver, id);
+
+        if (e != null) {
+            CalculatorFactory.getCalculatorFactory(es.getEntityFactory())
+                             .process(Stitch.getStitch(e));
+            return getStitch(ver, id);
+        } else {
+            return notFound("Unknown stitch key: " + id);
+        }
+
     }
     
     public Result stitches (Integer ver, Integer skip, Integer top) {
