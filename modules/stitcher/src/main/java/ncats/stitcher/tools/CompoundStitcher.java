@@ -13,6 +13,7 @@ import ncats.stitcher.GraphDb;
 import ncats.stitcher.Stitch;
 import ncats.stitcher.UntangleCompoundComponent;
 import ncats.stitcher.calculators.ApprovalCalculator;
+import ncats.stitcher.calculators.CalculatorFactory;
 import ncats.stitcher.calculators.StitchCalculator;
 
 public class CompoundStitcher implements Consumer<Stitch> {
@@ -20,15 +21,12 @@ public class CompoundStitcher implements Consumer<Stitch> {
         (CompoundStitcher.class.getName());
 
     
-    private List<StitchCalculator> calculators = new ArrayList<>();
-        
     final EntityFactory ef;
     final DataSourceFactory dsf;
         
     public CompoundStitcher (String db)  throws Exception {
         ef = new EntityFactory (GraphDb.getInstance(db));
         dsf = ef.getDataSourceFactory();
-        calculators.add(new ApprovalCalculator (ef));
     }
 
     public void shutdown () {
@@ -79,30 +77,10 @@ public class CompoundStitcher implements Consumer<Stitch> {
         cs.shutdown();
     }
 
-
-    /**
-     * Add a post-processing {@link StitchCalculator} to be called after
-     * a stitch is created.
-     * 
-     * This method returns itself for method chaining purposes.
-     * 
-     * @param calc
-     * @return
-     */
-    
-    public CompoundStitcher addCalculator(StitchCalculator calc){
-        this.calculators.add(calc);
-        
-        return this;
+    // Perform all calculator options
+    @Override
+    public void accept(Stitch t) {
+        CalculatorFactory.getCalculatorFactory(ef)
+                         .process(Stitch.getStitch(t));
     }
-
-
-    //Perform all calculator options
-        @Override
-        public void accept(Stitch t) {
-                calculators.stream()
-                           .forEach(c->{
-                                   c.accept(t);
-                           });
-        }
 }
