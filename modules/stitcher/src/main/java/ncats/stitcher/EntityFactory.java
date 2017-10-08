@@ -1795,6 +1795,34 @@ public class EntityFactory implements Props {
         }
     }
 
+    public int maps (Consumer<Entity> func, String... labels) {
+        StringBuilder query = new StringBuilder ("match(n");
+        for (String l : labels) {
+            query.append(":`"+l+"`");
+        }
+        query.append(") return n");
+        
+        int count = 0;
+        try (Transaction tx = gdb.beginTx();
+             Result result = gdb.execute(query.toString())) {
+            while (result.hasNext()) {
+                Map<String, Object> row = result.next();
+                try {
+                    Node n = (Node) row.get("n");                   
+                    func.accept(Entity._getEntity(n));
+                    ++count;
+                }
+                catch (Exception ex) {
+                    // not a valid entity
+                }
+            }
+            result.close();
+            tx.success();
+        }
+        
+        return count;
+    }
+
     public Entity[] entities (long[] ids) {
         try (Transaction tx = gdb.beginTx()) {
             Entity[] ents = _entities (ids);

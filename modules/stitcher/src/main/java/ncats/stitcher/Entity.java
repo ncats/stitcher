@@ -315,10 +315,10 @@ public class Entity extends CNode {
         return this;
     }
 
-    public Entity add (String type, Map<String, Object> props, 
-                       Map<String, Object> data) {
+    public Entity addIfAbsent (String type, Map<String, Object> props, 
+                               Map<String, Object> data) {
         try (Transaction tx = gdb.beginTx()) {
-            _add (type, props, data);
+            _addIfAbsent (type, props, data);
             tx.success();
         }
         return this;
@@ -329,8 +329,8 @@ public class Entity extends CNode {
      * props - properties associated with the edge
      * data - data
      */
-    public Entity _add (String type, Map<String, Object> props, 
-                        Map<String, Object> data) {
+    public Entity _addIfAbsent (String type, Map<String, Object> props, 
+                                Map<String, Object> data) {
         if (!props.containsKey(ID) || !props.containsKey(SOURCE)) {
             throw new IllegalArgumentException
                 ("props must contain "+ID+" and "+SOURCE+" properties!");
@@ -344,14 +344,21 @@ public class Entity extends CNode {
         if (source == null)
             throw new IllegalArgumentException
                 (SOURCE+" property can't be null!");
-
+        
+        RelationshipType reltype = RelationshipType.withName(type);
+        for (Relationship rel :
+                 _node.getRelationships(Direction.INCOMING, reltype)) {
+            if (source.equals(rel.getProperty(SOURCE))
+                && id.equals(rel.getProperty(ID)))
+                return this;
+        }
+        
         Node node = gdb.createNode(AuxNodeType.DATA);
         node.setProperty(CREATED, System.currentTimeMillis());
         for (Map.Entry<String, Object> me : data.entrySet())
             node.setProperty(me.getKey(), me.getValue());
 
-        Relationship rel = node.createRelationshipTo
-            (_node, RelationshipType.withName(type));
+        Relationship rel = node.createRelationshipTo(_node, reltype);
         rel.setProperty(SOURCE, source);
         rel.setProperty(ID, id);
         for (Map.Entry<String, Object> me : props.entrySet())

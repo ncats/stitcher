@@ -7,6 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ncats.stitcher.Stitch;
+import ncats.stitcher.Entity;
+import ncats.stitcher.GraphDb;
 import ncats.stitcher.DataSource;
 import ncats.stitcher.EntityFactory;
 import ncats.stitcher.DataSourceFactory;
@@ -21,10 +23,22 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 public class ApprovalCalculator implements StitchCalculator {
     static final Logger logger = Logger.getLogger(Stitch.class.getName());
     static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd");
+    static final SimpleDateFormat SDF2 = new SimpleDateFormat ("MM/dd/yyyy");
 
+    final EntityFactory ef;
     final DataSourceFactory dsf;
+    
     public ApprovalCalculator (EntityFactory ef) {
+        this.ef = ef;
         this.dsf = ef.getDataSourceFactory();
+    }
+
+    public int recalculate (int version) {
+        logger.info("## recalculating stitch_v"+version+"...");
+        return ef.maps(e -> {
+                Stitch s = Stitch._getStitch(e);
+                accept (s);
+            }, "stitch_v"+version);
     }
 
     /*
@@ -62,7 +76,7 @@ public class ApprovalCalculator implements StitchCalculator {
             labels.add(a.source);
             
             // now add event to this stitch node
-            stitch.add(AuxRelType.EVENT.name(), props, data);
+            stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
 
         if (approved)
@@ -158,6 +172,8 @@ public class ApprovalCalculator implements StitchCalculator {
         public Approval getApproval (Map<String, Object> payload) {
             approval = null;
             id = payload.get("Unii");
+            if (id != null && id.getClass().isArray())
+                id = Array.get(id, 0);
 
             Object content = payload.get("Conditions");
             if (content != null) {
@@ -197,6 +213,8 @@ public class ApprovalCalculator implements StitchCalculator {
             Approval approval = null;
             Object content = payload.get("DATASET");
             Object id = payload.get("ID");
+            if (id != null && id.getClass().isArray())
+                id = Array.get(id, 0);
 
             if (content != null) {
                 if (content.getClass().isArray()) {
@@ -356,13 +374,43 @@ public class ApprovalCalculator implements StitchCalculator {
             return approval;
         }
     }
-        
+
+    static class DrugsAtFDAApprovalParser extends ApprovalParser {
+        public DrugsAtFDAApprovalParser () {
+            super ("approvalYears.txt");
+        }
+
+        public Approval getApproval (Map<String, Object> payload) {
+            Approval approval = null;
+            Object id = payload.get("UNII");
+            Object content = payload.get("Date");
+            if (content != null) {
+                try {
+                    Date date = SDF2.parse((String)content);
+                    if (approval == null 
+                        || approval.approval == null
+                        || approval.approval.after(date)) {
+                        approval = new Approval (name, id, date, null);
+                        approval.comment = (String) payload.get("Comment");
+                    }
+                }
+                catch (Exception ex) {
+                    logger.log
+                        (Level.SEVERE, "Unknown date format: "+content, ex);
+                }
+            }
+            
+            return approval;
+        }       
+    }
+
     static ApprovalParser[] ApprovalParsers = {
         new RanchoApprovalParser (),
         new NPCApprovalParser (),
         new PharmManuApprovalParser (),
         new DrugBankApprovalParser (),
-        new DailyMedApprovalParser ()
+        new DailyMedApprovalParser (),
+        new DrugsAtFDAApprovalParser ()
     };
 
     List<Approval> getApprovalEvents (Stitch stitch) {
@@ -383,5 +431,20 @@ public class ApprovalCalculator implements StitchCalculator {
         }
 
         return approvals;
+    }
+
+    public static void main (String[] argv) throws Exception {
+        if (argv.length < 2) {
+            System.err.println("Usage: "+ApprovalCalculator.class.getName()
+                               +" DB VERSION");
+            System.exit(1);
+        }
+
+        EntityFactory ef = new EntityFactory (GraphDb.getInstance(argv[0]));
+        ApprovalCalculator ac = new ApprovalCalculator (ef);
+        int version = Integer.parseInt(argv[1]);
+        int count = ac.recalculate(version);
+        logger.info(count+" stitches recalculated!");
+        ef.shutdown();
     }
 }

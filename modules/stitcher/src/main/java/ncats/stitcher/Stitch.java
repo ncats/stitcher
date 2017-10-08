@@ -28,17 +28,27 @@ public class Stitch extends Entity {
 
     public static Stitch getStitch (Node node) {
         try (Transaction tx = node.getGraphDatabase().beginTx()) {
-            if (!node.hasLabel(AuxNodeType.SGROUP))
-                throw new IllegalArgumentException
-                    ("Node is not a stitch node!");
-            return new Stitch (node);
+            Stitch s = _getStitch (node);
+            tx.success();
+            return s;
         }
+    }
+
+    public static Stitch _getStitch (Node node) {
+        if (!node.hasLabel(AuxNodeType.SGROUP))
+            throw new IllegalArgumentException
+                ("Node is not a stitch node!");
+        return new Stitch (node);
     }
     
     public static Stitch getStitch (CNode cnode) {
         return getStitch (cnode._node());
     }
 
+    public static Stitch _getStitch (CNode cnode) {
+        return _getStitch (cnode._node());
+    }
+    
     Node parent;
     Map<Node, DataSource> members = new HashMap<>();
     
