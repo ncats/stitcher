@@ -162,18 +162,46 @@ public class Stitch extends Entity {
         }
     }
 
+    /*
+     * stitch [1]->[n] payload -> entity
+     * from the stitch node, we go through the payload to get to the
+     * entity node. from there, we then iterate through all the payload
+     * that connect to this entity and find those that match the given
+     * source.
+     */
     public Map<String, Object> payload (String source) {
-        Map<String, Object> payload = null;
+        DataSource dsrc = dsf.getDataSource(source);
+        if (dsrc == null)
+            throw new IllegalArgumentException
+                ("Not a valid data source: "+source);
+
+        Map<String, Object> payload = null;     
         try (Transaction tx = gdb.beginTx()) {
             for (Relationship rel : _node.getRelationships
                      (Direction.BOTH, AuxRelType.STITCH)) {
-                if (source.equals(rel.getProperty(SOURCE, null))) {
-                    Node n = rel.getOtherNode(_node);
-                    payload = new TreeMap<>();
-                    for (String key : n.getPropertyKeys()) {
-                        payload.put(key, n.getProperty(key, null));
+                Node n = rel.getOtherNode(_node); // payload
+                DataSource ds = dsf._getDataSource
+                    ((String)rel.getProperty(SOURCE, null));
+                if (dsrc.equals(ds)) {
+                    if (payload == null)
+                        payload = new TreeMap<>();
+                    payload.putAll(n.getAllProperties());
+                }
+                else {
+                    Node e = n.getSingleRelationship
+                        (AuxRelType.PAYLOAD, Direction.OUTGOING)
+                        .getOtherNode(n);
+                    for (Relationship prel : e.getRelationships
+                             (Direction.INCOMING, AuxRelType.PAYLOAD)) {
+                        Node p = prel.getOtherNode(e);
+                        ds = dsf._getDataSource
+                            ((String)prel.getProperty(SOURCE, null));
+                        if (dsrc.equals(ds)) {
+                            if (payload == null)
+                                payload = new TreeMap<>();
+                            payload.putAll(p.getAllProperties());
+                        }
                     }
-                    break;
                 }
             }
             tx.success();

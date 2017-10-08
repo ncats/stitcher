@@ -35,12 +35,13 @@ public class ApprovalCalculator implements StitchCalculator {
         logger.info("Stitch "+stitch.getId()+" => "+approvals.size()+
                     " approval events");
 
+        Set<String> labels = new TreeSet<>();
         boolean approved = false, marketed = false;
         for (Approval a : approvals) {
             Map<String, Object> props = new HashMap<>();
             props.put(ID, a.id);
             props.put(SOURCE, a.source);
-            props.put(KIND, "APPROVAL");
+            props.put(KIND, "Regulatory Status");
 
             Map<String, Object> data = new HashMap<>();
             if (a.approval != null) {
@@ -55,15 +56,22 @@ public class ApprovalCalculator implements StitchCalculator {
                 marketed = true;
             }
 
+            if (a.comment != null)
+                data.put("comment", a.comment);
+            
+            labels.add(a.source);
+            
             // now add event to this stitch node
             stitch.add(AuxRelType.EVENT.name(), props, data);
         }
 
         if (approved)
-            stitch.addLabel("APPROVED");
+            labels.add("APPROVED");
 
         if (marketed)
-            stitch.addLabel("MARKETED");            
+            labels.add("MARKETED");
+
+        stitch.addLabel(labels.toArray(new String[0]));
     }
 
     static class Approval {
@@ -71,14 +79,16 @@ public class ApprovalCalculator implements StitchCalculator {
         public Object id;
         public Date approval;
         public Date marketed;
+        public String comment;
 
         public Approval (String source, Object id) {
             this (source, id, null, null);
         }
 
-        public Approval (String source, Object id, Date approval, Date marketed) {
+        public Approval (String source, Object id,
+                         Date approval, Date marketed) {
             this.source = source;
-            this.id = id;
+            this.id = id != null ? id : "*";
             this.approval = approval;
             this.marketed = marketed;
         }
@@ -111,10 +121,18 @@ public class ApprovalCalculator implements StitchCalculator {
                     try {
                         Date date = SDF.parse(d);
                         if (approval == null || approval.marketed == null
-                            || approval.marketed.after(date))
+                            || approval.marketed.after(date)) {
                             approval = new Approval (name, id, null, date);
+                            if (n.has("ConditionName"))
+                                approval.comment =
+                                    n.get("ConditionName").asText();
+                            else if (n.has("ConditionMeshValue"))
+                                approval.comment =
+                                    n.get("ConditionMeshValue").asText();
+                        }
                     }
                     catch (Exception ex) {
+                        ex.printStackTrace();
                         logger.log(Level.SEVERE,
                                    "Can't parse date: "+d, ex);
                     }
@@ -182,16 +200,25 @@ public class ApprovalCalculator implements StitchCalculator {
 
             if (content != null) {
                 if (content.getClass().isArray()) {
+                    StringBuilder approved = new StringBuilder ();
                     for (int i = 0; i < Array.getLength(content); ++i) {
                         String s = (String) Array.get(content, i);
                         if (s.toLowerCase().indexOf("approved") >= 0) {
-                            approval = new Approval (name, id);
-                            break;
+                            if (approved.length() > 0)
+                                approved.append("; ");
+                            approved.append(s);
                         }
                     }
-                } else if (((String)content).toLowerCase()
+
+                    if (approved.length() > 0) {
+                        approval = new Approval (name, id);
+                        approval.comment = approved.toString();
+                    }
+                }
+                else if (((String)content).toLowerCase()
                            .indexOf("approved") >= 0) {
                     approval = new Approval (name, id);
+                    approval.comment = (String)content;
                 }
             }
             
@@ -225,8 +252,13 @@ public class ApprovalCalculator implements StitchCalculator {
                                 Date date = cal.getTime();
                                 if (approval == null 
                                     || approval.marketed == null
-                                    || approval.marketed.after(date))
-                                    approval = new Approval (name, id, null, date);
+                                    || approval.marketed.after(date)) {
+                                    approval = new Approval
+                                        (name, id, null, date);
+                                    if (node.has("Country"))
+                                        approval.comment =
+                                            node.get("Country").asText();
+                                }
                             }
                             catch (Exception ex) {
                                 logger.log(Level.SEVERE, 
@@ -256,17 +288,26 @@ public class ApprovalCalculator implements StitchCalculator {
             Object content = payload.get("DRUG_GROUPS");
             if (content != null) {
                 if (content.getClass().isArray()) {
+                    StringBuilder approved = new StringBuilder ();
                     for (int i = 0; i < Array.getLength(content); ++i) {
                         String s = (String) Array.get(content, i);
                         if (s.toLowerCase().indexOf("approved") >= 0) {
-                            approval = new Approval (name, id);
-                            break;
+                            if (approved.length() > 0)
+                                approved.append("; ");
+                            approved.append(s);
                         }
+                    }
+
+                    if (approved.length() > 0) {
+                        approval = new Approval (name, id);
+                        approval.comment = approved.toString();
                     }
                 }
                 else if (((String)content)
-                         .toLowerCase().indexOf("approved") >= 0) 
+                         .toLowerCase().indexOf("approved") >= 0) {
                     approval = new Approval (name, id);
+                    approval.comment = (String)content;
+                }
             }
             return approval;
         }
@@ -280,6 +321,7 @@ public class ApprovalCalculator implements StitchCalculator {
         public Approval getApproval (Map<String, Object> payload) {
             Approval approval = null;
             Object id = payload.get("NDC");
+            
             Object content = payload.get("InitialYearApproval");
             if (content != null) {
                 Calendar cal = Calendar.getInstance();
@@ -287,17 +329,22 @@ public class ApprovalCalculator implements StitchCalculator {
                 Date date = cal.getTime();
                 if (approval == null 
                     || approval.approval == null
-                    || approval.approval.after(date))
-                    approval = new Approval (name, id, null, date);
+                    || approval.approval.after(date)) {
+                    approval = new Approval (name, id, date, null);
+                    approval.comment = (String)payload.get("ApprovalAppId");
+                }
             }
 
             content = payload.get("MarketDate");
             if (content != null) {
                 try {
                     Date date = SDF.parse((String)content);
-                    if (approval == null)
+                    if (approval == null) {
                         approval = new Approval (name, id, null, date);
-                    else if (approval.marketed.after(date)) {
+                        approval.comment = (String)payload.get("ApprovalAppId");
+                    }
+                    else if (approval.marketed == null
+                             || approval.marketed.after(date)) {
                         approval.marketed = date;
                     }
                 }
@@ -322,17 +369,15 @@ public class ApprovalCalculator implements StitchCalculator {
         List<Approval> approvals = new ArrayList<>();
 
         for (ApprovalParser ap : ApprovalParsers) {
-            if (stitch.is(ap.name)) {
-                Map<String, Object> payload = stitch.payload(ap.name);
-                if (payload != null) {
-                    Approval a = ap.getApproval(payload);
-                    if (a == null) {
-                    }
-                    else {
-                        logger.info(ap.name+": approved="+a.approval
-                                    +" marketed="+a.marketed);
-                        approvals.add(a);
-                    }
+            Map<String, Object> payload = stitch.payload(ap.name);
+            if (payload != null) {
+                Approval a = ap.getApproval(payload);
+                if (a == null) {
+                }
+                else {
+                    logger.info(ap.name+": approved="+a.approval
+                                +" marketed="+a.marketed);
+                    approvals.add(a);
                 }
             }
         }

@@ -481,12 +481,12 @@ public class CNode implements Props, Comparable<CNode> {
     
     public JsonNode _toJson () {
         ObjectNode node = mapper.createObjectNode();
-        node.put("id", _node.getId());
         
         for (Map.Entry<String, Object> me :
                  _node.getAllProperties().entrySet()) {
             Util.setJson(node, me.getKey(), me.getValue());
         }
+        node.put("id", _node.getId());  
 
         DataSource ds = datasource ();
         if (ds != null) {
@@ -754,6 +754,7 @@ public class CNode implements Props, Comparable<CNode> {
                 node.put("newval",
                          mapper.valueToTree(_node.getProperty(NEWVAL)));
         }
+        
         return node;
     }
 
