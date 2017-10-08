@@ -1,22 +1,19 @@
 package ncats.stitcher.calculators;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ncats.stitcher.AuxRelType;
+import ncats.stitcher.DataSourceFactory;
+import ncats.stitcher.EntityFactory;
+import ncats.stitcher.Stitch;
+
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import ncats.stitcher.Stitch;
-import ncats.stitcher.DataSource;
-import ncats.stitcher.EntityFactory;
-import ncats.stitcher.DataSourceFactory;
-import ncats.stitcher.AuxRelType;
 import static ncats.stitcher.Props.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class ApprovalCalculator implements StitchCalculator {
     static final Logger logger = Logger.getLogger(Stitch.class.getName());
@@ -35,6 +32,7 @@ public class ApprovalCalculator implements StitchCalculator {
         logger.info("Stitch "+stitch.getId()+" => "+approvals.size()+
                     " approval events");
 
+        stitch.removeAll(AuxRelType.EVENT.name());
         Set<String> labels = new TreeSet<>();
         boolean approved = false, marketed = false;
         for (Approval a : approvals) {
@@ -369,16 +367,19 @@ public class ApprovalCalculator implements StitchCalculator {
         List<Approval> approvals = new ArrayList<>();
 
         for (ApprovalParser ap : ApprovalParsers) {
-            Map<String, Object> payload = stitch.payload(ap.name);
-            if (payload != null) {
-                Approval a = ap.getApproval(payload);
-                if (a == null) {
+            try {
+                Map<String, Object> payload = stitch.payload(ap.name);
+                if (payload != null) {
+                    Approval a = ap.getApproval(payload);
+                    if (a == null) {
+                    } else {
+                        logger.info(ap.name + ": approved=" + a.approval
+                                + " marketed=" + a.marketed);
+                        approvals.add(a);
+                    }
                 }
-                else {
-                    logger.info(ap.name+": approved="+a.approval
-                                +" marketed="+a.marketed);
-                    approvals.add(a);
-                }
+            } catch (IllegalArgumentException iae) {
+                logger.warning(ap.name + " not a valid data source");
             }
         }
 

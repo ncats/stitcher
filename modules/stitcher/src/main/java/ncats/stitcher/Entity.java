@@ -1,29 +1,16 @@
 package ncats.stitcher;
 
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.index.RelationshipIndex;
+import org.neo4j.graphdb.traversal.TraversalDescription;
+import org.neo4j.graphdb.traversal.Traverser;
 
 import java.lang.reflect.Array;
-
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Path;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.RelationshipIndex;
-import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.index.lucene.LuceneTimeline;
-import org.neo4j.index.lucene.TimelineIndex;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.traversal.*;
-
-import chemaxon.struc.Molecule;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Entity extends CNode {
     static final Logger logger = Logger.getLogger(Entity.class.getName());
@@ -305,6 +292,24 @@ public class Entity extends CNode {
 
     public Object _get (String name) {
         return _node.hasProperty(name) ? _node.getProperty(name) : null;
+    }
+
+    public Entity removeAll (String type) {
+        try (Transaction tx = gdb.beginTx()) {
+            _removeAll (type);
+            tx.success();
+        }
+        return this;
+    }
+
+    /* removes relationships of type AND the nodes that they point to */
+    public Entity _removeAll (String type) {
+        _node.getRelationships(RelationshipType.withName(type)).forEach(rel -> {
+            Node node = rel.getOtherNode(_node);
+            rel.delete();
+            node.delete();
+        });
+        return this;
     }
 
     public Entity add (Payload payload) {
