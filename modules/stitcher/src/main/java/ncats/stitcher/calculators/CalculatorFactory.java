@@ -1,12 +1,10 @@
 package ncats.stitcher.calculators;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ncats.stitcher.EntityFactory;
 import ncats.stitcher.Stitch;
-import ncats.stitcher.calculators.ApprovalCalculator;
-import ncats.stitcher.calculators.StitchCalculator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CalculatorFactory {
     private EntityFactory ef;
@@ -21,7 +19,7 @@ public class CalculatorFactory {
         //For now, add these explicitly
         //eventually, move this to setup place
         
-        calcs.add(new ApprovalCalculator(ef));
+        calcs.add(new EventCalculator(ef));
         /*
          * calcs.add(s->{ s.set("justatest","somevalue"); });
          */

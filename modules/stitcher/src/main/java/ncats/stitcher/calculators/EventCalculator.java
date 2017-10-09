@@ -2,18 +2,13 @@ package ncats.stitcher.calculators;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ncats.stitcher.AuxRelType;
-import ncats.stitcher.DataSourceFactory;
-import ncats.stitcher.EntityFactory;
-import ncats.stitcher.Stitch;
+import ncats.stitcher.*;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import ncats.stitcher.GraphDb;
 
 import static ncats.stitcher.Props.*;
 
@@ -42,37 +37,45 @@ public class EventCalculator implements StitchCalculator {
      * Consumer<Stitch>
      */
     public void accept (Stitch stitch) {
-        List<Approval> approvals = getApprovalEvents (stitch);
-        logger.info("Stitch "+stitch.getId()+" => "+approvals.size()+
-                    " approval events");
+        List<Event> events = getEvents(stitch);
+        logger.info("Stitch "+stitch.getId()+" => "+ events.size()+
+                    " event events");
 
         stitch.removeAll(AuxRelType.EVENT.name());
         Set<String> labels = new TreeSet<>();
         boolean approved = false, marketed = false;
-        for (Approval a : approvals) {
+        int counter = 0;
+        for (Event e : events) {
             Map<String, Object> props = new HashMap<>();
-            props.put(ID, a.id);
-            props.put(SOURCE, a.source);
-            props.put(KIND, "Regulatory Status");
+            props.put(ID, e.id+":"+counter);
+            counter++;
+            props.put(SOURCE, e.source);
+            props.put(KIND, e.kind.toString());
 
             Map<String, Object> data = new HashMap<>();
-            if (a.approval != null) {
-                approved = true;
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(a.approval);
-                data.put("approvalYear", cal.get(Calendar.YEAR));
-            }
+//            if (e.kind == Event.EventType.Approval && e.date != null) {
+//                approved = true;
+//                Calendar cal = Calendar.getInstance();
+//                cal.setTime(e.date);
+//                data.put("approvalYear", cal.get(Calendar.YEAR));
+//            }
+//
+//            if (e.kind == Event.EventType.Marketed && e.date != null) {
+//                data.put("marketedDate", SDF.format(e.date));
+//                marketed = true;
+//            }
 
-            if (a.marketed != null) {
-                data.put("marketedDate", SDF.format(a.marketed));
-                marketed = true;
-            }
+            if (e.date != null)
+                data.put("date", SDF.format(e.date));
 
-            if (a.comment != null)
-                data.put("comment", a.comment);
+            if (e.jurisdiction != null)
+                data.put("jurisdiction", e.jurisdiction);
+
+            if (e.comment != null)
+                data.put("comment", e.comment);
             
-            labels.add(a.source);
-            
+            labels.add(e.source);
+
             // now add event to this stitch node
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
@@ -86,60 +89,69 @@ public class EventCalculator implements StitchCalculator {
         stitch.addLabel(labels.toArray(new String[0]));
     }
 
-    static class Approval {
+    static class Event {
         public String source;
         public Object id;
-        public Date approval;
-        public Date marketed;
+        public Date date;
+        public String jurisdiction;
+        public EventType kind;
         public String comment;
 
-        public Approval (String source, Object id) {
-            this (source, id, null, null);
+        public enum EventType {
+            Publication,
+            Filing,
+            Designation,
+            Approval,
+            Marketed
         }
 
-        public Approval (String source, Object id,
-                         Date approval, Date marketed) {
+        public Event(String source, Object id, EventType kind, Date date) {
             this.source = source;
             this.id = id != null ? id : "*";
-            this.approval = approval;
-            this.marketed = marketed;
+            this.kind = kind;
+            this.date = date;
+        }
+
+        public Event(String source, Object id, EventType kind) {
+            this(source, id, kind, null);
         }
     }
-        
-    static abstract class ApprovalParser {
+
+    static abstract class EventParser {
         final public String name;
-        protected ApprovalParser (String name) {
+        protected EventParser(String name) {
             this.name = name;
         }
 
-        public abstract Approval getApproval (Map<String, Object> payload);
+        public abstract List<Event> getEvents (Map<String, Object> payload);
     }
 
-    static class RanchoApprovalParser extends ApprovalParser {
+    static class RanchoEventParser extends EventParser {
         final ObjectMapper mapper = new ObjectMapper ();
         final Base64.Decoder decoder = Base64.getDecoder();
-        Approval approval;
+        Event event;
         Object id;
 
-        public RanchoApprovalParser () {
+        public RanchoEventParser() {
             super ("rancho_2017-09-07_20-32.json");
         }
 
-        void parseApproval (JsonNode n) {
+        void parseEvent (JsonNode n) {
             if (n.has("HighestPhase") && "approved".equalsIgnoreCase
                 (n.get("HighestPhase").asText())) {
                 if (n.has("ConditionProductDate")) {
                     String d = n.get("ConditionProductDate").asText();
                     try {
                         Date date = SDF.parse(d);
-                        if (approval == null || approval.marketed == null
-                            || approval.marketed.after(date)) {
-                            approval = new Approval (name, id, null, date);
+                        if (event == null || (event.kind == Event.EventType.Marketed
+                            && event.date.after(date))) {
+                            event = new Event(name, id, Event.EventType.Marketed);
+                            event.date = date;
                             if (n.has("ConditionName"))
-                                approval.comment =
+                                event.comment =
                                     n.get("ConditionName").asText();
                             else if (n.has("ConditionMeshValue"))
-                                approval.comment =
+                                event.comment =
                                     n.get("ConditionMeshValue").asText();
                         }
                     }
@@ -155,20 +167,21 @@ public class EventCalculator implements StitchCalculator {
             }
         }
 
-        void parseApproval (String content) throws Exception {
+        void parseEvent (String content) throws Exception {
             JsonNode node = mapper.readTree(decoder.decode(content));
             if (node.isArray()) {
                 for (int i = 0; i < node.size(); ++i) {
                     JsonNode n = node.get(i);
-                    parseApproval (n);
+                    parseEvent (n);
                 }
             }
             else 
-                parseApproval (node);
+                parseEvent (node);
         }
 
-        public Approval getApproval (Map<String, Object> payload) {
-            approval = null;
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            event = null;
             id = payload.get("Unii");
             if (id != null && id.getClass().isArray())
                 id = Array.get(id, 0);
@@ -179,7 +192,7 @@ public class EventCalculator implements StitchCalculator {
                     for (int i = 0; i < Array.getLength(content); ++i) {
                         String c = (String) Array.get(content, i);
                         try {
-                            parseApproval (c);
+                            parseEvent (c);
                         }
                         catch (Exception ex) {
                             logger.log(Level.SEVERE, 
@@ -189,7 +202,7 @@ public class EventCalculator implements StitchCalculator {
                 }
                 else {
                     try {
-                        parseApproval ((String)content);
+                        parseEvent ((String)content);
                     }
                     catch (Exception ex) {
                         logger.log(Level.SEVERE, 
@@ -197,18 +210,19 @@ public class EventCalculator implements StitchCalculator {
                     }
                 }
             }
-
-            return approval;
+            if (event != null) events.add(event);
+            return events;
         }
     }
         
-    static class NPCApprovalParser extends ApprovalParser {
-        public NPCApprovalParser () {
+    static class NPCEventParser extends EventParser {
+        public NPCEventParser() {
             super ("npc-dump-1.2-04-25-2012_annot.sdf.gz");
         }
         
-        public Approval getApproval (Map<String, Object> payload) {
-            Approval approval = null;
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            Event event = null;
             Object content = payload.get("DATASET");
             Object id = payload.get("ID");
             if (id != null && id.getClass().isArray())
@@ -227,31 +241,32 @@ public class EventCalculator implements StitchCalculator {
                     }
 
                     if (approved.length() > 0) {
-                        approval = new Approval (name, id);
-                        approval.comment = approved.toString();
+                        event = new Event(name, id, Event.EventType.Marketed);
+                        event.comment = approved.toString();
                     }
                 }
                 else if (((String)content).toLowerCase()
                            .indexOf("approved") >= 0) {
-                    approval = new Approval (name, id);
-                    approval.comment = (String)content;
+                    event = new Event(name, id, Event.EventType.Marketed);
+                    event.comment = (String)content;
                 }
             }
-            
-            return approval;
+
+            if (event != null) events.add(event);
+            return events;
         }
     }
     
-    static class PharmManuApprovalParser extends ApprovalParser {
+    static class PharmManuEventParser extends EventParser {
         final ObjectMapper mapper = new ObjectMapper ();
         final Base64.Decoder decoder = Base64.getDecoder();
             
-        public PharmManuApprovalParser () {
+        public PharmManuEventParser() {
             super ("PharmManuEncycl3rdEd.json");
         }
             
-        public Approval getApproval (Map<String, Object> payload) {
-            Approval approval = null;
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
             Object id = payload.get("UNII");
 
             String content = (String) payload.get("Drug Products");
@@ -259,28 +274,33 @@ public class EventCalculator implements StitchCalculator {
                 try {
                     for (String c : content.split("\n")) {
                         JsonNode node = mapper.readTree(decoder.decode(c));
+                        Event event = new Event (name, id, Event.EventType.Marketed);
                         if (node.has("Year Introduced")) {
                             String year = node.get("Year Introduced").asText();
                             try {
-                                Calendar cal = Calendar.getInstance();
-                                cal.set(Calendar.YEAR, 
-                                        Integer.parseInt(year));
-                                Date date = cal.getTime();
-                                if (approval == null 
-                                    || approval.marketed == null
-                                    || approval.marketed.after(date)) {
-                                    approval = new Approval
-                                        (name, id, null, date);
-                                    if (node.has("Country"))
-                                        approval.comment =
-                                            node.get("Country").asText();
-                                }
+                                Date date = SDF.parse(year+"-12-31");
+                                event.date = date;
                             }
                             catch (Exception ex) {
                                 logger.log(Level.SEVERE, 
                                            "Can't parse date: "+year, ex);
                             }
                         }
+                        if (node.has("Country")) {
+                            event.jurisdiction =
+                                    node.get("Country").asText();
+                        }
+                        if (node.has("Product")) {
+                            event.comment =
+                                    node.get("Product").asText();
+                        }
+                        if (node.has("Company")) {
+                            if (event.comment.length() > 0)
+                                event.comment += " [" + node.get("Company").asText() + "]";
+                            else event.comment +=
+                                    node.get("Company").asText();
+                        }
+                        events.add(event);
                     }
                 }
                 catch (Exception ex) {
@@ -288,19 +308,21 @@ public class EventCalculator implements StitchCalculator {
                                "Can't parse json: '"+content+"'", ex);
                 }
             }
-                
-            return approval;
+
+            return events;
         }
     }
         
-    static class DrugBankApprovalParser extends ApprovalParser {
-        public DrugBankApprovalParser () {
+    static class DrugBankEventParser extends EventParser {
+        public DrugBankEventParser() {
             super ("drugbank-full-annotated.sdf");
         }
             
-        public Approval getApproval (Map<String, Object> payload) {
-            Approval approval = null;
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            Event event = null;
             Object id = payload.get("DATABASE_ID");
+            if (id.getClass().isArray()) id = Array.get(id, 0);
             Object content = payload.get("DRUG_GROUPS");
             if (content != null) {
                 if (content.getClass().isArray()) {
@@ -315,81 +337,87 @@ public class EventCalculator implements StitchCalculator {
                     }
 
                     if (approved.length() > 0) {
-                        approval = new Approval (name, id);
-                        approval.comment = approved.toString();
+                        event = new Event(name, id, Event.EventType.Marketed);
+                        event.comment = approved.toString();
                     }
                 }
                 else if (((String)content)
                          .toLowerCase().indexOf("approved") >= 0) {
-                    approval = new Approval (name, id);
-                    approval.comment = (String)content;
+                    event = new Event(name, id, Event.EventType.Marketed);
+                    event.comment = (String)content;
                 }
             }
-            return approval;
+            if (event != null) events.add(event);
+            return events;
         }
     }
 
-    static class DailyMedApprovalParser extends ApprovalParser {
-        public DailyMedApprovalParser () {
+    static class DailyMedEventParser extends EventParser {
+        public DailyMedEventParser() {
             super ("spl_acti_rx.txt");
         }
 
-        public Approval getApproval (Map<String, Object> payload) {
-            Approval approval = null;
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            Event event = null;
             Object id = payload.get("NDC");
-            
-            Object content = payload.get("InitialYearApproval");
-            if (content != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.set(Calendar.YEAR, Integer.parseInt(content.toString()));
-                Date date = cal.getTime();
-                if (approval == null 
-                    || approval.approval == null
-                    || approval.approval.after(date)) {
-                    approval = new Approval (name, id, date, null);
-                    approval.comment = (String)payload.get("ApprovalAppId");
+
+            Object content = null;
+            Date date = null;
+            try {
+                content = payload.get("InitialYearApproval");
+                if (content != null) {
+                    date = SDF.parse((String) content + "-12-31");
                 }
+                content = payload.get("MarketDate");
+                if (content != null) {
+                    Date date2 = SDF.parse((String)content);
+                    if (date == null || date.after(date2))
+                        date = date2;
+                }
+                if (date != null) {
+                    Event.EventType et = Event.EventType.Marketed;
+                    content = payload.get("ApprovalAppId");
+                    if (content != null &&
+                            (((String)content).startsWith("NDA") ||
+                            ((String)content).startsWith("BLA")))
+                        et = Event.EventType.Approval;
+                    else {
+                        System.err.println("Unusual approval app id: "+content);
+                    }
+                    event = new Event(name, id, et);
+                    event.jurisdiction = "US";
+                    event.date = date;
+                    event.comment = (String) payload.get("ApprovalAppId");
+                }
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, "Can't parse date: "+content, ex);
             }
 
-            content = payload.get("MarketDate");
-            if (content != null) {
-                try {
-                    Date date = SDF.parse((String)content);
-                    if (approval == null) {
-                        approval = new Approval (name, id, null, date);
-                        approval.comment = (String)payload.get("ApprovalAppId");
-                    }
-                    else if (approval.marketed == null
-                             || approval.marketed.after(date)) {
-                        approval.marketed = date;
-                    }
-                }
-                catch (Exception ex) {
-                    logger.log(Level.SEVERE, "Can't parse date: "+content, ex);
-                }
-            }
-
-            return approval;
+            if (event != null) events.add(event);
+            return events;
         }
     }
 
-    static class DrugsAtFDAApprovalParser extends ApprovalParser {
-        public DrugsAtFDAApprovalParser () {
+    static class DrugsAtFDAEventParser extends EventParser {
+        public DrugsAtFDAEventParser() {
             super ("approvalYears.txt");
         }
 
-        public Approval getApproval (Map<String, Object> payload) {
-            Approval approval = null;
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            Event event = null;
             Object id = payload.get("UNII");
             Object content = payload.get("Date");
             if (content != null) {
                 try {
                     Date date = SDF2.parse((String)content);
-                    if (approval == null 
-                        || approval.approval == null
-                        || approval.approval.after(date)) {
-                        approval = new Approval (name, id, date, null);
-                        approval.comment = (String) payload.get("Comment");
+                    if (event == null
+                        || (event.kind == Event.EventType.Approval
+                        && event.date.after(date))) {
+                        event = new Event(name, id, Event.EventType.Approval);
+                        event.date = date;
+                        event.comment = (String) payload.get("Comment");
                     }
                 }
                 catch (Exception ex) {
@@ -397,41 +425,40 @@ public class EventCalculator implements StitchCalculator {
                         (Level.SEVERE, "Unknown date format: "+content, ex);
                 }
             }
-            
-            return approval;
+
+            if (event != null) events.add(event);
+            return events;
         }       
     }
 
-    static ApprovalParser[] ApprovalParsers = {
-        new RanchoApprovalParser (),
-        new NPCApprovalParser (),
-        new PharmManuApprovalParser (),
-        new DrugBankApprovalParser (),
-        new DailyMedApprovalParser (),
-        new DrugsAtFDAApprovalParser ()
+    static EventParser[] eventParsers = {
+        new RanchoEventParser(),
+        new NPCEventParser(),
+        new PharmManuEventParser(),
+        new DrugBankEventParser(),
+        new DailyMedEventParser(),
+        new DrugsAtFDAEventParser()
     };
 
-    List<Approval> getApprovalEvents (Stitch stitch) {
-        List<Approval> approvals = new ArrayList<>();
+    List<Event> getEvents (Stitch stitch) {
+        List<Event> events = new ArrayList<>();
 
-        for (ApprovalParser ap : ApprovalParsers) {
+        for (EventParser ep : eventParsers) {
             try {
-                Map<String, Object> payload = stitch.payload(ap.name);
+                Map<String, Object> payload = stitch.payload(ep.name);
                 if (payload != null) {
-                    Approval a = ap.getApproval(payload);
-                    if (a == null) {
-                    } else {
-                        logger.info(ap.name + ": approved=" + a.approval
-                                + " marketed=" + a.marketed);
-                        approvals.add(a);
+                    for (Event e: ep.getEvents(payload)) {
+                        logger.info(ep.name + ": kind=" + e.kind
+                                + " date=" + e.date);
+                        events.add(e);
                     }
                 }
             } catch (IllegalArgumentException iae) {
-                logger.warning(ap.name + " not a valid data source");
+                logger.warning(ep.name + " not a valid data source");
             }
         }
 
-        return approvals;
+        return events;
     }
 
     public static void main (String[] argv) throws Exception {
