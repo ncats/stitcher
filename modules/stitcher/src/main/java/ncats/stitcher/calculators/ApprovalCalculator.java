@@ -175,7 +175,8 @@ public class ApprovalCalculator implements StitchCalculator {
         public Approval getApproval (Map<String, Object> payload) {
             approval = null;
             id = payload.get("Unii");
-            if (id != null && id.getClass().isArray())
+            if (id != null && id.getClass().isArray()
+                && Array.getLength(id) == 1)
                 id = Array.get(id, 0);
 
             Object content = payload.get("Conditions");
@@ -216,7 +217,8 @@ public class ApprovalCalculator implements StitchCalculator {
             Approval approval = null;
             Object content = payload.get("DATASET");
             Object id = payload.get("ID");
-            if (id != null && id.getClass().isArray())
+            if (id != null && id.getClass().isArray()
+                && Array.getLength(id) == 1)
                 id = Array.get(id, 0);
 
             if (content != null) {
@@ -306,6 +308,10 @@ public class ApprovalCalculator implements StitchCalculator {
         public Approval getApproval (Map<String, Object> payload) {
             Approval approval = null;
             Object id = payload.get("DATABASE_ID");
+            if (id != null && id.getClass().isArray()
+                && Array.getLength(id) == 1)
+                id = Array.get(id, 0);
+            
             Object content = payload.get("DRUG_GROUPS");
             if (content != null) {
                 if (content.getClass().isArray()) {
