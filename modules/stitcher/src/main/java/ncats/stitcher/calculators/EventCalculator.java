@@ -43,8 +43,8 @@ public class EventCalculator implements StitchCalculator {
 
         stitch.removeAll(AuxRelType.EVENT.name());
         Set<String> labels = new TreeSet<>();
-        boolean approved = false, marketed = false;
-        HashMap<String, Integer> eventIndexes = new HashMap<>(); // ensure addIfAbsent will work by making IDs unique
+        // ensure addIfAbsent will work by making IDs unique
+        HashMap<String, Integer> eventIndexes = new HashMap<>(); 
         for (Event e : events) {
             Map<String, Object> props = new HashMap<>();
             String ei = e.source + "|" + e.id;
@@ -57,6 +57,8 @@ public class EventCalculator implements StitchCalculator {
             }
             props.put(SOURCE, e.source);
             props.put(KIND, e.kind.toString());
+
+            labels.add(e.kind.toString());
 
             Map<String, Object> data = new HashMap<>();
             if (e.date != null)
@@ -73,12 +75,6 @@ public class EventCalculator implements StitchCalculator {
             // now add event to this stitch node
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
-
-        if (approved)
-            labels.add("APPROVED");
-
-        if (marketed)
-            labels.add("MARKETED");
 
         stitch.addLabel(labels.toArray(new String[0]));
     }
