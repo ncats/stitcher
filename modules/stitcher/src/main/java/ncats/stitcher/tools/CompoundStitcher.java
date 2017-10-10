@@ -1,20 +1,12 @@
 package ncats.stitcher.tools;
 
+import ncats.stitcher.*;
+import ncats.stitcher.calculators.CalculatorFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-
-import ncats.stitcher.Component;
-import ncats.stitcher.DataSource;
-import ncats.stitcher.DataSourceFactory;
-import ncats.stitcher.EntityFactory;
-import ncats.stitcher.GraphDb;
-import ncats.stitcher.Stitch;
-import ncats.stitcher.UntangleCompoundComponent;
-import ncats.stitcher.calculators.ApprovalCalculator;
-import ncats.stitcher.calculators.CalculatorFactory;
-import ncats.stitcher.calculators.StitchCalculator;
 
 public class CompoundStitcher implements Consumer<Stitch> {
     static final Logger logger = Logger.getLogger

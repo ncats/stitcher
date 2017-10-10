@@ -371,6 +371,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
 
         // merge disconnected labeled nodes
         Set<Object> lychi = new HashSet<>();
+        // FIXME: need to merge two equiv classes that are the same!!!
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
                 Long t = uf.root(target.getId());
@@ -409,9 +410,8 @@ public class UntangleCompoundComponent extends UntangleComponent {
                             //uf.union(source.getId(), target.getId()); // same
                         }
                         */
-                        
-                        Object dif = Util.delta(sv, tv);
-                        if (dif == null) {
+
+                        if (Util.equals(sv, tv)) {
                             uf.union(source.getId(), target.getId());
                         }
                     }

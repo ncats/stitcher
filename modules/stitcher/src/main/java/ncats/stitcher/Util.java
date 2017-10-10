@@ -339,6 +339,29 @@ public class Util {
         return merged;
     }
 
+    static public boolean equals (Object u, Object v) {
+        if (u == v) return true;
+        if ((u != null && v == null) || (u == null && v != null))
+            return false;
+        Set uset = new HashSet ();
+        if (u.getClass().isArray()) {
+            for (int i = 0; i < Array.getLength(u); ++i)
+                uset.add(Array.get(u, i));
+        }
+        else
+            uset.add(u);
+
+        if (v.getClass().isArray()) {
+            for (int i = 0; i < Array.getLength(v); ++i)
+                if (!uset.remove(Array.get(v, i)))
+                    return false;
+        }
+        else if (!uset.remove(v))
+            return false;
+        
+        return uset.isEmpty();
+    }
+    
     static public Object delta (Object val, Object old) {
         Class type = null;
         Set oldSet = new HashSet ();

@@ -605,7 +605,6 @@ public class CNode implements Props, Comparable<CNode> {
                     }
                     member.put("stitches", mapper.valueToTree(map));
 
-                    /*                    
                     ArrayNode data = mapper.createArrayNode();
                     for (Relationship srel :
                              sn.getRelationships(AuxRelType.PAYLOAD)) {
@@ -621,7 +620,6 @@ public class CNode implements Props, Comparable<CNode> {
                     
                     if (data.size() > 0)
                         member.put("data", data);
-                    */
                 }
                 
                 ((ArrayNode)stitches.get("members")).add(member);               

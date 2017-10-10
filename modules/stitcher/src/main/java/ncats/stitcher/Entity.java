@@ -354,8 +354,7 @@ public class Entity extends CNode {
         for (Relationship rel :
                  _node.getRelationships(Direction.INCOMING, reltype)) {
             if (source.equals(rel.getProperty(SOURCE))
-                && (id.equals(rel.getProperty(ID))
-                    || Util.delta(id, rel.getProperty(ID)) == null))
+                && Util.equals(id, rel.getProperty(ID)))
                 return this;
         }
         
