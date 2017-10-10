@@ -34,7 +34,7 @@ public class UserService {
     public UserService (Application app, ApplicationLifecycle lifecycle) {
         this.app = app;
 
-        List<Principal> results = Principal.find
+        List<Principal> results = Principal.find.query()
             .where().eq("username", ADMIN_USER).findList();
         if (results.isEmpty()) {
             admin = new Principal (ADMIN_USER);
@@ -46,7 +46,7 @@ public class UserService {
 
         lifecycle.addStopHook(() -> {
                 shutdown ();
-                return F.Promise.pure(null);            
+                return CompletableFuture.completedFuture(null);
             });
     }
 

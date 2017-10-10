@@ -9,6 +9,7 @@ import play.mvc.*;
 import play.libs.ws.*;
 import org.webjars.*;
 import views.html.*;
+import org.webjars.play.WebJarsUtil;
 
 import ncats.stitcher.CacheFactory;
 
@@ -17,7 +18,7 @@ public class MathJax extends Controller {
     CacheFactory cache;
     File workDir;
     final Configuration config;
-    @Inject WebJarAssets webJarAssets;
+    @Inject public WebJarsUtil webjars;
     
     @Inject
     public MathJax (Configuration config) {
@@ -32,8 +33,6 @@ public class MathJax extends Controller {
             ex.printStackTrace();
         }
     }
-    
-    public WebJarAssets webjars () { return webJarAssets; }
     
     String getText (final String id) {
         try {

@@ -1,6 +1,6 @@
 @import ncats.stitcher.Stitch
 @import ncats.stitcher.Props
-
+@import play.twirl.api.HtmlFormat
 @(version: Int, q: String, pages: Array[Int],
 page: Int, rows: Int, total: Int, stitches: Array[Stitch])
 
@@ -21,7 +21,7 @@ page: Int, rows: Int, total: Int, stitches: Array[Stitch])
     </div>
     <div class="col-md-8" style="max-height:100px;overflow-y:auto;">
       @for(e <- s.members){
-	<img alt='@e.get("name")' src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",80)'>
+        <img alt='@e.get("name")' src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",80)'>
       }
     </div>
   </div>
@@ -44,9 +44,9 @@ page: Int, rows: Int, total: Int, stitches: Array[Stitch])
         @pagination(version, q, page, rows, total, pages)
       }
       <div class="panel panel-default"
-	   style="border:0; box-shadow:none;">
-	@for(i <- 0 until stitches.length) {
-	  @display(i)
+           style="border:0; box-shadow:none;">
+        @for(i <- 0 until stitches.length) {
+          @display(i)
         }
       </div>
       @if(total > 0) {

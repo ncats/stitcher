@@ -4,16 +4,16 @@ import java.util.*;
 import java.sql.Timestamp;
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import io.ebean.Model;
+import io.ebean.Finder;
+import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.UpdatedTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Payload extends Model {
-    public static Find<Long, Payload> find =
-        new Finder<Long, Payload>(Payload.class);
+    public static Finder<Long, Payload> find = new Finder<>(Payload.class);
 
     public static Payload getInstance (Long id) {
         return find.byId(id);

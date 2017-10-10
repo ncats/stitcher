@@ -8,33 +8,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Payload</title>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.css"))'>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("font-awesome.min.css"))'>
+    <link rel="stylesheet" href='@app.webjars.css("bootstrap.min.css"))'>
+    <link rel="stylesheet" href='@app.webjars.css("font-awesome.min.css"))'>
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap-wizard.css")'></link>    
   </head>
   <body>
     <div class="container">    
       <div class="jumbotron">    
-	<h1>Payload setup</h1>
+        <h1>Payload setup</h1>
       </div>
       <div class="row">
-	<div class="col-md-8">
-	  <div class="wizard" id="some-wizard" data-title="Wizard Title">
-	    <div class="wizard-card" data-cardname="card1">
+        <div class="col-md-8">
+          <div class="wizard" id="some-wizard" data-title="Wizard Title">
+            <div class="wizard-card" data-cardname="card1">
               <h3>Card 1</h3>
               Some content
-	    </div>
-	    
-	    <div class="wizard-card" data-cardname="card2">
+            </div>
+            
+            <div class="wizard-card" data-cardname="card2">
               <h3>Card 2</h3>
               Some content
-	    </div>
-	  </div>
-	</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("jquery.min.js"))'></script>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.js"))'></script>
+    <script type="text/javascript" src='@app.webjars.script("jquery.min.js")'></script>
+    <script type="text/javascript" src='@app.webjars.script("bootstrap.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.versioned("javascripts/bootstrap-wizard.min.js")'></script>
     <script>
       $(function() {

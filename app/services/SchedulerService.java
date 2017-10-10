@@ -3,6 +3,9 @@ package services;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+
 import java.net.URL;
 import java.security.MessageDigest;
 
@@ -10,7 +13,7 @@ import javax.inject.Singleton;
 import javax.inject.Inject;
 
 import org.h2.tools.RunScript;
-import com.avaje.ebean.Ebean;
+import io.ebean.Ebean;
 
 import play.Environment;
 import play.Configuration;
@@ -91,7 +94,7 @@ public class SchedulerService {
             Object result = ctx.getResult();
             
             Ebean.execute(() -> {
-                    List<models.Job> jobs = models.Job.find
+                    List<models.Job> jobs = models.Job.find.query()
                         .where().eq("key", key).findList();
 
                     if (jobs.isEmpty()) {
@@ -172,7 +175,7 @@ public class SchedulerService {
         
         lifecycle.addStopHook(() -> {
                 shutdown ();
-                return F.Promise.pure(null);
+                return CompletableFuture.completedFuture(null);
             });
     }
 

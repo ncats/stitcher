@@ -8,11 +8,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@title</title>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.css"))'>
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("font-awesome.min.css"))'>
+    <link rel="stylesheet" href='@app.webjars.css("bootstrap.min.css")'>
+    <link rel="stylesheet" href='@app.webjars.css("font-awesome.min.css")'>
     <link href='@routes.Assets.versioned("stylesheets/prettify.css")' rel="stylesheet">
     <link href='@routes.Assets.versioned("stylesheets/slidereveal.css")' rel="stylesheet">
-    <link rel="stylesheet" href='@routes.WebJarAssets.at(app.webjars.locate("font-awesome.min.css"))'>
+    <link rel="stylesheet" href='@app.webjars.css("font-awesome.min.css")'>
   </head>
   <body>
     <div id="download-bar">
@@ -23,18 +23,18 @@
     </div>
     <div id="menu-bar">
       <div class="handle">
-	<i id="handle-trigger" class="fa fa-bars fa-lg fa-fw"></i>
-	<a href="#"><i class="fa fa-upload fa-fw"></i></a>
+        <i id="handle-trigger" class="fa fa-bars fa-lg fa-fw"></i>
+        <a href="#"><i class="fa fa-upload fa-fw"></i></a>
       </div>
       <h3>
         SlideReveal<br/>
         <small><span class="glyphicon glyphicon-info-sign"></span> Press <kbd>ESC</kbd> to close</small>
       </h3>
       <div id="menu-bar-item">
-	<a id="menu-bar-item-1" href="#include">How to include</a>
-	<a id="menu-bar-item-2" href="#use">How to use</a>
-	<a id="menu-bar-item-3" href="#method">Methods</a>
-	<a id="menu-bar-item-4" href="#option">Options</a>
+        <a id="menu-bar-item-1" href="#include">How to include</a>
+        <a id="menu-bar-item-2" href="#use">How to use</a>
+        <a id="menu-bar-item-3" href="#method">Methods</a>
+        <a id="menu-bar-item-4" href="#option">Options</a>
       </div>
     </div>
     <div class="jumbotron">
@@ -324,8 +324,8 @@ $("slider").slideReveal({
         <h5><a href="https://github.com/nnattawat/slideReveal">SlideReveal</a> is maintained by <a href="https://github.com/nnattawat">nnattawat</a></h5>
       </div>
     </footer>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("jquery.min.js"))'></script>
-    <script type="text/javascript" src='@routes.WebJarAssets.at(app.webjars.locate("bootstrap.min.js"))'></script>
+    <script type="text/javascript" src='@app.webjars.script("jquery.min.js")'></script>
+    <script type="text/javascript" src='@app.webjars.script("bootstrap.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.versioned("javascripts/jquery.slidereveal.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.versioned("javascripts/prettify.js")'></script>    
     <script type="text/javascript">

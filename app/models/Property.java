@@ -4,14 +4,14 @@ import java.util.*;
 import java.sql.Timestamp;
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import io.ebean.Model;
+import io.ebean.Finder;
+import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.UpdatedTimestamp;
 
 @Entity
 public class Property extends Model {
-    public static Find<Long, Property> find =
-        new Finder<Long,Property>(Property.class);
+    public static Finder<Long, Property> find = new Finder<>(Property.class);
     
     @Id public Long id;
     @Version public Long version;

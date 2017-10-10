@@ -7,6 +7,7 @@ import javax.inject.*;
 import play.*;
 import play.mvc.*;
 import play.libs.ws.*;
+import org.webjars.play.WebJarsUtil;
 
 import views.html.*;
 
@@ -15,14 +16,13 @@ import services.jobs.*;
 
 
 public class Test extends Controller {
-    @Inject controllers.WebJarAssets webjars;
     @Inject public SchedulerService scheduler;
     @Inject Environment env;
-
+    @Inject public WebJarsUtil webjars;
+    
     public Test () {
     }
 
-    public controllers.WebJarAssets webjars () { return webjars; }
     public Result slidereveal () {
         return ok (slidereveal.render(this, "IxCurator"));
     }

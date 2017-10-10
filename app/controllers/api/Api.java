@@ -12,7 +12,9 @@ import play.cache.*;
 import play.libs.ws.*;
 import static play.mvc.Http.MultipartFormData.*;
 import play.db.ebean.Transactional;
-
+import play.libs.streams.ActorFlow;
+import akka.actor.*;
+import akka.stream.*;
 import akka.actor.ActorRef;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,33 +37,13 @@ import controllers.Util;
 import chemaxon.struc.Molecule;
 
 public class Api extends Controller {
-
-    class ConsoleWebSocket extends LegacyWebSocket<String> {
-        final String key;
-        ConsoleWebSocket (String key) {
-            this.key = key;
-        }
-
-        public void onReady (WebSocket.In<String> in,
-                             WebSocket.Out<String> out) {
-        }
-        
-        public boolean isActor () { return true; }
-        public akka.actor.Props actorProps (ActorRef out) {
-            try {
-                return akka.actor.Props.create
-                    (WebSocketConsoleActor.class, out, key, cache);
-            }
-            catch (Exception ex) {
-                throw new RuntimeException (ex);
-            }
-        }
-    }
     
     @Inject SchedulerService scheduler;
     @Inject EntityService es;
     @Inject CacheService cache;
     @Inject CoreService service;
+    @Inject ActorSystem actorSystem;
+    @Inject Materializer materializer;
     
     ObjectMapper mapper = new ObjectMapper ();
     
@@ -89,11 +71,11 @@ public class Api extends Controller {
                 node.put("uri", ds.toURI().toString());
             }
             */
-            node.put("created", (Long)ds.get(Props.CREATED));
-            node.put("count", (Integer)ds.get(Props.INSTANCES));
-            node.put("sha1", (String)ds.get(Props.SHA1));
-            node.put("size", (Long)ds.get(Props.SIZE));
-            String[] props = (String[])ds.get(Props.PROPERTIES);
+            node.put("created", (Long)ds.get(ncats.stitcher.Props.CREATED));
+            node.put("count", (Integer)ds.get(ncats.stitcher.Props.INSTANCES));
+            node.put("sha1", (String)ds.get(ncats.stitcher.Props.SHA1));
+            node.put("size", (Long)ds.get(ncats.stitcher.Props.SIZE));
+            String[] props = (String[])ds.get(ncats.stitcher.Props.PROPERTIES);
             if (props != null)
                 node.put("properties", mapper.valueToTree(props));
             sources.add(node);
@@ -137,14 +119,6 @@ public class Api extends Controller {
             ex.printStackTrace();
         }
         return notFound ("Unknown node "+id);
-    }
-
-    public LegacyWebSocket<String> console (final String key) {
-        return new ConsoleWebSocket (key);
-    }
-
-    public LegacyWebSocket<String> echo () {
-        return WebSocket.withActor(WebSocketEchoActor::props);
     }
 
     @Transactional

@@ -20,8 +20,8 @@ import services.RecordScanner;
 import services.DelimiterRecordScanner;
 import services.MolRecordScanner;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Transaction;
+import io.ebean.Ebean;
+import io.ebean.Transaction;
 
 public class PayloadScannerJob implements Job, JobParams {
     @Inject protected CoreService service;

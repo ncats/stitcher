@@ -11,6 +11,7 @@ import play.data.*;
 import play.libs.ws.*;
 import static play.mvc.Http.MultipartFormData.*;
 import play.db.ebean.Transactional;
+import org.webjars.play.WebJarsUtil;
 
 import views.html.*;
 
@@ -28,15 +29,15 @@ import static ncats.stitcher.BuildInfo.*;
 import models.*;
 
 public class App extends Controller {
-    @Inject controllers.WebJarAssets webJarAssets;    
     @Inject public SchedulerService scheduler;
     @Inject public EntityService es;
     @Inject public CoreService service;
-
+    @Inject public WebJarsUtil webjars;
+    
     public App () {
     }
 
-    public controllers.WebJarAssets webjars () { return webJarAssets; }    
+    //public controllers.WebJarAssets webjars () { return webJarAssets; }    
 
     /*
     public Result build () {
