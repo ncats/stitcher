@@ -44,27 +44,21 @@ public class EventCalculator implements StitchCalculator {
         stitch.removeAll(AuxRelType.EVENT.name());
         Set<String> labels = new TreeSet<>();
         boolean approved = false, marketed = false;
-        int counter = 0;
+        HashMap<String, Integer> eventIndexes = new HashMap<>(); // ensure addIfAbsent will work by making IDs unique
         for (Event e : events) {
             Map<String, Object> props = new HashMap<>();
-            props.put(ID, e.id+":"+counter);
-            counter++;
+            String ei = e.source + "|" + e.id;
+            if (eventIndexes.containsKey(ei)) {
+                props.put(ID, e.id + ":" + eventIndexes.get(ei));
+                eventIndexes.put(ei, eventIndexes.get(ei)+1);
+            } else {
+                props.put(ID, e.id);
+                eventIndexes.put(ei, 1);
+            }
             props.put(SOURCE, e.source);
             props.put(KIND, e.kind.toString());
 
             Map<String, Object> data = new HashMap<>();
-//            if (e.kind == Event.EventType.Approval && e.date != null) {
-//                approved = true;
-//                Calendar cal = Calendar.getInstance();
-//                cal.setTime(e.date);
-//                data.put("approvalYear", cal.get(Calendar.YEAR));
-//            }
-//
-//            if (e.kind == Event.EventType.Marketed && e.date != null) {
-//                data.put("marketedDate", SDF.format(e.date));
-//                marketed = true;
-//            }
-
             if (e.date != null)
                 data.put("date", SDF.format(e.date));
 
@@ -90,14 +84,14 @@ public class EventCalculator implements StitchCalculator {
     }
 
     static class Event {
+        public EventKind kind;
         public String source;
         public Object id;
         public Date date;
         public String jurisdiction;
-        public EventType kind;
-        public String comment;
+        public String comment; // reference
 
-        public enum EventType {
+        public enum EventKind {
             Publication,
             Filing,
             Designation,
@@ -105,14 +99,14 @@ public class EventCalculator implements StitchCalculator {
             Marketed
         }
 
-        public Event(String source, Object id, EventType kind, Date date) {
+        public Event(String source, Object id, EventKind kind, Date date) {
             this.source = source;
             this.id = id != null ? id : "*";
             this.kind = kind;
             this.date = date;
         }
 
-        public Event(String source, Object id, EventType kind) {
+        public Event(String source, Object id, EventKind kind) {
             this(source, id, kind, null);
         }
     }
@@ -139,30 +133,34 @@ public class EventCalculator implements StitchCalculator {
         void parseEvent (JsonNode n) {
             if (n.has("HighestPhase") && "approved".equalsIgnoreCase
                 (n.get("HighestPhase").asText())) {
+                event = new Event(name, id, Event.EventKind.Marketed);
+                if (n.has("HighestPhaseUri")) {
+                    event.comment = n.get("HighestPhaseUri").asText();
+                    if (event.comment.contains("fda.gov")) {
+                        event.jurisdiction = "US";
+                    }
+                }
+                else {
+                    event.comment = "";
+                    if (n.has("ConditionName"))
+                        event.comment +=
+                                n.get("ConditionName").asText();
+                    else if (n.has("ConditionMeshValue"))
+                        event.comment +=
+                                n.get("ConditionMeshValue").asText();
+                    if (n.has("ConditionProductName"))
+                        event.comment += " " + n.get("ConditionProductName").asText();
+                }
                 if (n.has("ConditionProductDate")) {
                     String d = n.get("ConditionProductDate").asText();
                     try {
                         Date date = SDF.parse(d);
-                        if (event == null || (event.kind == Event.EventType.Marketed
-                            && event.date.after(date))) {
-                            event = new Event(name, id, Event.EventType.Marketed);
                             event.date = date;
-                            if (n.has("ConditionName"))
-                                event.comment =
-                                    n.get("ConditionName").asText();
-                            else if (n.has("ConditionMeshValue"))
-                                event.comment =
-                                    n.get("ConditionMeshValue").asText();
-                        }
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                         logger.log(Level.SEVERE,
-                                   "Can't parse date: "+d, ex);
+                                "Can't parse date: "+d, ex);
                     }
-                }
-                else {
-                    logger.warning("Approved Condition without date!");
                 }
             }
         }
@@ -243,13 +241,13 @@ public class EventCalculator implements StitchCalculator {
                     }
 
                     if (approved.length() > 0) {
-                        event = new Event(name, id, Event.EventType.Marketed);
+                        event = new Event(name, id, Event.EventKind.Marketed);
                         event.comment = approved.toString();
                     }
                 }
                 else if (((String)content).toLowerCase()
                            .indexOf("approved") >= 0) {
-                    event = new Event(name, id, Event.EventType.Marketed);
+                    event = new Event(name, id, Event.EventKind.Marketed);
                     event.comment = (String)content;
                 }
             }
@@ -276,7 +274,7 @@ public class EventCalculator implements StitchCalculator {
                 try {
                     for (String c : content.split("\n")) {
                         JsonNode node = mapper.readTree(decoder.decode(c));
-                        Event event = new Event (name, id, Event.EventType.Marketed);
+                        Event event = new Event (name, id, Event.EventKind.Marketed);
                         if (node.has("Year Introduced")) {
                             String year = node.get("Year Introduced").asText();
                             try {
@@ -291,6 +289,8 @@ public class EventCalculator implements StitchCalculator {
                         if (node.has("Country")) {
                             event.jurisdiction =
                                     node.get("Country").asText();
+                            if (event.jurisdiction.equals("US"))
+                                event.kind = Event.EventKind.Approval;
                         }
                         if (node.has("Product")) {
                             event.comment =
@@ -342,13 +342,13 @@ public class EventCalculator implements StitchCalculator {
                     }
 
                     if (approved.length() > 0) {
-                        event = new Event(name, id, Event.EventType.Marketed);
+                        event = new Event(name, id, Event.EventKind.Marketed);
                         event.comment = approved.toString();
                     }
                 }
                 else if (((String)content)
                          .toLowerCase().indexOf("approved") >= 0) {
-                    event = new Event(name, id, Event.EventType.Marketed);
+                    event = new Event(name, id, Event.EventKind.Marketed);
                     event.comment = (String)content;
                 }
             }
@@ -381,14 +381,17 @@ public class EventCalculator implements StitchCalculator {
                         date = date2;
                 }
                 if (date != null) {
-                    Event.EventType et = Event.EventType.Marketed;
+                    Event.EventKind et = Event.EventKind.Marketed;
                     content = payload.get("ApprovalAppId");
                     if (content != null &&
                             (((String)content).startsWith("NDA") ||
+                            ((String)content).startsWith("ANDA") ||
+                            ((String)content).startsWith("BA") ||
+                            ((String)content).startsWith("BN") ||
                             ((String)content).startsWith("BLA")))
-                        et = Event.EventType.Approval;
+                        et = Event.EventKind.Approval;
                     else {
-                        System.err.println("Unusual approval app id: "+content);
+                        logger.log(Level.WARNING, "Unusual approval app id: "+content+": "+payload.toString());
                     }
                     event = new Event(name, id, et);
                     event.jurisdiction = "US";
@@ -418,10 +421,11 @@ public class EventCalculator implements StitchCalculator {
                 try {
                     Date date = SDF2.parse((String)content);
                     if (event == null
-                        || (event.kind == Event.EventType.Approval
+                        || (event.kind == Event.EventKind.Approval
                         && event.date.after(date))) {
-                        event = new Event(name, id, Event.EventType.Approval);
+                        event = new Event(name, id, Event.EventKind.Approval);
                         event.date = date;
+                        event.jurisdiction = "US";
                         event.comment = (String) payload.get("Comment");
                     }
                 }
