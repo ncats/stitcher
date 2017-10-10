@@ -72,6 +72,9 @@ public class EventCalculator implements StitchCalculator {
             
             labels.add(e.source);
 
+            if (e.kind == Event.EventKind.Approval) approved = true;
+            if (e.kind == Event.EventKind.Marketed) marketed = true;
+
             // now add event to this stitch node
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
