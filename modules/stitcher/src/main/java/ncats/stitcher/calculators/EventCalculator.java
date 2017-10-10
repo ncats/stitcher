@@ -43,6 +43,9 @@ public class EventCalculator implements StitchCalculator {
 
         stitch.removeAll(AuxRelType.EVENT.name());
         Set<String> labels = new TreeSet<>();
+        Calendar cal = Calendar.getInstance();
+        
+        Map<String, Integer> approvals = new HashMap<>();
         // ensure addIfAbsent will work by making IDs unique
         HashMap<String, Integer> eventIndexes = new HashMap<>(); 
         for (Event e : events) {
@@ -71,11 +74,30 @@ public class EventCalculator implements StitchCalculator {
                 data.put("comment", e.comment);
             
             labels.add(e.source);
-
+            if (e.date != null && e.kind == Event.EventKind.Approval) {
+                cal.setTime(e.date);
+                approvals.put(e.source, cal.get(Calendar.YEAR));
+            }
+            
             // now add event to this stitch node
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
 
+        stitch.set("approved",
+                   labels.contains(Event.EventKind.Approval.toString()));
+        
+        // sources that have approval dates; order by relevance
+        for (EventParser ep : new EventParser[]{
+                new DrugsAtFDAEventParser(),
+                new DailyMedEventParser()
+            }) {
+            Integer year = approvals.get(ep.name);
+            if (year != null) {
+                stitch.set("approvedYear", year);
+                break;
+            }
+        }
+        
         stitch.addLabel(labels.toArray(new String[0]));
     }
 
