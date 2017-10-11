@@ -32,6 +32,8 @@ import services.jobs.*;
 
 import ncats.stitcher.*;
 import ncats.stitcher.calculators.CalculatorFactory;
+import serializer.JsonCodec;
+
 import models.*;
 import controllers.Util;
 import chemaxon.struc.Molecule;
@@ -44,6 +46,7 @@ public class Api extends Controller {
     @Inject CoreService service;
     @Inject ActorSystem actorSystem;
     @Inject Materializer materializer;
+    @Inject JsonCodec jsonCodec;
     
     ObjectMapper mapper = new ObjectMapper ();
     
@@ -112,7 +115,7 @@ public class Api extends Controller {
         try {
             CNode n = es.getNode(id);
             if (n != null) {
-                return ok (n.toJson());
+                return ok (jsonCodec.encode(n));
             }
         }
         catch (Exception ex) {
@@ -190,7 +193,7 @@ public class Api extends Controller {
     ObjectNode toJson (int s, int t, Entity... entities) {
         ArrayNode page = mapper.createArrayNode();
         for (Entity e : entities) {
-            page.add(e.toJson());
+            page.add(jsonCodec.encode(e));
         }
 
         ObjectNode result = mapper.createObjectNode();
@@ -222,7 +225,7 @@ public class Api extends Controller {
     
     public Result getStitch (Integer ver, String id) {
         Entity e = getStitchEntity (ver, id);
-        return e != null ? ok (e.toJson())
+        return e != null ? ok (jsonCodec.encode(e))
             : notFound ("Unknown stitch key: "+id);
     }
 
@@ -315,7 +318,7 @@ public class Api extends Controller {
         try {
             long id = Long.parseLong(label);
             Entity e = es.getEntity(id);
-            return e != null ? ok (e.toJson())
+            return e != null ? ok (jsonCodec.encode(e))
                 : notFound ("No such entity id "+id);
         }
         catch (NumberFormatException ex) {
