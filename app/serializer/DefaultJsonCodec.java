@@ -94,11 +94,17 @@ public class DefaultJsonCodec implements JsonCodec, Props {
         Node parent = null;
         
         ObjectNode stitches = null;
+        Set<ObjectNode> members = new TreeSet<>((a,b) -> {
+                long x = a.get("node").asLong(), y = b.get("node").asLong();
+                if (x < y) return -1;
+                if (x > y) return 1;
+                return 0;
+            });
+        
         if (_node.hasLabel(AuxNodeType.SGROUP)) {
             stitches = mapper.createObjectNode();
             stitches.put("hash", (String) _node.getProperty(ID, null));
             stitches.put("size", (Integer)_node.getProperty(RANK, 0));
-            stitches.put("members", mapper.createArrayNode());
             stitches.put("parent", (Long)_node.getProperty(PARENT, null));
             node.put("sgroup", stitches);
         }
@@ -205,7 +211,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                         member.put("data", data);
                 }
                 
-                ((ArrayNode)stitches.get("members")).add(member);               
+                members.add(member);
             }
             else if (rel.isType(AuxRelType.PAYLOAD)) {
                 ObjectNode on = Util.toJsonNode(rel);
@@ -232,6 +238,9 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 neighbors.add(nb);
             }
         }
+
+        if (!members.isEmpty())
+            stitches.put("members", mapper.valueToTree(members));
 
         if (!properties.isEmpty()) {
             for (Map.Entry<String, Object> me : properties.entrySet()) {

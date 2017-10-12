@@ -366,54 +366,17 @@ public class UntangleCompoundComponent extends UntangleComponent {
         // collapse based on trusted stitch keys; e.g., lychi layer 5, unii
         component.stitches((source, target) -> {
                 uf.union(source.getId(), target.getId());
-            }, H_LyChI_L5, I_UNII);
+            }, H_LyChI_L5);
         dump ("trusted keys stitching");
 
-        // merge disconnected labeled nodes
-        Set<Object> lychi = new HashSet<>();
-        // FIXME: need to merge two equiv classes that are the same!!!
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
                 Long t = uf.root(target.getId());
                 if (s != null && t != null && !s.equals(t)) {
                     Object sv = source.get(H_LyChI_L4);
                     Object tv = target.get(H_LyChI_L4);
-                    // only handle single values for now
-                    if (sv != null && tv != null) {
-                        /*
-                        if (sv.getClass().isArray() && Array.getLength(sv) > 0)
-                            sv = Array.get(sv, 0);
-                        if (tv.getClass().isArray() && Array.getLength(tv) > 0)
-                            tv = Array.get(tv, 0);
-
-                        if (sv.equals(tv) && !lychi.contains(tv)) {
-                            logger.info("## merging "+source.getId()+" ["+s+"]"
-                                        +" <-["+tv+"]-> "+target.getId()
-                                        +" ["+t+"]");
-                            component.cliques(clique -> {
-                                    Map<Long, Integer> labels = new HashMap<>();
-                                    for (Long n : clique.nodeSet()) {
-                                        Long l = uf.root(n);
-                                        if (l != null) {
-                                            Integer c = labels.get(l);
-                                            labels.put(l, c == null ? 1:c+1);
-                                        }
-                                    }
-                                    logger.info("..clique of size "
-                                                +clique.size()+" found: "
-                                                +clique.nodeSet()
-                                                +" =>\n"+labels.size()
-                                                +" "+labels);
-                                    return true;
-                                }, H_LyChI_L4, sv, Stitchable.ALL);
-                            lychi.add(sv);
-                            //uf.union(source.getId(), target.getId()); // same
-                        }
-                        */
-
-                        if (Util.equals(sv, tv)) {
-                            uf.union(source.getId(), target.getId());
-                        }
+                    if (sv != null && tv != null && Util.equals(sv, tv)) {
+                        uf.union(source.getId(), target.getId());
                     }
                 }
             }, H_LyChI_L4);
@@ -430,7 +393,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 if (transitive (e, H_LyChI_L4)) {
                     // 
                 }
-                else if (clique (e, N_Name, I_CAS)) {
+                else if (clique (e, N_Name, I_CAS, I_UNII)) {
                 }
                 else if (clique (e, false, H_LyChI_L3)) {
                     // desparate, last resort but require large min clique
