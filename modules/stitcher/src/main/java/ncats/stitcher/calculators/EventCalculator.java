@@ -74,7 +74,7 @@ public class EventCalculator implements StitchCalculator {
                 data.put("comment", e.comment);
             
             labels.add(e.source);
-            if (e.date != null && e.kind == Event.EventKind.Approval) {
+            if (e.date != null && e.kind == Event.EventKind.ApprovalRx) {
                 cal.setTime(e.date);
                 approvals.put(e.source, cal.get(Calendar.YEAR));
             }
@@ -84,7 +84,7 @@ public class EventCalculator implements StitchCalculator {
         }
 
         stitch.set("approved",
-                   labels.contains(Event.EventKind.Approval.toString()));
+                   labels.contains(Event.EventKind.ApprovalRx.toString()));
         
         // sources that have approval dates; order by relevance
         for (EventParser ep : new EventParser[]{
@@ -113,7 +113,8 @@ public class EventCalculator implements StitchCalculator {
             Publication,
             Filing,
             Designation,
-            Approval,
+            ApprovalRx,
+            ApprovalOtc,
             Marketed
         }
 
@@ -308,7 +309,7 @@ public class EventCalculator implements StitchCalculator {
                             event.jurisdiction =
                                     node.get("Country").asText();
                             if (event.jurisdiction.equals("US"))
-                                event.kind = Event.EventKind.Approval;
+                                event.kind = Event.EventKind.ApprovalRx;
                         }
                         if (node.has("Product")) {
                             event.comment =
@@ -407,9 +408,10 @@ public class EventCalculator implements StitchCalculator {
                             ((String)content).startsWith("BA") ||
                             ((String)content).startsWith("BN") ||
                             ((String)content).startsWith("BLA")))
-                        et = Event.EventKind.Approval;
+                        et = Event.EventKind.ApprovalRx;
                     else {
-                        logger.log(Level.WARNING, "Unusual approval app id: "+content+": "+payload.toString());
+                        logger.log(Level.WARNING, "Unusual approval app id: "+content
+                                   +": "+payload.toString());
                     }
                     event = new Event(name, id, et);
                     event.jurisdiction = "US";
@@ -439,9 +441,9 @@ public class EventCalculator implements StitchCalculator {
                 try {
                     Date date = SDF2.parse((String)content);
                     if (event == null
-                        || (event.kind == Event.EventKind.Approval
+                        || (event.kind == Event.EventKind.ApprovalRx
                         && event.date.after(date))) {
-                        event = new Event(name, id, Event.EventKind.Approval);
+                        event = new Event(name, id, Event.EventKind.ApprovalRx);
                         event.date = date;
                         event.jurisdiction = "US";
                         event.comment = (String) payload.get("Comment");

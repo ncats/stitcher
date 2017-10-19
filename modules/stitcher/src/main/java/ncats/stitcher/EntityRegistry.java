@@ -616,7 +616,13 @@ public class EntityRegistry extends EntityFactory {
             Set<String> l3 = new TreeSet<>();
             Map<String, Molecule> l4 = new TreeMap<>();
             boolean lychify;
-            for (Molecule f : clone.convertToFrags()) {
+            
+            Molecule[] frags = clone.convertToFrags();
+            String[] moieties = new String[frags.length];
+            for (int i = 0; i < frags.length; ++i) {
+                Molecule f = frags[i];
+                moieties[i] = f.toFormat("smiles:q");
+
                 lychify = true;
                 if (f.getAtomCount() == 1) {
                     // organic ion salt.. 
@@ -646,6 +652,7 @@ public class EntityRegistry extends EntityFactory {
                     l4.put(hk[hk.length-1], f);
                 }
             }
+            ent._snapshot(MOIETIES, moieties);
 
             if (!l3.isEmpty()) {
                 ent._set(H_LyChI_L3,

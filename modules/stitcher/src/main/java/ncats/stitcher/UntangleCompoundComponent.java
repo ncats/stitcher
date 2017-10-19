@@ -158,6 +158,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
         final Map<StitchKey, Object> values;
         final boolean anyvalue; // single valued?
 
+        Map<Clique, Set<StitchKey>> cliques = new HashMap<>();
         Clique bestClique; // best clique so far
         Map<Long, Integer> nodes = new HashMap<>();
 
@@ -231,6 +232,18 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 logger.info("## resolving "+entity.getId()+" => "+best);
                 for (Long n : best)
                     uf.union(entity.getId(), n);
+
+                for (Map.Entry<Clique, Set<StitchKey>> me : 
+                         cliques.entrySet()) {
+                    Clique clique = me.getKey();
+                    Set<StitchKey> keys = me.getValue();
+                    if (keys.size() > 1) {
+                        logger.info("## collapsing clique "+clique.nodeSet()
+                                    +" due to multiple spans: "+keys);
+                        for (Long id : clique.nodeSet())
+                            uf.union(entity.getId(), id);
+                    }
+                }
             }
 
             return !nodes.isEmpty();
@@ -300,6 +313,14 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                 logger.info("## best clique updated: "
                                             +clique.getId()+" key="+key
                                             +" value="+Util.toString(value));
+                            }
+                            else {
+                                Set<StitchKey> set = cliques.get(clique);
+                                if (set == null) {
+                                    cliques.put(clique, set = EnumSet.noneOf
+                                                (StitchKey.class));
+                                }
+                                set.add(key);
                             }
                         }
                     }
@@ -453,21 +474,36 @@ public class UntangleCompoundComponent extends UntangleComponent {
         if (comp.length == 1)
             return comp[0];
 
+        Entity root = null;
         if (comp.length > 0) {
             Entity[] entities = component.entities(comp);
             if (entities.length != comp.length)
                 logger.warning("There are missing entities in component!");
             
+            int moieties = 0;
             for (Entity e : entities) {
                 Entity[] in = e.inNeighbors(T_ActiveMoiety);
                 Entity[] out = e.outNeighbors(T_ActiveMoiety);
                 
-                if (in.length > 0 && out.length == 0)
-                    return e.getId();
+                if (in.length > 0 && out.length == 0) {
+                    root = e;
+                    break;
+                }
+
+                Object m = e.get(MOIETIES);
+                if (m != null) {
+                    int mc = m.getClass().isArray() ? Array.getLength(m) : 1;
+                    if (root == null || mc < moieties) {
+                        root = e;
+                        moieties = mc;
+                    }
+                    else if (root.getId() > e.getId())
+                        root = e;
+                }
             }
         }
         
-        return null;
+        return root != null ? root.getId() : null;
     }
 
     boolean transitive (Entity e, StitchKey key) {
