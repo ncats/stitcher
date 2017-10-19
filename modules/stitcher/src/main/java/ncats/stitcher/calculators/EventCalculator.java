@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static ncats.stitcher.Props.*;
 
@@ -42,7 +44,8 @@ public class EventCalculator implements StitchCalculator {
                     " event events");
 
         stitch.removeAll(AuxRelType.EVENT.name());
-        Set<String> labels = new TreeSet<>();
+        Labels labels = new Labels();
+
         Calendar cal = Calendar.getInstance();
         
         Map<String, Integer> approvals = new HashMap<>();
@@ -61,7 +64,7 @@ public class EventCalculator implements StitchCalculator {
             props.put(SOURCE, e.source);
             props.put(KIND, e.kind.toString());
 
-            labels.add(e.kind.toString());
+            labels.add(e.kind);
 
             Map<String, Object> data = new HashMap<>();
             if (e.date != null)
@@ -74,7 +77,7 @@ public class EventCalculator implements StitchCalculator {
                 data.put("comment", e.comment);
             
             labels.add(e.source);
-            if (e.date != null && e.kind == Event.EventKind.Approval) {
+            if (e.date != null && e.kind.isApproved()) {
                 cal.setTime(e.date);
                 approvals.put(e.source, cal.get(Calendar.YEAR));
             }
@@ -83,8 +86,7 @@ public class EventCalculator implements StitchCalculator {
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
 
-        stitch.set("approved",
-                   labels.contains(Event.EventKind.Approval.toString()));
+        stitch.set("approved", labels.isApproved);
         
         // sources that have approval dates; order by relevance
         for (EventParser ep : new EventParser[]{
@@ -98,9 +100,29 @@ public class EventCalculator implements StitchCalculator {
             }
         }
         
-        stitch.addLabel(labels.toArray(new String[0]));
+        stitch.addLabel(labels.getLabelNames());
     }
 
+    static class Labels{
+        private boolean isApproved;
+
+        Set<String> labels = new TreeSet<>();
+
+        public void add(Event.EventKind kind){
+            if(kind.isApproved()){
+                isApproved = true;
+            }
+            add(kind.name());
+        }
+
+        public void add(String label){
+            labels.add(label);
+        }
+
+        public String[] getLabelNames(){
+            return labels.toArray(new String[labels.size()]);
+        }
+    }
     static class Event {
         public EventKind kind;
         public String source;
@@ -113,8 +135,31 @@ public class EventCalculator implements StitchCalculator {
             Publication,
             Filing,
             Designation,
-            Approval,
-            Marketed
+            ApprovalRX {
+                @Override
+                public boolean isApproved() {
+                    return true;
+                }
+            },
+            Marketed,
+            ApprovalOTC{
+                @Override
+                public boolean isApproved(){
+                    return true;
+                }
+            },
+            Approval{
+                @Override
+                public boolean isApproved(){
+                    return true;
+                }
+            }
+
+            ;
+
+            public boolean isApproved(){
+                return false;
+            }
         }
 
         public Event(String source, Object id, EventKind kind, Date date) {
@@ -380,6 +425,12 @@ public class EventCalculator implements StitchCalculator {
             super ("spl_acti_rx.txt");
         }
 
+        /**
+         * Code of Federal Regulations Title 21
+         *
+         * looks like anything in 3XX is for human consumption
+         */
+        private static Pattern CFR_21_OTC_PATTERN = Pattern.compile("part3([1-9][0-9]).+");
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
             Event event = null;
@@ -401,13 +452,31 @@ public class EventCalculator implements StitchCalculator {
                 if (date != null) {
                     Event.EventKind et = Event.EventKind.Marketed;
                     content = payload.get("ApprovalAppId");
-                    if (content != null &&
-                            (((String)content).startsWith("NDA") ||
-                            ((String)content).startsWith("ANDA") ||
-                            ((String)content).startsWith("BA") ||
-                            ((String)content).startsWith("BN") ||
-                            ((String)content).startsWith("BLA")))
-                        et = Event.EventKind.Approval;
+                    if (content != null) {
+                        String contentStr = (String)content;
+                        if (
+                                contentStr.startsWith("NDA") ||
+                                        contentStr.startsWith("ANDA") ||
+                                        contentStr.startsWith("BA") ||
+                                        contentStr.startsWith("BN") ||
+                                        contentStr.startsWith("BLA")) {
+                            et = Event.EventKind.ApprovalRX;
+                        }else{
+                            Matcher matcher = CFR_21_OTC_PATTERN.matcher(contentStr);
+                            if(matcher.find()){
+                                //We include if it's 310.545. We exclude if it's any other 310.5XX
+                                if(contentStr.startsWith("310.5")) {
+                                    if (contentStr.equals("310.545")) {
+                                        et = Event.EventKind.ApprovalOTC;
+                                    }
+
+                                }  else{
+                                    et = Event.EventKind.ApprovalOTC;
+                                }
+                            }
+
+                        }
+                    }
                     else {
                         logger.log(Level.WARNING, "Unusual approval app id: "+content+": "+payload.toString());
                     }
@@ -439,9 +508,8 @@ public class EventCalculator implements StitchCalculator {
                 try {
                     Date date = SDF2.parse((String)content);
                     if (event == null
-                        || (event.kind == Event.EventKind.Approval
-                        && event.date.after(date))) {
-                        event = new Event(name, id, Event.EventKind.Approval);
+                        || (event.kind.isApproved() && event.date.after(date))) {
+                        event = new Event(name, id, event.kind);
                         event.date = date;
                         event.jurisdiction = "US";
                         event.comment = (String) payload.get("Comment");
