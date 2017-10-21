@@ -500,6 +500,12 @@ public class UntangleCompoundComponent extends UntangleComponent {
                     else if (root.getId() > e.getId())
                         root = e;
                 }
+                else {
+                    // just pick the lower id
+                    if (root == null
+                        || (moieties == 0 && root.getId() > e.getId()))
+                        root = e;
+                }
             }
         }
         
