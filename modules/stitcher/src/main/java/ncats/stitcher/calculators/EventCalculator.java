@@ -149,14 +149,7 @@ public class EventCalculator implements StitchCalculator {
                 public boolean isApproved(){
                     return true;
                 }
-            },
-            Approval{
-                @Override
-                public boolean isApproved(){
-                    return true;
-                }
             }
-
             ;
 
             public boolean isApproved(){
@@ -355,7 +348,7 @@ public class EventCalculator implements StitchCalculator {
                             event.jurisdiction =
                                     node.get("Country").asText();
                             if (event.jurisdiction.equals("US"))
-                                event.kind = Event.EventKind.Approval;
+                                event.kind = Event.EventKind.ApprovalRx;
                         }
                         if (node.has("Product")) {
                             event.comment =

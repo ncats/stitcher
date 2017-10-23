@@ -416,9 +416,11 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 }
                 else if (clique (e, N_Name, I_CAS, I_UNII)) {
                 }
+                /*
                 else if (clique (e, false, H_LyChI_L3)) {
                     // desparate, last resort but require large min clique
                 }
+                */
                 else {
                     uf.add(e.getId());
                     logger.warning("** unmapped entity "+e.getId()+": "
@@ -470,7 +472,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
     /*
      * TODO: find the root active moiety and if exists return it
      */
-    Long getRoot (long[] comp) {
+    protected Long getRoot (long[] comp) {
         if (comp.length == 1)
             return comp[0];
 

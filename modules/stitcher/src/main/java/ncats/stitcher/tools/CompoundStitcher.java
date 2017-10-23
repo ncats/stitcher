@@ -12,6 +12,36 @@ public class CompoundStitcher implements Consumer<Stitch> {
     static final Logger logger = Logger.getLogger
         (CompoundStitcher.class.getName());
 
+    static class StitcherUntangleCompoundComponent
+        extends UntangleCompoundComponent {
+        public StitcherUntangleCompoundComponent
+            (DataSource dsource, Component component) {
+            super (dsource, component);
+        }
+
+        @Override
+        protected Long getRoot (long[] comp) {
+            Long root = super.getRoot(comp), r = root;
+            
+            if (r != null) {
+                // make sure it's a
+                Entity[] e = component.entities(new long[]{root});
+                if (!e[0].datasource().toURI().toString().endsWith(".gsrs"))
+                    r = null;
+            }
+            
+            if (r == null) {
+                for (Entity e : component.entities(comp)) {
+                    if (e.datasource().toURI().toString().endsWith(".gsrs")) {
+                        if (r == null || r > e.getId())
+                            r = e.getId();
+                    }
+                }
+            }
+            
+            return r != null ? r : root;
+        }
+    }
     
     final EntityFactory ef;
     final DataSourceFactory dsf;
@@ -37,7 +67,7 @@ public class CompoundStitcher implements Consumer<Stitch> {
             logger.info("### "+components.length+" components!");
             for (Long cid : comps) {
                 logger.info("########### Untangle component "+cid+"...");
-                ef.untangle(new UntangleCompoundComponent
+                ef.untangle(new StitcherUntangleCompoundComponent
                             (dsource, ef.component(cid)), this);
             }
         }
@@ -45,7 +75,7 @@ public class CompoundStitcher implements Consumer<Stitch> {
             for (Long cid : components) {
                 Component comp = ef.component(cid);
                 logger.info("Stitching component "+comp.getId());
-                ef.untangle(new UntangleCompoundComponent
+                ef.untangle(new StitcherUntangleCompoundComponent
                             (dsource, comp), this);
             }
         }
