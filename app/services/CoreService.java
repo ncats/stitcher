@@ -45,12 +45,14 @@ public class CoreService {
     final public String DATA = "ix.data";
     final public String HASH = "ix.hash";
     final public String WORK = "ix.work";
+    final public String LATEST = "ix.version.latest";
     
     final File base;
     final File hash;
     final File data;
     final File work;
     final Injector injector;
+    final Integer latestVersion;
     CacheFactory cacheFactory;
     ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -82,6 +84,10 @@ public class CoreService {
 
         work = new File (base, config.getString(WORK, "work"));
         work.mkdirs();
+
+        latestVersion = config.getInt(LATEST, null);
+        if (latestVersion == null)
+            Logger.warn("No value set for property "+LATEST);
 
         lifecycle.addStopHook(() -> {
                 shutdown ();
@@ -292,4 +298,6 @@ public class CoreService {
     public List<models.Job> getJobs () {
         return models.Job.find.query().order().desc("id").findList();
     }
+
+    public Integer getLatestVersion () { return latestVersion; }
 }

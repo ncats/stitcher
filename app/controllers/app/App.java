@@ -122,6 +122,15 @@ public class App extends Controller {
         return redirect (routes.App.payload());
     }
 
+    public Result latestStitches (String q, Integer rows, Integer page) {
+        String uri = routes.App.latestStitches(q, rows, page).url();
+        Integer version = service.getLatestVersion();
+        if (null == version)
+            return ok (error.render(this, uri+": No latest version defined!"));
+
+        return redirect (routes.App.stitches(version, q, rows, page));
+    }
+    
     public Result stitches (Integer version, String q,
                             Integer rows, Integer page) {
         Label[] labels = {
@@ -152,6 +161,8 @@ public class App extends Controller {
 
     public Result stitch (Integer version, String name) {
         String uri = routes.App.stitch(version, name).url();
+        Logger.debug(uri);
+        
         Stitch stitch = null;
         try {
             long pid = Long.parseLong(name);
@@ -165,7 +176,23 @@ public class App extends Controller {
         }
         catch (NumberFormatException ex) {
             // now try looking by name or id
+            Entity[] entities = es.getEntityFactory()
+                .filter("UNII", "'"+name+"'", "stitch_v"+version);
+            
+            return ok (stitches.render
+                       (version, "UNII="+name, new int[]{entities.length},
+                        1, entities.length, entities.length,
+                        Arrays.stream(entities).map(e -> Stitch.getStitch(e))
+                        .toArray(Stitch[]::new)));
         }
-        return ok (error.render(this, uri+": can find entity "+name));
+        //return ok (error.render(this, uri+": can find entity "+name));
+    }
+
+    public Result latestStitch (String name) {
+        Integer version = service.getLatestVersion();
+        if (null == version)
+            return badRequest ("No latest version defined!");
+
+        return stitch (version, name);
     }
 }

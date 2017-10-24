@@ -217,19 +217,38 @@ public class Api extends Controller {
         catch (NumberFormatException ex) {
             Entity[] entities = es.getEntityFactory()
                 .filter("UNII", "'"+id+"'", "stitch_v"+ver);
-            if (entities.length > 0)
+            if (entities.length > 0) {
+                if (entities.length > 1)
+                    Logger.warn(id+" yields "+entities.length+" matches!");
                 e = entities[0];
+            }
         }
         return e;
     }
+
+    public Result getLatestStitch (String id) {
+        String uri = routes.Api.getLatestStitch(id).url();
+        Logger.debug(uri);
+        
+        Integer ver = service.getLatestVersion();
+        if (null == ver)
+            return badRequest ("No latest stitch version defined!");
+        return getStitch (ver, id);
+    }
     
     public Result getStitch (Integer ver, String id) {
+        String uri = routes.Api.getStitch(ver, id).url();
+        Logger.debug(uri);
+        
         Entity e = getStitchEntity (ver, id);
         return e != null ? ok (jsonCodec.encode(e))
             : notFound ("Unknown stitch key: "+id);
     }
 
     public Result updateStitch(Integer ver, String id) {
+        String uri = routes.Api.updateStitch(ver, id).url();
+        Logger.debug(uri);
+        
         Entity e = getStitchEntity(ver, id);
 
         if (e != null) {
@@ -243,6 +262,9 @@ public class Api extends Controller {
     }
     
     public Result stitches (Integer ver, Integer skip, Integer top) {
+        String uri = routes.Api.stitches(ver, skip, top).url();
+        Logger.debug(uri);
+        
         Map<String, String[]> params = request().queryString();
         if (params.isEmpty())
             return entities ("stitch_v"+ver, skip, top);
@@ -302,6 +324,9 @@ public class Api extends Controller {
     }
     
     public Result entities (String label, Integer skip, Integer top) {
+        String uri = routes.Api.entities(label, skip, top).url();
+        Logger.debug(uri);
+        
         if ("@labels".equalsIgnoreCase(label)) {
             return ok ((JsonNode)mapper.valueToTree
                        (es.getEntityFactory().labels()));
@@ -333,6 +358,7 @@ public class Api extends Controller {
 
     public Result structure (Long id, String format, Integer size) {
         String uri = routes.Api.structure(id, format, size).url();
+        Logger.debug(uri);
 
         Entity e = es.getEntityFactory().entity(id);
         if (e != null) {

@@ -5,6 +5,7 @@ GET	/datasources	controllers.api.Api.getDataSources
 GET	/metrics		controllers.api.Api.getMetrics(label: String ?= null)
 GET	/node/:id		controllers.api.Api.getNode(id: Long)
 GET	/entities/:label	controllers.api.Api.entities(label: String, skip: Integer ?= null, top: Integer ?= 10)
+GET	/stitches/latest/:id	controllers.api.Api.getLatestStitch(id: String)
 GET	/stitches/v$ver<[0-9]+>/:id	controllers.api.Api.getStitch(ver: Integer, id: String)
 POST /stitches/v$ver<[0-9]+>/:id/@update	controllers.api.Api.updateStitch(ver: Integer, id: String)
 GET	/stitches/v$ver<[0-9]+>		controllers.api.Api.stitches(ver: Integer, skip: Integer ?= null, top: Integer ?= 5)
