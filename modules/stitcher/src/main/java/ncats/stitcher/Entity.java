@@ -498,19 +498,23 @@ public class Entity extends CNode {
     }
 
     public Entity _set (StitchKey key, Stitchable value) {
-        // first _unstitch this node before we proceed
-        _unstitch (key);
-
-        if (value == null || value.getValue() == null) {
-            if (_node.hasProperty(key.name()))
-                _snapshot (key.name(), null);
+        if (!value.isBlacklist(key)) {
+            // first _unstitch this node before we proceed
+            _unstitch (key);
+            
+            if (value == null || value.getValue() == null) {
+                if (_node.hasProperty(key.name()))
+                    _snapshot (key.name(), null);
+            }
+            else {
+                Object val = value.getValue();
+                _snapshot (key.name(), val);
+                _stitch (key, val);
+                _node.setProperty(key.name(), val);
+            }
         }
-        else {
-            Object val = value.getValue();
-            _snapshot (key.name(), val);
-            _stitch (key, val);
-            _node.setProperty(key.name(), val);
-        }
+        else
+            logger.info("Blacklist: "+key+"="+value.getValue());
         
         return this;
     }
@@ -693,20 +697,25 @@ public class Entity extends CNode {
             return _set (key, value);
         }
 
-        Object val = value.getValue();
-        if (val != null) { // TODO min linking string length = 3?
-            // find diffs and update node prop and stitch
-            Object old = _node.getProperty(key.name());
-            Object delta = Util.delta(val, old);
-            if (delta != null) {
-                Object newVal = Util.merge(old, val);           
-                if (delta == Util.NO_CHANGE)
-                    delta = val;
-                _snapshot (key.name(), old, newVal);
-                _node.setProperty(key.name(), newVal);
-                _stitch (key, delta);
+        if (!value.isBlacklist(key)) {
+            Object val = value.getValue();
+            if (val != null) { // TODO min linking string length = 3?
+                // find diffs and update node prop and stitch
+                Object old = _node.getProperty(key.name());
+                Object delta = Util.delta(val, old);
+                if (delta != null) {
+                    Object newVal = Util.merge(old, val);           
+                    if (delta == Util.NO_CHANGE)
+                        delta = val;
+                    _snapshot (key.name(), old, newVal);
+                    _node.setProperty(key.name(), newVal);
+                    _stitch (key, delta);
+                }
             }
         }
+        else
+            logger.info("Blacklist: "+key+"="+value.getValue());
+        
         return this;
     }
 

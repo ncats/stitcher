@@ -128,7 +128,7 @@ def rancho (file):
                                 x[name] = True
                             elif r.isdigit():
                                 x[name] = long(r)
-                            elif r.lower() != 'null' and r.lower() != 'unknown':
+                            elif r.lower() != 'null':# and r.lower() != 'unknown':
                                 x[name] = r
 
                             #update the hashes for conditions/targets

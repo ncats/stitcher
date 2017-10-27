@@ -260,6 +260,14 @@ public class Api extends Controller {
         }
 
     }
+
+    public Result latestStitches (Integer skip, Integer top) {
+        Integer ver = service.getLatestVersion();
+        if (ver == null)
+            return badRequest ("No latest version defined!");
+
+        return redirect (routes.Api.stitches(ver, skip, top));
+    }
     
     public Result stitches (Integer ver, Integer skip, Integer top) {
         String uri = routes.Api.stitches(ver, skip, top).url();

@@ -46,6 +46,29 @@ public class EntityRegistry extends EntityFactory {
         public String id;
     }
 
+    class SV extends StitchValue {
+        public SV (Object value) {
+            super (value);
+        }
+        public SV (String name, Object value) {
+            super (name, value);
+        }
+        public SV (StitchKey key, Object value) {
+            super (key, value);
+        }
+
+        @Override
+        public boolean isBlacklist (StitchKey key) {
+            return EntityRegistry.this.isBlacklist(key, value);
+        }
+        
+        @Override
+        public boolean isBlacklist () {
+            return key != null ? EntityRegistry.this.isBlacklist(key, value)
+                : EntityRegistry.this.isBlacklist(value);
+        }
+    }
+
     protected final PropertyChangeSupport pcs =
         new PropertyChangeSupport (this);
 
@@ -59,6 +82,7 @@ public class EntityRegistry extends EntityFactory {
     // stitch key due to mappers
     protected EnumMap<StitchKey, Set<String>> stitchMappers;
     protected List<Reference> references = new ArrayList<>();
+    protected Map<StitchKey, Set<Object>> blacklist;
     
     public EntityRegistry (String dir) throws IOException {
         this (GraphDb.getInstance(dir));
@@ -80,6 +104,47 @@ public class EntityRegistry extends EntityFactory {
         stitches = new EnumMap<StitchKey, Set<String>>(StitchKey.class);
         mappers = new HashMap<String, StitchKeyMapper>();
         stitchMappers = new EnumMap<>(StitchKey.class);
+        blacklist = new HashMap<>();
+    }
+
+    public void addBlacklist (Object... values) {
+        for (Object v : values)
+            for (StitchKey key : Entity.KEYS)
+                addBlacklist (key, v);
+    }
+    
+    public void addBlacklist (StitchKey key, Object... values) {
+        Set set = blacklist.get(key);
+        if (set == null)
+            blacklist.put(key, set = new HashSet ());
+        for (Object v : values)
+            set.add(v);
+    }
+
+    public boolean isBlacklist (StitchKey key, Object value) {
+        Set set = blacklist.get(key);
+        if (set != null)
+            return set.contains(value);
+        return false;
+    }
+
+    public boolean isBlacklist (Object value) {
+        for (StitchKey key : Entity.KEYS)
+            if (isBlacklist (key, value))
+                return true;
+        return false;
+    }
+    
+    public void removeBlacklist (StitchKey key) {
+        blacklist.remove(key);
+    }
+
+    public void removeBlacklist (StitchKey key, Object... values) {
+        Set set = blacklist.get(key);
+        if (set != null) {
+            for (Object v : values)
+                set.remove(v);
+        }
     }
 
     public EntityRegistry add (String property, StitchKeyMapper mapper) {

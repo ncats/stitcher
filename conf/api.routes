@@ -8,6 +8,7 @@ GET	/entities/:label	controllers.api.Api.entities(label: String, skip: Integer ?
 GET	/stitches/latest/:id	controllers.api.Api.getLatestStitch(id: String)
 GET	/stitches/v$ver<[0-9]+>/:id	controllers.api.Api.getStitch(ver: Integer, id: String)
 POST /stitches/v$ver<[0-9]+>/:id/@update	controllers.api.Api.updateStitch(ver: Integer, id: String)
+GET  	/stitches/latest		controllers.api.Api.latestStitches(skip: Integer ?= null, top: Integer ?= 5)
 GET	/stitches/v$ver<[0-9]+>		controllers.api.Api.stitches(ver: Integer, skip: Integer ?= null, top: Integer ?= 5)
 GET	/structure/$id<[0-9]+>.$format<(svg|png|mol|sdf|smi|smiles|mrv)>	controllers.api.Api.structure(id: Long, format: String, size: Int ?= 150)
 POST	/upload	controllers.api.Api.uploader

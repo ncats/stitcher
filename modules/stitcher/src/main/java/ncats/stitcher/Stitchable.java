@@ -21,9 +21,13 @@ public interface Stitchable {
      */
     Object getDisplay ();
 
+    default boolean isBlacklist (StitchKey key) {
+        return false;
+    }
+
+    default boolean isBlacklist () { return false; }
+    
     // TODO Arrays are not kept in sorted order, so be careful updating displays!
-
-
     // TODO curation status
     // TODO normalized/hash value
     // TODO what normalized these values
