@@ -2,10 +2,8 @@
 
 db="stitchv1.db"
 
-#sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db jsonDump2016-08-05.gsrs"
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db dump-public-2017-10-14.gsrs"
-#sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data/hash.db ../inxight-planning/files/rancho-export_2017-06-28_17-51.json.gz"
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data/hash.db rancho_2017-09-07_20-32.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data/hash.db rancho-export_2017-10-26_20-39.json"
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db cache=data/hash.db ../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
 sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db ../inxight-planning/files/PharmManuEncycl3rdEd.json"
 sbt stitcher/"runMain ncats.stitcher.impl.DrugBankEntityFactory $db cache=data/hash.db ../inxight-planning/files/drugbank-full-annotated.sdf"
@@ -19,6 +17,6 @@ sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrx.c
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrem.conf"
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedotc.conf"
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ob.conf"
-#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
 # calculate events
-#sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
+sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
