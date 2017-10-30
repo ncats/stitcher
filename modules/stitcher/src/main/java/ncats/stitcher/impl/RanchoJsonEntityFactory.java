@@ -49,6 +49,7 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
         setIdField ("CompoundName");
         setNameField ("CompoundName");
         setUseName (false);
+        addBlacklist ("Unknown");
         add (N_Name, "CompoundName")
             .add (N_Name, "CompoundSynonym")
             .add (I_CAS, "Cas")

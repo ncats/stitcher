@@ -578,7 +578,8 @@ public class Util {
             int size = codes.size();
             for (int i = 0; i < size; ++i) {
                 JsonNode n = codes.get(i);
-                if ("PRIMARY".equals(n.get("type").asText())) {
+                if (n.has("type")
+                    && "PRIMARY".equals(n.get("type").asText())) {
                     String sys = n.get("codeSystem").asText();
                     Object val = map.get(sys);
                     String code = n.get("code").asText();
@@ -597,13 +598,15 @@ public class Util {
             StringBuilder sb = new StringBuilder ();
             for (int i = 0; i < size; ++i) {
                 JsonNode n = refs.get(i);
-                String cite = n.get("citation").asText();
-                Object val = map.get("References");
-                if (val != null)
-                    val = Util.merge(val, cite);
-                else
-                    val = cite;
-                map.put("References", val);
+                if (n.has("citation")) {
+                    String cite = n.get("citation").asText();
+                    Object val = map.get("References");
+                    if (val != null)
+                        val = Util.merge(val, cite);
+                    else
+                        val = cite;
+                    map.put("References", val);
+                }
             }
         }
 

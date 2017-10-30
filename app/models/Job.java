@@ -4,15 +4,16 @@ import java.util.*;
 import java.sql.Timestamp;
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import io.ebean.Model;
+import io.ebean.Finder;
+import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.UpdatedTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Job extends Model {
-    public static Find<Long, Job> find = new Finder<Long, Job>(Job.class);
+    public static Finder<Long, Job> find = new Finder<>(Job.class);
 
     public enum Status {
         FIRED,

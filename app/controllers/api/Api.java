@@ -12,7 +12,9 @@ import play.cache.*;
 import play.libs.ws.*;
 import static play.mvc.Http.MultipartFormData.*;
 import play.db.ebean.Transactional;
-
+import play.libs.streams.ActorFlow;
+import akka.actor.*;
+import akka.stream.*;
 import akka.actor.ActorRef;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,38 +32,21 @@ import services.jobs.*;
 
 import ncats.stitcher.*;
 import ncats.stitcher.calculators.CalculatorFactory;
+import serializer.JsonCodec;
+
 import models.*;
 import controllers.Util;
 import chemaxon.struc.Molecule;
 
 public class Api extends Controller {
-
-    class ConsoleWebSocket extends LegacyWebSocket<String> {
-        final String key;
-        ConsoleWebSocket (String key) {
-            this.key = key;
-        }
-
-        public void onReady (WebSocket.In<String> in,
-                             WebSocket.Out<String> out) {
-        }
-        
-        public boolean isActor () { return true; }
-        public akka.actor.Props actorProps (ActorRef out) {
-            try {
-                return akka.actor.Props.create
-                    (WebSocketConsoleActor.class, out, key, cache);
-            }
-            catch (Exception ex) {
-                throw new RuntimeException (ex);
-            }
-        }
-    }
     
     @Inject SchedulerService scheduler;
     @Inject EntityService es;
     @Inject CacheService cache;
     @Inject CoreService service;
+    @Inject ActorSystem actorSystem;
+    @Inject Materializer materializer;
+    @Inject JsonCodec jsonCodec;
     
     ObjectMapper mapper = new ObjectMapper ();
     
@@ -89,11 +74,11 @@ public class Api extends Controller {
                 node.put("uri", ds.toURI().toString());
             }
             */
-            node.put("created", (Long)ds.get(Props.CREATED));
-            node.put("count", (Integer)ds.get(Props.INSTANCES));
-            node.put("sha1", (String)ds.get(Props.SHA1));
-            node.put("size", (Long)ds.get(Props.SIZE));
-            String[] props = (String[])ds.get(Props.PROPERTIES);
+            node.put("created", (Long)ds.get(ncats.stitcher.Props.CREATED));
+            node.put("count", (Integer)ds.get(ncats.stitcher.Props.INSTANCES));
+            node.put("sha1", (String)ds.get(ncats.stitcher.Props.SHA1));
+            node.put("size", (Long)ds.get(ncats.stitcher.Props.SIZE));
+            String[] props = (String[])ds.get(ncats.stitcher.Props.PROPERTIES);
             if (props != null)
                 node.put("properties", mapper.valueToTree(props));
             sources.add(node);
@@ -130,21 +115,13 @@ public class Api extends Controller {
         try {
             CNode n = es.getNode(id);
             if (n != null) {
-                return ok (n.toJson());
+                return ok (jsonCodec.encode(n));
             }
         }
         catch (Exception ex) {
             ex.printStackTrace();
         }
         return notFound ("Unknown node "+id);
-    }
-
-    public LegacyWebSocket<String> console (final String key) {
-        return new ConsoleWebSocket (key);
-    }
-
-    public LegacyWebSocket<String> echo () {
-        return WebSocket.withActor(WebSocketEchoActor::props);
     }
 
     @Transactional
@@ -216,7 +193,7 @@ public class Api extends Controller {
     ObjectNode toJson (int s, int t, Entity... entities) {
         ArrayNode page = mapper.createArrayNode();
         for (Entity e : entities) {
-            page.add(e.toJson());
+            page.add(jsonCodec.encode(e));
         }
 
         ObjectNode result = mapper.createObjectNode();
@@ -240,19 +217,38 @@ public class Api extends Controller {
         catch (NumberFormatException ex) {
             Entity[] entities = es.getEntityFactory()
                 .filter("UNII", "'"+id+"'", "stitch_v"+ver);
-            if (entities.length > 0)
+            if (entities.length > 0) {
+                if (entities.length > 1)
+                    Logger.warn(id+" yields "+entities.length+" matches!");
                 e = entities[0];
+            }
         }
         return e;
     }
+
+    public Result getLatestStitch (String id) {
+        String uri = routes.Api.getLatestStitch(id).url();
+        Logger.debug(uri);
+        
+        Integer ver = service.getLatestVersion();
+        if (null == ver)
+            return badRequest ("No latest stitch version defined!");
+        return getStitch (ver, id);
+    }
     
     public Result getStitch (Integer ver, String id) {
+        String uri = routes.Api.getStitch(ver, id).url();
+        Logger.debug(uri);
+        
         Entity e = getStitchEntity (ver, id);
-        return e != null ? ok (e.toJson())
+        return e != null ? ok (jsonCodec.encode(e))
             : notFound ("Unknown stitch key: "+id);
     }
 
     public Result updateStitch(Integer ver, String id) {
+        String uri = routes.Api.updateStitch(ver, id).url();
+        Logger.debug(uri);
+        
         Entity e = getStitchEntity(ver, id);
 
         if (e != null) {
@@ -264,8 +260,19 @@ public class Api extends Controller {
         }
 
     }
+
+    public Result latestStitches (Integer skip, Integer top) {
+        Integer ver = service.getLatestVersion();
+        if (ver == null)
+            return badRequest ("No latest version defined!");
+
+        return redirect (routes.Api.stitches(ver, skip, top));
+    }
     
     public Result stitches (Integer ver, Integer skip, Integer top) {
+        String uri = routes.Api.stitches(ver, skip, top).url();
+        Logger.debug(uri);
+        
         Map<String, String[]> params = request().queryString();
         if (params.isEmpty())
             return entities ("stitch_v"+ver, skip, top);
@@ -325,6 +332,9 @@ public class Api extends Controller {
     }
     
     public Result entities (String label, Integer skip, Integer top) {
+        String uri = routes.Api.entities(label, skip, top).url();
+        Logger.debug(uri);
+        
         if ("@labels".equalsIgnoreCase(label)) {
             return ok ((JsonNode)mapper.valueToTree
                        (es.getEntityFactory().labels()));
@@ -341,7 +351,7 @@ public class Api extends Controller {
         try {
             long id = Long.parseLong(label);
             Entity e = es.getEntity(id);
-            return e != null ? ok (e.toJson())
+            return e != null ? ok (jsonCodec.encode(e))
                 : notFound ("No such entity id "+id);
         }
         catch (NumberFormatException ex) {
@@ -356,6 +366,7 @@ public class Api extends Controller {
 
     public Result structure (Long id, String format, Integer size) {
         String uri = routes.Api.structure(id, format, size).url();
+        Logger.debug(uri);
 
         Entity e = es.getEntityFactory().entity(id);
         if (e != null) {

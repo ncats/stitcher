@@ -9,22 +9,22 @@
   </div>
   <div class="row">
     <div class="col-lg-8">
-	    <div class="panel">
-	     <div class="panel-body" >
- 	      <button class="btn btn-default"
-			           onclick="toggle()" id="button">Stop</button>
- 	      <button class="btn btn-default"
-			           onclick="onClear()">Clear</button>
-	      <p><div id="console-area"
-	      	      style="width:100%;height:400px;font-family:monospace;max-height: 300px; overflow-y: auto;"></div>
-	     </div>
-	    </div>
+            <div class="panel">
+             <div class="panel-body" >
+              <button class="btn btn-default"
+                                   onclick="toggle()" id="button">Stop</button>
+              <button class="btn btn-default"
+                                   onclick="onClear()">Clear</button>
+              <p><div id="console-area"
+                      style="width:100%;height:400px;font-family:monospace;max-height: 300px; overflow-y: auto;"></div>
+             </div>
+            </div>
     </div>
   </div>
  }
  
  <script language="javascript" type="text/javascript">
-  var wsUri = "ws://@{request.host}@{controllers.api.routes.Api.console(key)}";
+  var wsUri = "@**ws://@{request.host}@{controllers.api.routes.Api.console(key)}**@";
   var output;
   var websocket;
 
@@ -58,7 +58,7 @@
      var b = document.getElementById("button");
      if (b.innerHTML == 'Stop') {
         b.innerHTML = 'Start';
-      	websocket.close();
+        websocket.close();
      } else {
         b.innerHTML = 'Stop';
         loadWebSocket ();

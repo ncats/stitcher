@@ -158,6 +158,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
         final Map<StitchKey, Object> values;
         final boolean anyvalue; // single valued?
 
+        Map<Clique, Set<StitchKey>> cliques = new HashMap<>();
         Clique bestClique; // best clique so far
         Map<Long, Integer> nodes = new HashMap<>();
 
@@ -231,6 +232,18 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 logger.info("## resolving "+entity.getId()+" => "+best);
                 for (Long n : best)
                     uf.union(entity.getId(), n);
+
+                for (Map.Entry<Clique, Set<StitchKey>> me : 
+                         cliques.entrySet()) {
+                    Clique clique = me.getKey();
+                    Set<StitchKey> keys = me.getValue();
+                    if (keys.size() > 1) {
+                        logger.info("## collapsing clique "+clique.nodeSet()
+                                    +" due to multiple spans: "+keys);
+                        for (Long id : clique.nodeSet())
+                            uf.union(entity.getId(), id);
+                    }
+                }
             }
 
             return !nodes.isEmpty();
@@ -301,6 +314,14 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                             +clique.getId()+" key="+key
                                             +" value="+Util.toString(value));
                             }
+                            else {
+                                Set<StitchKey> set = cliques.get(clique);
+                                if (set == null) {
+                                    cliques.put(clique, set = EnumSet.noneOf
+                                                (StitchKey.class));
+                                }
+                                set.add(key);
+                            }
                         }
                     }
                     else {
@@ -366,54 +387,17 @@ public class UntangleCompoundComponent extends UntangleComponent {
         // collapse based on trusted stitch keys; e.g., lychi layer 5, unii
         component.stitches((source, target) -> {
                 uf.union(source.getId(), target.getId());
-            }, H_LyChI_L5, I_UNII);
+            }, H_LyChI_L5);
         dump ("trusted keys stitching");
 
-        // merge disconnected labeled nodes
-        Set<Object> lychi = new HashSet<>();
-        // FIXME: need to merge two equiv classes that are the same!!!
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
                 Long t = uf.root(target.getId());
                 if (s != null && t != null && !s.equals(t)) {
                     Object sv = source.get(H_LyChI_L4);
                     Object tv = target.get(H_LyChI_L4);
-                    // only handle single values for now
-                    if (sv != null && tv != null) {
-                        /*
-                        if (sv.getClass().isArray() && Array.getLength(sv) > 0)
-                            sv = Array.get(sv, 0);
-                        if (tv.getClass().isArray() && Array.getLength(tv) > 0)
-                            tv = Array.get(tv, 0);
-
-                        if (sv.equals(tv) && !lychi.contains(tv)) {
-                            logger.info("## merging "+source.getId()+" ["+s+"]"
-                                        +" <-["+tv+"]-> "+target.getId()
-                                        +" ["+t+"]");
-                            component.cliques(clique -> {
-                                    Map<Long, Integer> labels = new HashMap<>();
-                                    for (Long n : clique.nodeSet()) {
-                                        Long l = uf.root(n);
-                                        if (l != null) {
-                                            Integer c = labels.get(l);
-                                            labels.put(l, c == null ? 1:c+1);
-                                        }
-                                    }
-                                    logger.info("..clique of size "
-                                                +clique.size()+" found: "
-                                                +clique.nodeSet()
-                                                +" =>\n"+labels.size()
-                                                +" "+labels);
-                                    return true;
-                                }, H_LyChI_L4, sv, Stitchable.ALL);
-                            lychi.add(sv);
-                            //uf.union(source.getId(), target.getId()); // same
-                        }
-                        */
-
-                        if (Util.equals(sv, tv)) {
-                            uf.union(source.getId(), target.getId());
-                        }
+                    if (sv != null && tv != null && Util.equals(sv, tv)) {
+                        uf.union(source.getId(), target.getId());
                     }
                 }
             }, H_LyChI_L4);
@@ -430,11 +414,13 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 if (transitive (e, H_LyChI_L4)) {
                     // 
                 }
-                else if (clique (e, N_Name, I_CAS)) {
+                else if (clique (e, N_Name, I_CAS, I_UNII)) {
                 }
+                /*
                 else if (clique (e, false, H_LyChI_L3)) {
                     // desparate, last resort but require large min clique
                 }
+                */
                 else {
                     uf.add(e.getId());
                     logger.warning("** unmapped entity "+e.getId()+": "
@@ -486,25 +472,46 @@ public class UntangleCompoundComponent extends UntangleComponent {
     /*
      * TODO: find the root active moiety and if exists return it
      */
-    Long getRoot (long[] comp) {
+    protected Long getRoot (long[] comp) {
         if (comp.length == 1)
             return comp[0];
 
+        Entity root = null;
         if (comp.length > 0) {
             Entity[] entities = component.entities(comp);
             if (entities.length != comp.length)
                 logger.warning("There are missing entities in component!");
             
+            int moieties = 0;
             for (Entity e : entities) {
                 Entity[] in = e.inNeighbors(T_ActiveMoiety);
                 Entity[] out = e.outNeighbors(T_ActiveMoiety);
                 
-                if (in.length > 0 && out.length == 0)
-                    return e.getId();
+                if (in.length > 0 && out.length == 0) {
+                    root = e;
+                    break;
+                }
+
+                Object m = e.get(MOIETIES);
+                if (m != null) {
+                    int mc = m.getClass().isArray() ? Array.getLength(m) : 1;
+                    if (root == null || mc < moieties) {
+                        root = e;
+                        moieties = mc;
+                    }
+                    else if (root.getId() > e.getId())
+                        root = e;
+                }
+                else {
+                    // just pick the lower id
+                    if (root == null
+                        || (moieties == 0 && root.getId() > e.getId()))
+                        root = e;
+                }
             }
         }
         
-        return null;
+        return root != null ? root.getId() : null;
     }
 
     boolean transitive (Entity e, StitchKey key) {

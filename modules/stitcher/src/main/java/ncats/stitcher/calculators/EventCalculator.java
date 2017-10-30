@@ -91,7 +91,9 @@ public class EventCalculator implements StitchCalculator {
         // sources that have approval dates; order by relevance
         for (EventParser ep : new EventParser[]{
                 new DrugsAtFDAEventParser(),
-                new DailyMedEventParser()
+                new DailyMedRxEventParser(),
+                new DailyMedOtcEventParser(),
+                new DailyMedRemEventParser(),           
             }) {
             Integer year = approvals.get(ep.name);
             if (year != null) {
@@ -135,7 +137,7 @@ public class EventCalculator implements StitchCalculator {
             Publication,
             Filing,
             Designation,
-            ApprovalRX {
+            ApprovalRx {
                 @Override
                 public boolean isApproved() {
                     return true;
@@ -147,14 +149,7 @@ public class EventCalculator implements StitchCalculator {
                 public boolean isApproved(){
                     return true;
                 }
-            },
-            Approval{
-                @Override
-                public boolean isApproved(){
-                    return true;
-                }
             }
-
             ;
 
             public boolean isApproved(){
@@ -353,7 +348,7 @@ public class EventCalculator implements StitchCalculator {
                             event.jurisdiction =
                                     node.get("Country").asText();
                             if (event.jurisdiction.equals("US"))
-                                event.kind = Event.EventKind.Approval;
+                                event.kind = Event.EventKind.ApprovalRx;
                         }
                         if (node.has("Product")) {
                             event.comment =
@@ -421,8 +416,8 @@ public class EventCalculator implements StitchCalculator {
     }
 
     static class DailyMedEventParser extends EventParser {
-        public DailyMedEventParser() {
-            super ("spl_acti_rx.txt");
+        public DailyMedEventParser (String source) {
+            super (source);
         }
 
         /**
@@ -430,7 +425,9 @@ public class EventCalculator implements StitchCalculator {
          *
          * looks like anything in 3XX is for human consumption
          */
-        private static Pattern CFR_21_OTC_PATTERN = Pattern.compile("part3([1-9][0-9]).+");
+        private static Pattern CFR_21_OTC_PATTERN =
+            Pattern.compile("part3([1-9][0-9]).+");
+        
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
             Event event = null;
@@ -443,25 +440,27 @@ public class EventCalculator implements StitchCalculator {
                 if (content != null) {
                     date = SDF.parse((String) content + "-12-31");
                 }
+                
                 content = payload.get("MarketDate");
                 if (content != null) {
                     Date date2 = SDF.parse((String)content);
                     if (date == null || date.after(date2))
                         date = date2;
                 }
+                
                 if (date != null) {
                     Event.EventKind et = Event.EventKind.Marketed;
                     content = payload.get("ApprovalAppId");
                     if (content != null) {
                         String contentStr = (String)content;
-                        if (
-                                contentStr.startsWith("NDA") ||
-                                        contentStr.startsWith("ANDA") ||
-                                        contentStr.startsWith("BA") ||
-                                        contentStr.startsWith("BN") ||
-                                        contentStr.startsWith("BLA")) {
-                            et = Event.EventKind.ApprovalRX;
-                        }else{
+                        if (contentStr.startsWith("NDA") ||
+                            contentStr.startsWith("ANDA") ||
+                            contentStr.startsWith("BA") ||
+                            contentStr.startsWith("BN") ||
+                            contentStr.startsWith("BLA")) {
+                            et = Event.EventKind.ApprovalRx;
+                        }
+                        else {
                             Matcher matcher = CFR_21_OTC_PATTERN.matcher(contentStr);
                             if(matcher.find()){
                                 //We include if it's 310.545. We exclude if it's any other 310.5XX
@@ -474,16 +473,17 @@ public class EventCalculator implements StitchCalculator {
                                     et = Event.EventKind.ApprovalOTC;
                                 }
                             }
-
+                            else {
+                                logger.log(Level.WARNING,
+                                           "Unusual approval app id: "+content
+                                           +": "+payload.toString());
+                            }
                         }
-                    }
-                    else {
-                        logger.log(Level.WARNING, "Unusual approval app id: "+content+": "+payload.toString());
                     }
                     event = new Event(name, id, et);
                     event.jurisdiction = "US";
                     event.date = date;
-                    event.comment = (String) payload.get("ApprovalAppId");
+                    event.comment = (String)content;
                 }
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Can't parse date: "+content, ex);
@@ -494,6 +494,24 @@ public class EventCalculator implements StitchCalculator {
         }
     }
 
+    static class DailyMedRxEventParser extends DailyMedEventParser {
+        public DailyMedRxEventParser () {
+            super ("spl_acti_rx.txt");
+        }
+    }
+
+    static class DailyMedOtcEventParser extends DailyMedEventParser {
+        public DailyMedOtcEventParser () {
+            super ("spl_acti_otc.txt");
+        }
+    }
+
+    static class DailyMedRemEventParser extends DailyMedEventParser {
+        public DailyMedRemEventParser () {
+            super ("spl_acti_rem.txt");
+        }
+    }
+    
     static class DrugsAtFDAEventParser extends EventParser {
         public DrugsAtFDAEventParser() {
             super ("approvalYears.txt");
@@ -508,16 +526,17 @@ public class EventCalculator implements StitchCalculator {
                 try {
                     Date date = SDF2.parse((String)content);
                     if (event == null
-                        || (event.kind.isApproved() && event.date.after(date))) {
-                        event = new Event(name, id, event.kind);
+                        || (event.kind.isApproved()
+                            && event.date.after(date))) {
+                        event = new Event(name, id, Event.EventKind.ApprovalRx);
                         event.date = date;
                         event.jurisdiction = "US";
                         event.comment = (String) payload.get("Comment");
                     }
                 }
                 catch (Exception ex) {
-                    logger.log
-                        (Level.SEVERE, "Unknown date format: "+content, ex);
+                    logger.log(Level.SEVERE,
+                               "Can't parse date: \""+content+"\"", ex);
                 }
             }
 
@@ -527,12 +546,14 @@ public class EventCalculator implements StitchCalculator {
     }
 
     static EventParser[] eventParsers = {
-        new RanchoEventParser(),
-        new NPCEventParser(),
-        new PharmManuEventParser(),
-        new DrugBankEventParser(),
-        new DailyMedEventParser(),
-        new DrugsAtFDAEventParser()
+        new RanchoEventParser (),
+        new NPCEventParser (),
+        new PharmManuEventParser (),
+        new DrugBankEventParser (),
+        new DailyMedRxEventParser (),
+        new DailyMedOtcEventParser (),
+        new DailyMedRemEventParser (),
+        new DrugsAtFDAEventParser ()
     };
 
     List<Event> getEvents (Stitch stitch) {
@@ -551,6 +572,7 @@ public class EventCalculator implements StitchCalculator {
             } catch (IllegalArgumentException iae) {
                 logger.warning(ep.name + " not a valid data source");
             }
+
         }
 
         return events;

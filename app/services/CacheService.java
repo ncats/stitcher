@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,7 +21,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.Statistics;
 
 @Singleton
 public class CacheService implements CacheApi {
@@ -43,11 +43,10 @@ public class CacheService implements CacheApi {
             .timeToIdleSeconds(conf.getInt(CACHE_TIME_TO_IDLE, TIME_TO_IDLE));
         cache = CacheManager.getInstance()
             .addCacheIfAbsent(new Cache (config));
-        cache.setSampledStatisticsEnabled(true);
 
         lifecycle.addStopHook(() -> {
                 shutdown ();
-                return F.Promise.pure(null);
+                return CompletableFuture.completedFuture(null);
             });
     }
 
@@ -167,10 +166,6 @@ public class CacheService implements CacheApi {
         }
     }
     
-    public Statistics getStatistics () {
-        return cache.getStatistics();
-    }
-
     public boolean contains (String key) {
         return cache.isKeyInCache(key);
     }

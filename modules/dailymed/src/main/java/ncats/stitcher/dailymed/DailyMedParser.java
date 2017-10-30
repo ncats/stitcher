@@ -87,6 +87,8 @@ public class DailyMedParser {
         public Calendar marketDate;
         public String ndc;
         public String equivNDC;
+        public Boolean isPart;
+        public List<Product> parts = new ArrayList<>();
         public List<Ingredient> ingredients = new ArrayList<>();
         public List<Package> packages = new ArrayList<>();
     }
@@ -403,6 +405,16 @@ public class DailyMedParser {
             case "asContent":
                 parsePackages (product.packages, child);
                 break;
+
+            case "part":
+                { NodeList nl = child.getElementsByTagName("partProduct");
+                    for (int j = 0; j < nl.getLength(); ++j) {
+                        Product p = parseProduct ((Element)nl.item(j));
+                        p.isPart = true;
+                        product.parts.add(p);
+                    }
+                }
+                break;
             }
         }
         return product;
@@ -477,8 +489,11 @@ public class DailyMedParser {
                                        +low, ex);
                         }
                     }
-                    
-                    label.products.add(product);
+
+                    if (!product.parts.isEmpty())
+                        label.products.addAll(product.parts);
+                    else
+                        label.products.add(product);
                 }
             }
             else {
@@ -602,8 +617,8 @@ public class DailyMedParser {
                 :"";
 
             for (Ingredient i : p.ingredients) {
-                if (i.code.startsWith("ACTI") 
-                    && !seen.contains(i.substance.unii)) {
+                if (true /*i.code.startsWith("ACTI") 
+                           && !seen.contains(i.substance.unii)*/) {
                     System.out.println
                         (i.substance.unii+"\t"
                          +marketDate+"\t"
@@ -614,9 +629,10 @@ public class DailyMedParser {
                          +(p.ndc!=null?p.ndc:"")+"\t"
                          +"\""+i.substance.name
                          .replaceAll("\n","").toUpperCase().trim()
-                         +"\""+"\t\""+p.genericName
-                         .replaceAll("\n","").toUpperCase().trim()
-                         +"\"");
+                         +"\""+"\t"+(p.genericName != null ? 
+                                     ("\""+p.genericName
+                                      .replaceAll("\n","").toUpperCase().trim()
+                                      +"\""):""));
                     //seen.add(i.substance.unii);
                 }
             }

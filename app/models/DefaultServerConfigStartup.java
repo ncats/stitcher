@@ -1,7 +1,7 @@
 package models;
 
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.event.ServerConfigStartup;
+import io.ebean.config.ServerConfig;
+import io.ebean.event.ServerConfigStartup;
 
 import play.Logger;
 

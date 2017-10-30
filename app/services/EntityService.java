@@ -3,6 +3,7 @@ package services;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import javax.inject.*;
 
 import play.Logger;
@@ -52,7 +53,7 @@ public class EntityService {
         
         lifecycle.addStopHook(() -> {
                 shutdown ();
-                return F.Promise.pure(null);
+                return CompletableFuture.completedFuture(null);
             });
     }
 

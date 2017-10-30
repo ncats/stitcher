@@ -27,8 +27,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
+import io.ebean.Ebean;
+import io.ebean.Expr;
 
 import ncats.stitcher.CacheFactory;
 import ncats.stitcher.DataSourceFactory;
@@ -45,12 +45,14 @@ public class CoreService {
     final public String DATA = "ix.data";
     final public String HASH = "ix.hash";
     final public String WORK = "ix.work";
+    final public String LATEST = "ix.version.latest";
     
     final File base;
     final File hash;
     final File data;
     final File work;
     final Injector injector;
+    final Integer latestVersion;
     CacheFactory cacheFactory;
     ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -83,9 +85,13 @@ public class CoreService {
         work = new File (base, config.getString(WORK, "work"));
         work.mkdirs();
 
+        latestVersion = config.getInt(LATEST, null);
+        if (latestVersion == null)
+            Logger.warn("No value set for property "+LATEST);
+
         lifecycle.addStopHook(() -> {
                 shutdown ();
-                return F.Promise.pure(null);            
+                return CompletableFuture.completedFuture(null);
             });
         
         this.injector = injector;
@@ -131,7 +137,7 @@ public class CoreService {
 
         Payload payload;
         String sha1 = Util.hex(dis.getMessageDigest().digest());
-        List<Payload> results = Payload.find
+        List<Payload> results = Payload.find.query()
             .where().and(Expr.eq("sha1", sha1),
                          Expr.isNull("deleted"))
             .findList();
@@ -251,7 +257,7 @@ public class CoreService {
     }
 
     public List<models.Payload> getPayloads () {
-        return models.Payload.find
+        return models.Payload.find.query()
             .where().isNull("deleted")
             .order().desc("id").findList();
     }
@@ -260,13 +266,13 @@ public class CoreService {
         List<models.Payload> payloads;  
         try {
             long id = Long.parseLong(key);
-            payloads = models.Payload.find
+            payloads = models.Payload.find.query()
                 .where().and(Expr.eq("id", id),
                              Expr.isNull("deleted"))
                 .findList();
         }
         catch (NumberFormatException ex) {
-            payloads = models.Payload.find
+            payloads = models.Payload.find.query()
                 .where().and(Expr.ilike("sha1", key+"%"),
                              Expr.isNull("deleted"))
                 .findList();
@@ -290,6 +296,8 @@ public class CoreService {
     }
 
     public List<models.Job> getJobs () {
-        return models.Job.find.order().desc("id").findList();
+        return models.Job.find.query().order().desc("id").findList();
     }
+
+    public Integer getLatestVersion () { return latestVersion; }
 }
