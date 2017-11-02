@@ -214,12 +214,15 @@ public class Api extends Controller {
             if (!e.is(AuxNodeType.SGROUP))
                 e = null;
         }
-        catch (NumberFormatException ex) {
+        catch (Exception ex) {
             Entity[] entities = es.getEntityFactory()
-                .filter("UNII", "'"+id+"'", "stitch_v"+ver);
+                //.filter("UNII", "'"+id+"'", "stitch_v"+ver);
+                // only gsrs source has unii as the name!
+                .filter("name", "'"+id+"'", "stitch_v"+ver);
             if (entities.length > 0) {
                 if (entities.length > 1)
-                    Logger.warn(id+" yields "+entities.length+" matches!");
+                    Logger.warn(id+" yields "+entities.length
+                                +" matches!");
                 e = entities[0];
             }
         }

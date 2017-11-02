@@ -29,11 +29,11 @@
     <img src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",150)' alt='Structure for @e.get("srcid")'>
     <div class="caption">
       <p><a href='#stitch-modal-@e.get("id")' data-toggle="modal">@e.get("srcid")</a>
-	@if(e.get("srcid") != null) {
-	  <p>@name(e)
-	} else {
+        @if(e.get("srcid") != null) {
+          <p>@name(e)
+        } else {
           <p><a href='#stitch-modal-@e.get("id")' data-toggle="modal">@name(e)</a>
-	}
+        }
       <p><code>@e.get("datasource")</code>
     </div>
   </div>
@@ -51,62 +51,62 @@
                 data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id='stitch-modal-label-@e.get("id")'>
-	    <a href='@api.routes.Api.getNode(e.get("id").asInstanceOf[Long])'><i class="fa fa-code"></i></a> <em>@e.get("name")</em><span class="pull-right"><code>@e.get("datasource")</code></span></h4>
+            <a href='@api.routes.Api.getNode(e.get("id").asInstanceOf[Long])'><i class="fa fa-code"></i></a> <em>@e.get("name")</em><span class="pull-right"><code>@e.get("datasource")</code></span></h4>
       </div>
       <div class="modal-body">
-	<div class="row">
-	  <div class="col-md-4">
-	    <img src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",250)' alt='Structure of @e.get("name")'>
-	    <p><code>@e.get("srcid")</code>
-	  </div>
-	  <div class="col-md-8">
-	    <div>
-	      <ul class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active">
-		  <a href='#tab-props-@e.get("id")' aria-controls="props"
-		     role="tab" data-toggle="tab">Properties</a></li>
-		<li role="presentation">
-		  <a href='#tab-stitches-@e.get("id")' aria-controls="stitches"
-		     role="tab" data-toggle="tab">Stitches</a></li>
-	      </ul>
-	      <div class="tab-content">
-		<div role="tabpanel" class="tab-pane active"
-		     id='tab-props-@e.get("id")'>
-		  <div class="table-responsive">
-		    <table class="table table-condensed">
-		    @for((k,v) <- e.get("properties").asInstanceOf[Map[String,Object]]) {
-		    <tr>
-	              <td>@k</td>
-		    @k match {
-		      case "created" => {
-		        <td>@{new java.util.Date(v.asInstanceOf[Long])}</td>
-		      }
-		      case _ => {
-		        <td>@displaypre(v)</td>
-	              }
-		    }
-	            </tr>
-		    }
-		    </table>
-		  </div>
-		</div>
-		<div role="tabpanel" class="tab-pane"
-		     id='tab-stitches-@e.get("id")'>
-		  <div class="table-responsive">
-		    <table class="table table-condensed">
-		    @for((k,v) <- e.get("stitches").asInstanceOf[Map[String,Object]]) {
-		    <tr>
-		      <td>@k</td>
-		      <td>@displaypre(v)</td>
-	            </tr>
-		    }
-		    </table>
-		  </div>		     
-		</div>
-	      </div>
-	    </div>
-	  </div> <!-- col-md-8 -->
-	</div> <!-- row -->
+        <div class="row">
+          <div class="col-md-4">
+            <img src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",250)' alt='Structure of @e.get("name")'>
+            <p><code>@e.get("srcid")</code>
+          </div>
+          <div class="col-md-8">
+            <div>
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                  <a href='#tab-props-@e.get("id")' aria-controls="props"
+                     role="tab" data-toggle="tab">Properties</a></li>
+                <li role="presentation">
+                  <a href='#tab-stitches-@e.get("id")' aria-controls="stitches"
+                     role="tab" data-toggle="tab">Stitches</a></li>
+              </ul>
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active"
+                     id='tab-props-@e.get("id")'>
+                  <div class="table-responsive">
+                    <table class="table table-condensed">
+                    @for((k,v) <- e.get("properties").asInstanceOf[Map[String,Object]]) {
+                    <tr>
+                      <td>@k</td>
+                    @k match {
+                      case "created" => {
+                        <td>@{new java.util.Date(v.asInstanceOf[Long])}</td>
+                      }
+                      case _ => {
+                        <td>@displaypre(v)</td>
+                      }
+                    }
+                    </tr>
+                    }
+                    </table>
+                  </div>
+                </div>
+                <div role="tabpanel" class="tab-pane"
+                     id='tab-stitches-@e.get("id")'>
+                  <div class="table-responsive">
+                    <table class="table table-condensed">
+                    @for((k,v) <- e.get("stitches").asInstanceOf[Map[String,Object]]) {
+                    <tr>
+                      <td>@k</td>
+                      <td>@displaypre(v)</td>
+                    </tr>
+                    }
+                    </table>
+                  </div>                     
+                </div>
+              </div>
+            </div>
+          </div> <!-- col-md-8 -->
+        </div> <!-- row -->
       </div> <!-- modal-body -->
     </div>
   </div>
@@ -116,7 +116,7 @@
 @main(stitch.name){
 <div class="container-fluid">
   <div class="page-header">
-    <h1>@stitch.name</h1>
+    <h1><a href='@api.routes.Api.getStitch(version,stitch.getId.toString)'><i class="fa fa-code"></i></a> @stitch.name</h1>
     @for((k,v) <- stitch.datasources){
      <code><span class="badge">@v</span> @k</code>
     }
@@ -124,19 +124,19 @@
   <div class="row">
     <div class="col-md-4">
       <div class="panel panel-default">
-	<div class="panel-body">
-	  <img class="img-responsive" src='@api.routes.Api.structure(stitch.getId,"svg",300)'>	  
-	</div>
-	<div class="panel-footer">
-	  <code>@stitch.source</code>
-	</div>
+        <div class="panel-body">
+          <img class="img-responsive" src='@api.routes.Api.structure(stitch.getId,"svg",300)'>    
+        </div>
+        <div class="panel-footer">
+          <code>@stitch.source</code>
+        </div>
       </div>
     </div>
     <div class="col-md-8">
       <div class="row" style="max-height:600px;overflow-y:auto;">
-	@for(e <- stitch.members) {
-	  @thumbnail(e.asInstanceOf[Map[String,Object]])
-	}
+        @for(e <- stitch.members) {
+          @thumbnail(e.asInstanceOf[Map[String,Object]])
+        }
       </div>
     </div>
   </div>
@@ -146,12 +146,12 @@
    @stitchmodal(e.asInstanceOf[Map[String,Object]])
 }
 }{
-$(document).ready(function () {	  
+$(document).ready(function () {   
     $('[data-toggle="popover"]').popover();
     $('[data-toggle="tooltip"]').tooltip();
     var target = window.location.hash;
     if (target.startsWith('#stitch-modal')) {
-	$(target).modal('show');
+        $(target).modal('show');
     }
 });
 }

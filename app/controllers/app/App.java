@@ -174,7 +174,7 @@ public class App extends Controller {
             return ok (stitchdetails.render
                        (this, version, Stitch.getStitch(e)));
         }
-        catch (NumberFormatException ex) {
+        catch (Exception ex) {
             // now try looking by name or id
             Entity[] entities = es.getEntityFactory()
                 .filter("UNII", "'"+name+"'", "stitch_v"+version);
