@@ -183,6 +183,57 @@ public class Util {
         return bos.toByteArray();
     }
 
+    public static String encode64 (String s) throws Exception {
+        return encode64 (s, false);
+    }
+    
+    public static String encode64 (String s, boolean compress)
+        throws Exception {
+        byte[] b = s.getBytes("utf8");
+        if (compress) {
+            Deflater compresser = new Deflater ();
+            compresser.setInput(b);
+            compresser.finish();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+            byte[] buf = new byte[1024];
+            for (int len; (len = compresser.deflate(buf)) > 0; ) {
+                bos.write(buf, 0, len);
+            }
+            b = bos.toByteArray();
+        }
+        return Base64.getEncoder().encodeToString(b);
+    }
+
+    public static String decode64 (byte[] b) throws Exception {
+        return decode64 (b, false);
+    }
+
+    public static String decode64 (String s) throws Exception {
+        return decode64 (s.getBytes("utf8"));
+    }
+
+    public static String decode64 (String s, boolean compressed)
+        throws Exception {
+        return decode64 (s.getBytes("utf8"), compressed);
+    }
+    
+    public static String decode64 (byte[] b, boolean compressed)
+        throws Exception {
+        b = Base64.getDecoder().decode(b);
+        if (compressed) {
+            Inflater in = new Inflater ();
+            in.setInput(b);
+            byte[] buf = new byte[1024];
+            ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+            for (int len; (len = in.inflate(buf)) > 0; ) {
+                bos.write(buf, 0, len);
+            }
+            in.end();
+            b = bos.toByteArray();
+        }
+        return new String (b);
+    }
+
     public static String toJson (Object obj) {
         if (obj != null) {
             try {
@@ -301,7 +352,9 @@ public class Util {
         Class type = null;
         Set unique = new HashSet ();
         for (Object val : values) {
-            if (val.getClass().isArray()) {
+            if (val == null)
+                ;
+            else if (val.getClass().isArray()) {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
@@ -324,7 +377,9 @@ public class Util {
         Object merged = Array.newInstance(type, unique.size());
         int count = 0;
         for (Object val : values) {
-            if (val.getClass().isArray()) {
+            if (val == null)
+                ;
+            else if (val.getClass().isArray()) {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);

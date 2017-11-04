@@ -508,8 +508,25 @@ public class EntityRegistry extends EntityFactory {
             for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
                 for (String prop : me.getValue()) {
                     if (!mappers.containsKey(prop)) { // deal with mappers later
-                        Object value  = normalize (me.getKey(), map.get(prop));
-                        ent._add(me.getKey(), new StitchValue (prop, value));
+                        Object val = map.get(prop);
+                        if (val == null) {
+                        }
+                        else if (me.getKey() == StitchKey.T_Keyword) {
+                            if (val.getClass().isArray()) {
+                                int len = Array.getLength(val);
+                                for (int i = 0; i < len; ++i) {
+                                    Object t = Array.get(val, i);
+                                    ent._addLabel(Label.label(t.toString()));
+                                }
+                            }
+                            else
+                                ent._addLabel(Label.label(val.toString()));
+                        }
+                        else {
+                            Object value  = normalize (me.getKey(), val);
+                            ent._add(me.getKey(),
+                                     new StitchValue (prop, value));
+                        }
                     }
                 }
             }
