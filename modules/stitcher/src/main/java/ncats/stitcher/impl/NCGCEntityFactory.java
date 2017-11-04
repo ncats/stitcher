@@ -88,8 +88,9 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
         String tox21 = rset.getString("tox21_id");
         if (tox21 != null) row.put("Tox21Id", tox21);
             
-        register (row);
-        ++count;        
+        ncats.stitcher.Entity e = registerIfAbsent (row);
+        if (e != null)
+            ++count;
     }
     
     void register (Connection con) throws SQLException {
@@ -98,7 +99,8 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
              +"pubchem_sid,pubchem_cid,cas,primary_moa,approval_status,"
              +"tox21_id,sample_name2 "
              +"from ncgc_sample "
-             +(maxrows > 0 ? "where rownum <= "+maxrows:""));
+             +(maxrows > 0 ? "order by sample_id fetch first "
+               +maxrows+" rows only":""));
         ResultSet rset = pstm.executeQuery();
         Map<String, Object> row = new TreeMap<>();      
         while (rset.next()) {
@@ -148,16 +150,21 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
                 .register(source.getString("name"));
             Integer instances = (Integer)ds.get(INSTANCES);
             if (instances != null && instances > 0) {
-                logger.warning("### Data source "+ds.getName()
-                               +" has already been registered with "+instances
-                               +" entities!");
+                logger.info("### Data source "+ds.getName()
+                            +" has already been registered with "+instances
+                            +" entities!");
             }
-            else {
-                setDataSource (ds);
-                register (con);
-                ds.set(INSTANCES, count);
-                logger.info("$$$ "+count+" entities registered for "+ds);
+            setDataSource (ds);
+            
+            register (con);
+            if (count > 0) {
+                if (instances == null)
+                    instances = 0;
+                ds.set(INSTANCES, instances+count);
             }
+            
+            logger.info("$$$ "+count+" new entities registered "
+                        +"for data source \""+ds+"\"");
         }
         catch (SQLException ex) {
             ex.printStackTrace();

@@ -471,13 +471,48 @@ public class EntityRegistry extends EntityFactory {
         }
     }
 
+    public Entity registerIfAbsent (final Map<String, Object> map) {
+        Entity ent = null;      
+        try (Transaction tx = gdb.beginTx()) {
+            Object id = map.get(idField);           
+            if (id != null) {
+                // check if this has been registered before..
+                int dups = 0;
+                Iterator<Entity> it = find (idField, id);
+                while (it.hasNext()) {
+                    Entity e = it.next();
+                    if (e._is(source.getName())) {
+                        if (ent != null)
+                            ++dups;
+                        ent = e;
+                    }
+                }
+                
+                if (dups > 0)
+                    logger.warning(idField+"="+id
+                                   +" yields "+dups+" matches!");
+            }
+
+            if (ent == null) {
+                ent = _register (map);
+            }
+            else {
+                ent = null;
+                logger.info(id+" is already registered!");
+            }
+            tx.success();
+            
+            return ent;
+        }
+    }
+
     protected Entity _register (Map<String, Object> map) {
-        Entity ent;
+        Entity ent = null;
         
         if (stitches.isEmpty() && mappers.isEmpty()) {
             ent = _attach (map);
         }
-        else {
+        else {      
             ent = Entity._getEntity(_createNode ());
             String id = null;
             if (idField != null && map.containsKey(idField))
