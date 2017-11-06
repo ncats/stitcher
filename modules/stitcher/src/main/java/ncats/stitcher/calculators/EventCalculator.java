@@ -6,11 +6,18 @@ import ncats.stitcher.*;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.stream.*;
+import javax.xml.stream.events.*;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
 
 import static ncats.stitcher.Props.*;
 
@@ -93,7 +100,8 @@ public class EventCalculator implements StitchCalculator {
                 new DrugsAtFDAEventParser(),
                 new DailyMedRxEventParser(),
                 new DailyMedOtcEventParser(),
-                new DailyMedRemEventParser(),           
+                new DailyMedRemEventParser(),
+                //new DrugBankXmlEventParser()
             }) {
             Integer year = approvals.get(ep.name);
             if (year != null) {
@@ -144,7 +152,7 @@ public class EventCalculator implements StitchCalculator {
                 }
             },
             Marketed,
-            ApprovalOTC{
+            ApprovalOTC {
                 @Override
                 public boolean isApproved(){
                     return true;
@@ -185,7 +193,7 @@ public class EventCalculator implements StitchCalculator {
         Object id;
 
         public RanchoEventParser() {
-            super ("rancho_2017-09-07_20-32.json");
+            super ("rancho-export_2017-10-26_20-39.json");
         }
 
         void parseEvent (JsonNode n) {
@@ -207,7 +215,8 @@ public class EventCalculator implements StitchCalculator {
                         event.comment +=
                                 n.get("ConditionMeshValue").asText();
                     if (n.has("ConditionProductName"))
-                        event.comment += " " + n.get("ConditionProductName").asText();
+                        event.comment += " "
+                            + n.get("ConditionProductName").asText();
                 }
                 if (n.has("ConditionProductDate")) {
                     String d = n.get("ConditionProductDate").asText();
@@ -415,6 +424,92 @@ public class EventCalculator implements StitchCalculator {
         }
     }
 
+    static class DrugBankXmlEventParser extends EventParser {
+        protected String id;
+        public DrugBankXmlEventParser () {
+            super ("drugbank_all_full_database.xml.zip");
+        }
+
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            String xml = (String) payload.get("xml");
+            id = (String) payload.get("drugbank-id");
+            if (xml != null) { // unlikely!
+                try {
+                    parseEvents (events, xml);
+                }
+                catch (Exception ex) {
+                    logger.log(Level.SEVERE, "Can't parse xml document for "
+                               +payload.get("drugbank-id"), ex);
+                }
+            }
+            return events;
+        }
+
+        void parseEvents (List<Event> events, String xml) throws Exception {
+            DocumentBuilder builder =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Element doc = builder.parse
+                (new ByteArrayInputStream
+                 (Util.decode64(xml, true).getBytes("utf8")))
+                .getDocumentElement();
+            NodeList products = doc.getElementsByTagName("product");
+            for (int i = 0; i < products.getLength(); ++i) {
+                Element p = (Element)products.item(i);
+                Event ev = parseEvent (p);
+                if (ev != null)
+                    events.add(ev);
+            }
+        }
+
+        Event parseEvent (Element p) {
+            NodeList children = p.getChildNodes();
+            Event ev = new Event (name, id, Event.EventKind.Marketed);
+            for (int i = 0; i < children.getLength(); ++i) {
+                Node child = children.item(i);
+                if ( Node.ELEMENT_NODE == child.getNodeType()) {
+                    Element n = (Element)child;
+                    
+                    boolean approved = false;
+                    Map<String, String> map = new HashMap<>();
+                    switch (n.getTagName()) {
+                    case "approved":
+                        approved = "true".equalsIgnoreCase(n.getTextContent());
+                        break;
+                        
+                    case "over-the-counter":
+                        if ("true".equalsIgnoreCase(n.getTextContent()))
+                            ev.kind = Event.EventKind.ApprovalOTC;
+                        break;
+                        
+                    case "country":
+                        ev.jurisdiction = n.getTextContent();
+                        break;
+                        
+                    case "started-marketing-on":
+                        try {
+                            ev.date = SDF.parse(n.getTextContent());
+                        }
+                        catch (Exception ex) {
+                            logger.warning("Bogus date format: "
+                                           +n.getTextContent());
+                        }
+                        break;
+                        
+                    default:
+                        map.put(n.getTagName(), n.getTextContent());
+                    }
+                    
+                    if (!approved) {
+                        ev.kind = Event.EventKind.Marketed;
+                    }
+                    ev.comment = map.get("name")+" ["+map.get("labeller")+"]";
+                }
+            }
+            return ev;
+        }
+    }
+
     static class DailyMedEventParser extends EventParser {
         public DailyMedEventParser (String source) {
             super (source);
@@ -549,7 +644,8 @@ public class EventCalculator implements StitchCalculator {
         new RanchoEventParser (),
         new NPCEventParser (),
         new PharmManuEventParser (),
-        new DrugBankEventParser (),
+        //new DrugBankEventParser (),
+        new DrugBankXmlEventParser (),
         new DailyMedRxEventParser (),
         new DailyMedOtcEventParser (),
         new DailyMedRemEventParser (),
