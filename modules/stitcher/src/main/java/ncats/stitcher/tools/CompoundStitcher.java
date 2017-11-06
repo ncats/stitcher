@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import java.net.URI;
 
 public class CompoundStitcher implements Consumer<Stitch> {
     static final Logger logger = Logger.getLogger
@@ -26,13 +27,15 @@ public class CompoundStitcher implements Consumer<Stitch> {
             if (r != null) {
                 // make sure it's a
                 Entity[] e = component.entities(new long[]{root});
-                if (!e[0].datasource().toURI().toString().endsWith(".gsrs"))
+                URI uri = e[0].datasource().toURI();
+                if (uri != null && !uri.toString().endsWith(".gsrs"))
                     r = null;
             }
             
             if (r == null) {
                 for (Entity e : component.entities(comp)) {
-                    if (e.datasource().toURI().toString().endsWith(".gsrs")) {
+                    URI uri = e.datasource().toURI();
+                    if (uri != null && uri.toString().endsWith(".gsrs")) {
                         if (r == null || r > e.getId())
                             r = e.getId();
                     }
