@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import java.net.URI;
 
 public class CompoundStitcher implements Consumer<Stitch> {
     static final Logger logger = Logger.getLogger
@@ -26,13 +27,15 @@ public class CompoundStitcher implements Consumer<Stitch> {
             if (r != null) {
                 // make sure it's a
                 Entity[] e = component.entities(new long[]{root});
-                if (!e[0].datasource().toURI().toString().endsWith(".gsrs"))
+                URI uri = e[0].datasource().toURI();
+                if (uri != null && !uri.toString().endsWith(".gsrs"))
                     r = null;
             }
             
             if (r == null) {
                 for (Entity e : component.entities(comp)) {
-                    if (e.datasource().toURI().toString().endsWith(".gsrs")) {
+                    URI uri = e.datasource().toURI();
+                    if (uri != null && uri.toString().endsWith(".gsrs")) {
                         if (r == null || r > e.getId())
                             r = e.getId();
                     }
@@ -61,14 +64,18 @@ public class CompoundStitcher implements Consumer<Stitch> {
             // do all components
             logger.info("Untangle all components...");
             List<Long> comps = new ArrayList<>();
-            ef.components(component -> {
-                    comps.add(component.root().getId());
-                });
-            logger.info("### "+components.length+" components!");
+            int total = ef.components(comps);
+            logger.info("### "+total+" components!");
+            int count = 1;
             for (Long cid : comps) {
-                logger.info("########### Untangle component "+cid+"...");
+                logger.info("################ UNTANGLE COMPONENT "+cid
+                            +"... "+count+"/"+total);
+                Component comp = ef.component(cid);
+                logger.info("################ component "+cid
+                            +" has "+comp.size()+" members!");
                 ef.untangle(new StitcherUntangleCompoundComponent
-                            (dsource, ef.component(cid)), this);
+                            (dsource, comp), this);
+                ++count;
             }
         }
         else {
