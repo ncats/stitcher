@@ -98,7 +98,7 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
             ("select sample_id,smiles_iso,sample_name,supplier,supplier_id,"
              +"pubchem_sid,pubchem_cid,cas,primary_moa,approval_status,"
              +"tox21_id,sample_name2 "
-             +"from ncgc_sample "
+             +"from ncgc_sample where smiles_iso is not null "
              +(maxrows > 0 ? "order by sample_id fetch first "
                +maxrows+" rows only":""));
         ResultSet rset = pstm.executeQuery();

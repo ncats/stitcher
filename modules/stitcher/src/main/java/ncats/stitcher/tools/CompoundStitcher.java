@@ -64,14 +64,18 @@ public class CompoundStitcher implements Consumer<Stitch> {
             // do all components
             logger.info("Untangle all components...");
             List<Long> comps = new ArrayList<>();
-            ef.components(component -> {
-                    comps.add(component.root().getId());
-                });
-            logger.info("### "+components.length+" components!");
+            int total = ef.components(comps);
+            logger.info("### "+total+" components!");
+            int count = 1;
             for (Long cid : comps) {
-                logger.info("########### Untangle component "+cid+"...");
+                logger.info("################ UNTANGLE COMPONENT "+cid
+                            +"... "+count+"/"+total);
+                Component comp = ef.component(cid);
+                logger.info("################ component "+cid
+                            +" has "+comp.size()+" members!");
                 ef.untangle(new StitcherUntangleCompoundComponent
-                            (dsource, ef.component(cid)), this);
+                            (dsource, comp), this);
+                ++count;
             }
         }
         else {
