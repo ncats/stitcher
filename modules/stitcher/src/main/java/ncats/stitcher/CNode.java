@@ -37,6 +37,12 @@ public class CNode implements Props, Comparable<CNode> {
     public static final String PARENT_INDEX = ".parent_index";
     public static final String NODE_TIMELINE = "node.timeline";
 
+    static final String[] MOLFIELDS = new String[]{
+        "MOLFILE",
+        "SMILES",
+        "SMILES_ISO"
+    };
+
     protected ObjectMapper mapper = new ObjectMapper ();
     protected final Node _node;
     protected GraphDatabaseService gdb;
@@ -489,13 +495,13 @@ public class CNode implements Props, Comparable<CNode> {
     static protected Molecule getMol (Node node) {
         Molecule mol = null;
         try (Transaction tx = node.getGraphDatabase().beginTx()) {
-            String molfile = (String) node.getProperty("MOLFILE", null);
-            if (molfile != null)
-                mol = getMol (molfile);
-            else {
-                molfile = (String) node.getProperty("SMILES", null);
-                if (molfile != null)
+            for (String f : MOLFIELDS) {
+                String molfile = (String) node.getProperty(f, null);
+                if (molfile != null) {
                     mol = getMol (molfile);
+                    if (mol != null)
+                        break;
+                }
             }
             tx.success();
         }

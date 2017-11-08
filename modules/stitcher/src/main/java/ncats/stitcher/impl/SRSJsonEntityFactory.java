@@ -38,11 +38,12 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         setIdField ("UNII");
         setNameField ("PreferredName");
         setUseName (false);
-        add (N_Name, "Synonyms")
-            .add (I_CAS, "CAS")
-            .add (I_UNII, "UNII")
-            //.add (T_ActiveMoiety, "ActiveMoieties")
-            ;
+        add (N_Name, "Synonyms");
+        add (I_CAS, "CAS");
+        add (I_UNII, "UNII");
+        add (I_CID, "PUBCHEM");
+        add (T_Keyword, "Class");
+        //add (T_ActiveMoiety, "ActiveMoieties");
     }
 
     void register (String line, int total) {

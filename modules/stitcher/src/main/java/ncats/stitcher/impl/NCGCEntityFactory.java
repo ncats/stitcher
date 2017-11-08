@@ -47,7 +47,7 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
     protected void init () {
         super.init();
         setIdField ("SampleId");
-        setStrucField ("SMILES_ISO");
+        setStrucField ("SMILES");
         add (N_Name, "SampleName");
         add (I_CID, "PubChemCID");
         add (I_SID, "PubChemSID");
@@ -69,7 +69,7 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
         long sid = rset.getLong("pubchem_sid");
         if (!rset.wasNull()) row.put("PubChemSID", sid);
         String smiles = rset.getString("smiles_iso");
-        if (smiles != null) row.put("SMILES_ISO", smiles);
+        if (smiles != null) row.put("SMILES", smiles);
         String cas = rset.getString("cas");
         if (cas != null) row.put("CAS", cas);
         String moa = rset.getString("primary_moa");
@@ -158,8 +158,10 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
             
             register (con);
             if (count > 0) {
-                if (instances == null)
+                if (instances == null) {
                     instances = 0;
+                    updateMeta (ds);
+                }
                 ds.set(INSTANCES, instances+count);
             }
             

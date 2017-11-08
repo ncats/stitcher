@@ -518,7 +518,7 @@ public class EntityRegistry extends EntityFactory {
             if (idField != null && map.containsKey(idField))
                 id = map.get(idField).toString();
             
-            DefaultPayload payload = new DefaultPayload (getDataSource ());
+            DefaultPayload payload = new DefaultPayload (getDataSource (), id);
             payload.putAll(map);
             
             if (strucField != null) {
@@ -545,22 +545,46 @@ public class EntityRegistry extends EntityFactory {
                     if (!mappers.containsKey(prop)) { // deal with mappers later
                         Object val = map.get(prop);
                         if (val == null) {
+                            continue;
                         }
-                        else if (me.getKey() == StitchKey.T_Keyword) {
+
+                        switch (me.getKey()) {
+                        case I_SID: // sigh.. should check by type instead!
+                        case I_CID:
+                        case I_PMID:
+                            if (val instanceof Long) {
+                                ent._add(me.getKey(),
+                                         new StitchValue (prop, val));
+                            }
+                            else {
+                                try {
+                                    ent._add(me.getKey(), new StitchValue
+                                             (prop,
+                                              Long.parseLong(val.toString())));
+                                }
+                                catch (NumberFormatException ex) {
+                                    logger.warning("Bogus long value "+val);
+                                }
+                            }
+                            break;
+                            
+                        case T_Keyword:
                             if (val.getClass().isArray()) {
                                 int len = Array.getLength(val);
                                 for (int i = 0; i < len; ++i) {
                                     Object t = Array.get(val, i);
-                                    ent._addLabel(Label.label(t.toString()));
+                                    ent._addLabel
+                                        (Label.label(t.toString()));
                                 }
                             }
-                            else
+                            else 
                                 ent._addLabel(Label.label(val.toString()));
-                        }
-                        else {
-                            Object value  = normalize (me.getKey(), val);
-                            ent._add(me.getKey(),
-                                     new StitchValue (prop, value));
+                            break;
+                        default:
+                            { Object value  = normalize (me.getKey(), val);
+                                ent._add(me.getKey(),
+                                         new StitchValue (prop, value));
+                            }
                         }
                     }
                 }
