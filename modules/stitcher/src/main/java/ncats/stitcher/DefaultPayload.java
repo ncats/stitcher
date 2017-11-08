@@ -19,11 +19,12 @@ public class DefaultPayload implements Payload {
         if (source == null)
             throw new IllegalArgumentException ("Data source is null");
         this.source = source;
-        this.id = id;
+        setId (id);
     }
 
     public Object getId () { return id; }
     public DefaultPayload setId (Object id) {
+        data.put(Props.ID, id);
         this.id = id;
         return this;
     }

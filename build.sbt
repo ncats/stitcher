@@ -24,7 +24,7 @@ lazy val commonDependencies = Seq(
   javaWs,
   "com.typesafe.play" %% "play-json" % "2.6.0",
   "com.h2database" % "h2" % "1.4.193",
-  "org.neo4j" % "neo4j" % "3.2.2",
+  "org.neo4j" % "neo4j" % "3.3.0",
   "org.apache.lucene" % "lucene-core" % "5.5.0",
   "org.apache.lucene" % "lucene-facet" % "5.5.0",
   "org.apache.lucene" % "lucene-analyzers-common" % "5.5.0",

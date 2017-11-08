@@ -604,6 +604,11 @@ public class Util {
         else {
             logger.warning("No UNII found!");
         }
+
+        JsonNode cls = node.get("substanceClass");
+        if (cls != null) {
+            map.put("Class", cls.asText());
+        }
                     
         JsonNode names = node.get("names");
         if (names != null && names.isArray()) {

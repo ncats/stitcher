@@ -22,6 +22,15 @@ import org.neo4j.graphdb.event.*;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.IndexCreator;
 
+import org.apache.lucene.store.*;
+import org.apache.lucene.document.*;
+import org.apache.lucene.index.*;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.search.*;
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.facet.*;
+import org.apache.lucene.facet.taxonomy.directory.*;
+
 /**
  * wrapper around GraphDatabaseService instance
  */
@@ -29,22 +38,30 @@ public class GraphDb extends TransactionEventHandler.Adapter
     implements KernelEventHandler {
     
     static final String DEFAULT_CACHE = "cache"; // cache
-    static final String DEFAULT_TAXON = "taxon"; // facet index
-    static final String DEFAULT_INDEX = "index"; // lucene index
+    static final String DEFAULT_FACET = "facet"; // facet index
+    static final String DEFAULT_TEXT = "text"; // lucene index
     static final String DEFAULT_SUGGEST = "suggest"; // suggest index
-    static final String DEFAULT_IXDB = "ix.db"; // top-level
 
     static final Logger logger = Logger.getLogger(GraphDb.class.getName());
 
     static final Map<File, GraphDb> INSTANCES =
         new ConcurrentHashMap<File, GraphDb>();
 
+
     protected final File dir;
     protected final GraphDatabaseService gdb;
     protected CacheFactory cache;
     protected boolean localCache;
     protected final AtomicLong lastUpdated = new AtomicLong ();
-
+    
+    protected final File indexPath;
+    protected Directory textDir;
+    protected Directory facetsDir;
+    protected IndexWriter indexWriter;
+    protected DirectoryTaxonomyWriter facetsWriter;
+    protected FacetsConfig facetsConfig; 
+    protected IndexSearcher indexSearcher;
+    
     protected GraphDb (File dir) throws IOException {
         this (dir, null);
     }
@@ -79,13 +96,16 @@ public class GraphDb extends TransactionEventHandler.Adapter
         gdb.registerTransactionEventHandler(this);
         gdb.registerKernelEventHandler(this);
 
+        indexPath = new File (dir, "index/lucene");
+        if (!indexPath.exists()) {
+            indexPath.mkdirs();
+        }
+        initLucene (indexPath);
+
         // this must be initialized after graph initialization
         if (cache == null) {
-            File ixdb = new File (dir, DEFAULT_IXDB);
-            ixdb.mkdirs();
-            
             this.cache = CacheFactory.getInstance
-                   (new File (ixdb, DEFAULT_CACHE));
+                   (new File (indexPath, DEFAULT_CACHE));
             localCache = true;
         }
         else {
@@ -93,6 +113,21 @@ public class GraphDb extends TransactionEventHandler.Adapter
             localCache = false;
         }
         this.dir = dir;
+    }
+
+    protected void initLucene (File base) throws IOException {
+        File dir = new File (base, DEFAULT_TEXT);
+        dir.mkdirs();
+        textDir = new NIOFSDirectory (dir.toPath());
+        IndexWriterConfig config =
+            new IndexWriterConfig (new StandardAnalyzer ());
+        indexWriter = new IndexWriter (textDir, config);
+        
+        dir = new File (base, DEFAULT_FACET);
+        dir.mkdirs();
+        facetsDir = new NIOFSDirectory (dir.toPath());
+        facetsWriter = new DirectoryTaxonomyWriter (facetsDir);
+        facetsConfig = new FacetsConfig ();
     }
 
     @Override
@@ -115,6 +150,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
         gdb.shutdown();
         if (localCache)
             cache.shutdown();
+        try {
+            IOUtils.close(indexWriter);
+            IOUtils.close(textDir);
+            IOUtils.close(facetsWriter);
+            IOUtils.close(facetsDir);
+        }
+        catch (IOException ex) {
+            logger.log(Level.SEVERE, "Can't close Lucene handles", ex);
+        }
     }
 
     public CNode getNode (long id) {

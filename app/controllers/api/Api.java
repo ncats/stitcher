@@ -216,9 +216,7 @@ public class Api extends Controller {
         }
         catch (Exception ex) {
             Entity[] entities = es.getEntityFactory()
-                //.filter("UNII", "'"+id+"'", "stitch_v"+ver);
-                // only gsrs source has unii as the name!
-                .filter("name", "'"+id+"'", "stitch_v"+ver);
+                .filter("id", "'"+id+"'", "stitch_v"+ver);
             if (entities.length > 0) {
                 if (entities.length > 1)
                     Logger.warn(id+" yields "+entities.length

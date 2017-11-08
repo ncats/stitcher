@@ -74,7 +74,6 @@ public class MoleculeEntityFactory extends EntityRegistry {
         DefaultPayload payload = new DefaultPayload (getDataSource ());
 
         if (idval != null) {
-            //ent._addLabel(DynamicLabel.label(idLabel));
             ent._snapshot(ID, idval);
             payload.setId(idval);
         }
