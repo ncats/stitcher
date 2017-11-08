@@ -1382,6 +1382,16 @@ public class EntityFactory implements Props {
         return comps;
     }
 
+    public int components (Collection<Long> comps) {
+        try (Transaction tx = gdb.beginTx()) {
+            gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
+                    comps.add(node.getId());
+                });
+            tx.success();
+        }
+        return comps.size();
+    }
+
     public void components (Consumer<Component> consumer) {
         try (Transaction tx = gdb.beginTx()) {
             gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
