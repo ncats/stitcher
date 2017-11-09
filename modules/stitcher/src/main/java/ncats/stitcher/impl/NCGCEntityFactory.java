@@ -55,13 +55,14 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
         add (I_Code, "Tox21Id");
         add (I_CAS, "CAS");
         add (T_Keyword, "ApprovalStatus");
+        add (T_Keyword, "Library");
+        add (T_Keyword, "Supplier");
     }
 
-    void register (ResultSet rset, Map<String, Object> row)
+    String instrument (ResultSet rset, Map<String, Object> row)
         throws SQLException {
         row.clear();
         String sampleId = rset.getString("sample_id");  
-        System.out.println("+++++ "+sampleId+" "+(count+1)+" +++++");
         
         row.put("SampleId", sampleId);
         long cid = rset.getLong("pubchem_cid");
@@ -87,10 +88,7 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
             row.put("SampleName", Util.merge(row.get("SampleName"), name));
         String tox21 = rset.getString("tox21_id");
         if (tox21 != null) row.put("Tox21Id", tox21);
-            
-        ncats.stitcher.Entity e = registerIfAbsent (row);
-        if (e != null)
-            ++count;
+        return sampleId;
     }
     
     void register (Connection con) throws SQLException {
@@ -98,16 +96,46 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
             ("select sample_id,smiles_iso,sample_name,supplier,supplier_id,"
              +"pubchem_sid,pubchem_cid,cas,primary_moa,approval_status,"
              +"tox21_id,sample_name2 "
-             +"from ncgc_sample where smiles_iso is not null "
+             +"from ncgc_sample "
+             +"where smiles_iso is not null "
              +(maxrows > 0 ? "order by sample_id fetch first "
                +maxrows+" rows only":""));
+        PreparedStatement pstm2 = con.prepareStatement
+            ("select key,value from sample_annotation where sample_id = ?");
         ResultSet rset = pstm.executeQuery();
         Map<String, Object> row = new TreeMap<>();      
         while (rset.next()) {
-            register (rset, row);
+            String sampleId = instrument (rset, row);
+            
+            System.out.println("+++++ "+sampleId+" "+(count+1)+" +++++");
+            pstm2.setString(1, sampleId);
+            ResultSet rs = pstm2.executeQuery();
+            while (rs.next()) {
+                String key = rs.getString(1);
+                String val = rs.getString(2);
+                switch (key) {
+                case "library":
+                    row.put("Library", Util.merge(row.get("Library"), val));
+                    break;
+                    
+                case "compound.name.primary":
+                    row.put("SampleName",
+                            Util.merge(row.get("SampleName"), val));
+                    break;
+                    
+                default:
+                    logger.warning("Unknown sample annotation: "+key);
+                }
+            }
+            rs.close();
+            
+            ncats.stitcher.Entity e = registerIfAbsent (row);
+            if (e != null)
+                ++count;
         }
         rset.close();
         pstm.close();
+        pstm2.close();
     }
     
     public int register (String config, String username, String password)

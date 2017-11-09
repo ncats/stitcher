@@ -22,14 +22,6 @@ import org.neo4j.graphdb.event.*;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.IndexCreator;
 
-import org.apache.lucene.store.*;
-import org.apache.lucene.document.*;
-import org.apache.lucene.index.*;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.search.*;
-import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.facet.*;
-import org.apache.lucene.facet.taxonomy.directory.*;
 
 /**
  * wrapper around GraphDatabaseService instance
@@ -38,15 +30,11 @@ public class GraphDb extends TransactionEventHandler.Adapter
     implements KernelEventHandler {
     
     static final String DEFAULT_CACHE = "cache"; // cache
-    static final String DEFAULT_FACET = "facet"; // facet index
-    static final String DEFAULT_TEXT = "text"; // lucene index
-    static final String DEFAULT_SUGGEST = "suggest"; // suggest index
 
     static final Logger logger = Logger.getLogger(GraphDb.class.getName());
 
     static final Map<File, GraphDb> INSTANCES =
         new ConcurrentHashMap<File, GraphDb>();
-
 
     protected final File dir;
     protected final GraphDatabaseService gdb;
@@ -54,13 +42,7 @@ public class GraphDb extends TransactionEventHandler.Adapter
     protected boolean localCache;
     protected final AtomicLong lastUpdated = new AtomicLong ();
     
-    protected final File indexPath;
-    protected Directory textDir;
-    protected Directory facetsDir;
-    protected IndexWriter indexWriter;
-    protected DirectoryTaxonomyWriter facetsWriter;
-    protected FacetsConfig facetsConfig; 
-    protected IndexSearcher indexSearcher;
+    protected final File indexDir;
     
     protected GraphDb (File dir) throws IOException {
         this (dir, null);
@@ -96,16 +78,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
         gdb.registerTransactionEventHandler(this);
         gdb.registerKernelEventHandler(this);
 
-        indexPath = new File (dir, "index/lucene");
-        if (!indexPath.exists()) {
-            indexPath.mkdirs();
+        indexDir = new File (dir, "index");
+        if (!indexDir.exists()) {
+            indexDir.mkdirs();
         }
-        initLucene (indexPath);
 
         // this must be initialized after graph initialization
         if (cache == null) {
             this.cache = CacheFactory.getInstance
-                   (new File (indexPath, DEFAULT_CACHE));
+                   (new File (indexDir, DEFAULT_CACHE));
             localCache = true;
         }
         else {
@@ -113,21 +94,6 @@ public class GraphDb extends TransactionEventHandler.Adapter
             localCache = false;
         }
         this.dir = dir;
-    }
-
-    protected void initLucene (File base) throws IOException {
-        File dir = new File (base, DEFAULT_TEXT);
-        dir.mkdirs();
-        textDir = new NIOFSDirectory (dir.toPath());
-        IndexWriterConfig config =
-            new IndexWriterConfig (new StandardAnalyzer ());
-        indexWriter = new IndexWriter (textDir, config);
-        
-        dir = new File (base, DEFAULT_FACET);
-        dir.mkdirs();
-        facetsDir = new NIOFSDirectory (dir.toPath());
-        facetsWriter = new DirectoryTaxonomyWriter (facetsDir);
-        facetsConfig = new FacetsConfig ();
     }
 
     @Override
@@ -150,15 +116,6 @@ public class GraphDb extends TransactionEventHandler.Adapter
         gdb.shutdown();
         if (localCache)
             cache.shutdown();
-        try {
-            IOUtils.close(indexWriter);
-            IOUtils.close(textDir);
-            IOUtils.close(facetsWriter);
-            IOUtils.close(facetsDir);
-        }
-        catch (IOException ex) {
-            logger.log(Level.SEVERE, "Can't close Lucene handles", ex);
-        }
     }
 
     public CNode getNode (long id) {
@@ -259,6 +216,10 @@ public class GraphDb extends TransactionEventHandler.Adapter
             if (db.graphDb() == gdb)
                 return db;
         return null;
+    }
+
+    public Indexer getIndexer (Integer version) throws IOException {
+        return Indexer.getInstance(new File (indexDir, "v"+version));
     }
 
     public static void addShutdownHook () {
