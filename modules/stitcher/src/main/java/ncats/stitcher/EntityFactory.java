@@ -102,8 +102,11 @@ public class EntityFactory implements Props {
         }
         
         public Entity next () {
-            Node n = iter.next();
-            return Entity.getEntity(n);
+            try (Transaction tx = gdb.beginTx()) {
+                Node n = iter.next();
+                tx.success();
+                return Entity.getEntity(n);
+            }
         }
         
         public void remove () {
@@ -1652,7 +1655,7 @@ public class EntityFactory implements Props {
                         Object v = Array.get(value, i);
                         IndexHits<Node> hits = index.get(key, v);
                         // return on the first non-empty hits
-                        if (best == null || hits.size() < best.size()) {
+                        if (best == null || hits.size() > best.size()) {
                             if (best != null)
                                 best.close();
                             best = hits;

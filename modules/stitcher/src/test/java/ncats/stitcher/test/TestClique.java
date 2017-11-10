@@ -50,7 +50,7 @@ public class TestClique {
 
     @Test
     public void testClique1 () throws Exception {
-        GraphDb graphDb = GraphDb.createTempDb(name.getMethodName(), TEMPDIR);
+        GraphDb graphDb = GraphDb.createTempDb(name.getMethodName());
         try {
             MapEntityFactory reg = new MapEntityFactory (graphDb);
             DataSource source = reg.getDataSourceFactory()
@@ -82,7 +82,7 @@ public class TestClique {
              * one of size 4 for {I_UNII, N_Synonym, N_Name}
              */
             MyCliqueVisitor visitor = new MyCliqueVisitor ();
-            reg.cliqueEnumeration(visitor);
+            reg.cliques(visitor);
             assertTrue ("There should only be two cliques!",
                         visitor.ncliques == 2);
             assertTrue ("Expecting "+keys.size()+" matching keys, but instead "

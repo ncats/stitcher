@@ -27,11 +27,11 @@ public class NPCEntityFactory extends MoleculeEntityFactory {
     @Override
     protected void init () {
         super.init();
-        setIdField("ID").
-            add(StitchKey.I_CAS, "CAS").
-            //add(StitchKey.N_Name, "Synonyms").
-            add(StitchKey.I_UNII, "CompoundUNII").
-            add(StitchKey.T_Keyword, "DATASET");
+        setIdField ("ID");
+        add (StitchKey.I_CAS, "CAS");
+        //add (StitchKey.N_Name, "Synonyms");
+        add (StitchKey.I_UNII, "CompoundUNII");
+        add (StitchKey.T_Keyword, "DATASET");
     }
 
     public static void main (String[] argv) throws Exception {

@@ -449,16 +449,21 @@ public class EventCalculator implements StitchCalculator {
         void parseEvents (List<Event> events, String xml) throws Exception {
             DocumentBuilder builder =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Element doc = builder.parse
-                (new ByteArrayInputStream
-                 (Util.decode64(xml, true).getBytes("utf8")))
-                .getDocumentElement();
-            NodeList products = doc.getElementsByTagName("product");
-            for (int i = 0; i < products.getLength(); ++i) {
-                Element p = (Element)products.item(i);
-                Event ev = parseEvent (p);
-                if (ev != null)
-                    events.add(ev);
+            xml = Util.decode64(xml, true);
+            try {
+                Element doc = builder.parse
+                    (new ByteArrayInputStream (xml.getBytes("utf8")))
+                    .getDocumentElement();
+                NodeList products = doc.getElementsByTagName("product");
+                for (int i = 0; i < products.getLength(); ++i) {
+                    Element p = (Element)products.item(i);
+                    Event ev = parseEvent (p);
+                    if (ev != null)
+                        events.add(ev);
+                }
+            }
+            catch (Exception ex) {
+                logger.log(Level.SEVERE, "Bogus XML: "+xml, ex);
             }
         }
 

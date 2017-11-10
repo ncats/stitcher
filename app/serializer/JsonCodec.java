@@ -5,4 +5,5 @@ import ncats.stitcher.CNode;
 
 public interface JsonCodec {
     JsonNode encode (CNode node);
+    JsonNode encodeSimple (CNode node);
 }
