@@ -194,9 +194,27 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
             }
             else if (ev.isCharacters()) {
                 Characters chars = ev.asCharacters();
-                if (!chars.isCData())
-                    buf.append(chars.getData());
-                snippet.append(chars.getData());
+                String s = chars.getData();
+                for (int i = 0; i < s.length(); ++i) {
+                    char ch = s.charAt(i);
+                    switch (ch) {
+                    case '&':
+                        snippet.append("&amp;");
+                        break;
+                    case '<':
+                        snippet.append("&lt;");
+                        break;
+                    case '>':
+                        snippet.append("&gt;");
+                        break;
+                    default:
+                        if (ch > 0x7e)
+                            snippet.append("&#"+((int)ch)+";");
+                        else
+                            snippet.append(ch);
+                    }
+                    buf.append(ch);
+                }
             }
         }
         events.close(); 

@@ -147,7 +147,7 @@ public class EntityRegistry extends EntityFactory {
         }
     }
 
-    public EntityRegistry add (String property, StitchKeyMapper mapper) {
+    public EntityRegistry add (StitchKeyMapper mapper, String property) {
         mappers.put(property, mapper);
         return this;
     }
@@ -294,7 +294,7 @@ public class EntityRegistry extends EntityFactory {
                                             +regex+"\" on property \""
                                             +property+"\"");
                                 mapper.add(key, regex);
-                                add (property, mapper);
+                                add (mapper, property);
                             }
                             catch (Exception ex) {
                                 logger.warning
@@ -310,7 +310,7 @@ public class EntityRegistry extends EntityFactory {
                                         +regex+"\" on property \""
                                         +property+"\"");
                             mapper.add(key, regex);
-                            add (property, mapper);
+                            add (mapper, property);
                         }
                         catch (Exception ex) {
                             logger.warning
@@ -332,7 +332,7 @@ public class EntityRegistry extends EntityFactory {
                     else {
                         mapper.addBlacklist(cv.unwrapped());
                     }
-                    add (property, mapper);
+                    add (mapper, property);
                 }
                 else { // treat this as normal stitch key
                     add (key, property);

@@ -57,8 +57,8 @@ public class IntegrityMoleculeEntityFactory extends MoleculeEntityFactory {
         setNameField ("Drug_Name");
         setUseName (false);
         add (StitchKey.T_Keyword, "Highest_Phase");
-        add ("CAS", new KeyMapper (StitchKey.I_CAS));
-        add ("Drug_Name", new KeyMapper (StitchKey.N_Name));
+        add (new KeyMapper (StitchKey.I_CAS), "CAS");
+        add (new KeyMapper (StitchKey.N_Name), "Drug_Name");
     }
 
     public static void main (String[] argv) throws Exception {

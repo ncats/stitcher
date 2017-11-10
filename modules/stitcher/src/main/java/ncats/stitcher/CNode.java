@@ -203,6 +203,7 @@ public class CNode implements Props, Comparable<CNode> {
         // update the timeline
         lastUpdated = System.currentTimeMillis();
         _node.setProperty(UPDATED, lastUpdated);
+        /*
         Node snapshot = gdb.createNode(AuxNodeType.SNAPSHOT);
         snapshot.setProperty(PARENT, _node.getId());
         snapshot.setProperty(KEY, key);
@@ -210,16 +211,14 @@ public class CNode implements Props, Comparable<CNode> {
         snapshot.setProperty(UPDATED, lastUpdated);
         if (oldVal != null)
             snapshot.setProperty(OLDVAL, oldVal);
+        */
         if (newVal != null) {
-            snapshot.setProperty(NEWVAL, newVal);
+            //snapshot.setProperty(NEWVAL, newVal);
             _node.setProperty(key, newVal);
         }
         else {
             _node.removeProperty(key);
         }
-        /*
-        Relationship rel = snapshot.createRelationshipTo
-        (_node, DynamicRelationshipType.withName(key+".SNAPSHOT"));*/
         timeline.add(_node, lastUpdated);
     }
 
