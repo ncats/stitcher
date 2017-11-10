@@ -3,34 +3,28 @@ package ncats.stitcher.test;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.traversal.*;
-
+import org.neo4j.graphdb.GraphDatabaseService;
 import ncats.stitcher.*;
 
 public class TestUtil {
     static final Logger logger = Logger.getLogger(TestUtil.class.getName());
 
     public static GraphDatabaseService createTempDb () {
-        return createTempDb ("");
+        return createTempDb ("_ix");
     }
 
     public static File createTempDir () throws IOException {
-        return createTempDir (null);
+        return createTempDir ("_ix");
     }
     
     public static File createTempDir (String name) throws IOException {
-        File file = File.createTempFile("_ix"+(name != null ? name:""),
-                                        ".db", new File ("."));
-        file.delete();
-        file.mkdirs();
-        return file;
+        Path path = Files.createTempDirectory(name);
+        return path.toFile();
     }
     
     public static GraphDatabaseService createTempDb (String name) {

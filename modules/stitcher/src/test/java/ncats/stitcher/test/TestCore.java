@@ -40,7 +40,7 @@ public class TestCore extends EntityRegistry {
     }
 
     public TestCore () throws IOException {
-        super (GraphDb.createTempDb(new File (".")));
+        super (GraphDb.createTempDb());
         setDataSource (getDataSourceFactory().register("test data source"));
     }
 
@@ -160,7 +160,7 @@ public class TestCore extends EntityRegistry {
         for (count = 0; iter.hasNext(); ++count)
             iter.next();
         assertTrue ("c. failure -- there should be 3 entities with N_Name=one "
-                    , count == 3);
+                    +"but instead got "+count, count == 3);
 
         GraphMetrics metrics = calcGraphMetrics();
         logger.info("CurationMetric: "+Util.toJson(metrics));

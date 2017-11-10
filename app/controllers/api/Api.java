@@ -227,6 +227,41 @@ public class Api extends Controller {
         return e;
     }
 
+    public Result getStitches (Integer ver, String id, String format) {
+        String uri = routes.Api.getStitches(ver, id, format).url();
+        Logger.debug(uri);
+
+        ArrayNode json = mapper.createArrayNode();
+        try {
+            long n = Long.parseLong(id);
+            Entity e = es.getEntityFactory().entity(n);
+            if (!e.is(AuxNodeType.SGROUP))
+                json.add(jsonCodec.encodeSimple(e));
+        }
+        catch (Exception ex) {
+            Entity[] entities = es.getEntityFactory()
+                .filter("id", "'"+id+"'", "stitch_v"+ver);
+            for (int i = 0; i < entities.length; ++i) {
+                JsonNode n = jsonCodec.encodeSimple(entities[i]);
+                if (n.isArray()) {
+                    // unwrap this array
+                    ArrayNode an = (ArrayNode)n;
+                    for (int j = 0; j < an.size(); ++j)
+                        json.add(an.get(j));
+                }
+                else
+                    json.add(n);
+            }
+        }
+
+        ObjectNode node = mapper.createObjectNode();
+        node.put("uri", uri);
+        node.put("count", json.size());
+        node.put("data", json);
+
+        return ok (node);
+    }
+
     public Result getLatestStitch (String id) {
         String uri = routes.Api.getLatestStitch(id).url();
         Logger.debug(uri);

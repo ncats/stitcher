@@ -1,6 +1,9 @@
 package ncats.stitcher;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentMap;
@@ -159,32 +162,13 @@ public class GraphDb extends TransactionEventHandler.Adapter
     }
 
     public static GraphDb createTempDb () throws IOException {
-        return createTempDb (null, null);
+        return createTempDb ("_ix");
     }
 
-    public static GraphDb createTempDb (String name) throws IOException {
-        return createTempDb (name, null);
-    }
-
-    public static GraphDb createTempDb (File temp) throws IOException {
-        return createTempDb (null, temp);
-    }
-    
-    public static GraphDb createTempDb (String name, File temp)
-        throws IOException {
-        return createTempDb ("_ix"+(name != null ? name:""), ".db", temp);
-    }
-    
-    public static GraphDb createTempDb (String prefix,
-                                        String suffix, File temp)
-        throws IOException {
-        File junk = File.createTempFile(prefix, suffix, temp);
-        File parent = temp == null ? junk.getParentFile() : temp;
-        junk.delete();
-        junk = new File (parent, junk.getName());
-        junk.mkdirs();
-        GraphDb graphDb = new GraphDb (junk);
-        INSTANCES.put(junk, graphDb);
+    public static GraphDb createTempDb (String prefix) throws IOException {
+        File file = Files.createTempDirectory(prefix).toFile();
+        GraphDb graphDb = new GraphDb (file);
+        INSTANCES.put(file, graphDb);
         return graphDb;
     }
 

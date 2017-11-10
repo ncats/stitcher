@@ -12,7 +12,7 @@ import java.lang.reflect.Array;
 import chemaxon.struc.Molecule;
 import chemaxon.formats.MolImporter;
 
-import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 
 import ncats.stitcher.*;
@@ -128,10 +128,13 @@ public class MoleculeEntityFactory extends EntityRegistry {
                 for (String prop : me.getValue()) {
                     String value = mol.getProperty(prop);
                     if (value != null) {
-                        for (String t : value.split("[\n]+")) {
-                            ent._addLabel(DynamicLabel.label(t));
+                        List<String> labels = new ArrayList<>();
+                        for (String t : value.split("[\r\n]+")) {
+                            String l = t.trim();
+                            labels.add(l);
+                            ent._addLabel(Label.label(l));
                         }
-                        payload.put(prop, value.split("[\n]+"));
+                        payload.put(prop, labels.toArray(new String[0]));
                     }
                 }
                 break;

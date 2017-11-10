@@ -16,6 +16,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -38,6 +39,33 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             JsonNode json = toJson (_node);
             tx.success();
             return json;
+        }
+    }
+
+    public JsonNode encodeSimple (CNode node) {
+        return toJsonSimple (node._node());
+    }
+
+    void setJson (ObjectNode node, PropertyContainer data) {
+        for (Map.Entry<String, Object> me : 
+                 data.getAllProperties().entrySet()) {
+            Util.setJson(node, me.getKey(), me.getValue());
+        }
+    }
+                
+    JsonNode toJsonSimple (Node _node) {
+        try (Transaction tx = _node.getGraphDatabase().beginTx()) {
+            ArrayNode node = mapper.createArrayNode();
+            for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
+                Node n = rel.getOtherNode(_node);
+                if (rel.isType(AuxRelType.STITCH) || rel.isType(AuxRelType.PAYLOAD)) {
+                    ObjectNode obj = mapper.createObjectNode();
+                    setJson (obj, n);
+                    node.add(obj);
+                }
+            }
+            tx.success();
+            return node;
         }
     }
 
