@@ -22,6 +22,7 @@ public enum StitchKey implements RelationshipType {
     I_CID(2, Long.class), // public cid
     I_NCT(1), // clinical trial NCT
     I_PMID(2, Long.class), // PubMed id
+    I_MeSH(2),
     I_UniProt(2), // UniProt id
     I_ChEMBL(2), // CHEMBL_ID
     I_Code(1), // any code

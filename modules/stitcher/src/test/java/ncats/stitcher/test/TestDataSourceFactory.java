@@ -115,7 +115,7 @@ public class TestDataSourceFactory {
         
         MoleculeEntityFactory mef = new MoleculeEntityFactory (graphDb);
         mef.setIdField("ncgc_id");
-        mef.add("PUBCHEM_SUBSTANCE_SYNONYM", new StitchKeyMapper () {
+        mef.add(new StitchKeyMapper () {
                 public Map<StitchKey, Object> map (Object value) {
                     Map<StitchKey, Set<String>> values =
                         new HashMap<StitchKey, Set<String>>();
@@ -152,7 +152,7 @@ public class TestDataSourceFactory {
                     }
                     return stitches;
                 }
-            });
+            }, "PUBCHEM_SUBSTANCE_SYNONYM");
         mef.register(getClass().getResource("/aspirin_tox.sdf"));
         // this shouldn't register anything
         mef.register(getClass().getResource("/aspirin_tox.sdf"));

@@ -61,9 +61,9 @@ public class DrugBankEntityFactory extends MoleculeEntityFactory {
         add (StitchKey.H_InChIKey, "INCHI_KEY");
         add (StitchKey.N_Name, "GENERIC_NAME");
         add (StitchKey.N_Name, "JCHEM_TRADITIONAL_IUPAC");
-        add ("DRUG_GROUPS", new KeyMapper (StitchKey.T_Keyword));
-        add ("SYNONYMS", new KeyMapper (StitchKey.N_Name));
-        add ("INTERNATIONAL_BRANDS", new KeyMapper (StitchKey.N_Name));
+        add (new KeyMapper (StitchKey.T_Keyword), "DRUG_GROUPS");
+        add (new KeyMapper (StitchKey.N_Name), "SYNONYMS");
+        add (new KeyMapper (StitchKey.N_Name), "INTERNATIONAL_BRANDS");
     }
 
     public static void main (String[] argv) throws Exception {

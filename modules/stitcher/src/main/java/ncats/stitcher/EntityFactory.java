@@ -1425,6 +1425,11 @@ public class EntityFactory implements Props {
         }
     }
 
+    public Long count (String... labels) {
+        return count (Arrays.stream(labels)
+                      .map(l -> Label.label(l)).toArray(Label[]::new));
+    }
+    
     public Long count (Label... labels) {
         StringBuilder q = new StringBuilder ("match(n");
         if (labels != null) {

@@ -203,37 +203,48 @@ public class UntangleCompoundComponent extends UntangleComponent {
             }
             else if (!nodes.isEmpty()) {
                 // find labeled nodes that maximally span multiple cliques
-                Integer max = Collections.max(nodes.values());
-                Map<Long, Set<Long>> map = new TreeMap<>();
-                for (Map.Entry<Long, Integer> me : nodes.entrySet()) {
-                    if (me.getValue() == max) {
-                        Long cls = uf.root(me.getKey());
-                        Set<Long> set = map.get(cls);
-                        if (set == null)
-                            map.put(cls, set = new HashSet<>());
-                        set.add(me.getKey());
+
+                if (false) {
+                    /*
+                     * I'm not sure if this heuristic is still needed. In
+                     * theory, the clique heuristic should be able to handle
+                     * both cases.
+                     */
+                    Integer max = Collections.max(nodes.values());
+                    Map<Long, Set<Long>> map = new TreeMap<>();
+                    for (Map.Entry<Long, Integer> me : nodes.entrySet()) {
+                        if (me.getValue() == max) {
+                            Long cls = uf.root(me.getKey());
+                            Set<Long> set = map.get(cls);
+                            if (set == null)
+                                map.put(cls, set = new HashSet<>());
+                            set.add(me.getKey());
+                        }
                     }
+
+                    logger.info("No best clique found, so resort to "
+                                +"maximal clique span heuristic: "+map);
+                
+                    // find label with maximum members
+                    Set<Long> best = null;
+                    for (Map.Entry<Long, Set<Long>> me : map.entrySet()) {
+                        int size = me.getValue().size();
+                        if (best == null || best.size() < size) {
+                            best = me.getValue();
+                        }
+                        else if (best.size() == size)
+                            return false; // not unanimous
+                    }
+
+                    logger.info("## resolving "+entity.getId()+" => "+best);
+                    for (Long n : best)
+                        uf.union(entity.getId(), n);
                 }
 
                 logger.info("No best clique found, so resort to "
-                            +"maximal clique span heuristic: "+map);
+                            +"clique span heuristic.");
                 
-                // find label with maximum members
-                Set<Long> best = null;
-                for (Map.Entry<Long, Set<Long>> me : map.entrySet()) {
-                    int size = me.getValue().size();
-                    if (best == null || best.size() < size) {
-                        best = me.getValue();
-                    }
-                    else if (best.size() == size)
-                        return false; // not unanimous
-                }
-
-                logger.info("## resolving "+entity.getId()+" => "+best);
-                for (Long n : best)
-                    uf.union(entity.getId(), n);
-
-                for (Map.Entry<Clique, Set<StitchKey>> me : 
+                for (Map.Entry<Clique, Set<StitchKey>> me :
                          cliques.entrySet()) {
                     Clique clique = me.getKey();
                     Set<StitchKey> keys = me.getValue();
@@ -285,47 +296,64 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                 +" ("+count+") => ");
                     Util.dump(clique);
                     
-                    if (count == (clique.size() * (clique.size() -1)/2)) {
-                        // collapse components
-                        if (clique.contains(entity)) {
-                            Map<Long, Integer> classes = new HashMap<>();
-                            int unmapped = 0;
-                            for (Long n : clique.nodeSet()) {
-                                Long c = uf.root(n);
-                                logger.info(" .. "+n+" => "+ c);
-                                if (c != null) {
-                                    Integer cnt = classes.get(c);
-                                    classes.put(c, cnt == null ? 1 :cnt+1);
-                                    // keeping track of labeled nodes in cliques
-                                    cnt = nodes.get(n);
-                                    nodes.put(n, cnt == null ? 1 : cnt+1);
+                    if (count != (clique.size() * (clique.size() -1)/2)) {
+                        logger.warning("** might be spurious clique **");
+                        return true;
+                    }
+                    
+                    // collapse components
+                    if (clique.contains(entity)) {
+                        Map<Long, Integer> classes = new HashMap<>();
+                        int unmapped = 0;
+                        for (Long n : clique.nodeSet()) {
+                            Long c = uf.root(n);
+                            logger.info(" .. "+n+" => "+ c);
+                            if (c != null) {
+                                Integer cnt = classes.get(c);
+                                classes.put(c, cnt == null ? 1 :cnt+1);
+                                // keeping track of labeled nodes in cliques
+                                cnt = nodes.get(n);
+                                nodes.put(n, cnt == null ? 1 : cnt+1);
+                            }
+                            else
+                                ++unmapped;
+                        }
+                        
+                        if (classes.size() < 2
+                            && (anyvalue
+                                || containsExactly (clique, key, value))
+                            && (bestClique == null
+                                || bestClique.size() < clique.size())) {
+                            bestClique = clique;
+                            logger.info("## best clique updated: "
+                                        +clique.getId()+" key="+key
+                                        +" value="+Util.toString(value));
+                        }
+                        else {
+                            // find larger cliques that contains the same
+                            //  set of members and update their keys
+                            List<Clique> superCliques = new ArrayList<>();
+                            for (Map.Entry<Clique, Set<StitchKey>> me
+                                     : cliques.entrySet()) {
+                                Clique c = me.getKey();
+                                if (c.size() > clique.size()) {
+                                    Component ov = c.and(clique);
+                                    if (ov.equals(clique))
+                                        superCliques.add(c);
                                 }
-                                else
-                                    ++unmapped;
                             }
                             
-                            if (classes.size() < 2
-                                && (anyvalue
-                                    || containsExactly (clique, key, value))
-                                && (bestClique == null
-                                    || bestClique.size() < clique.size())) {
-                                bestClique = clique;
-                                logger.info("## best clique updated: "
-                                            +clique.getId()+" key="+key
-                                            +" value="+Util.toString(value));
+                            Set<StitchKey> set = cliques.get(clique);
+                            if (set == null) {
+                                cliques.put(clique, set = EnumSet.noneOf
+                                            (StitchKey.class));
                             }
-                            else {
-                                Set<StitchKey> set = cliques.get(clique);
-                                if (set == null) {
-                                    cliques.put(clique, set = EnumSet.noneOf
-                                                (StitchKey.class));
-                                }
-                                set.add(key);
-                            }
+                            
+                            set.add(key);
+                            // merge other keys into this clique
+                            for (Clique c : superCliques)
+                                set.addAll(cliques.get(c));
                         }
-                    }
-                    else {
-                        logger.warning("** might be spurious clique **");
                     }
             
                     return true;
