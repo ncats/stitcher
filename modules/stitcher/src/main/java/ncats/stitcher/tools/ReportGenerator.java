@@ -420,7 +420,7 @@ public class ReportGenerator {
                     H_LyChI_L4, I_UNII, I_CAS,
                     N_Name, H_LyChI_L3
             }) {
-                for (Object v : c.values(k)) {
+                for (Object v : c.values(k).keySet()) {
                     System.out.println(">>> cliques for "+k+"="+v+" <<<");
                     c.cliques(clique -> {
                         long[] nc = clique.nodes();
