@@ -40,7 +40,7 @@ public interface Component extends Iterable<Entity> {
     /*
      * unique set of values that span the given stitch key
      */
-    default Object[] values (StitchKey key) {
+    default Map<Object, Integer> values (StitchKey key) {
         throw new UnsupportedOperationException
             ("vlaues(key) is not supported for this implementation");
     }
