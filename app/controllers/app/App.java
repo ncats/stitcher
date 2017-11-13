@@ -128,7 +128,7 @@ public class App extends Controller {
         if (null == version)
             return ok (error.render(this, uri+": No latest version defined!"));
 
-        return redirect (routes.App.stitches(version, q, rows, page));
+        return stitches (version, q, rows, page);
     }
     
     public Result stitches (Integer version, String q,
