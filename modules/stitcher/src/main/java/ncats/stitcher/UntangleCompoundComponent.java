@@ -16,6 +16,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
         (UntangleCompoundComponent.class.getName());
 
     final Map<Object, Set<Entity>> moieties = new TreeMap<>();
+    EntityFactory ef;
 
     class TransitiveClosure {
         Entity emin;
@@ -405,6 +406,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
     @Override
     public void untangle (EntityFactory ef, BiConsumer<Long, long[]> consumer) {
         logger.info("####### Untangling component: "+component);
+        this.ef = ef;
 
         // collapse based on single/terminal active moieties
         Set<Entity> unsure = new TreeSet<>();
@@ -466,7 +468,11 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 }
             }, H_LyChI_L4);
 
-        int count = 0;        
+        // we need to do another pass over each component to see
+        // if we have multi-value cliques that span components
+        mergeComponents (N_Name, I_CAS, I_UNII, H_LyChI_L3);
+
+        List<Entity> singletons = new ArrayList<>();
         // now find all remaining unmapped nodes
         int processed = 0, total = component.size();
         for (Entity e : component) {
@@ -486,16 +492,17 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 }
                 */
                 else {
-                    uf.add(e.getId());
                     logger.warning("** unmapped entity "+e.getId()+": "
                                    +e.keys());
-                    
-                    ++count;
+                    singletons.add(e);
                 }
                 ++processed;            
             }
         }
-        dump ("##### number of unmapped nodes: "+count);
+        dump ("##### number of unmapped nodes: "+singletons.size());
+
+        // now merge singeltons
+        mergeSingletons (singletons, N_Name, I_CAS, I_UNII);
         
         // now handle unresolved nodes with multiple active moieties and
         // assign to the class with less references 
@@ -524,10 +531,6 @@ public class UntangleCompoundComponent extends UntangleComponent {
         }
         dump ("##### nodes with multiple active moieties");
 
-        // we need to do another pass over each component to see
-        // if we have multi-value cliques that span components
-        mergeComponents (N_Name, I_CAS, I_UNII, H_LyChI_L3);
-        
         // now generate untangled compoennts..
         long[][] components = uf.components();
         logger.info("There are "+components.length
@@ -646,7 +649,45 @@ public class UntangleCompoundComponent extends UntangleComponent {
                         uf.union(nodes[i], nodes[j]);
             }
         }
-    }   
+    }
+
+    void mergeSingletons (Collection<Entity> singletons, StitchKey... span) {
+        logger.info("Merging singletons..."+singletons.size());
+        for (Entity e : singletons) {
+            Entity[] nb = e.neighbors(span);
+            
+            Map<Long, Integer> classes = new HashMap<>();
+            for (int i = 0; i < nb.length; ++i) {
+                Long cls = uf.root(nb[i].getId());
+                if (cls != null) {
+                    Integer c = classes.get(cls);
+                    classes.put(cls, c==null ? 1 : c+1);
+                }
+            }
+
+            boolean merged = false;
+            if (!classes.isEmpty()) {
+                Map.Entry<Long, Integer> max = Collections.max
+                    (classes.entrySet(), (a, b) -> {
+                        return b.getValue() - a.getValue();
+                    });
+                
+                // should we require unanimous?
+                if (max.getValue() > 1) {
+                    logger.info("$$$$ collapsing entity "+e.getId()
+                                +" => "+max.getKey()+" ("+max.getValue()+"/"
+                                +nb.length+")");
+                    uf.union(max.getKey(), e.getId());
+                    merged = true;
+                }
+            }
+
+            if (!merged) {
+                logger.info("**** singleton entity "+e.getId()+": "+e.keys());
+                uf.add(e.getId());
+            }
+        }
+    }
 
     void dumpActiveMoieties () {
         try {
