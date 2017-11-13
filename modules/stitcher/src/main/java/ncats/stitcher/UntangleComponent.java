@@ -14,7 +14,7 @@ import static ncats.stitcher.StitchKey.*;
 public abstract class UntangleComponent implements Props {
     static final Logger logger = Logger.getLogger
         (UntangleComponent.class.getName());
-
+    
     final protected DataSource dsource;
     final protected Component component;
     final protected UnionFind uf = new UnionFind ();
@@ -82,7 +82,8 @@ public abstract class UntangleComponent implements Props {
         return sep == ',' ? "["+sb+"]" : sb.toString();
     }
     
-    public abstract void untangle (BiConsumer<Long, long[]> consumer);
+    public abstract void untangle
+        (EntityFactory ef, BiConsumer<Long, long[]> consumer);
     public Component component () { return component; }
     public DataSource getDataSource () { return dsource; }
 }

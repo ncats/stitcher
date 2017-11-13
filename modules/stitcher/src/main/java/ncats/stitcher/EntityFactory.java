@@ -334,6 +334,7 @@ public class EntityFactory implements Props {
             try (Transaction tx = gdb.beginTx()) {
                 entities = new Entity[nodes.length];
                 int rank = 0;
+                
                 for (int i = 0; i < nodes.length; ++i) {
                     Node n = gdb.getNodeById(nodes[i]);
                     entities[i] = Entity._getEntity(n);
@@ -434,19 +435,24 @@ public class EntityFactory implements Props {
         /*
          * unique set of values that span the given stitch key
          */
-        public Object[] values (StitchKey key) {
-            Set values = new HashSet ();
+        public Map<Object, Integer> values (StitchKey key) {
+            Map<Object, Integer> values = new HashMap<>();
             for (Entity e : entities) {
                 try (Transaction tx = e._node().getGraphDatabase().beginTx()) {
-                    for (Relationship rel :
-                             e._node().getRelationships(key, Direction.BOTH)) {
-                        if (rel.hasProperty(VALUE))
-                            values.add(rel.getProperty(VALUE));
+                    for (Relationship rel : e._node().getRelationships
+                             // pick either direction
+                             (key, Direction.OUTGOING)) {
+                        long xn = rel.getOtherNodeId(e._node().getId());
+                        if (rel.hasProperty(VALUE) && nodes.contains(xn)) {
+                            Object v = rel.getProperty(VALUE);
+                            Integer c = values.get(v);
+                            values.put(v, c==null ? 1 : (c+1));
+                        }
                     }
                     tx.success();
                 }
             }
-            return values.toArray(new Object[0]);
+            return values;
         }
         
         public Component filter (StitchKey key, Object value) {
@@ -814,9 +820,8 @@ public class EntityFactory implements Props {
     }
 
     static class CliqueImpl extends ComponentImpl implements Clique {
-        final EnumMap<StitchKey, Object> values =
-            new EnumMap (StitchKey.class);
-
+        final Map<StitchKey, Object> values = new EnumMap<>(StitchKey.class);
+        
         CliqueImpl (Component... comps) {
             super (comps);
         }
@@ -838,9 +843,9 @@ public class EntityFactory implements Props {
                     update (nodes, key);
 
                 if (values.isEmpty()) {
-                    logger.warning("Clique has no defining key span!\n"+this.nodes);
+                    logger.warning("Clique has no defining key span!\n"
+                                   +this.nodes);
                 }
-
                 tx.success();
             }
             id = Util.sha1(nodes).substring(0, 9);
@@ -1027,65 +1032,6 @@ public class EntityFactory implements Props {
             }
             
             return done;
-        }
-    }
-
-    static class MaxCliqueEnum {
-        final GraphDatabaseService gdb;
-        final Map<BitSet, CliqueImpl> cliques =
-            new HashMap<BitSet, CliqueImpl>();
-        final StitchKey[] keys;
-        
-        MaxCliqueEnum (GraphDatabaseService gdb, StitchKey[] keys) {
-            this.gdb = gdb;
-            this.keys = keys;
-        }
-
-        public boolean enumerate (long[] nodes, CliqueVisitor visitor) {
-            cliques.clear();
-            
-            /*
-             * for each key, we first identify all unique values; then
-             * for each key-value combination, we construct a subgraph
-             * that spans only those key-value nodes whereas in 
-             * CliqueEnumeration we need to enumerate over all maximal
-             * cliques for all possible stitch key-value combinations.
-             */
-            ComponentImpl subgraph = new ComponentImpl (gdb, nodes);
-            logger.info("** "+subgraph);
-            for (StitchKey key : keys) {
-                // find all unique values for this subgraph over the given
-                // stitch key
-                Object[] vals = subgraph.values(key);
-                if (vals.length > 0) {
-                    System.err.print(" ++  "+key+":");
-                    for (int i = 0; i < vals.length; ++i) {
-                        Component comp = subgraph.filter(key, vals[i]);
-                        System.err.print(" "+vals[i]+"("+comp.size()+")");
-                        if (comp.size() >= CLIQUE_MINSIZE) {
-                            maxclique (comp, key, vals[i]);
-                        }
-                    }
-                    System.err.println();
-                }
-            }
-            
-            for (Map.Entry<BitSet, CliqueImpl> me: cliques.entrySet()) {
-            }
-            
-            return true;
-        }
-
-        void maxclique (Component comp, StitchKey key, Object value) {
-            Graph G = new Graph (comp);
-            BitSet C = G.maxclique(key, value);
-            CliqueImpl clique = cliques.get(C);
-            if (clique == null) {
-                cliques.put(C, clique);
-            }
-            Object val = clique.values().get(key);
-            clique.values()
-                .put(key, val == null ? value : Util.merge(val, value));
         }
     }
 
@@ -1630,7 +1576,7 @@ public class EntityFactory implements Props {
      * @param consumer
      */
     public void untangle (UntangleComponent uc, Consumer<Stitch> consumer) {
-        uc.untangle((root, member) -> {
+        uc.untangle(this, (root, member) -> {
                 ComponentImpl comp = new ComponentImpl (gdb, member);
                 if (root != null)
                     comp.setRoot(root);

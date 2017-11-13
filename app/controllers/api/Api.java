@@ -302,7 +302,7 @@ public class Api extends Controller {
         if (ver == null)
             return badRequest ("No latest version defined!");
 
-        return redirect (routes.Api.stitches(ver, skip, top));
+        return stitches (ver, skip, top);
     }
     
     public Result stitches (Integer ver, Integer skip, Integer top) {
