@@ -231,12 +231,12 @@ public class Api extends Controller {
         String uri = routes.Api.getStitches(ver, id, format).url();
         Logger.debug(uri);
 
-        ArrayNode json = mapper.createArrayNode();
+        JsonNode json = mapper.createArrayNode();
         try {
             long n = Long.parseLong(id);
             Entity e = es.getEntityFactory().entity(n);
-            if (!e.is(AuxNodeType.SGROUP))
-                json.add(jsonCodec.encodeSimple(e));
+            if (e.is(AuxNodeType.SGROUP))
+                json = jsonCodec.encodeSimple(e);
         }
         catch (Exception ex) {
             Entity[] entities = es.getEntityFactory()
@@ -247,10 +247,10 @@ public class Api extends Controller {
                     // unwrap this array
                     ArrayNode an = (ArrayNode)n;
                     for (int j = 0; j < an.size(); ++j)
-                        json.add(an.get(j));
+                        ((ArrayNode)json).add(an.get(j));
                 }
                 else
-                    json.add(n);
+                    ((ArrayNode)json).add(n);
             }
         }
 

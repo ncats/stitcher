@@ -379,12 +379,12 @@ public class UntangleCompoundComponent extends UntangleComponent {
             Clique c = me.getKey();
             if (c.size() > clique.size()) {
                 Component ov = c.and(clique);
-                if (ov.equals(clique))
+                if (ov != null && ov.equals(clique))
                     superCliques.add(c);
             }
             else if (c.size() < clique.size()) {
                 Component ov = clique.and(c);
-                if (ov.equals(c))
+                if (ov != null && ov.equals(c))
                     subCliques.add(c);
             }
         }
@@ -607,18 +607,24 @@ public class UntangleCompoundComponent extends UntangleComponent {
     void mergeComponents (StitchKey... span) {
         logger.info("Merging components with different equivalence classes...");
         final Map<Clique, Set<StitchKey>> cliques = new HashMap<>();
-        for (StitchKey key : Entity.KEYS) {
+        for (StitchKey key : span) {
             Map<Object, Integer> values = component.values(key);
             for (Map.Entry<Object, Integer> me : values.entrySet()) {
                 // only consider clique of side 3 or larger             
                 if (me.getValue() > 2) {
                     boolean ok = true;
+                    Object value = me.getKey();
                     switch (key) {
                     case H_LyChI_L3:
+                        if (value.toString().endsWith("-S") 
+                            || value.toString().endsWith("-M"))
+                            ok = false;
+                        break;
+
                     case H_LyChI_L4:
                     case H_LyChI_L5:
                         // don't do clique on salt values
-                        if (me.getKey().toString().endsWith("-S"))
+                        if (value.toString().endsWith("-S"))
                             ok = false;
                         break;
                     }
@@ -631,7 +637,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                 Util.dump(clique);
                                 updateCliques (cliques, key, clique);
                                 return true;
-                            }, key, me.getKey());
+                            }, key, value);
                     }
                 }
             }
@@ -654,30 +660,39 @@ public class UntangleCompoundComponent extends UntangleComponent {
     void mergeSingletons (Collection<Entity> singletons, StitchKey... span) {
         logger.info("Merging singletons..."+singletons.size());
         for (Entity e : singletons) {
-            Entity[] nb = e.neighbors(span);
-            
-            Map<Long, Integer> classes = new HashMap<>();
-            for (int i = 0; i < nb.length; ++i) {
-                Long cls = uf.root(nb[i].getId());
-                if (cls != null) {
-                    Integer c = classes.get(cls);
-                    classes.put(cls, c==null ? 1 : c+1);
+            // only merge if this entity has multiple key span
+            Map<StitchKey, Long> classes = new HashMap<>();
+            for (StitchKey key : span) {
+                Entity[] nb = e.neighbors(key);
+                for (int i = 0; i < nb.length; ++i) {
+                    Long cls = uf.root(nb[i].getId());
+                    if (cls != null) {
+                        Long c = classes.get(key);
+                        if (c == null)
+                            classes.put(key, cls);
+                        else if (c == -1l) {
+                        }
+                        else if (!cls.equals(c)) {
+                            classes.put(key, -1l);
+                        }
+                    }
                 }
             }
 
             boolean merged = false;
-            if (!classes.isEmpty()) {
-                Map.Entry<Long, Integer> max = Collections.max
+            if (classes.size() > 1) { // should we require unanimous?
+                Map.Entry<StitchKey, Long> max = Collections.max
                     (classes.entrySet(), (a, b) -> {
-                        return b.getValue() - a.getValue();
+                        if (b.getValue() > a.getValue()) return 1;
+                        if (b.getValue() < a.getValue()) return -1;
+                        return 0;
                     });
                 
-                // should we require unanimous?
-                if (max.getValue() > 1) {
+                if (max.getValue() > 0l) {
                     logger.info("$$$$ collapsing entity "+e.getId()
-                                +" => "+max.getKey()+" ("+max.getValue()+"/"
-                                +nb.length+")");
-                    uf.union(max.getKey(), e.getId());
+                                +" => "+max.getKey()+" ("+max.getValue()
+                                +") from "+classes);
+                    uf.union(max.getValue(), e.getId());
                     merged = true;
                 }
             }
