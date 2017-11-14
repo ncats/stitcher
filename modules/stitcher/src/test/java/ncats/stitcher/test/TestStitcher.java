@@ -163,4 +163,12 @@ public class TestStitcher {
              EntityRegistry.class.getResourceAsStream("/OZAGREL1.json"),
              EntityRegistry.class.getResourceAsStream("/OZAGREL2.json"));
     }
+
+    @Test
+    public void testStitch4 () throws Exception {
+        logger.info("##### "+name.getMethodName()+" #####");
+        testMergedStitches
+            (name.getMethodName(),
+             EntityRegistry.class.getResourceAsStream("/1020343.json"));
+    }
 }
