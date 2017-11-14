@@ -60,19 +60,19 @@ public class CompoundStitcher implements Consumer<Stitch> {
 
     public void stitch (int version, Long... components) throws Exception {
         DataSource dsource = dsf.register("stitch_v"+version);
+        int count = 1;
         if (components == null || components.length == 0) {
             // do all components
             logger.info("Untangle all components...");
             List<Long> comps = new ArrayList<>();
             int total = ef.components(comps);
             logger.info("### "+total+" components!");
-            int count = 1;
             for (Long cid : comps) {
                 logger.info("################ UNTANGLE COMPONENT "+cid
+                            +" of size "+ef.entity(cid).get(Props.RANK)
                             +"... "+count+"/"+total);
                 Component comp = ef.component(cid);
-                logger.info("################ component "+cid
-                            +" has "+comp.size()+" members!");
+                logger.info("Stitching component "+cid);
                 ef.untangle(new StitcherUntangleCompoundComponent
                             (dsource, comp), this);
                 ++count;
@@ -80,10 +80,14 @@ public class CompoundStitcher implements Consumer<Stitch> {
         }
         else {
             for (Long cid : components) {
+                logger.info("################ UNTANGLE COMPONENT "+cid
+                            +" of size "+ef.entity(cid).get(Props.RANK)
+                            +"... "+count+"/"+components.length);
                 Component comp = ef.component(cid);
                 logger.info("Stitching component "+comp.getId());
                 ef.untangle(new StitcherUntangleCompoundComponent
                             (dsource, comp), this);
+                ++count;
             }
         }
     }
