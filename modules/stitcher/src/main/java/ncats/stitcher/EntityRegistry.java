@@ -556,6 +556,15 @@ public class EntityRegistry extends EntityFactory {
                                 ent._add(me.getKey(),
                                          new StitchValue (prop, val));
                             }
+                            else if (val.getClass().isArray()) {
+                                int len = Array.getLength(val);
+                                for (int i = 0; i < len; ++i) {
+                                    Object v = Array.get(val, i);
+                                    ent._add
+                                        (me.getKey(), new StitchValue
+                                         (prop, Long.parseLong(v.toString())));
+                                }
+                            }
                             else {
                                 try {
                                     ent._add(me.getKey(), new StitchValue
@@ -880,6 +889,10 @@ public class EntityRegistry extends EntityFactory {
             ds.set("NameField", nameField);
         if (strucField != null)
             ds.set("StrucField", strucField);
+    }
+    
+    public void updateDataSourceMetadata () {
+        updateMeta (source);
     }
     
     public DataSourceFactory getDataSourceFactory () { return dsf; }

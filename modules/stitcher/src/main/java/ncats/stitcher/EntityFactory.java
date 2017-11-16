@@ -1013,7 +1013,7 @@ public class EntityFactory implements Props {
                     else
                         keys.add(G.key());
                     
-                    done = C.cardinality() == G.size();
+                    //done = C.cardinality() == G.size();
                 }
             }
             else {

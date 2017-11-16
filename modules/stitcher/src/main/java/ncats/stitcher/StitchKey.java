@@ -14,22 +14,27 @@ public enum StitchKey implements RelationshipType {
     N_Name, // any name
 
     /*
-     * Identifier
+     * Compound identifiers
      */
     I_UNII(2), // FDA UNII
     I_CAS(1), // CAS registry number
     I_SID(1, Long.class), // pubchem sid
     I_CID(2, Long.class), // public cid
-    I_NCT(1), // clinical trial NCT
-    I_PMID(2, Long.class), // PubMed id
-    I_MeSH(2),
-    I_UniProt(2), // UniProt id
-    I_ChEMBL(2), // CHEMBL_ID
-    I_Code(1), // any code
-    I_Any(1, Long.class), // Any numeric id
+    I_ChEMBL, // CHEMBL_ID
+    I_DB, // DrugBank
+    I_CODE(1), // any code
 
     /*
-     * Hash
+     * Other identifiers
+     */
+    I_MeSH(2),
+    I_UniProt(2), // UniProt id
+    I_NCT(1), // clinical trial NCT
+    I_PMID(2, Long.class), // PubMed id
+    I_ANY(1, Long.class), // Any numeric id
+    
+    /*
+     * Compound hash
      */
     H_InChIKey(3), // InChIKey
     H_LyChI_L1, // LyChI Layer 1
@@ -37,6 +42,10 @@ public enum StitchKey implements RelationshipType {
     H_LyChI_L3, // LyChI layer 3
     H_LyChI_L4(2), // LyChI layer 4
     H_LyChI_L5(3), // LyChI layer 4 with salt + solvent
+
+    /*
+     * Generic hash
+     */
     H_SHA1(5), // SHA1 hash
     H_SHA256(5), // SHA256 hash
     H_MD5(4), // MD5 hash

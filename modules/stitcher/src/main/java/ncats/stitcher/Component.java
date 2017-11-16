@@ -28,6 +28,10 @@ public interface Component extends Iterable<Entity> {
      * return the set of node ids
      */
     Set<Long> nodeSet ();
+
+    default boolean isEmpty () {
+        return nodeSet().isEmpty();
+    }
     
     default boolean contains (Entity e) {
         return nodeSet().contains(e.getId());

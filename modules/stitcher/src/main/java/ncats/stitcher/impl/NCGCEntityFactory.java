@@ -51,8 +51,8 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
         add (N_Name, "SampleName");
         add (I_CID, "PubChemCID");
         add (I_SID, "PubChemSID");
-        add (I_Code, "SampleId");
-        add (I_Code, "Tox21Id");
+        add (I_CODE, "SampleId");
+        add (I_CODE, "Tox21Id");
         add (I_CAS, "CAS");
         add (T_Keyword, "ApprovalStatus");
         add (T_Keyword, "Library");

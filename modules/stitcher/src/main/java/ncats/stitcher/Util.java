@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import chemaxon.struc.Molecule;
+import chemaxon.struc.MolBond;
+import chemaxon.struc.MolAtom;
 import chemaxon.util.MolHandler;
 
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -819,6 +821,157 @@ public class Util {
 
         // ok, give up
         return String.class;
+    }
+
+    public static boolean isTetrahedral (MolAtom atom, int[] gi) {
+        Molecule m = (Molecule)atom.getParent();
+        // check for symmetry 
+        Set<Integer> g = new HashSet<Integer>();
+        for (int i = 0; i < atom.getBondCount(); ++i) {
+            MolBond b = atom.getBond(i);
+            if (b.getType() != 1)
+                return false;
+
+            MolAtom xa = b.getOtherAtom(atom);
+            // any symmetry is false
+            if (!g.add(gi[m.indexOf(xa)]))
+                return false;
+        }
+
+        return g.size() > 2 
+            && atom.getAtno() != 7 
+            && atom.getAtno() != 15;
+    }
+
+    public static boolean isQuatAmine (MolAtom atom) {
+        return atom.getAtno() == 7 && atom.getBondCount() == 4;
+    }
+    
+    public static Map calcMolProps (Molecule mol) {
+        if (mol.getDim() < 2) {
+            mol.clean(2, null);
+        }
+
+        // no explicit Hs
+        mol.hydrogenize(false);
+        // make sure molecule is kekulized consistently
+        mol.aromatize();
+        mol.dearomatize();
+
+        MolAtom[] atoms = mol.getAtomArray();
+        int stereo = 0, def = 0, charge = 0;
+        
+        int[] gi = new int[atoms.length];
+        mol.getGrinv(gi);
+        
+        for (int i = 0; i < atoms.length; ++i) {
+            int chiral = mol.getChirality(i);
+            MolAtom atom = mol.getAtom(i);
+            
+            if (chiral == MolAtom.CHIRALITY_R
+                || chiral == MolAtom.CHIRALITY_S) {
+                ++def;
+                ++stereo;
+                atom.setAtomMap(chiral == MolAtom.CHIRALITY_R ? 1 : 2);
+            }
+            else {
+                boolean undef = chiral != 0;
+                
+                int pc = 0;
+                // now check to see if for bond parity.. if any is 
+                // defined then we consider this stereocenter as
+                // defined!
+                for (int k = 0; k < atom.getBondCount(); ++k) {
+                    MolBond bond = atom.getBond(k);
+                    int parity = bond.getFlags() & MolBond.STEREO1_MASK;
+                    if ((parity == MolBond.UP || parity == MolBond.DOWN)
+                        && bond.getAtom1() == atom)
+                        ++pc;
+                }
+                
+                boolean tetra = isTetrahedral (atom, gi);
+                if (isQuatAmine (atom) 
+                    || (pc > 0 && atom.getBondCount() > 2 )
+                    || (undef && tetra)) {
+                    ++stereo;
+                    
+                    if (pc > 0) {
+                        ++def;
+                        atom.setAtomMap(0);
+                    }
+                    else
+                        atom.setAtomMap(3); // unknown
+                }
+            }
+            
+            charge += atoms[i].getCharge();
+        }
+        
+        int ez = 0; // ez centers
+        MolBond[] bonds = mol.getBondArray();
+        for (int i = 0; i < bonds.length; ++i) {
+            MolBond bond = bonds[i];
+            if (mol.isRingBond(i)) {
+            }
+            else if (bond.getType() == 2) {
+                MolAtom a1 = bond.getAtom1();
+                MolAtom a2 = bond.getAtom2();
+                if (a1.getBondCount() == 1 || a2.getBondCount() == 1) {
+                    // nothing to do
+                }
+                else {
+                    /*
+                     *  \      /
+                     *   \    /
+                     *    ----
+                     * a1 ---- a2
+                     *   /         \
+                     *  /          \
+                     *
+                     */
+                    int g1 = -1;
+                    for (int j = 0; j < a1.getBondCount(); ++j) {
+                        MolBond b = a1.getBond(j);
+                        if (b != bond) {
+                            int index = mol.indexOf(b.getOtherAtom(a1));
+                            if (gi[index] == g1) {
+                                g1 = -1;
+                                break;
+                            }
+                            g1 = gi[index];
+                        }
+                    }
+                    
+                    int g2 = -1;
+                    for (int j = 0; j < a2.getBondCount(); ++j) {
+                        MolBond b = a2.getBond(j);
+                        if (b != bond) {
+                            int index = mol.indexOf(b.getOtherAtom(a2));
+                            if (gi[index] == g2) {
+                                g2 = -1;
+                                break;
+                            }
+                            g2 = gi[index];
+                        }
+                    }
+                    
+                    if (g1 >= 0 && g2 >= 0)
+                        ++ez;
+                }
+            }
+        }
+
+        Map props = new HashMap ();
+        props.put("undefinedStereo", stereo - def);
+        props.put("definedStereo", def);
+        props.put("stereoCenters", stereo);
+        props.put("ezCenters", ez);
+        props.put("charge", charge);
+        props.put("formula", mol.getFormula());
+        props.put("mwt", mol.getMass());
+        props.put("molfile", mol.toFormat("mol"));
+
+        return props;
     }
 
     public static String sha1 (Collection<Long> ids) {
