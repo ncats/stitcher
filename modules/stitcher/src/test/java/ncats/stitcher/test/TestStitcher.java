@@ -28,30 +28,39 @@ public class TestStitcher {
             super (GraphDb.createTempDb(name));
             // set data source for this registry
             setDataSource(getDataSourceFactory().register(name));
+            updateDataSourceMetadata ();            
         }
 
         @Override
         protected void init () {
             super.init();
             //setStrucField("MOLFILE");
-            setStrucField("SMILES");
+            setStrucField ("SMILES");
             // setup mapping
-            add(I_UNII, "UNII");
-            add(N_Name, "Synonyms");
-            add(I_CAS, "CAS");
-            add(I_CID, "PUBCHEM");
-            add(N_Name, "CompoundName");
-            add(N_Name, "CompoundSynonym");
-            add(I_CAS, "Cas");
-            add(I_UNII, "CompoundUNII");
-            add(I_CID, "Cid");
-            add(T_Keyword, "Class");
-            add(T_Keyword, "DATASET");
+            add (I_UNII, "UNII");
+            add (I_UNII, "CompoundUNII");           
+            add (I_CAS, "CAS");
+            add (I_CAS, "Cas");
+            add (I_CID, "PUBCHEM");
+            add (I_CID, "Cid");
+            add (I_ChEMBL, "ChemblId");
+            add (I_ChEMBL, "ChEMBL");
+            add (I_DB, "DrugbankId");
+            add (I_DB, "drugbank-id");
+            add (I_DB, "DRUG BANK");        
+            add (N_Name, "Synonyms");       
+            add (N_Name, "CompoundName");
+            add (N_Name, "CompoundSynonym");
+            add (N_Name, "Drug Substance");
+            add (N_Name, "Chemical Name");
+            add (T_Keyword, "Class");
+            add (T_Keyword, "DATASET");
+            add (T_Keyword, "Therapeutic Function");
         }
 
         void register (ArrayNode data) {
-            Map<String, Entity> entities = new HashMap<>();
-            Map<String, String> activeMoieties = new HashMap<>();
+            Map<Object, Entity> entities = new HashMap<>();
+            Map<Object, Object> activeMoieties = new HashMap<>();
             for (int i = 0; i < data.size(); ++i) {
                 Map<String, Object> row = new HashMap<>();
                 for (Iterator<Map.Entry<String, JsonNode>> it =
@@ -72,29 +81,38 @@ public class TestStitcher {
                 }
                 
                 Entity e = register (row);
-                String id = (String) row.get("id");
-                if (id != null) {
+                if (row.containsKey("PreferredName")) {
+                    // only use id from gsrs entries (which has PreferredName)
+                    Object id = row.get("id");
                     entities.put(id, e);
                     Object am = row.get("ActiveMoieties");
-                    if (am != null) {
-                        if (am.getClass().isArray())
-                            am = Array.get(am, 0);
-                        
-                        if (!id.equals(am))
-                            activeMoieties.put(id, (String)am);
-                    }
+                    if (am != null)
+                        activeMoieties.put(id, am);
                 }
             }
             
-            for (Map.Entry<String, String> me : activeMoieties.entrySet()) {
+            for (Map.Entry<Object, Object> me : activeMoieties.entrySet()) {
                 Entity child = entities.get(me.getKey());
-                Entity parent = entities.get(me.getValue());
-                child.stitch(parent, T_ActiveMoiety, me.getValue());
+                Object am = me.getValue();
+                if (am.getClass().isArray()) {
+                    int len = Array.getLength(am);
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(am, i);
+                        Entity parent = entities.get(v);
+                        if (!child.equals(parent))
+                            child.stitch(parent, T_ActiveMoiety, v);
+                    }
+                }
+                else {
+                    Entity parent = entities.get(am);
+                    if (!child.equals(parent))
+                        child.stitch(parent, T_ActiveMoiety, am);
+                }
             }
         }
     }
 
-    void testMergedStitches (String name, InputStream... streams)
+    void testMergedStitches (String name, int ncomp, InputStream... streams)
         throws Exception {
         ObjectMapper mapper = new ObjectMapper ();
         ArrayNode data = mapper.createArrayNode();
@@ -128,7 +146,8 @@ public class TestStitcher {
         }
         
         count = reg.count(ds.getName());
-        assertTrue ("Expect 1 stitch node but instead got "+count, count == 1l);
+        assertTrue ("Expect "+ncomp+" stitch node(s) but instead got "+count,
+                    count == ncomp);
 
         reg.shutdown();
     }
@@ -140,35 +159,39 @@ public class TestStitcher {
 
     @Test
     public void testStitch1 () throws Exception {
-        logger.info("##### "+name.getMethodName()+" #####");
+        logger.info("##################################### "
+                    +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(),
+            (name.getMethodName(), 1, 
              EntityRegistry.class.getResourceAsStream("/1JQS135EYN.json"));
     }
 
     @Test
     public void testStitch2 () throws Exception {
-        logger.info("##### "+name.getMethodName()+" #####");
+        logger.info("##################################### "
+                    +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(),
+            (name.getMethodName(), 1, 
              EntityRegistry.class.getResourceAsStream("/cefotetan1.json"),
              EntityRegistry.class.getResourceAsStream("/cefotetan2.json"));
     }
 
     @Test
     public void testStitch3 () throws Exception {
-        logger.info("##### "+name.getMethodName()+" #####");
+        logger.info("##################################### "
+                    +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(),
+            (name.getMethodName(), 1,
              EntityRegistry.class.getResourceAsStream("/OZAGREL1.json"),
              EntityRegistry.class.getResourceAsStream("/OZAGREL2.json"));
     }
 
     @Test
     public void testStitch4 () throws Exception {
-        logger.info("##### "+name.getMethodName()+" #####");
+        logger.info("##################################### "
+                    +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(),
+            (name.getMethodName(), 3,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
     }
 }

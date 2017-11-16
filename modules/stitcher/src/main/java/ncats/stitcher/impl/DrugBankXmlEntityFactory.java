@@ -80,7 +80,7 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
         add (I_CAS, "cas-number");
         add (I_UNII, "unii");
         add (H_InChIKey, "InChIKey");
-        add (I_Code, "drugbank-id-others");
+        add (I_CODE, "drugbank-id-others");
         add (T_Keyword, "groups");
     }
 

@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.util.function.BiConsumer;
 
+import chemaxon.struc.Molecule;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import static ncats.stitcher.StitchKey.*;
 
@@ -391,8 +393,7 @@ public class UntangleCompoundComponent extends UntangleComponent {
                             
         Set<StitchKey> set = cliques.get(clique);
         if (set == null) {
-            cliques.put(clique, set = EnumSet.noneOf
-                        (StitchKey.class));
+            cliques.put(clique, set = EnumSet.noneOf(StitchKey.class));
         }
                             
         set.add(key);
@@ -454,7 +455,6 @@ public class UntangleCompoundComponent extends UntangleComponent {
         component.stitches((source, target) -> {
                 uf.union(source.getId(), target.getId());
             }, H_LyChI_L5);
-        dump ("##### trusted keys stitching");
 
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
@@ -467,10 +467,15 @@ public class UntangleCompoundComponent extends UntangleComponent {
                     }
                 }
             }, H_LyChI_L4);
+        dump ("##### L5 & L4 keys stitching");
 
         // we need to do another pass over each component to see
         // if we have multi-value cliques that span components
-        mergeComponents (N_Name, I_CAS, I_UNII, H_LyChI_L3);
+        /*
+        mergeComponents (N_Name, I_CAS, I_UNII, I_DB, I_ChEMBL,
+                         I_CID, I_SID, H_LyChI_L4);
+        */
+        mergeCliqueComponents (H_LyChI_L3);
 
         List<Entity> singletons = new ArrayList<>();
         // now find all remaining unmapped nodes
@@ -484,7 +489,8 @@ public class UntangleCompoundComponent extends UntangleComponent {
                 if (transitive (e, H_LyChI_L4)) {
                     // 
                 }
-                else if (clique (e, N_Name, I_CAS, I_UNII, H_LyChI_L3)) {
+                else if (clique (e, N_Name, I_CAS, I_UNII,
+                                 I_DB, I_ChEMBL, H_LyChI_L3)) {
                 }
                 /*
                 else if (clique (e, false, H_LyChI_L3)) {
@@ -496,13 +502,13 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                    +e.keys());
                     singletons.add(e);
                 }
-                ++processed;            
+                ++processed;
             }
         }
         dump ("##### number of unmapped nodes: "+singletons.size());
 
         // now merge singeltons
-        mergeSingletons (singletons, N_Name, I_CAS, I_UNII);
+        mergeSingletons (singletons, N_Name, I_CAS, I_UNII, I_DB, I_ChEMBL);
         
         // now handle unresolved nodes with multiple active moieties and
         // assign to the class with less references 
@@ -603,6 +609,65 @@ public class UntangleCompoundComponent extends UntangleComponent {
     boolean clique (Entity e, boolean anyvalue, StitchKey... keys) {
         return new CliqueClosure(e, anyvalue, keys).closure();
     }
+
+    static boolean checkH4 (Object value) {
+        boolean ok = false;
+        if (value != null) {
+            if (value.getClass().isArray()) {
+                int len = Array.getLength(value), n = 0;
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(value, i);
+                    if (v.toString().endsWith("-N"))
+                        ++n;
+                }
+                ok = n > 0;
+            }
+            else {
+                ok = value.toString().endsWith("-N");
+            }
+        }
+        return ok;
+    }
+    
+    void mergeCliqueComponents (StitchKey key) {
+        Map<Object, Integer> values = component.values(key);
+        logger.info("$$$$ Merging components based on spanning cliques..."
+                    +key+"="+values);   
+        for (Map.Entry<Object, Integer> me : values.entrySet()) {
+            component.cliques(clique -> {
+                    Util.dump(clique);
+                    
+                    Entity[] entities = clique.entities();
+                    for (int i = 0; i < entities.length; ++i) {
+                        long ei = entities[i].getId();
+                        Long ci = uf.root(ei);
+                        for (int j = i+1; j < entities.length; ++j) {
+                            long ej = entities[j].getId();
+                            Long cj = uf.root(ej);
+
+                            Map<StitchKey, Object> stitches =
+                                entities[i].keys(entities[j]);
+                            //stitches.remove(key);
+                            Object h4 = stitches.get(H_LyChI_L4);
+                            if (stitches.size() > 2 /* key + another */
+                                || stitches.containsKey(H_LyChI_L5)
+                                || checkH4 (h4)) {
+                                logger.info
+                                    (ei+" <-"+stitches+"-> "+ej);
+                                uf.union(ei, ej);
+                            }
+                            else {
+                                logger.info("..."+ei+" ("+ci+") :: "
+                                            +stitches+" :: "+ ej
+                                            +" ("+cj+")");
+                            }
+                        }
+                    }
+                    
+                    return true;
+                }, key, me.getKey());
+        }
+    }
     
     void mergeComponents (StitchKey... span) {
         logger.info("Merging components with different equivalence classes...");
@@ -634,9 +699,31 @@ public class UntangleCompoundComponent extends UntangleComponent {
                                 logger.info("$$$$ searching for cliques "+key
                                             +": "+me.getKey()
                                             +"="+me.getValue());
-                                Util.dump(clique);
-                                updateCliques (cliques, key, clique);
-                                return true;
+                                // only consider this if there are missing
+                                // stereocenters
+                                boolean cont = true;
+                                if (key == H_LyChI_L3) {
+                                    int undef = 0;
+                                    for (Entity e : clique) {
+                                        Molecule mol = e.mol();
+                                        if (mol != null) {
+                                            Map props = Util.calcMolProps(mol);
+                                            Integer cnt = (Integer)props
+                                                .get("undefinedStereo");
+                                            if (cnt > 0) ++undef; 
+                                        }
+                                    }
+
+                                    logger.info("$$$$ entities with undefined "
+                                                +"stereocenters: "+undef);
+                                    cont = undef > 0;
+                                }
+
+                                if (cont) {
+                                    Util.dump(clique);
+                                    updateCliques (cliques, key, clique);
+                                }
+                                return cont;
                             }, key, value);
                     }
                 }
