@@ -69,6 +69,122 @@ public class Entity extends CNode {
         }
     }
 
+    static public class Triple implements Comparable<Triple> {
+        final Entity source, target;
+        final Set<StitchKey> flip = EnumSet.noneOf(StitchKey.class);
+        final Map<StitchKey, Object> values = new EnumMap<>(StitchKey.class);
+        
+        Triple (Node source, Node target) {
+            this.source = Entity._getEntity(source);
+            this.target = Entity._getEntity(target);
+        }
+        
+        void add (StitchKey key, Object value, boolean flip) {
+            if (flip) this.flip.add(key);
+            Object v = values.get(key);
+            values.put(key, Util.merge(v, value));
+        }
+        
+        void add (StitchKey key, Object value) {
+            add (key, value, false);
+        }
+
+        public int compareTo (Triple t) {
+            int d = t.values.size() - values.size();
+            if (d == 0) {
+                if (source.getId() < t.source.getId()) d = -1;
+                else if (source.getId() > t.source.getId()) d = 1;
+            }
+            return d;
+        }
+
+        public Entity source () { return source; }
+        public Entity source (StitchKey key) {
+            return flip.contains(key) ? target : source;
+        }
+        public Entity target () { return target; }
+        public Entity target (StitchKey key) {
+            return flip.contains(key) ? source : target;
+        }
+
+        public boolean contains (StitchKey key) {
+            return values.containsKey(key);
+        }
+        public Map<StitchKey, Object> values () { return values; }
+        public int size () { return values.size(); }
+    }
+    
+    static public class Traversal {
+        final Set<Long> visited = new HashSet<>();
+        final LinkedList<Node> stack = new LinkedList<>();
+        final GraphDatabaseService gdb;
+        final Entity start;
+        final Integer rank;
+        
+        Traversal (Node node) {
+            this (Entity.getEntity(node));
+        }
+        
+        Traversal (Entity start) {
+            this.start = start;
+            this.gdb = start._node.getGraphDatabase();
+            try (Transaction tx = gdb.beginTx()) {
+                rank = (Integer)start.parent()._node.getProperty(RANK, null);
+                tx.success();
+            }
+            stack.push(start._node);
+        }
+
+        public Entity getStart () { return start; }
+        public Integer getRank () { return rank; }
+        public Entity[] getPath () {
+            return stack.stream()
+                .map(n -> Entity.getEntity(n)).toArray(Entity[]::new);
+        }
+        public int getVisitCount () { return visited.size(); }
+
+        public void _traverse (EntityVisitor visitor) {
+            while (!stack.isEmpty()) {
+                Node n = stack.pop();
+                visited.add(n.getId());
+                
+                Map<Node, Triple> neighbors = new HashMap<>();
+                for (Relationship rel :
+                         n.getRelationships(Direction.BOTH, Entity.KEYS)) {
+                    Node xn = rel.getOtherNode(n);
+                    Triple triple = neighbors.get(xn);
+                    if (triple == null) {
+                        neighbors.put(xn, triple = new Triple (n, xn));
+                    }
+                    StitchKey key = StitchKey.valueOf(rel.getType().name());
+                    triple.add(key, rel.getProperty(VALUE),
+                               rel.getStartNode() != n);
+                }
+                
+                List<Map.Entry<Node, Triple>> ordered =
+                    new ArrayList<>(neighbors.entrySet());
+                Collections.sort(ordered, (a, b) -> {
+                        return a.getValue().compareTo(b.getValue());
+                    });
+
+                for (Map.Entry<Node, Triple> me : ordered) {
+                    Node xn = me.getKey();
+                    if (!visited.contains(xn.getId())
+                        && visitor.visit(this, me.getValue())) {
+                        stack.push(xn);
+                    }
+                }
+            }
+        }
+
+        public void traverse (EntityVisitor visitor) {
+            try (Transaction tx = gdb.beginTx()) {
+                _traverse (visitor);
+                tx.success();
+            }
+        }
+    }
+    
     protected EnumSet<StitchKey> stitches = EnumSet.noneOf(StitchKey.class);
     
     public static Entity getEntity (Node node) {
@@ -956,45 +1072,12 @@ public class Entity extends CNode {
         }
     }
 
-    public void walk (EntityVisitor visitor) {
-        try (Transaction tx = gdb.beginTx()) {
-            _walk (visitor);
-            tx.success();
-        }
+    public void traverse (EntityVisitor visitor) {
+        new Traversal(_node).traverse(visitor);
     }
 
-    public void _walk (EntityVisitor visitor) {
-        Set<Long> visited = new HashSet<Long>();
-        LinkedList<Entity> path = new LinkedList<Entity>();
-        depthFirst (visited, path, _node, visitor);
-    }
-
-    static protected void depthFirst (Set<Long> visited,
-                                      LinkedList<Entity> path, Node node,
-                                      EntityVisitor visitor) {
-        Entity entity = _getEntity(node);
-        path.push(entity);
-        if (visitor.visit
-            (Util.reverse(path.toArray(new Entity[0])), entity)) {
-            visited.add(node.getId());
-            for (Relationship rel : node.getRelationships(Direction.BOTH)) {
-                Node xnode = rel.getOtherNode(node);
-                if (!visited.contains(xnode.getId())) {
-                    RelationshipType type = rel.getType();
-                    try {
-                        StitchKey key = StitchKey.valueOf(type.name());
-                        if (rel.hasProperty(VALUE)
-                            && visitor.next(key, rel.getProperty(VALUE))) {
-                            depthFirst (visited, path, xnode, visitor);
-                        }
-                    }
-                    catch (Exception ex) {
-                        // not a stitch key
-                    }
-                }
-            }
-        }
-        path.pop();
+    public void _traverse (EntityVisitor visitor) {
+        new Traversal(_node)._traverse(visitor);
     }
 
     public Map<String, Object> payload (Entity entity) {

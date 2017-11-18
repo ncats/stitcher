@@ -205,22 +205,13 @@ public class TestCore extends EntityRegistry {
                     == metrics.getEntitySizeDistribution().get(0));
 
         Entity a = entities.get("a");
-        { final List<Entity> path = new ArrayList<Entity>();
-            AbstractEntityVisitor visitor = new AbstractEntityVisitor () {
-                    public boolean visit (Entity[] p, Entity e) {
-                        logger.info("#### path "+p);
-                        assertTrue ("Last component of path is "
-                                    +p[p.length-1]+"; expecting "+e,
-                                    e.equals(p[p.length-1]));
-                        path.add(e);
-                        return true;
-                    }
-                };
-            visitor.set(StitchKey.I_CAS, "2-1-3");
-            a.walk(visitor);
-            assertTrue ("5a. failure -- number of nodes stitched by "
-                        +"I_CAS=\"2-1-3\" should be 2", path.size() == 2);
-        }
+        a.traverse((traversal, triple) -> {
+                logger.info("#### "+traversal.getVisitCount()
+                            +" ("+triple.source().getId()
+                            +","+triple.target().getId()+").. "
+                            +triple.values());
+                return true;
+            });
         
         Entity b = entities.get("b");
         assertTrue ("6. failure -- there should be a path between "
