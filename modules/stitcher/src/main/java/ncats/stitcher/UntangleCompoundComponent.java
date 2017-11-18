@@ -459,7 +459,9 @@ public class UntangleCompoundComponent extends UntangleComponent {
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
                 Long t = uf.root(target.getId());
-                if (s != null && t != null && !s.equals(t)) {
+                if (true || (s != null && t == null)
+                    || (s == null && t != null)
+                    || !s.equals(t)) {
                     Object sv = source.get(H_LyChI_L4);
                     Object tv = target.get(H_LyChI_L4);
                     if (sv != null && tv != null && Util.equals(sv, tv)) {
@@ -471,11 +473,9 @@ public class UntangleCompoundComponent extends UntangleComponent {
 
         // we need to do another pass over each component to see
         // if we have multi-value cliques that span components
-        /*
         mergeComponents (N_Name, I_CAS, I_UNII, I_DB, I_ChEMBL,
                          I_CID, I_SID, H_LyChI_L4);
-        */
-        mergeCliqueComponents (H_LyChI_L3);
+        //mergeCliqueComponents (H_LyChI_L3);
 
         List<Entity> singletons = new ArrayList<>();
         // now find all remaining unmapped nodes
@@ -681,15 +681,11 @@ public class UntangleCompoundComponent extends UntangleComponent {
                     Object value = me.getKey();
                     switch (key) {
                     case H_LyChI_L3:
-                        if (value.toString().endsWith("-S") 
-                            || value.toString().endsWith("-M"))
-                            ok = false;
-                        break;
-
                     case H_LyChI_L4:
                     case H_LyChI_L5:
-                        // don't do clique on salt values
-                        if (value.toString().endsWith("-S"))
+                        // don't do clique on salt or metal values 
+                        if (value.toString().endsWith("-S") 
+                            || value.toString().endsWith("-M"))
                             ok = false;
                         break;
                     }

@@ -60,21 +60,27 @@ public class UnionFind {
         return parent.containsKey(p) ? getRoot (p) : null;
     }
 
-    public void union (long p, long q) {
+    public long union (long p, long q) {
         long i = getRoot (p);
         long j = getRoot (q);
+        long k;
         if (i != j) {
             int ri = rank.get(i);
             int rj = rank.get(j);
             if (ri < rj) {
                 parent.put(i, j);
                 rank.put(j, ri+rj);
+                k = j;
             }
             else {
                 parent.put(j, i);
                 rank.put(i, ri+rj);
+                k = i;
             }
         }
+        else
+            k = i; // or p = j
+        return k;
     }
 
     public long component (long p) { return getRoot (p); }

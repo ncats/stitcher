@@ -72,7 +72,7 @@ public class TestStitcher {
                         ArrayNode an = (ArrayNode)n;
                         String[] vals = new String[an.size()];
                         for (int j = 0; j < an.size(); ++j)
-                            vals[j] = an.get(j).asText();
+                            vals[j] = an.get(j).asText().toUpperCase();
                         row.put(me.getKey(), vals);
                     }
                     else {
@@ -130,20 +130,33 @@ public class TestStitcher {
 
         TestRegistry reg = new TestRegistry (name);
         reg.register(data);
+        /*
+        reg.traverse((a, b, values) -> {
+                logger.info("### ("+a.getId()+","+b.getId()+") => "+values);
+                return true;
+            });
+        */
         
         long count = reg.count(AuxNodeType.ENTITY);
         assertTrue ("Expecting "+data.size()+" entities but instead got "
                     +count, data.size() == count);
 
         DataSource ds = reg.getDataSourceFactory().register(name+"-stitch");
+
         List<Long> comps = new ArrayList<>();
         int nc = reg.components(comps);
         assertTrue ("Expect 1 component but instead got "+nc, nc == 1);
-
         for (Long id : comps) {
             Component comp = reg.component(id);
             reg.untangle(new UntangleCompoundComponent (ds, comp));
         }
+
+        /*
+        UntangleStitches us = new UntangleCompoundStitches (ds);
+        us.untangle(reg, s -> {
+                logger.info("Stitch "+s.getId()+" created!");
+            });
+        */
         
         count = reg.count(ds.getName());
         assertTrue ("Expect "+ncomp+" stitch node(s) but instead got "+count,

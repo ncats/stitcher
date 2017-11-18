@@ -1013,7 +1013,7 @@ public class EntityFactory implements Props {
                     else
                         keys.add(G.key());
                     
-                    //done = C.cardinality() == G.size();
+                    done = C.cardinality() == G.size();
                 }
             }
             else {
@@ -1364,6 +1364,10 @@ public class EntityFactory implements Props {
     }
 
     public Component component (long[] nodes) {
+        return component (null, nodes);
+    }
+    
+    public Component component (Long root, long[] nodes) {
         try (Transaction tx = gdb.beginTx()) {
             Component comp = new ComponentImpl (gdb, nodes);
             tx.success();
@@ -1742,7 +1746,22 @@ public class EntityFactory implements Props {
             return props;
         }
     }
-        
+
+    /**
+     * traverse over each connected component in turn
+     */
+    public void traverse (EntityVisitor visitor) {
+        try (Transaction tx = gdb.beginTx()) {
+            gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
+                    logger.info("############### COMPONENT "
+                                +node.getId()+" ("+ node.getProperty(RANK)
+                                +") ################");
+                    Entity._getEntity(node)._traverse(visitor);
+                });
+            tx.success();
+        }
+    }
+    
     /**
      * iterate over entities of a particular data source
      */
