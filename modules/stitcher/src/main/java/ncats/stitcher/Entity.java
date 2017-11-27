@@ -88,7 +88,7 @@ public class Entity extends CNode {
         void add (StitchKey key, Object value) {
             add (key, value, false);
         }
-
+        
         public int compareTo (Triple t) {
             int d = t.values.size() - values.size();
             if (d == 0) {
@@ -100,11 +100,15 @@ public class Entity extends CNode {
 
         public Entity source () { return source; }
         public Entity source (StitchKey key) {
-            return flip.contains(key) ? target : source;
+            if (key.directed)
+                return flip.contains(key) ? target : source;
+            return source;
         }
         public Entity target () { return target; }
         public Entity target (StitchKey key) {
-            return flip.contains(key) ? source : target;
+            if (key.directed)
+                return flip.contains(key) ? source : target;
+            return target;
         }
 
         public boolean contains (StitchKey key) {
@@ -143,14 +147,17 @@ public class Entity extends CNode {
         }
         public int getVisitCount () { return visited.size(); }
 
-        public void _traverse (EntityVisitor visitor) {
+        public void _traverse (EntityVisitor visitor, StitchKey... keys) {
+            if (keys == null || keys.length == 0)
+                keys = Entity.KEYS;
+            
             while (!stack.isEmpty()) {
                 Node n = stack.pop();
                 visited.add(n.getId());
                 
                 Map<Node, Triple> neighbors = new HashMap<>();
                 for (Relationship rel :
-                         n.getRelationships(Direction.BOTH, Entity.KEYS)) {
+                         n.getRelationships(Direction.BOTH, keys)) {
                     Node xn = rel.getOtherNode(n);
                     Triple triple = neighbors.get(xn);
                     if (triple == null) {
@@ -177,9 +184,9 @@ public class Entity extends CNode {
             }
         }
 
-        public void traverse (EntityVisitor visitor) {
+        public void traverse (EntityVisitor visitor, StitchKey... keys) {
             try (Transaction tx = gdb.beginTx()) {
-                _traverse (visitor);
+                _traverse (visitor, keys);
                 tx.success();
             }
         }
@@ -1072,12 +1079,12 @@ public class Entity extends CNode {
         }
     }
 
-    public void traverse (EntityVisitor visitor) {
-        new Traversal(_node).traverse(visitor);
+    public void traverse (EntityVisitor visitor, StitchKey... keys) {
+        new Traversal(_node).traverse(visitor, keys);
     }
 
-    public void _traverse (EntityVisitor visitor) {
-        new Traversal(_node)._traverse(visitor);
+    public void _traverse (EntityVisitor visitor, StitchKey... keys) {
+        new Traversal(_node)._traverse(visitor, keys);
     }
 
     public Map<String, Object> payload (Entity entity) {

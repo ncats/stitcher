@@ -26,8 +26,12 @@ public class UnionFind {
         parent.clear();
         rank.clear();
     }
-    
+
     protected Long getRoot (Long n) {
+        return getRoot (n, 1);
+    }
+    
+    protected Long getRoot (Long n, int r) {
         Long p = parent.get(n);
         if (p != null) {
             while (!n.equals(p)) {
@@ -37,13 +41,17 @@ public class UnionFind {
         }
         else {
             parent.put(n, n);
-            rank.put(n, 1);
+            rank.put(n, r);
         }
         return n;
     }
 
     public boolean add (long p) {
-        Long q = getRoot (p);
+        return add (p, 1);
+    }
+    
+    public boolean add (long p, int r) {
+        Long q = getRoot (p, r);
         return q.equals(p);
     }
     

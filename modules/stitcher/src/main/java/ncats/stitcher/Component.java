@@ -46,7 +46,7 @@ public interface Component extends Iterable<Entity> {
      */
     default Map<Object, Integer> values (StitchKey key) {
         throw new UnsupportedOperationException
-            ("vlaues(key) is not supported for this implementation");
+            ("values(key) is not supported for this implementation");
     }
     
     default long[] nodes () {

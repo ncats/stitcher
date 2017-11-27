@@ -278,4 +278,23 @@ public class TestCore extends EntityRegistry {
         assertTrue ("Data source sha1 should be "+sha1,
                     sha1.startsWith(ds.getKey()));
     }
+
+    @Test
+    public void test3 () {
+        Object v1 = new String[]{"QVQRDH1X2WY6-S","V6WH9AARYJAJ-M]"};
+        Object v2 = "V6WH9AARYJAJ-M";
+        assertTrue ("Test equality: [QVQRDH1X2WY6-S,V6WH9AARYJAJ-M] "
+                    +"vs V6WH9AARYJAJ-M should be false", !Util.equals(v1, v2));
+        assertTrue ("Test equality: V6WH9AARYJAJ-M "
+                    +"vs [QVQRDH1X2WY6-S,V6WH9AARYJAJ-M] should be false",
+                    !Util.equals(v1, v2));
+        Object v3 = new String[]{"V6WH9AARYJAJ-M"};
+        assertTrue ("Test equality: [V6WH9AARYJAJ-M] "
+                    +"vs V6WH9AARYJAJ-M should be true",
+                    Util.equals(v3, v2));
+        Object v4 = new String[]{"V6WH9AARYJAJ-M]","QVQRDH1X2WY6-S"};
+        assertTrue ("Test equality: [V6WH9AARYJAJ-M,QVQRDH1X2WY6-S] "
+                    +"vs [QVQRDH1X2WY6-S,V6WH9AARYJAJ-M] should be true",
+                    Util.equals(v4, v1));
+    }
 }

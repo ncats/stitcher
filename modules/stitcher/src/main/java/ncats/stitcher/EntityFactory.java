@@ -1566,8 +1566,8 @@ public class EntityFactory implements Props {
         return false;
     }
 
-    public void untangle (UntangleComponent uc) {
-        untangle (uc, null);
+    public void untangle (UntangleAbstract untangler) {
+        untangle (untangler, null);
     }
     
     /**
@@ -1579,12 +1579,13 @@ public class EntityFactory implements Props {
      * @param uc
      * @param consumer
      */
-    public void untangle (UntangleComponent uc, Consumer<Stitch> consumer) {
-        uc.untangle(this, (root, member) -> {
+    public void untangle (UntangleAbstract untangler,
+                          Consumer<Stitch> consumer) {
+        untangler.untangle(this, (root, member) -> {
                 ComponentImpl comp = new ComponentImpl (gdb, member);
                 if (root != null)
                     comp.setRoot(root);
-                DataSource dsource = uc.getDataSource();
+                DataSource dsource = untangler.getDataSource();
                 Stitch stitch = createStitch (dsource, comp);
                 if (consumer != null)
                     consumer.accept(stitch);
@@ -1750,13 +1751,13 @@ public class EntityFactory implements Props {
     /**
      * traverse over each connected component in turn
      */
-    public void traverse (EntityVisitor visitor) {
+    public void traverse (EntityVisitor visitor, StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
             gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
                     logger.info("############### COMPONENT "
                                 +node.getId()+" ("+ node.getProperty(RANK)
                                 +") ################");
-                    Entity._getEntity(node)._traverse(visitor);
+                    Entity._getEntity(node)._traverse(visitor, keys);
                 });
             tx.success();
         }

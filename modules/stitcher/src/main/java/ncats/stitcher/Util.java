@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URI;
 import java.util.zip.*;
 import java.util.regex.*;
+import java.util.function.Predicate;
 
 import java.lang.reflect.Array;
 import java.util.logging.Level;
@@ -268,8 +269,31 @@ public class Util {
         return Util.toPrimitive(values.toArray(new Long[0]));
     }
 
+    public static String toString (Map values) {
+        StringBuilder sb = new StringBuilder ("{");
+        int i = 0;
+        for (Object obj : values.entrySet()) {
+            Map.Entry me = (Map.Entry)obj;
+            sb.append(me.getKey()+"="+toString (me.getValue()));
+            if (++i < values.size()) sb.append(" ");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+    
     public static String toString (Object obj) {
         return toString (obj, 10);
+    }
+
+    public static int getLength (Object obj) {
+        if (obj == null) return 0;
+        if (obj instanceof Map)
+            return ((Map)obj).size();
+        if (obj instanceof Collection)
+            return ((Collection)obj).size();
+        if (obj.getClass().isArray())
+            return Array.getLength(obj);
+        return 1;
     }
     
     public static String toString (Object obj, int max) {
@@ -402,14 +426,22 @@ public class Util {
             return false;
         Set uset = new HashSet ();
         if (u.getClass().isArray()) {
-            for (int i = 0; i < Array.getLength(u); ++i)
+            int len = Array.getLength(u);
+            if (len == 0)
+                return false;
+            
+            for (int i = 0; i < len; ++i)
                 uset.add(Array.get(u, i));
         }
         else
             uset.add(u);
 
         if (v.getClass().isArray()) {
-            for (int i = 0; i < Array.getLength(v); ++i)
+            int len = Array.getLength(v);
+            if (len == 0 || len != uset.size())
+                return false;
+            
+            for (int i = 0; i < len; ++i)
                 if (!uset.remove(Array.get(v, i)))
                     return false;
         }
@@ -821,6 +853,19 @@ public class Util {
 
         // ok, give up
         return String.class;
+    }
+
+    public static boolean contains (Object value, Predicate pred) {
+        if (value == null) return false;
+        if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            for (int i = 0; i < len; ++i) {
+                if (pred.test(Array.get(value, i)))
+                    return true;
+            }
+            return false;
+        }
+        return pred.test(value);
     }
 
     public static boolean isTetrahedral (MolAtom atom, int[] gi) {
