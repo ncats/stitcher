@@ -25,18 +25,20 @@
 
 @thumbnail(e: Map[String,Object]) = {
 <div class="col-xs-6 col-md-4">
+  <a href='#stitch-modal-@e.get("id")' data-toggle="modal">
   <div class="thumbnail">
     <img src='@api.routes.Api.structure(e.get("id").asInstanceOf[Long],"svg",150)' alt='Structure for @e.get("srcid")'>
     <div class="caption">
-      <p><a href='#stitch-modal-@e.get("id")' data-toggle="modal">@e.get("srcid")</a>
+      <p>
         @if(e.get("srcid") != null) {
           <p>@name(e)
         } else {
-          <p><a href='#stitch-modal-@e.get("id")' data-toggle="modal">@name(e)</a>
+          <p>@name(e)
         }
       <p><code>@e.get("datasource")</code>
     </div>
   </div>
+ </a>  
 </div>
 }
 

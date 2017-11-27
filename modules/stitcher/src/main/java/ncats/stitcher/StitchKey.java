@@ -11,27 +11,27 @@ public enum StitchKey implements RelationshipType {
     /*
      * Name
      */
-    N_Name, // any name
+    N_Name(2), // any name
 
     /*
      * Compound identifiers
      */
-    I_UNII(2), // FDA UNII
-    I_CAS(1), // CAS registry number
-    I_SID(1, Long.class), // pubchem sid
+    I_UNII(3), // FDA UNII
+    I_CAS(2), // CAS registry number
+    I_SID(Long.class), // pubchem sid
     I_CID(2, Long.class), // public cid
-    I_ChEMBL, // CHEMBL_ID
-    I_DB, // DrugBank
-    I_CODE(1), // any code
+    I_ChEMBL(2), // CHEMBL_ID
+    I_DB(2), // DrugBank
+    I_CODE, // any code
 
     /*
      * Other identifiers
      */
     I_MeSH(2),
     I_UniProt(2), // UniProt id
-    I_NCT(1), // clinical trial NCT
+    I_NCT, // clinical trial NCT
     I_PMID(2, Long.class), // PubMed id
-    I_ANY(1, Long.class), // Any numeric id
+    I_ANY(Long.class), // Any numeric id
     
     /*
      * Compound hash
@@ -64,11 +64,11 @@ public enum StitchKey implements RelationshipType {
     ;
   
     final public Class type;
-    final public int priority; // priority 0 (lowest) to 5 (highest)
+    final public int priority; // priority 1 (lowest) to 5 (highest)
     final public boolean directed;
     
     StitchKey () {
-        this (0, String.class, false);
+        this (1, String.class, false);
     }
     StitchKey (int priority) {
         this (priority, String.class, false);
@@ -80,10 +80,10 @@ public enum StitchKey implements RelationshipType {
         this (priority, String.class, directed);
     }
     StitchKey (Class type) {
-        this (0, type, false);
+        this (1, type, false);
     }
     StitchKey (Class type, boolean directed) {
-        this (0, type, directed);
+        this (1, type, directed);
     }
     StitchKey (int priority, Class type, boolean directed) {
         this.type = type;
@@ -95,8 +95,8 @@ public enum StitchKey implements RelationshipType {
     public static StitchKey[] keys (int lower, int upper) {
         Set<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
         for (StitchKey k : EnumSet.allOf(StitchKey.class)) {
-            if ((lower < 0 || k.priority >= lower)
-                && (upper < 0 || k.priority <= upper))
+            if ((lower <= 0 || k.priority >= lower)
+                && (upper <= 0 || k.priority <= upper))
                 keys.add(k);
         }
         

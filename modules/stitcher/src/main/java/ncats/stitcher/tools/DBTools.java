@@ -8,18 +8,7 @@ import java.util.logging.Level;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import ncats.stitcher.EntityFactory;
-import ncats.stitcher.Entity;
-import ncats.stitcher.DataSource;
-import ncats.stitcher.DataSourceFactory;
-import ncats.stitcher.GraphDb;
-import ncats.stitcher.StitchKey;
-import ncats.stitcher.AuxNodeType;
-import ncats.stitcher.CliqueVisitor;
-import ncats.stitcher.Clique;
-import ncats.stitcher.Props;
-import ncats.stitcher.Component;
-import ncats.stitcher.Util;
+import ncats.stitcher.*;
 
 public class DBTools {
     static final Logger logger = Logger.getLogger(DBTools.class.getName());
@@ -78,6 +67,67 @@ public class DBTools {
             super ("V");
         }
     }
+
+    static class CountOperator implements EntityVisitor {
+        final public Map<Object, Integer> counts = new HashMap<>();
+        final public Map<StitchKey, Integer> keys =
+            new EnumMap<>(StitchKey.class);
+
+        public boolean visit (Entity.Traversal traversal,
+                              Entity.Triple triple) {
+            Map<StitchKey, Object> values = triple.values();
+            for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
+                Object val = me.getValue();
+                if (val.getClass().isArray()) {
+                    int len = Array.getLength(val);
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(val, i);
+                        Integer c = counts.get(v);
+                        counts.put(v, c== null ? 1 : (c+1));
+                    }
+                }
+                else {
+                    Integer c = counts.get(val);
+                    counts.put(val, c==null ? 1 : (c+1));
+                }
+                
+                Integer c = keys.get(me.getKey());
+                keys.put(me.getKey(), c==null?1 : (c+1));
+            }
+            return true;
+        }
+    }
+
+    static class ScoreOperator implements EntityVisitor {
+        public final Map<Integer, Integer> scores = new TreeMap<>();
+        
+        ScoreOperator () {
+        }
+
+        public boolean visit (Entity.Traversal traversal,
+                              Entity.Triple triple) {
+            Map<StitchKey, Object> values = triple.values();
+            int score = 0;
+            for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
+                Object val = me.getValue();
+                if (val.getClass().isArray()) {
+                    int len = Array.getLength(val);
+                    score += me.getKey().priority*len;
+                }
+                else {
+                    score += me.getKey().priority;
+                }
+            }
+
+            Integer c = scores.get(score);
+            scores.put(score, c==null? 1 : (c+1));
+
+            System.out.println(triple.source().getId()
+                               +" "+triple.target().getId()+" "+score);
+            
+            return true;
+        }
+    }
     
     public DBTools (GraphDb graphDb) {
         ef = new EntityFactory (graphDb);
@@ -98,6 +148,64 @@ public class DBTools {
         }
     }
 
+    public void path (long start, long end, StitchKey... keys) {
+        Entity e0 = ef.entity(start);
+        Entity e1 = ef.entity(end);
+        if (keys == null || keys.length == 0)
+            keys = Entity.KEYS;
+        Entity[] path = e0.anyPath(e1, keys);
+        System.out.println("Any path between ("+start+") and ("+end+")...");
+        if (path != null && path.length > 0) {
+            for (int i = 1; i < path.length; ++i) {
+                System.out.println(path[i-1].getId());
+                Map<StitchKey, Object> stitches = path[i-1].keys(path[i]);
+                System.out.println(".."+stitches);
+            }
+            System.out.println(e1.getId());
+        }
+    }
+
+    public void traverse (Long... comps) {
+        if (comps == null || comps.length == 0) {
+            CountOperator oper = new CountOperator ();
+            ef.traverse(oper);
+            
+            System.out.println("#### value histogram ####");
+            Set<Object> sorted = new TreeSet<>((a,b) -> {
+                    int d = oper.counts.get(b) - oper.counts.get(a);
+                    if (d == 0)
+                        d = a.toString().compareTo(b.toString());
+                    return d;
+                });
+            sorted.addAll(oper.counts.keySet());
+            
+            for (Object key : sorted) {
+                System.out.println("\""+key+"\" "+oper.counts.get(key));
+            }
+            
+            System.out.println("#### key histogram ####");
+            for (Map.Entry<StitchKey, Integer> me : oper.keys.entrySet())
+                System.out.println(me.getKey()+" "+me.getValue());
+        }
+        else {
+            for (Long c : comps) {
+                Entity e = ef.entity(c);
+                System.out.println("################## COMPONENT "+e.getId()
+                                   +" #####################");
+                CountOperator oper = new CountOperator ();
+                e.traverse(oper);
+                
+                System.out.println("#### value histogram ####");
+                for (Map.Entry<Object, Integer> me : oper.counts.entrySet())
+                    System.out.println("\""+me.getKey()+"\" "+me.getValue());
+                
+                System.out.println("#### key histogram ####");
+                for (Map.Entry<StitchKey, Integer> me : oper.keys.entrySet())
+                    System.out.println(me.getKey()+" "+me.getValue());
+            }
+        }
+    }
+    
     public void delete (String source) {
         DataSource ds = dsf.getDataSourceByKey(source);
         if (ds != null) {
@@ -265,12 +373,35 @@ public class DBTools {
                 else
                     dbt.cliques();
             }
+            else if ("traverse".equalsIgnoreCase(cmd)) {
+                if (argv.length > 2) {
+                    List<Long> comps = new ArrayList<>();
+                    for (int i = 2; i < argv.length; ++i)
+                        comps.add(Long.parseLong(argv[i]));
+                    dbt.traverse(comps.toArray(new Long[0]));
+                }
+                else
+                    dbt.traverse();
+            }
             else if ("clique".equalsIgnoreCase(cmd)) {
                 if (argv.length > 2) {
                     dbt.clique(Long.parseLong(argv[2]));
                 }
                 else {
                     System.err.println("No component id specified!");
+                }
+            }
+            else if ("path".equalsIgnoreCase(cmd)) {
+                if (argv.length > 3) {
+                    Set<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
+                    for (int i = 4; i < argv.length; ++i) {
+                        keys.add(StitchKey.valueOf(argv[i]));
+                    }
+                    dbt.path(Long.parseLong(argv[2]), Long.parseLong(argv[3]),
+                             keys.toArray(new StitchKey[0]));
+                }
+                else {
+                    System.err.println("START END [KEYS...]");
                 }
             }
             else if ("dump".equalsIgnoreCase(cmd)) {

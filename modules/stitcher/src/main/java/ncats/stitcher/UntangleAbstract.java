@@ -11,34 +11,18 @@ import java.util.function.BiConsumer;
 import ncats.stitcher.graph.UnionFind;
 import static ncats.stitcher.StitchKey.*;
 
-public abstract class UntangleComponent implements Props {
+public abstract class UntangleAbstract implements Props {
     static final Logger logger = Logger.getLogger
-        (UntangleComponent.class.getName());
+        (UntangleAbstract.class.getName());
     
     final protected DataSource dsource;
-    final protected Component component;
     final protected UnionFind uf = new UnionFind ();
-    final protected Map<StitchKey, Map<Object, Integer>> stats;
 
-    protected UntangleComponent (DataSource dsource, Component component) {
-        stats = new HashMap<>();
-        for (StitchKey key : Entity.KEYS) {
-            stats.put(key, component.stats(key));
-        }
-        
-        long created = (Long) dsource.get(CREATED);
-        for (Entity e : component) {
-            long c = (Long) e.get(CREATED);
-            if (c > created) {
-                throw new IllegalArgumentException
-                    ("Can't use DataSource \""+dsource.getName()+"\" ("
-                     +dsource.getKey()+") "
-                     +"as reference to untangle component "
-                     +component.getId()+" because data has changed "
-                     +"since it was last created!");
-            }
-        }
-        this.component = component;
+    // current untangle entity factory; all derived classes must make sure
+    // to set update this as appropriate!
+    protected EntityFactory ef;
+    
+    protected UntangleAbstract (DataSource dsource) {
         this.dsource = dsource;
     }
 
@@ -84,6 +68,5 @@ public abstract class UntangleComponent implements Props {
     
     public abstract void untangle
         (EntityFactory ef, BiConsumer<Long, long[]> consumer);
-    public Component component () { return component; }
-    public DataSource getDataSource () { return dsource; }
+    public DataSource getDataSource () { return dsource; }    
 }

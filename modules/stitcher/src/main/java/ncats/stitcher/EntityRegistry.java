@@ -170,7 +170,8 @@ public class EntityRegistry extends EntityFactory {
     }
     public String getStrucField () { return strucField; }
     
-    public void clear () { stitches.clear(); }    
+    public void clear () { stitches.clear(); }
+    
     public EntityRegistry add (StitchKey key, String property) {
         Set<String> props = stitches.get(key);
         if (props == null) {
@@ -179,8 +180,17 @@ public class EntityRegistry extends EntityFactory {
         props.add(property);
         return this;
     }
-    public Set<String> get (StitchKey key) {
+    
+    public Set<String> getProperties (StitchKey key) {
         return stitches.get(key);
+    }
+    
+    public StitchKey getStitchKey (String prop) {
+        for (Map.Entry<StitchKey, Set<String>> me : stitches.entrySet()) {
+            if (me.getValue().contains(prop))
+                return me.getKey();
+        }
+        return null;
     }
 
     public DataSource registerFromConfig (String config) throws Exception {
