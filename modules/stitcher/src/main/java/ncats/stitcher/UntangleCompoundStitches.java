@@ -9,6 +9,9 @@ import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.util.function.BiConsumer;
 
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import static ncats.stitcher.StitchKey.*;
 
@@ -16,20 +19,33 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
     static final Logger logger = Logger.getLogger
         (UntangleCompoundStitches.class.getName());
 
-    final protected double threshold;
+    final protected Double threshold;
+    final protected Map<Object, Integer> counts = new HashMap<>();
+    final protected Entity seed;
+    protected double total;
+
+    public UntangleCompoundStitches (DataSource dsource) {
+        this (dsource, null, null);
+    }
+
+    public UntangleCompoundStitches (DataSource dsource, Entity seed) {
+        this (dsource, seed, null);
+    }
     
-    public UntangleCompoundStitches (DataSource dsource, double threshold) {
+    public UntangleCompoundStitches (DataSource dsource, Double threshold) {
+        this (dsource, null, threshold);
+    }
+    
+    public UntangleCompoundStitches (DataSource dsource,
+                                     Entity seed, Double threshold) {
         super (dsource);
+        this.seed = seed;
         this.threshold = threshold;
     }
 
-    static double calcScore (Map<Object, Integer> counts,
-                             Entity.Triple triple) {
+    double calcScore (Entity.Triple triple) {
         Map<StitchKey, Object> values = triple.values();        
-        double score = 0., total = 0.;
-        // this should be calculated once..
-        for (Integer v : counts.values())
-            total += v;
+        double score = 0.;
 
         Entity target = triple.target();
         Entity source = triple.source();
@@ -54,14 +70,20 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         return -score;
     }
 
-    @Override
-    public void untangle (EntityFactory ef, BiConsumer<Long, long[]> consumer) {
-        this.ef = ef;
-        uf.clear();
+    protected void traverse (EntityVisitor visitor, StitchKey... keys) {
+        if (seed != null) {
+            seed.traverse(visitor, keys);
+        }
+        else {
+            ef.traverse(visitor, keys);
+        }
+    }
 
-        Map<Object, Integer> counts = new HashMap<>();
-        logger.info("############## CALCULATING COUNTS ##############");
-        ef.traverse((traversal, triple) -> {
+    protected void updateCounts (EntityFactory ef) {
+        counts.clear();
+
+        logger.info("############## STITCH COUNTS ##############");
+        traverse ((traversal, triple) -> {
                 Map<StitchKey, Object> values = triple.values();
                 for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
                     Object val = me.getValue();
@@ -79,11 +101,24 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 }
                 return true;
             });
-        logger.info("$$$$ COUNTS ==> "+counts);
+        //logger.info("$$$$ COUNTS ==> "+counts);
+
+        total = 0.;
+        for (Integer v : counts.values())
+            total += v;
+        logger.info("$$$$ total stitch count ==> "+total);
+    }
+
+    @Override
+    public void untangle (EntityFactory ef, BiConsumer<Long, long[]> consumer) {
+        this.ef = ef;
+        uf.clear();
+
+        updateCounts (ef);
 
         Set<Entity> roots = new HashSet<>();
         Set<Entity> unsure = new HashSet<>();
-        ef.traverse((traversal, triple) -> {
+        traverse ((traversal, triple) -> {
                 Entity source = triple.source(T_ActiveMoiety);
                 Entity target = triple.target(T_ActiveMoiety);
                 
@@ -104,6 +139,7 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                     for (Entity e : out) {
                         uf.union(source.getId(), e.getId());
                     }
+                    roots.add(source);
                 }
 
                 if (out.length == 1) {
@@ -119,9 +155,22 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         dump ("##### active moiety stitching");
 
         logger.info("########### STITCHING TRIPLES #############");
-        List<Map.Entry<Entity.Triple, Double>> seeds = new ArrayList<>();
-        ef.traverse((traversal, triple) -> {
-                double score = calcScore (counts, triple);
+        Queue<Map.Entry<Entity.Triple, Double>> seeds =
+            new PriorityQueue<>((a, b) -> {
+                    if (b.getValue() > a.getValue()) return 1;
+                    if (b.getValue() < a.getValue()) return -1;
+                    if (a.getKey().source().getId()
+                        < b.getKey().source().getId())
+                        return -1;
+                    if (a.getKey().source().getId()
+                        > b.getKey().source().getId())
+                        return 1;
+                    return 0;
+                });
+
+        List<Double> scores = new ArrayList<>();
+        traverse ((traversal, triple) -> {
+                double score = calcScore (triple);
                 Entity source = triple.source();
                 Entity target = triple.target();
                 
@@ -142,36 +191,65 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 logger.info("..."+source.getId()+" "+target.getId()
                             +" score="+score+" "
                             +Util.toString(triple.values()));
-                if (score > threshold && !(a && b)) {
+                scores.add(score);
+                if (/*score > threshold &&*/!(a && b)) {
                     seeds.add(new AbstractMap.SimpleImmutableEntry
                               (triple, score));
                 }
+                /*
                 else {
                     if (!a) uf.add(source.getId());
                     if (!b) uf.add(target.getId());
                 }
+                */
                 
                 return true;
             });
 
-        Collections.sort(seeds, (a, b) -> {
-                    if (b.getValue() > a.getValue()) return 1;
-                    if (b.getValue() < a.getValue()) return -1;
-                    if (a.getKey().source().getId()
-                        < b.getKey().source().getId())
-                        return -1;
-                    if (a.getKey().source().getId()
-                        > b.getKey().source().getId())
-                        return 1;
-                    return 0;
-                });
-        
-        for (Map.Entry<Entity.Triple, Double> me : seeds) {
+        double thres = 0.;
+        int size = scores.size();       
+        if (size > 0) {
+            Collections.sort(scores);
+            double min = scores.get(0);
+            double max = scores.get(scores.size()-1);
+            
+            double med = 0.;
+            if (size % 2 == 0)
+                med = (scores.get(size/2) + scores.get(size/2 -1))/2.0;
+            else
+                med = scores.get(size/2);
+
+            double mean = 0.;
+            for (Double s : scores)
+                mean += s;
+            mean /= size;
+            
+            logger.info("$$$$$$ SCORE: MIN = "+min
+                        +" MAX = "+max
+                        +" MEDIAN = "+med
+                        +" MEAN = "+mean+" $$$$$$$$");
+            if (min < 1.)
+                thres = Math.max(5.0*min, mean - 5.0*min);
+            else
+                thres = min;
+        }
+
+        if (threshold != null)
+            thres = threshold;
+
+        logger.info("$$$$$$ THRESHOLD = "+thres+" ");
+
+        for (Map.Entry<Entity.Triple, Double> me;
+             (me = seeds.poll()) != null; ) {
             Entity source = me.getKey().source();
             Entity target = me.getKey().target();
-            if (union (target, source)) {
+            if (me.getValue() > thres && union (target, source)) {
                 logger.info("## merging "+source.getId()+" "+target.getId()
                             +".. "+me.getValue());
+            }
+            else {
+                uf.add(source.getId());
+                uf.add(target.getId());
             }
         }
 
@@ -198,9 +276,20 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             EntityFactory ef = new EntityFactory (graphDb);
             int version = Integer.parseInt(argv[1]);
             DataSource dsource =
-                ef.getDataSourceFactory().register("stitch_v"+version); 
+                ef.getDataSourceFactory().register("stitch_v"+version);
 
-            ef.untangle(new UntangleCompoundStitches (dsource, 10.0));
+            if (argv.length > 2) {
+                for (int i = 2; i < argv.length; ++i) {
+                    long id = Long.parseLong(argv[i]);
+                    logger.info("################ COMPONENT "
+                                +id+" ################");
+                    Entity e = ef.entity(id);
+                    ef.untangle(new UntangleCompoundStitches (dsource, e));
+                }
+            }
+            else {
+                ef.untangle(new UntangleCompoundStitches (dsource));
+            }
         }
         finally {
             graphDb.shutdown();

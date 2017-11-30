@@ -58,7 +58,8 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             ArrayNode node = mapper.createArrayNode();
             for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
                 Node n = rel.getOtherNode(_node);
-                if (rel.isType(AuxRelType.STITCH) || rel.isType(AuxRelType.PAYLOAD)) {
+                if (rel.isType(AuxRelType.STITCH)
+                    || rel.isType(AuxRelType.PAYLOAD)) {
                     ObjectNode obj = mapper.createObjectNode();
                     setJson (obj, n);
                     node.add(obj);

@@ -29,8 +29,10 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             Object u = e.payload("UNII");
             return Util.delta(u, v) == null;
         }
-        
-        return false;
+
+        Entity[] out = e.outNeighbors(T_ActiveMoiety);
+        Entity[] in = e.inNeighbors(T_ActiveMoiety);
+        return in.length > 0 && out.length == 0;
     }
 
     protected boolean union (Entity... entities) {
@@ -39,8 +41,11 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
 
         List<long[]> ids = new ArrayList<>();
         for (int i = 1; i < entities.length; ++i) {
-            Long p = uf.root(entities[i-1].getId());
-            Long q = uf.root(entities[i].getId());
+            Entity P = entities[i-1];
+            Entity Q = entities[i];
+            
+            Long p = uf.root(P.getId());
+            Long q = uf.root(Q.getId());
             if (p != null && q != null) {
                 if (!p.equals(q)) {
                     boolean pr = isRoot (ef.entity(p));
@@ -48,9 +53,9 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                     if (pr && qr) {
                         logger.warning
                             ("Can't merge two root active moieties: "
-                             +entities[i-1].getId()+" ("+p+" -> "
+                             +P.getId()+" ("+p+" -> "
                              +Util.toString(ef.entity(p).get(I_UNII))
-                             +") and "+entities[i].getId()+" ("+q+" ->"
+                             +") and "+Q.getId()+" ("+q+" ->"
                              +Util.toString(ef.entity(q).get(I_UNII))+")");
                         
                         return false; // bail out
@@ -62,13 +67,11 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                 }
             }
             else {
-                Object u = getActiveMoiety (entities[i]),
-                    v = getActiveMoiety (entities[i-1]);
+                Object u = getActiveMoiety (P), v = getActiveMoiety (Q);
                 if (u != null && v != null && !Util.equals(u, v))
                     return false; // bail..
 
-                ids.add(new long[]{entities[i].getId(),
-                                   entities[i-1].getId()});
+                ids.add(new long[]{P.getId(), Q.getId()});
             }
         }
 

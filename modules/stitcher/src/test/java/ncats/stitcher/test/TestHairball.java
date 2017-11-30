@@ -28,7 +28,7 @@ public class TestHairball {
     public TestHairball () {
     }
 
-    void loadTest (String name, double threshold, InputStream... streams)
+    void loadTest (String name, Double threshold, InputStream... streams)
         throws Exception {
         ObjectMapper mapper = new ObjectMapper ();
         ArrayNode data = mapper.createArrayNode();
@@ -68,7 +68,7 @@ public class TestHairball {
     public void testHairball1 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
-        loadTest (name.getMethodName(), 15.0,
+        loadTest (name.getMethodName(), null,
                   EntityRegistry.class.getResourceAsStream
                   ("/calcium_hairball.json"));
     }
