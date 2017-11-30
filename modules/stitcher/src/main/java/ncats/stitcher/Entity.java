@@ -80,7 +80,10 @@ public class Entity extends CNode {
         }
         
         void add (StitchKey key, Object value, boolean flip) {
-            if (flip) this.flip.add(key);
+            if (key.directed && flip) {
+                //logger.info("** FLIPPED: "+key+" "+source.getId()+" "+target.getId());
+                this.flip.add(key);
+            }
             Object v = values.get(key);
             values.put(key, Util.merge(v, value));
         }
@@ -148,8 +151,12 @@ public class Entity extends CNode {
         public int getVisitCount () { return visited.size(); }
 
         public void _traverse (EntityVisitor visitor, StitchKey... keys) {
-            if (keys == null || keys.length == 0)
-                keys = Entity.KEYS;
+            EnumSet<StitchKey> keyset = null;
+            if (keys != null && keys.length > 0) {
+                keyset = EnumSet.noneOf(StitchKey.class);
+                for (StitchKey k : keys)
+                    keyset.add(k);
+            }
             
             while (!stack.isEmpty()) {
                 Node n = stack.pop();
@@ -157,7 +164,7 @@ public class Entity extends CNode {
                 
                 Map<Node, Triple> neighbors = new HashMap<>();
                 for (Relationship rel :
-                         n.getRelationships(Direction.BOTH, keys)) {
+                         n.getRelationships(Direction.BOTH, Entity.KEYS)) {
                     Node xn = rel.getOtherNode(n);
                     Triple triple = neighbors.get(xn);
                     if (triple == null) {
@@ -165,7 +172,8 @@ public class Entity extends CNode {
                     }
                     StitchKey key = StitchKey.valueOf(rel.getType().name());
                     triple.add(key, rel.getProperty(VALUE),
-                               rel.getStartNode() != n);
+                               !rel.getStartNode()
+                               .equals(triple.source._node()));
                 }
                 
                 List<Map.Entry<Node, Triple>> ordered =
@@ -176,8 +184,14 @@ public class Entity extends CNode {
 
                 for (Map.Entry<Node, Triple> me : ordered) {
                     Node xn = me.getKey();
-                    if (!visited.contains(xn.getId())
-                        && visitor.visit(this, me.getValue())) {
+                    if (!visited.contains(xn.getId())) {
+                        Triple triple = me.getValue();                  
+                        if (keyset == null
+                            || triple.values().keySet().containsAll(keyset)) {
+                            if (!visitor.visit(this, triple)) {
+                                return; // stop
+                            }
+                        }
                         stack.push(xn);
                     }
                 }
@@ -586,8 +600,8 @@ public class Entity extends CNode {
         if (nodes.size() > 1) {
             Collections.sort(nodes, new Comparator<Node>() {
                     public int compare (Node n1, Node n2) {
-                        Long l1 = (Long)n1.getProperty(CREATED);
-                        Long l2 = (Long)n2.getProperty(CREATED);
+                        Long l1 = (Long)n1.getProperty(CREATED, 0l);
+                        Long l2 = (Long)n2.getProperty(CREATED, 0l);
                         return (int)(l2 - l1);
                     }
                 });
@@ -1079,12 +1093,16 @@ public class Entity extends CNode {
         }
     }
 
-    public void traverse (EntityVisitor visitor, StitchKey... keys) {
-        new Traversal(_node).traverse(visitor, keys);
+    public Traversal traverse (EntityVisitor visitor, StitchKey... keys) {
+        Traversal tr = new Traversal (_node);
+        tr.traverse(visitor, keys);
+        return tr;
     }
 
-    public void _traverse (EntityVisitor visitor, StitchKey... keys) {
-        new Traversal(_node)._traverse(visitor, keys);
+    public Traversal _traverse (EntityVisitor visitor, StitchKey... keys) {
+        Traversal tr = new Traversal(_node);
+        tr._traverse(visitor, keys);
+        return tr;
     }
 
     public Map<String, Object> payload (Entity entity) {

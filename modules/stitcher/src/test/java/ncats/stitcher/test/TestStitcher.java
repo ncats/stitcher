@@ -23,7 +23,7 @@ public class TestStitcher {
     static final Logger logger =
         Logger.getLogger(TestStitcher.class.getName());
 
-    void testMergedStitches (String name, int ncomp, double threshold,
+    void testMergedStitches (String name, int ncomp, Double threshold,
                              InputStream... streams)
         throws Exception {
         ObjectMapper mapper = new ObjectMapper ();
@@ -83,7 +83,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 1, 2.0,
+            (name.getMethodName(), 1, null,
              EntityRegistry.class.getResourceAsStream("/1JQS135EYN.json"));
     }
 
@@ -92,7 +92,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 1, 2.0,
+            (name.getMethodName(), 1, null,
              EntityRegistry.class.getResourceAsStream("/cefotetan1.json"),
              EntityRegistry.class.getResourceAsStream("/cefotetan2.json"));
     }
@@ -102,7 +102,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 1, 2.,
+            (name.getMethodName(), 1, null,
              EntityRegistry.class.getResourceAsStream("/OZAGREL1.json"),
              EntityRegistry.class.getResourceAsStream("/OZAGREL2.json"));
     }
@@ -112,7 +112,16 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 3, 2.0,
+            (name.getMethodName(), 3, null,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
+    }
+
+    @Test
+    public void testStitch5 () throws Exception {
+        logger.info("##################################### "
+                    +name.getMethodName());
+        testMergedStitches
+            (name.getMethodName(), 8, null,
+             EntityRegistry.class.getResourceAsStream("/heparin.json"));
     }
 }

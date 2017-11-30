@@ -281,6 +281,32 @@ public class Api extends Controller {
             : notFound ("Unknown stitch key: "+id);
     }
 
+    public Result getComponent (Long id) {
+        String uri = routes.Api.getComponent(id).url();
+        Logger.debug(uri);
+        
+        try {
+            Component comp = es.getEntityFactory().component(id);
+            ArrayNode json = mapper.createArrayNode();
+            for (Entity e : comp) {
+                ArrayNode a = (ArrayNode)jsonCodec.encodeSimple(e);
+                for (int i = 0; i < a.size(); ++i)
+                    json.add(a.get(i));
+            }
+
+            ObjectNode node = mapper.createObjectNode();
+            node.put("uri", uri);
+            node.put("count", json.size());
+            node.put("data", json);
+            
+            return ok (node);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return notFound ("Unknown component: "+id);
+        }
+    }
+
     public Result updateStitch(Integer ver, String id) {
         String uri = routes.Api.updateStitch(ver, id).url();
         Logger.debug(uri);
