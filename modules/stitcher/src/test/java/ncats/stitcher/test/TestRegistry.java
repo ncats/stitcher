@@ -30,6 +30,7 @@ public class TestRegistry extends EntityRegistry {
         super.init();
         //setStrucField("MOLFILE");
         setStrucField ("SMILES");
+        setIdField ("id");
         // setup mapping
         add (I_UNII, "UNII");
         add (I_UNII, "Unii");
