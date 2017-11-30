@@ -32,7 +32,25 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
 
         Entity[] out = e.outNeighbors(T_ActiveMoiety);
         Entity[] in = e.inNeighbors(T_ActiveMoiety);
-        return in.length > 0 && out.length == 0;
+        
+        boolean root = false;
+        if (in.length > 0 && out.length == 0) {
+            // make sure in doesn't contain any active moiety (if it does)
+            // then the active moiety relationship is flipped
+            for (Entity nb : in) {
+                v = getActiveMoiety (nb);
+                if (v != null) {
+                    Object u = nb.payload("UNII");
+                    // can't have active moiety relationship to another entity
+                    // and self, so the relationship must be flipped
+                    if (Util.delta(u, v) == null)
+                        return false;
+                }
+            }
+            root = true;
+        }
+        
+        return root;
     }
 
     protected boolean union (Entity... entities) {

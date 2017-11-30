@@ -41,37 +41,41 @@ public class TestStitcher {
                     +"instead got "+data.size(), data.size() == total);
 
         TestRegistry reg = new TestRegistry (name);
-        reg.register(data);
-        /*
-        reg.traverse((a, b, values) -> {
-                logger.info("### ("+a.getId()+","+b.getId()+") => "+values);
-                return true;
-            });
-        */
-        
-        long count = reg.count(AuxNodeType.ENTITY);
-        assertTrue ("Expecting "+data.size()+" entities but instead got "
-                    +count, data.size() == count);
-
-        DataSource ds = reg.getDataSourceFactory().register("stitch_v1");
-
-        List<Long> comps = new ArrayList<>();
-        int nc = reg.components(comps);
-        assertTrue ("Expect 1 component but instead got "+nc, nc == 1);
-        /*
-        for (Long id : comps) {
-            Component comp = reg.component(id);
-            reg.untangle(new UntangleCompoundComponent (ds, threshold, comp));
+        try {
+            reg.register(data);
+            /*
+              reg.traverse((a, b, values) -> {
+              logger.info("### ("+a.getId()+","+b.getId()+") => "+values);
+              return true;
+              });
+            */
+            
+            long count = reg.count(AuxNodeType.ENTITY);
+            assertTrue ("Expecting "+data.size()+" entities but instead got "
+                        +count, data.size() == count);
+            
+            DataSource ds = reg.getDataSourceFactory().register("stitch_v1");
+            
+            List<Long> comps = new ArrayList<>();
+            int nc = reg.components(comps);
+            assertTrue ("Expect 1 component but instead got "+nc, nc == 1);
+            /*
+              for (Long id : comps) {
+              Component comp = reg.component(id);
+              reg.untangle(new UntangleCompoundComponent (ds, threshold, comp));
+              }
+            */
+            
+            reg.untangle(new UntangleCompoundStitches (ds, threshold));
+            
+            count = reg.count(ds.getName());
+            assertTrue ("Expect "+ncomp
+                        +" stitch node(s) but instead got "+count,
+                        count == ncomp);
         }
-        */
-
-        reg.untangle(new UntangleCompoundStitches (ds, threshold));
-        
-        count = reg.count(ds.getName());
-        assertTrue ("Expect "+ncomp+" stitch node(s) but instead got "+count,
-                    count == ncomp);
-
-        reg.shutdown();
+        finally {
+            reg.shutdown();
+        }
     }
 
     @Rule public TestName name = new TestName();
@@ -121,7 +125,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 8, null,
+            (name.getMethodName(), 16, null,
              EntityRegistry.class.getResourceAsStream("/heparin.json"));
     }
 }
