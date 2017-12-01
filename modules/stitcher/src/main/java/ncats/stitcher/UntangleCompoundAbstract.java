@@ -27,7 +27,7 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
         Object v = getActiveMoiety (e);
         if (v != null) {
             Object u = e.payload("UNII");
-            return Util.delta(u, v) == null;
+            return u != null && Util.delta(u, v) == null;
         }
 
         Entity[] out = e.outNeighbors(T_ActiveMoiety);
@@ -43,7 +43,7 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                     Object u = nb.payload("UNII");
                     // can't have active moiety relationship to another entity
                     // and self, so the relationship must be flipped
-                    if (Util.delta(u, v) == null)
+                    if (u != null && Util.delta(u, v) == null)
                         return false;
                 }
             }

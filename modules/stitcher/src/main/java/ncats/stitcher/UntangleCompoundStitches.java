@@ -229,7 +229,7 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                         +" MEDIAN = "+med
                         +" MEAN = "+mean+" $$$$$$$$");
             if (min < 1.)
-                thres = Math.max(5.0*min, mean - 5.0*min);
+                thres = Math.max(5.0*min, mean - 5.0*min); // eh..??
             else
                 thres = min;
         }
@@ -241,9 +241,22 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
 
         for (Map.Entry<Entity.Triple, Double> me;
              (me = seeds.poll()) != null; ) {
-            Entity source = me.getKey().source();
-            Entity target = me.getKey().target();
-            if (me.getValue() > thres && union (target, source)) {
+            Entity.Triple triple = me.getKey();
+            Entity source = triple.source();
+            Entity target = triple.target();
+            
+            double score = me.getValue();
+            if (score > thres && triple.values().containsKey(H_LyChI_L3)
+                && !triple.values().containsKey(H_LyChI_L4)) {
+                // adjust the score to require strong evidence if there
+                // might be a chance of structural problems
+                score /= 3.0; // eh..??
+                logger.warning("** score is adjusted from "
+                               +me.getValue()+" to "+score);
+            }
+            
+            if (score > thres && union (target, source)) {
+                // now let's interogate this a big more                
                 logger.info("## merging "+source.getId()+" "+target.getId()
                             +".. "+me.getValue());
             }
@@ -281,14 +294,24 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             if (argv.length > 2) {
                 for (int i = 2; i < argv.length; ++i) {
                     long id = Long.parseLong(argv[i]);
-                    logger.info("################ COMPONENT "
-                                +id+" ################");
                     Entity e = ef.entity(id);
+                    logger.info("################ COMPONENT "
+                                +id+" ("+e.get(RANK)+") ################");
                     ef.untangle(new UntangleCompoundStitches (dsource, e));
                 }
             }
             else {
-                ef.untangle(new UntangleCompoundStitches (dsource));
+                List<Long> comps = new ArrayList<>();
+                ef.components(comps);
+                logger.info("### there are "+comps.size()+" components ###");
+                for (int i = 0; i < comps.size(); ++i) {
+                    long id = comps.get(i);
+                    Entity e = ef.entity(id);
+                    logger.info("################ COMPONENT "
+                                +String.format("%1$5d", i+1)+": "+
+                                +id+" ("+e.get(RANK)+") ################");
+                    ef.untangle(new UntangleCompoundStitches (dsource, e));
+                }
             }
         }
         finally {

@@ -9,8 +9,8 @@ GET	/setup		controllers.app.App.setup
 GET	/index		controllers.app.App.index
 GET	/dashboard	controllers.app.App.dashboard
 GET	/stitches/latest/:name	controllers.app.App.latestStitch(name: String)
-GET	/stitches/v$version<[1-9]+>/:name	controllers.app.App.stitch(version: Int, name: String)
+GET	/stitches/v$version<[1-9][0-9]*>/:name	controllers.app.App.stitch(version: Int, name: String)
 GET	/stitches/latest	controllers.app.App.latestStitches(q: String ?=null, rows: Int ?= 5, page: Int ?= 1)
-GET	/stitches/v$version<[1-9]+>	controllers.app.App.stitches(version: Int, q: String ?= null, rows: Int ?= 5, page: Int ?= 1)
+GET	/stitches/v$version<[1-9][0-9]*>	controllers.app.App.stitches(version: Int, q: String ?= null, rows: Int ?= 5, page: Int ?= 1)
 DELETE	/payload		controllers.app.App.delete(key: String)
 
