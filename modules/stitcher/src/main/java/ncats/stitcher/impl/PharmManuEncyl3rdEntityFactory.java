@@ -52,7 +52,7 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
             .add (I_CAS, "CAS")
             .add (N_Name, "Products")
             //.add (N_Name, "UNII PT")
-            //.add (I_UNII, "UNII")
+            .add (I_UNII, "UNII")
             ;
     }
     

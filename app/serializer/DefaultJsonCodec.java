@@ -60,9 +60,12 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 Node n = rel.getOtherNode(_node);
                 if (rel.isType(AuxRelType.STITCH)
                     || rel.isType(AuxRelType.PAYLOAD)) {
+                    /*if (!n.hasProperty("CONDITION") && !n.hasProperty("NDC")
+                      && !n.hasProperty("Year")) {*/
                     ObjectNode obj = mapper.createObjectNode();
                     setJson (obj, n);
                     node.add(obj);
+                    //}
                 }
             }
             tx.success();
