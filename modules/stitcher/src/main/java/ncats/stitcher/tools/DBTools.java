@@ -230,17 +230,33 @@ public class DBTools {
     }
 
     public void components () {
-        AtomicInteger ai = new AtomicInteger (0);
-        ef.components(c -> {
-                //int score = c.score().intValue();               
-                if (c.size() > 10) {
-                    System.out.println("++++++++++++ Component "
-                                       +c.root().getId()+" ++++++++++++");
-                    //System.out.println("score: "+score);
-                    System.out.println("size: "+c.size());
+        components (100);
+    }
+
+    public void components (int N) {
+        AtomicInteger cnt = new AtomicInteger ();
+        Queue<Map.Entry<Long, Integer>> topN = new PriorityQueue<>
+            ((a, b) -> {
+                int d = b.getValue() - a.getValue();
+                if (d == 0) {
+                    if (a.getKey() < b.getKey()) d = -1;
+                    else if (a.getKey() > b.getKey()) d = 1;
                 }
-                ai.getAndIncrement();
+                return d;
             });
+        ef.maps(e -> {
+                Map.Entry<Long, Integer> me = new AbstractMap.SimpleImmutableEntry
+                    (e.getId(), (Integer)e.get(Props.RANK));
+                System.out.println(me.getKey()+" "+me.getValue());
+                topN.add(me);
+                cnt.incrementAndGet();
+            }, "COMPONENT");
+        System.out.println("## "+cnt.get()+" component(s)!");
+        System.out.println("## Top "+N+" components");
+        for (int i = 0; i < Math.min(cnt.get(), N); ++i) {
+            Map.Entry<Long, Integer> me = topN.poll();
+            System.out.println(me.getKey()+" "+me.getValue());
+        }
     }
 
     public void clique (long id) {
