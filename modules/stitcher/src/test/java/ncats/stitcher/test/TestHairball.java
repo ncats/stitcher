@@ -2,6 +2,7 @@ package ncats.stitcher.test;
 
 import java.util.*;
 import java.io.*;
+import java.util.zip.GZIPInputStream;
 import java.lang.reflect.Array;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -51,7 +52,7 @@ public class TestHairball {
         assertTrue ("Expecting "+data.size()+" entities but instead got "
                     +count, data.size() == count);
 
-        DataSource ds = reg.getDataSourceFactory().register("stitch_v"+1);
+        DataSource ds = reg.getDataSourceFactory().register("stitch_v1");
         /*
         List<Long> comps = new ArrayList<>();
         int nc = reg.components(comps);
@@ -70,6 +71,10 @@ public class TestHairball {
                     +name.getMethodName());
         loadTest (name.getMethodName(), null,
                   EntityRegistry.class.getResourceAsStream
-                  ("/calcium_hairball.json"));
+                  ("/calcium_hairball.json")
+                  /* new GZIPInputStream
+                      (EntityRegistry.class.getResourceAsStream
+                      ("/2277.json.gz"))*/
+                  );
     }
 }
