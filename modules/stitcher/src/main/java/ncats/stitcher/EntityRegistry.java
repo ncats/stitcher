@@ -570,9 +570,15 @@ public class EntityRegistry extends EntityFactory {
                                 int len = Array.getLength(val);
                                 for (int i = 0; i < len; ++i) {
                                     Object v = Array.get(val, i);
-                                    ent._add
-                                        (me.getKey(), new StitchValue
-                                         (prop, Long.parseLong(v.toString())));
+                                    try {
+                                        ent._add
+                                            (me.getKey(), new StitchValue
+                                             (prop, Long.parseLong
+                                              (v.toString())));
+                                    }
+                                    catch (NumberFormatException ex) {
+                                        logger.warning("Bogus long value: "+v);
+                                    }
                                 }
                             }
                             else {
@@ -582,7 +588,7 @@ public class EntityRegistry extends EntityFactory {
                                               Long.parseLong(val.toString())));
                                 }
                                 catch (NumberFormatException ex) {
-                                    logger.warning("Bogus long value "+val);
+                                    logger.warning("Bogus long value: "+val);
                                 }
                             }
                             break;
