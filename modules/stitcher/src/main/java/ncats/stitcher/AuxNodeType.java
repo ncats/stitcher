@@ -10,6 +10,7 @@ public enum AuxNodeType implements Label {
     SINGLETON,
     SGROUP,
     COMPONENT,
+    STATS,
     DATA,
     ENTITY,
     DATASOURCE,

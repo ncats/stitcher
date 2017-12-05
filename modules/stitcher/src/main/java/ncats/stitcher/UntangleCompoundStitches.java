@@ -1,5 +1,7 @@
 package ncats.stitcher;
 
+import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.*;
 import java.net.URI;
@@ -15,6 +17,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import static ncats.stitcher.StitchKey.*;
 
+import com.sleepycat.je.*;
+import com.sleepycat.bind.EntryBinding;
+import com.sleepycat.bind.tuple.DoubleBinding;
+import com.sleepycat.bind.serial.ClassCatalog;
+import com.sleepycat.bind.serial.SerialBinding;
+import com.sleepycat.bind.serial.StoredClassCatalog;
+import com.sleepycat.collections.StoredEntrySet;
+import com.sleepycat.collections.StoredSortedMap;
+import com.sleepycat.collections.StoredSortedKeySet;
+
 public class UntangleCompoundStitches extends UntangleCompoundAbstract {
     static final Logger logger = Logger.getLogger
         (UntangleCompoundStitches.class.getName());
@@ -22,7 +34,38 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
     final protected Double threshold;
     final protected Map<Object, Integer> counts = new HashMap<>();
     final protected Entity seed;
+
+    static class TripleEntry implements Serializable,
+                                        Comparable<TripleEntry> {
+        public final Entity.Triple triple;
+        public final double score;
+        
+        public TripleEntry () {
+            this (null, -1.0);
+        }
+        
+        public TripleEntry (Entity.Triple triple, double score) {
+            this.triple = triple;
+            this.score = score;
+        }
+
+        public int compareTo (TripleEntry t) {
+            if (t.score > score) return 1;
+            else if (t.score < score) return -1;
+            return triple.compareTo(t.triple);
+        }
+
+        public String toString () {
+            return "("+triple.source()+","+triple.target()+","+score+")";
+        }
+    }
+    
     protected double total;
+    protected Environment env;
+    protected StoredClassCatalog catalog;
+    protected SerialBinding entryBinding;
+    protected StoredSortedKeySet<TripleEntry> triples;
+    protected Database tripleDb;
 
     public UntangleCompoundStitches (DataSource dsource) {
         this (dsource, null, null);
@@ -41,14 +84,48 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         super (dsource);
         this.seed = seed;
         this.threshold = threshold;
+        try {
+            initDbEnv ();
+        }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, "Can't initialize database!", ex);
+        }
     }
+
+    void initDbEnv () throws Exception {
+        EnvironmentConfig envConfig = new EnvironmentConfig();
+        envConfig.setTransactional(true);
+        envConfig.setAllowCreate(true);
+        envConfig.setCacheSize(8*1024*1024);
+        env = new Environment
+            (Files.createTempDirectory("stitcher").toFile(), envConfig);
+                
+        Transaction tx = env.beginTransaction(null, null);
+        try {
+            DatabaseConfig dbconf = new DatabaseConfig ();
+            dbconf.setTransactional(true);
+            dbconf.setAllowCreate(true);
+            Database db = env.openDatabase(tx, "ClassCataglog", dbconf);
+            catalog = new StoredClassCatalog (db);
+
+            dbconf = (DatabaseConfig)dbconf.clone();
+            dbconf.setSortedDuplicates(true);
+            tripleDb = env.openDatabase(tx, "StoredSortedTripleEntry", dbconf);
+            entryBinding = new SerialBinding (catalog, TripleEntry.class);
+            triples = new StoredSortedKeySet (tripleDb, entryBinding, true);
+        }
+        finally {
+            tx.commit();
+        }
+    }
+
 
     double calcScore (Entity.Triple triple) {
         Map<StitchKey, Object> values = triple.values();        
         double score = 0.;
 
-        Entity target = triple.target();
-        Entity source = triple.source();
+        Entity target = ef.entity(triple.target());
+        Entity source = ef.entity(triple.source());
         for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
             StitchKey key = me.getKey();
             Object val = me.getValue();
@@ -83,6 +160,7 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         counts.clear();
 
         logger.info("############## STITCH COUNTS ##############");
+        /*
         traverse ((traversal, triple) -> {
                 Map<StitchKey, Object> values = triple.values();
                 for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
@@ -101,11 +179,16 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 }
                 return true;
             });
-        //logger.info("$$$$ COUNTS ==> "+counts);
+        */
+        
+        counts.putAll(seed != null ? seed.getComponentStitchCounts()
+                      : ef.getStitchCounts());
+        //logger.info("$$$$ COUNTS ==> "+counts);       
 
         total = 0.;
         for (Integer v : counts.values())
             total += v;
+
         logger.info("$$$$ total stitch count ==> "+total);
     }
 
@@ -119,8 +202,8 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         Set<Entity> roots = new HashSet<>();
         Set<Entity> unsure = new HashSet<>();
         traverse ((traversal, triple) -> {
-                Entity source = triple.source(T_ActiveMoiety);
-                Entity target = triple.target(T_ActiveMoiety);
+                Entity source = ef.entity(triple.source(T_ActiveMoiety));
+                Entity target = ef.entity(triple.target(T_ActiveMoiety));
                 
                 Entity[] out = source.outNeighbors(T_ActiveMoiety);
                 Entity[] in = target.inNeighbors(T_ActiveMoiety);
@@ -155,24 +238,10 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         dump ("##### active moiety stitching");
 
         logger.info("########### STITCHING TRIPLES #############");
-        Queue<Map.Entry<Entity.Triple, Double>> seeds =
-            new PriorityQueue<>((a, b) -> {
-                    if (b.getValue() > a.getValue()) return 1;
-                    if (b.getValue() < a.getValue()) return -1;
-                    if (a.getKey().source().getId()
-                        < b.getKey().source().getId())
-                        return -1;
-                    if (a.getKey().source().getId()
-                        > b.getKey().source().getId())
-                        return 1;
-                    return 0;
-                });
-
-        List<Double> scores = new ArrayList<>();
         traverse ((traversal, triple) -> {
                 double score = calcScore (triple);
-                Entity source = triple.source();
-                Entity target = triple.target();
+                Entity source = ef.entity(triple.source());
+                Entity target = ef.entity(triple.target());
                 
                 boolean a = roots.contains(source);
                 if (!a && (a = isRoot (source))) {
@@ -191,10 +260,8 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 logger.info("..."+source.getId()+" "+target.getId()
                             +" score="+score+" "
                             +Util.toString(triple.values()));
-                scores.add(score);
-                if (/*score > threshold &&*/!(a && b)) {
-                    seeds.add(new AbstractMap.SimpleImmutableEntry
-                              (triple, score));
+                if (/*score > threshold &&*/ !(a && b)) {
+                    triples.add(new TripleEntry (triple, score));
                 }
                 /*
                 else {
@@ -207,26 +274,17 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             });
 
         double thres = 0.;
-        int size = scores.size();       
-        if (size > 0) {
-            Collections.sort(scores);
-            double min = scores.get(0);
-            double max = scores.get(scores.size()-1);
-            
-            double med = 0.;
-            if (size % 2 == 0)
-                med = (scores.get(size/2) + scores.get(size/2 -1))/2.0;
-            else
-                med = scores.get(size/2);
+        if (!triples.isEmpty()) {
+            double min = triples.first().score;
+            double max = triples.last().score;
 
             double mean = 0.;
-            for (Double s : scores)
-                mean += s;
-            mean /= size;
+            for (TripleEntry te : triples)
+                mean += te.score;
+            mean /= triples.size();
             
             logger.info("$$$$$$ SCORE: MIN = "+min
                         +" MAX = "+max
-                        +" MEDIAN = "+med
                         +" MEAN = "+mean+" $$$$$$$$");
             if (min < 1.)
                 thres = Math.max(5.0*min, mean - 5.0*min); // eh..??
@@ -239,31 +297,50 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
 
         logger.info("$$$$$$ THRESHOLD = "+thres+" ");
 
-        for (Map.Entry<Entity.Triple, Double> me;
-             (me = seeds.poll()) != null; ) {
-            Entity.Triple triple = me.getKey();
-            Entity source = triple.source();
-            Entity target = triple.target();
-            
-            double score = me.getValue();
-            if (score > thres && triple.values().containsKey(H_LyChI_L3)
-                && !triple.values().containsKey(H_LyChI_L4)) {
-                // adjust the score to require strong evidence if there
-                // might be a chance of structural problems
-                score /= 3.0; // eh..??
-                logger.warning("** score is adjusted from "
-                               +me.getValue()+" to "+score);
+        Transaction tx = env.beginTransaction(null, null);
+        try {
+            Cursor cursor = tripleDb.openCursor
+                (tx, CursorConfig.READ_UNCOMMITTED);
+            DatabaseEntry key = new DatabaseEntry ();
+            DatabaseEntry data = new DatabaseEntry();
+            if (OperationStatus.SUCCESS == cursor.getLast(key, data, null)) {
+                do {
+                    TripleEntry entry =
+                        (TripleEntry) entryBinding.entryToObject(key);
+                    Entity.Triple triple = entry.triple;
+                    //logger.info("----- "+entry+" -----");
+                    
+                    Entity source = ef.entity(triple.source());
+                    Entity target = ef.entity(triple.target());
+                    
+                    double score = entry.score;
+                    if (score > thres
+                        && triple.values().containsKey(H_LyChI_L3)
+                        && !triple.values().containsKey(H_LyChI_L4)) {
+                        // adjust the score to require strong evidence if there
+                        // might be a chance of structural problems
+                        score /= 3.0; // eh..??
+                        logger.warning("** score is adjusted from "
+                                       +entry.score+" to "+score);
+                    }
+                    
+                    if (score > thres && union (target, source)) {
+                        // now let's interogate this a big more 
+                        logger.info("## merging "+source.getId()
+                                    +" "+target.getId()+".. "+score);
+                    }
+                    else {
+                        uf.add(source.getId());
+                        uf.add(target.getId());
+                    }
+                }
+                while (OperationStatus.SUCCESS
+                       == cursor.getPrev(key, data, null));
             }
-            
-            if (score > thres && union (target, source)) {
-                // now let's interogate this a big more                
-                logger.info("## merging "+source.getId()+" "+target.getId()
-                            +".. "+me.getValue());
-            }
-            else {
-                uf.add(source.getId());
-                uf.add(target.getId());
-            }
+            cursor.close();
+        }
+        finally {
+            tx.commit();
         }
 
         // now resolve entities that point to multiple active moieties
@@ -274,6 +351,18 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         }
 
         createStitches (consumer);
+    }
+
+    public void shutdown () {
+        try {
+            catalog.close();
+            tripleDb.close();
+            env.close();
+            env.getHome().delete();
+        }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, "Closing databases", ex);
+        }
     }
 
     public static void main (String[] argv) throws Exception {
@@ -297,7 +386,10 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                     Entity e = ef.entity(id);
                     logger.info("################ COMPONENT "
                                 +id+" ("+e.get(RANK)+") ################");
-                    ef.untangle(new UntangleCompoundStitches (dsource, e));
+                    UntangleCompoundStitches ucs =
+                        new UntangleCompoundStitches (dsource, e);
+                    ef.untangle(ucs);
+                    ucs.shutdown();
                 }
             }
             else {
@@ -310,7 +402,10 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                     logger.info("################ COMPONENT "
                                 +String.format("%1$5d", i+1)+": "+
                                 +id+" ("+e.get(RANK)+") ################");
-                    ef.untangle(new UntangleCompoundStitches (dsource, e));
+                    UntangleCompoundStitches ucs =
+                        new UntangleCompoundStitches (dsource, e);
+                    ef.untangle(ucs);
+                    ucs.shutdown();
                 }
             }
         }

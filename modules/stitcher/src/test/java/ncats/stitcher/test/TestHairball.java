@@ -70,11 +70,11 @@ public class TestHairball {
         logger.info("##################################### "
                     +name.getMethodName());
         loadTest (name.getMethodName(), null,
-                  EntityRegistry.class.getResourceAsStream
-                  ("/calcium_hairball.json")
-                  /* new GZIPInputStream
+                  /*EntityRegistry.class.getResourceAsStream
+                    ("/calcium_hairball.json")*/
+                   new GZIPInputStream
                       (EntityRegistry.class.getResourceAsStream
-                      ("/2277.json.gz"))*/
+                      ("/2277.json.gz"))
                   );
     }
 }

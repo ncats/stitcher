@@ -349,29 +349,39 @@ public class CNode implements Props, Comparable<CNode> {
         return connected (n._node);
     }
 
-    protected static void union (Node p, Node q) {
+    protected static Node union (Node p, Node q) {
         Node P = getRoot (p);
         Node Q = getRoot (q);
-        if (!P.equals(Q)) {
-            int rankp = (Integer)P.getProperty(RANK);
-            int rankq = (Integer)Q.getProperty(RANK);
-            long dif = rankp - rankq;
-            if (dif == 0) {
-                // if two ranks are the same, we designate the older
-                // node as the parent
-                dif = Q.getId() - P.getId();
-            }
-            if (dif < 0) { // P -> Q
+
+        Node root = null;
+        int rankp = (Integer)P.getProperty(RANK);
+        int rankq = (Integer)Q.getProperty(RANK);
+            
+        long dif = rankp - rankq;
+        if (dif == 0) {
+            // if two ranks are the same, we designate the older
+            // node as the parent
+            dif = Q.getId() - P.getId();
+        }
+            
+        if (dif < 0) { // P -> Q
+            if (!P.equals(Q)) {
                 P.setProperty(PARENT, Q.getId());
                 P.removeLabel(AuxNodeType.COMPONENT);
                 Q.setProperty(RANK, rankq+rankp);
             }
-            else { // Q -> P
+            root = Q;
+        }
+        else { // Q -> P
+            if (!P.equals(Q)) {
                 Q.setProperty(PARENT, P.getId());
                 Q.removeLabel(AuxNodeType.COMPONENT);
                 P.setProperty(RANK, rankq+rankp);
             }
+            root = P;
         }
+        
+        return root;
     }
     
     public void execute (Runnable r) {

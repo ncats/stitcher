@@ -143,7 +143,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 13, null,
+            (name.getMethodName(), 30, null,
              EntityRegistry.class.getResourceAsStream("/12871.json"));
     }
 }
