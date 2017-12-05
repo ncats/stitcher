@@ -207,8 +207,8 @@ public class TestCore extends EntityRegistry {
         Entity a = entities.get("a");
         a.traverse((traversal, triple) -> {
                 logger.info("#### "+traversal.getVisitCount()
-                            +" ("+triple.source().getId()
-                            +","+triple.target().getId()+").. "
+                            +" ("+triple.source()
+                            +","+triple.target()+").. "
                             +triple.values());
                 return true;
             });

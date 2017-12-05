@@ -1251,6 +1251,23 @@ public class EntityFactory implements Props {
         return count;
     }
 
+    public Map<Object, Integer> geStitchCounts (long id) {
+        Entity e = entity (id);
+        if (e != null)
+            return e.getComponentStitchCounts();
+        return null;
+    }
+
+    public Map<Object, Integer> getStitchCounts () {
+        Map<Object, Integer> counts = new HashMap<>();
+        List<Long> comps = new ArrayList<>();
+        if (components (comps) > 0) {
+            for (Long c : comps)
+                counts.putAll(entity(c).getComponentStitchCounts());
+        }
+        return counts;
+    }
+
     /*
      * globally delete the value for a particular stitch key
      */

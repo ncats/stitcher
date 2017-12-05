@@ -122,8 +122,7 @@ public class DBTools {
             Integer c = scores.get(score);
             scores.put(score, c==null? 1 : (c+1));
 
-            System.out.println(triple.source().getId()
-                               +" "+triple.target().getId()+" "+score);
+            System.out.println(triple.source()+" "+triple.target()+" "+score);
             
             return true;
         }

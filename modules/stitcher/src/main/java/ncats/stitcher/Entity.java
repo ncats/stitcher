@@ -7,6 +7,7 @@ import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.logging.Level;
@@ -69,14 +70,16 @@ public class Entity extends CNode {
         }
     }
 
-    static public class Triple implements Comparable<Triple> {
-        final Entity source, target;
+    static public class Triple implements Comparable<Triple>, Serializable {
+        static private final long serialVersionUID = 12052017l;
+        
+        final long source, target;
         final Set<StitchKey> flip = EnumSet.noneOf(StitchKey.class);
         final Map<StitchKey, Object> values = new EnumMap<>(StitchKey.class);
         
         Triple (Node source, Node target) {
-            this.source = Entity._getEntity(source);
-            this.target = Entity._getEntity(target);
+            this.source = source.getId();
+            this.target = target.getId();
         }
         
         void add (StitchKey key, Object value, boolean flip) {
@@ -95,20 +98,20 @@ public class Entity extends CNode {
         public int compareTo (Triple t) {
             int d = t.values.size() - values.size();
             if (d == 0) {
-                if (source.getId() < t.source.getId()) d = -1;
-                else if (source.getId() > t.source.getId()) d = 1;
+                if (source < t.source) d = -1;
+                else if (source > t.source) d = 1;
             }
             return d;
         }
 
-        public Entity source () { return source; }
-        public Entity source (StitchKey key) {
+        public long source () { return source; }
+        public long source (StitchKey key) {
             if (key.directed)
                 return flip.contains(key) ? target : source;
             return source;
         }
-        public Entity target () { return target; }
-        public Entity target (StitchKey key) {
+        public long target () { return target; }
+        public long target (StitchKey key) {
             if (key.directed)
                 return flip.contains(key) ? source : target;
             return target;
@@ -172,8 +175,7 @@ public class Entity extends CNode {
                     }
                     StitchKey key = StitchKey.valueOf(rel.getType().name());
                     triple.add(key, rel.getProperty(VALUE),
-                               !rel.getStartNode()
-                               .equals(triple.source._node()));
+                               rel.getStartNode().getId() != triple.source);
                 }
                 
                 List<Map.Entry<Node, Triple>> ordered =
@@ -246,7 +248,15 @@ public class Entity extends CNode {
             return e;
         }
     }
-    
+
+    public Entity root () {
+        try (Transaction tx = gdb.beginTx()) {
+            Entity e = new Entity (getRoot (_node));
+            tx.success();
+            return e;
+        }
+    }
+
     public Object get (StitchKey key) {
         try (Transaction tx = gdb.beginTx()) {
             Object ret = _get (key);
@@ -293,6 +303,42 @@ public class Entity extends CNode {
             tx.success();
             return keys;
         }
+    }
+
+    /*
+     * return stitch counts over values spanning all entities
+     * in the component for which this entity belongs.
+     */
+    public Map<Object, Integer> getComponentStitchCounts () {
+        Map<Object, Integer> counts = new HashMap<>();
+        try (Transaction tx = gdb.beginTx()) {
+            Node root = getRoot (_node);
+            Relationship rel = root.getSingleRelationship
+                (AuxRelType.SUMMARY, Direction.INCOMING);
+            
+            if (rel != null) {
+                RelationshipIndex relidx = _relationshipIndex (_node);
+                Node stats = rel.getOtherNode(root);
+
+                for (Relationship r : stats.getRelationships(Entity.KEYS)) {
+                    Object value = r.getProperty(VALUE, null);
+                    if (value != null) {
+                        IndexHits<Relationship> hits
+                            = relidx.get(r.getType().name(), value);
+                        Integer c = counts.get(value);
+                        counts.put(value, c==null
+                                   ? hits.size() : (c+hits.size()));
+                    }
+                }
+            }
+            else {
+                logger.warning("Root node "+root.getId()
+                               +" has no SUMMARY relationship!");
+            }
+            
+            tx.success();
+        }
+        return counts;
     }
 
     public Map<StitchKey, Object> _keys () {
@@ -886,6 +932,58 @@ public class Entity extends CNode {
         }
     }
 
+    static void updateStatsNode (Node parent, Node node, Node target,
+                                 StitchKey key, Object value) {
+        // now update stitching stats
+        Node root = getRoot (node);
+        Relationship rel = root.getSingleRelationship
+            (AuxRelType.SUMMARY, Direction.INCOMING);
+        
+        Node stats = null;      
+        if (rel == null) {
+            root = getRoot (target);
+            rel = root.getSingleRelationship
+                (AuxRelType.SUMMARY, Direction.INCOMING);
+            
+            if (rel != null) {
+                stats = rel.getOtherNode(root);         
+                if (!parent.equals(root)) { // move rel to root
+                    rel.delete();
+                    rel = null;
+                }
+            }
+        }
+        else {
+            stats = rel.getOtherNode(root);
+            if (!parent.equals(root)) { // move rel to root
+                rel.delete();
+                rel = null;
+            }
+        }
+
+        if (stats == null) {
+            stats = parent.getGraphDatabase().createNode(AuxNodeType.STATS);
+            stats.setProperty(KIND, "StitchValues");
+            assert rel == null
+                : "Expecting relationship to be null but it's not!";
+        }
+        
+        if (rel == null)
+            rel = stats.createRelationshipTo(parent, AuxRelType.SUMMARY);
+
+        RelationshipIndex relidx = _relationshipIndex (stats);
+        IndexHits<Relationship> hits =
+            relidx.get(key.name(), value, stats, stats);
+        rel = hits.getSingle();
+        if (rel == null) {
+            // create relationship to self
+            rel = stats.createRelationshipTo(stats, key);
+            rel.setProperty(VALUE, value);
+            relidx.add(rel, key.name(), value);
+        }
+        hits.close();
+    }
+
     /**
      * manually perform the stitch; if either of the nodes is already stitched
      * on the designated key, then the value is append to the existing values.
@@ -908,8 +1006,10 @@ public class Entity extends CNode {
         
         RelationshipIndex relindx = _relationshipIndex (_node);
         relindx.add(rel, key.name(), value);
-        union (_node, target._node);
+        Node parent = union (_node, target._node);
 
+        updateStatsNode (parent, _node, target._node, key, value);
+        
         // now update node properties
         _update (_node, key, value);
         _update (target._node, key, value);
@@ -999,7 +1099,8 @@ public class Entity extends CNode {
                         rel.setProperty(CREATED, System.currentTimeMillis());
                         rel.setProperty(VALUE, value); 
                         relindx.add(rel, key.name(), value);
-                        union (n, node);
+                        Node parent = union (n, node);
+                        updateStatsNode (parent, node, n, key, value);
                         /*   
                              logger.info(node.getId()
                              +" <-["+key+":\""+value+"\"]-> "+n.getId());*/
