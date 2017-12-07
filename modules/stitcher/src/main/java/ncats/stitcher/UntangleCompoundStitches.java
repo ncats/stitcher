@@ -129,18 +129,33 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
             StitchKey key = me.getKey();
             Object val = me.getValue();
-            double s, t = 0.;
+            double s = 0., t = 0.;
             if (val.getClass().isArray()) {
-                int len = Array.getLength(val);
-                for (int i = 0; i < len; ++i)
-                    t += Math.log(counts.get(Array.get(val, i))/total);
-                s = (double)len/(Util.getLength(source.get(key))
-                                 + Util.getLength(target.get(key)) - len);
+                int len = Array.getLength(val), l = 0;
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(val, i);
+                    if (v != null) {
+                        Integer c = counts.get(v);
+                        if (c != null) {
+                            t += Math.log(c/total);
+                            ++l;
+                        }
+                        else 
+                            logger.warning("** stitch value \""+v+"\" has zero count!");
+                    }
+                }
+                s = (double)l/(Util.getLength(source.get(key))
+                               + Util.getLength(target.get(key)) - l);
             }
             else {
-                t = Math.log(counts.get(val)/total);
-                s = 1.0/(Util.getLength(source.get(key))
-                         + Util.getLength(target.get(key)) - 1.0);
+                Integer c = counts.get(val);
+                if (c != null) {
+                    t = Math.log(c/total);
+                    s = 1.0/(Util.getLength(source.get(key))
+                             + Util.getLength(target.get(key)) - 1.0);
+                }
+                else
+                    logger.warning("*** stitch value \""+val+"\" has zero count!");
             }
             score += s*me.getKey().priority*t;
         }
@@ -180,9 +195,16 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 return true;
             });
         */
-        
-        counts.putAll(seed != null ? seed.getComponentStitchCounts()
-                      : ef.getStitchCounts());
+
+        StitchValueVisitor visitor = (key, value, count) -> {
+            Integer c = counts.get(value);
+            counts.put(value, c == null ? count : (c+count));
+        };
+
+        if (seed != null)
+            seed.componentStitchValues(visitor);
+        else 
+            ef.stitchValues(visitor);
         //logger.info("$$$$ COUNTS ==> "+counts);       
 
         total = 0.;
@@ -238,6 +260,8 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         dump ("##### active moiety stitching");
 
         logger.info("########### STITCHING TRIPLES #############");
+        DoubleAdder mean = new DoubleAdder ();
+        AtomicInteger count = new AtomicInteger ();
         traverse ((traversal, triple) -> {
                 double score = calcScore (triple);
                 Entity source = ef.entity(triple.source());
@@ -260,6 +284,15 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 logger.info("..."+source.getId()+" "+target.getId()
                             +" score="+score+" "
                             +Util.toString(triple.values()));
+
+                double m = mean.sumThenReset();
+                if (count.getAndIncrement() > 0) {
+                    mean.add(((count.get()-1)*m + score)/count.get());
+                }
+                else {
+                    mean.add(score);
+                }
+
                 if (/*score > threshold &&*/ !(a && b)) {
                     triples.add(new TripleEntry (triple, score));
                 }
@@ -274,20 +307,15 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             });
 
         double thres = 0.;
-        if (!triples.isEmpty()) {
+        if (count.get() > 0) {
             double min = triples.first().score;
             double max = triples.last().score;
 
-            double mean = 0.;
-            for (TripleEntry te : triples)
-                mean += te.score;
-            mean /= triples.size();
-            
             logger.info("$$$$$$ SCORE: MIN = "+min
                         +" MAX = "+max
                         +" MEAN = "+mean+" $$$$$$$$");
             if (min < 1.)
-                thres = Math.max(5.0*min, mean - 5.0*min); // eh..??
+                thres = Math.max(5.0*min, mean.doubleValue() - 5.0*min); // eh..??
             else
                 thres = min;
         }

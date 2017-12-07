@@ -53,15 +53,26 @@ public class TestHairball {
                     +count, data.size() == count);
 
         DataSource ds = reg.getDataSourceFactory().register("stitch_v1");
-        /*
         List<Long> comps = new ArrayList<>();
         int nc = reg.components(comps);
+        logger.info("########### "+name+" has "+comps.size()+" COMPONENTS ###############");
         for (Long id : comps) {
-            Component comp = reg.component(id);
-            reg.untangle(new UntangleCompoundComponent (ds, comp));
+            Entity e = reg.entity(id);
+            Integer rank = (Integer) e.get(Props.RANK);
+            if (rank != null && rank > 1) {
+                logger.info("################ UNTANGLING COMPONENT "
+                            +id+" ("+rank+") ################");
+                /*
+                UntangleCompoundStitches ucs = new UntangleCompoundStitches (ds, e);
+                reg.untangle(ucs);
+                ucs.shutdown();
+                */
+            }
+            else {
+                logger.info("################ SKIPPING COMPONENT "
+                            +id+" ("+rank+") ################");
+            }
         }
-        */
-        reg.untangle(new UntangleCompoundStitches (ds, threshold));
         reg.shutdown(); 
     }
     
