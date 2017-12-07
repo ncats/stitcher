@@ -218,6 +218,24 @@ public class DBTools {
         }
     }
 
+    public void values (Long... comps) {
+        StitchValueVisitor visitor = (key, value, count) -> {
+            System.out.println(key+": "+value+"="+count);
+        };
+
+        if (comps != null && comps.length > 0) {
+            for (Long id :comps) {
+                Entity e = ef.entity(id).root();
+                logger.info("########## COMPONENT "+id+" ("
+                            +e.get(Props.RANK)+") ############");
+                e.componentStitchValues(visitor);
+            }
+        }
+        else {
+            ef.stitchValues(visitor);
+        }
+    }
+
     public void dump (OutputStream os, String source) throws IOException {
         PrintStream ps = new PrintStream (os);
         for (Iterator<Entity> it = ef.entities(source); it.hasNext(); ) {
@@ -404,6 +422,14 @@ public class DBTools {
                 }
                 else {
                     System.err.println("No component id specified!");
+                }
+            }
+            else if ("values".equalsIgnoreCase(cmd)) {
+                if (argv.length > 2) {
+                    dbt.values(Long.parseLong(argv[2]));
+                }
+                else {
+                    dbt.values();
                 }
             }
             else if ("path".equalsIgnoreCase(cmd)) {

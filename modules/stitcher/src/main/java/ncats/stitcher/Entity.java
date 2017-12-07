@@ -309,25 +309,27 @@ public class Entity extends CNode {
      * return stitch counts over values spanning all entities
      * in the component for which this entity belongs.
      */
-    public Map<Object, Integer> getComponentStitchCounts () {
-        Map<Object, Integer> counts = new HashMap<>();
+    public void componentStitchValues (StitchValueVisitor visitor, StitchKey... keys) {
+        if (keys == null || keys.length == 0)
+            keys = KEYS;
+
         try (Transaction tx = gdb.beginTx()) {
             Node root = getRoot (_node);
             Relationship rel = root.getSingleRelationship
                 (AuxRelType.SUMMARY, Direction.INCOMING);
             
             if (rel != null) {
-                RelationshipIndex relidx = _relationshipIndex (_node);
+                RelationshipIndex relidx = _relationshipIndex (root);
                 Node stats = rel.getOtherNode(root);
 
-                for (Relationship r : stats.getRelationships(Entity.KEYS)) {
+                for (Relationship r : stats.getRelationships(keys)) {
                     Object value = r.getProperty(VALUE, null);
                     if (value != null) {
-                        IndexHits<Relationship> hits
-                            = relidx.get(r.getType().name(), value);
-                        Integer c = counts.get(value);
-                        counts.put(value, c==null
-                                   ? hits.size() : (c+hits.size()));
+                        StitchKey key = StitchKey.valueOf(r.getType().name());
+                        IndexHits<Relationship> hits = 
+                            relidx.get(key.name(), value);
+                        visitor.visit(key, value, hits.size());
+                        hits.close();
                     }
                 }
             }
@@ -338,7 +340,6 @@ public class Entity extends CNode {
             
             tx.success();
         }
-        return counts;
     }
 
     public Map<StitchKey, Object> _keys () {
@@ -932,8 +933,15 @@ public class Entity extends CNode {
         }
     }
 
-    static void updateStatsNode (Node parent, Node node, Node target,
-                                 StitchKey key, Object value) {
+    static Node getStatsNode (Node node) {
+        Node root = getRoot (node);
+        Relationship rel = root.getSingleRelationship
+            (AuxRelType.SUMMARY, Direction.INCOMING);
+        return rel != null ? rel.getOtherNode(root) : null;
+    }
+
+    static synchronized void updateStatsNode 
+        (Node parent, Node node, Node target, StitchKey key, Object value) {
         // now update stitching stats
         Node root = getRoot (node);
         Relationship rel = root.getSingleRelationship
@@ -984,6 +992,103 @@ public class Entity extends CNode {
         hits.close();
     }
 
+    static void mergeStatsNodes (Node to, Node from) {
+        RelationshipIndex relidx = _relationshipIndex (to);
+        for (Relationship rel : from.getRelationships(Direction.BOTH, KEYS)) {
+            Object value = rel.getProperty(VALUE, null);
+            if (value != null) {
+                IndexHits<Relationship> hits =
+                    relidx.get(rel.getType().name(), value, to, to);
+                Relationship hit = hits.getSingle();
+                if (hit == null) {
+                    // create relationship to self
+                    hit = to.createRelationshipTo(to, rel.getType());
+                    hit.setProperty(VALUE, value);
+                    relidx.add(hit, rel.getType().name(), value);
+                }
+                relidx.remove(rel);
+                rel.delete();
+                hits.close();
+            }
+        }
+    }
+
+    static void updateStatsNode (Node stats, StitchKey key, Object value) {
+        RelationshipIndex relidx = _relationshipIndex (stats);
+        IndexHits<Relationship> hits = relidx.get(key.name(), value, stats, stats);
+        Relationship hit = hits.getSingle();
+        if (hit == null) {
+            // create relationship to self
+            hit = stats.createRelationshipTo(stats, key);
+            hit.setProperty(VALUE, value);
+            relidx.add(hit, key.name(), value);
+        }
+    }
+
+    protected void union (Node node, StitchKey key, Object value) {
+        union (_node, node, key, value);
+    }
+
+    protected static void union (Node _node, Node node, StitchKey key, Object value) {
+        Node stats1 = getStatsNode (_node);
+        Node stats2 = getStatsNode (node);
+        Node root = union (_node, node);
+
+        Node stats = null;
+        if (stats1 != null && stats2 != null) {
+            if (!stats1.equals(stats2)) {
+                // merge
+                Relationship rel1 = stats1.getSingleRelationship
+                    (AuxRelType.SUMMARY, Direction.OUTGOING);
+                Relationship rel2 = stats2.getSingleRelationship
+                    (AuxRelType.SUMMARY, Direction.OUTGOING);
+                if (root.equals(rel1.getOtherNode(stats1))) {
+                    mergeStatsNodes (stats1, stats2);
+                    rel2.delete();
+                    stats2.delete();
+                    stats = stats1;
+                }
+                else if (root.equals(rel2.getOtherNode(stats2))) {
+                    mergeStatsNodes (stats2, stats1);
+                    rel1.delete();
+                    stats1.delete();
+                    stats = stats2;
+                }
+                else {
+                    // huh?
+                }
+            }
+            else {
+                stats = stats1; // or stats2
+            }
+        }
+        else if (stats1 != null) {
+            stats = stats1;
+        }
+        else if (stats2 != null) {
+            stats = stats2;
+        }
+        else {
+            stats = root.getGraphDatabase().createNode(AuxNodeType.STATS);
+            stats.setProperty(KIND, "StitchValues");
+            stats.createRelationshipTo(root, AuxRelType.SUMMARY);
+        }
+
+        if (stats != null) {
+            updateStatsNode (stats, key, value);
+            Relationship rel = stats.getSingleRelationship
+                (AuxRelType.SUMMARY, Direction.OUTGOING);
+            if (!root.equals(rel.getOtherNode(stats))) {
+                rel.delete();
+                stats.createRelationshipTo(root, AuxRelType.SUMMARY);
+            }
+        }
+        else {
+            logger.log(Level.SEVERE, 
+                       "SOMETHING'S ROTTEN WITH THE SUMMARY STATS!");
+        }
+    }
+
     /**
      * manually perform the stitch; if either of the nodes is already stitched
      * on the designated key, then the value is append to the existing values.
@@ -1006,9 +1111,9 @@ public class Entity extends CNode {
         
         RelationshipIndex relindx = _relationshipIndex (_node);
         relindx.add(rel, key.name(), value);
-        Node parent = union (_node, target._node);
-
-        updateStatsNode (parent, _node, target._node, key, value);
+        /*Node parent = union (_node, target._node);
+          updateStatsNode (parent, _node, target._node, key, value);*/
+        union (target._node, key, value);
         
         // now update node properties
         _update (_node, key, value);
@@ -1099,8 +1204,10 @@ public class Entity extends CNode {
                         rel.setProperty(CREATED, System.currentTimeMillis());
                         rel.setProperty(VALUE, value); 
                         relindx.add(rel, key.name(), value);
-                        Node parent = union (n, node);
-                        updateStatsNode (parent, node, n, key, value);
+                        /*Node parent = union (n, node);
+                          updateStatsNode (parent, node, n, key, value);*/
+                        union (n, node, key, value);
+
                         /*   
                              logger.info(node.getId()
                              +" <-["+key+":\""+value+"\"]-> "+n.getId());*/
