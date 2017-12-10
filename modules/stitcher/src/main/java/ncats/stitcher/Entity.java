@@ -153,14 +153,7 @@ public class Entity extends CNode {
         }
         public int getVisitCount () { return visited.size(); }
 
-        public void _traverse (EntityVisitor visitor, StitchKey... keys) {
-            EnumSet<StitchKey> keyset = null;
-            if (keys != null && keys.length > 0) {
-                keyset = EnumSet.noneOf(StitchKey.class);
-                for (StitchKey k : keys)
-                    keyset.add(k);
-            }
-            
+        public void __traverse (EntityVisitor visitor) {
             while (!stack.isEmpty()) {
                 Node n = stack.pop();
                 visited.add(n.getId());
@@ -188,13 +181,49 @@ public class Entity extends CNode {
                     Node xn = me.getKey();
                     if (!visited.contains(xn.getId())) {
                         Triple triple = me.getValue();                  
-                        if (keyset == null
-                            || triple.values().keySet().containsAll(keyset)) {
-                            if (!visitor.visit(this, triple)) {
-                                return; // stop
-                            }
+                        if (!visitor.visit(this, triple)) {
+                            return; // stop
                         }
                         stack.push(xn);
+                    }
+                }
+            }
+        }
+
+        public void _traverse (EntityVisitor visitor, StitchKey... keys) {
+            StringBuilder query = new StringBuilder 
+                ("match (n:"+AuxNodeType.ENTITY+")-[");
+            if (keys != null && keys.length > 0) {
+                query.append(":");
+                for (int i = 0; i < keys.length; ++i) {
+                    if (i > 0) query.append("|"); // OR'ed
+                    query.append("`"+keys[i]+"`");
+                }
+            }
+            query.append("]-(m:"+AuxNodeType.ENTITY+") return distinct n,m");
+
+            Node root = getRoot (start._node);
+            try (Result result = gdb.execute(query.toString())) {
+                while (result.hasNext()) {
+                    Map<String, Object> row = result.next();
+                    Node n = (Node)row.get("n");
+                    Node m = (Node)row.get("m");
+                    if (root.equals(getRoot (n)) || root.equals(getRoot (m))) {
+                        Triple triple = new Triple (n, m);
+                        for (Relationship rel : n.getRelationships
+                                 (Direction.BOTH, KEYS)) {
+                            Node xn = rel.getOtherNode(n);
+                            if (xn.equals(m)) {
+                                StitchKey key = 
+                                    StitchKey.valueOf(rel.getType().name());
+                                triple.add(key, rel.getProperty(VALUE), 
+                                           rel.getStartNode().getId() 
+                                           != triple.source());
+                            }
+                        }
+
+                        if (!visitor.visit(this, triple))
+                            return;
                     }
                 }
             }
@@ -940,58 +969,6 @@ public class Entity extends CNode {
         return rel != null ? rel.getOtherNode(root) : null;
     }
 
-    static synchronized void updateStatsNode 
-        (Node parent, Node node, Node target, StitchKey key, Object value) {
-        // now update stitching stats
-        Node root = getRoot (node);
-        Relationship rel = root.getSingleRelationship
-            (AuxRelType.SUMMARY, Direction.INCOMING);
-        
-        Node stats = null;      
-        if (rel == null) {
-            root = getRoot (target);
-            rel = root.getSingleRelationship
-                (AuxRelType.SUMMARY, Direction.INCOMING);
-            
-            if (rel != null) {
-                stats = rel.getOtherNode(root);         
-                if (!parent.equals(root)) { // move rel to root
-                    rel.delete();
-                    rel = null;
-                }
-            }
-        }
-        else {
-            stats = rel.getOtherNode(root);
-            if (!parent.equals(root)) { // move rel to root
-                rel.delete();
-                rel = null;
-            }
-        }
-
-        if (stats == null) {
-            stats = parent.getGraphDatabase().createNode(AuxNodeType.STATS);
-            stats.setProperty(KIND, "StitchValues");
-            assert rel == null
-                : "Expecting relationship to be null but it's not!";
-        }
-        
-        if (rel == null)
-            rel = stats.createRelationshipTo(parent, AuxRelType.SUMMARY);
-
-        RelationshipIndex relidx = _relationshipIndex (stats);
-        IndexHits<Relationship> hits =
-            relidx.get(key.name(), value, stats, stats);
-        rel = hits.getSingle();
-        if (rel == null) {
-            // create relationship to self
-            rel = stats.createRelationshipTo(stats, key);
-            rel.setProperty(VALUE, value);
-            relidx.add(rel, key.name(), value);
-        }
-        hits.close();
-    }
-
     static void mergeStatsNodes (Node to, Node from) {
         RelationshipIndex relidx = _relationshipIndex (to);
         for (Relationship rel : from.getRelationships(Direction.BOTH, KEYS)) {
@@ -1111,8 +1088,6 @@ public class Entity extends CNode {
         
         RelationshipIndex relindx = _relationshipIndex (_node);
         relindx.add(rel, key.name(), value);
-        /*Node parent = union (_node, target._node);
-          updateStatsNode (parent, _node, target._node, key, value);*/
         union (target._node, key, value);
         
         // now update node properties
@@ -1204,8 +1179,6 @@ public class Entity extends CNode {
                         rel.setProperty(CREATED, System.currentTimeMillis());
                         rel.setProperty(VALUE, value); 
                         relindx.add(rel, key.name(), value);
-                        /*Node parent = union (n, node);
-                          updateStatsNode (parent, node, n, key, value);*/
                         union (n, node, key, value);
 
                         /*   

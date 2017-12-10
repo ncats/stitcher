@@ -1,6 +1,7 @@
 package ncats.stitcher;
 
 import java.io.Serializable;
+import java.io.File;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.*;
@@ -136,12 +137,10 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                     Object v = Array.get(val, i);
                     if (v != null) {
                         Integer c = counts.get(v);
-                        if (c != null) {
-                            t += Math.log(c/total);
-                            ++l;
-                        }
-                        else 
-                            logger.warning("** stitch value \""+v+"\" has zero count!");
+                        assert c != null:
+                            "** stitch value \""+v+"\" has zero count!";
+                        t += Math.log(c/total);
+                        ++l;
                     }
                 }
                 s = (double)l/(Util.getLength(source.get(key))
@@ -149,13 +148,11 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             }
             else {
                 Integer c = counts.get(val);
-                if (c != null) {
-                    t = Math.log(c/total);
-                    s = 1.0/(Util.getLength(source.get(key))
-                             + Util.getLength(target.get(key)) - 1.0);
-                }
-                else
-                    logger.warning("*** stitch value \""+val+"\" has zero count!");
+                assert c != null:
+                    "*** stitch value \""+val+"\" has zero count!";
+                t = Math.log(c/total);
+                s = 1.0/(Util.getLength(source.get(key))
+                         + Util.getLength(target.get(key)) - 1.0);
             }
             score += s*me.getKey().priority*t;
         }
@@ -266,25 +263,10 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 double score = calcScore (triple);
                 Entity source = ef.entity(triple.source());
                 Entity target = ef.entity(triple.target());
-                
-                boolean a = roots.contains(source);
-                if (!a && (a = isRoot (source))) {
-                    uf.add(source.getId(), 2);
-                    roots.add(source);
-                    logger.info("Entity "+source.getId()+" is root!");
-                }
-
-                boolean b = roots.contains(target);
-                if (!b && (b = isRoot (target))) {
-                    uf.add(target.getId(), 2);
-                    roots.add(target);
-                    logger.info("Entity "+target.getId()+" is root!");
-                }
 
                 logger.info("..."+source.getId()+" "+target.getId()
                             +" score="+score+" "
                             +Util.toString(triple.values()));
-
                 double m = mean.sumThenReset();
                 if (count.getAndIncrement() > 0) {
                     mean.add(((count.get()-1)*m + score)/count.get());
@@ -292,16 +274,40 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 else {
                     mean.add(score);
                 }
-
-                if (/*score > threshold &&*/ !(a && b)) {
-                    triples.add(new TripleEntry (triple, score));
+                
+                if (unsure.contains(source)) {
+                    logger.info("Defer entity "+source.getId()
+                                +" because it has multiple active moieties!");
                 }
-                /*
+                else if (unsure.contains(target)) {
+                    logger.info("Defer entity "+target.getId()
+                                +" because it has multiple active moieties!");
+                }
                 else {
-                    if (!a) uf.add(source.getId());
-                    if (!b) uf.add(target.getId());
+                    boolean a = roots.contains(source);
+                    if (!a && (a = isRoot (source))) {
+                        uf.add(source.getId(), 2);
+                        roots.add(source);
+                        logger.info("Entity "+source.getId()+" is root!");
+                    }
+                    
+                    boolean b = roots.contains(target);
+                    if (!b && (b = isRoot (target))) {
+                        uf.add(target.getId(), 2);
+                        roots.add(target);
+                        logger.info("Entity "+target.getId()+" is root!");
+                    }
+                    
+                    if (/*score > threshold &&*/ !(a && b)) {
+                        triples.add(new TripleEntry (triple, score));
+                    }
+                    /*
+                      else {
+                      if (!a) uf.add(source.getId());
+                      if (!b) uf.add(target.getId());
+                      }
+                    */
                 }
-                */
                 
                 return true;
             });
@@ -332,11 +338,14 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             DatabaseEntry key = new DatabaseEntry ();
             DatabaseEntry data = new DatabaseEntry();
             if (OperationStatus.SUCCESS == cursor.getLast(key, data, null)) {
+                int cnt = 1;
                 do {
                     TripleEntry entry =
                         (TripleEntry) entryBinding.entryToObject(key);
                     Entity.Triple triple = entry.triple;
-                    //logger.info("----- "+entry+" -----");
+                    logger.info("----- "+cnt+"/"+count
+                                +" "+entry.score+" -----");
+                    logger.info(Util.toString(triple.values()));
                     
                     Entity source = ef.entity(triple.source());
                     Entity target = ef.entity(triple.target());
@@ -361,6 +370,7 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                         uf.add(source.getId());
                         uf.add(target.getId());
                     }
+                    ++cnt;
                 }
                 while (OperationStatus.SUCCESS
                        == cursor.getPrev(key, data, null));
@@ -383,10 +393,11 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
 
     public void shutdown () {
         try {
+            File file = env.getHome();
             catalog.close();
             tripleDb.close();
             env.close();
-            env.getHome().delete();
+            file.delete();
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Closing databases", ex);
@@ -408,33 +419,43 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             DataSource dsource =
                 ef.getDataSourceFactory().register("stitch_v"+version);
 
+            List<Long> comps = new ArrayList<>();
+            Double score = null;
             if (argv.length > 2) {
                 for (int i = 2; i < argv.length; ++i) {
-                    long id = Long.parseLong(argv[i]);
-                    Entity e = ef.entity(id);
-                    logger.info("################ COMPONENT "
-                                +id+" ("+e.get(RANK)+") ################");
-                    UntangleCompoundStitches ucs =
-                        new UntangleCompoundStitches (dsource, e);
-                    ef.untangle(ucs);
-                    ucs.shutdown();
+                    int index = argv[i].indexOf("score=");
+                    if (index >= 0) {
+                        score = Double.parseDouble(argv[i].substring(index+6));
+                    }
+                    else {
+                        try {
+                            long id = Long.parseLong(argv[i]);
+                            comps.add(id);
+                        }
+                        catch (NumberFormatException ex) {
+                            logger.warning("Bogus component id: "+argv[i]);
+                        }
+                    }
                 }
             }
             else {
-                List<Long> comps = new ArrayList<>();
                 ef.components(comps);
-                logger.info("### there are "+comps.size()+" components ###");
-                for (int i = 0; i < comps.size(); ++i) {
-                    long id = comps.get(i);
-                    Entity e = ef.entity(id);
-                    logger.info("################ COMPONENT "
-                                +String.format("%1$5d", i+1)+": "+
-                                +id+" ("+e.get(RANK)+") ################");
-                    UntangleCompoundStitches ucs =
-                        new UntangleCompoundStitches (dsource, e);
-                    ef.untangle(ucs);
-                    ucs.shutdown();
-                }
+                logger.info("##### there are "+comps.size()+" components #####");
+            }
+
+            if (score != null)
+                logger.info("#### MINSCORE = "+score+" #####");
+
+            for (int i = 0; i < comps.size(); ++i) {
+                long id = comps.get(i);
+                Entity e = ef.entity(id);
+                logger.info("################ COMPONENT "
+                            +String.format("%1$5d", i+1)+": "+
+                            +id+" ("+e.get(RANK)+") ################");
+                UntangleCompoundStitches ucs =
+                    new UntangleCompoundStitches (dsource, e, score);
+                ef.untangle(ucs);
+                ucs.shutdown();
             }
         }
         finally {
