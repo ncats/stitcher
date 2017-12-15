@@ -172,27 +172,6 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         counts.clear();
 
         logger.info("############## STITCH COUNTS ##############");
-        /*
-        traverse ((traversal, triple) -> {
-                Map<StitchKey, Object> values = triple.values();
-                for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
-                    Object val = me.getValue();
-                    if (val.getClass().isArray()) {
-                        int len = Array.getLength(val);
-                        for (int i = 0; i < len; ++i) {
-                            Integer c = counts.get(Array.get(val, i));
-                            counts.put(Array.get(val, i), c==null ? 1:c+1);
-                        }
-                    }
-                    else {
-                        Integer c = counts.get(val);
-                        counts.put(val, c==null ? 1:c+1);
-                    }
-                }
-                return true;
-            });
-        */
-
         StitchValueVisitor visitor = (key, value, count) -> {
             Integer c = counts.get(value);
             counts.put(value, c == null ? count : (c+count));
@@ -317,19 +296,40 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             double min = triples.first().score;
             double max = triples.last().score;
 
-            logger.info("$$$$$$ SCORE: MIN = "+min
+            double med = 0.0;
+            int mid = triples.size() / 2, i = 0;
+            TripleEntry p = null;
+            for (TripleEntry te : triples) {
+                if (++i < mid) {
+                }
+                else {
+                    med = triples.size() % 2 == 0
+                        ? te.score + (p.score - te.score)/2.0
+                        : p.score;
+                    break;
+                }
+                p = te;
+            }
+
+            logger.info("============= SCORE: MIN = "+min
                         +" MAX = "+max
-                        +" MEAN = "+mean+" $$$$$$$$");
+                        +" MEAN = "+mean+" MED = "+med+" =============");
+
+            /*
             if (min < 1.)
-                thres = Math.max(5.0*min, mean.doubleValue() - 5.0*min); // eh..??
+                thres = Math.max
+                    (5.0*min, mean.doubleValue() - 5.0*min); // eh..??
             else
                 thres = min;
+            */
+            thres = Math.max(med - min, mean.doubleValue() - med);
         }
 
         if (threshold != null)
             thres = threshold;
 
-        logger.info("$$$$$$ THRESHOLD = "+thres+" ");
+        logger.info("################ THRESHOLD = "+thres
+                    +" ##################");
 
         Transaction tx = env.beginTransaction(null, null);
         try {
@@ -342,18 +342,47 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 do {
                     TripleEntry entry =
                         (TripleEntry) entryBinding.entryToObject(key);
-                    Entity.Triple triple = entry.triple;
-                    logger.info("----- "+cnt+"/"+count
-                                +" "+entry.score+" -----");
-                    logger.info(Util.toString(triple.values()));
-                    
+                    Entity.Triple triple = entry.triple;                    
                     Entity source = ef.entity(triple.source());
                     Entity target = ef.entity(triple.target());
+                    Map<StitchKey, Object> values = triple.values();
+
+                    logger.info("----- "+cnt+"/"+count
+                                +" "+triple.source()+" ("
+                                +uf.root(triple.source())+") "
+                                +triple.target()+" ("
+                                +uf.root(triple.target())+") "
+                                +entry.score+" -----");
+                    logger.info(Util.toString(values));
                     
                     double score = entry.score;
-                    if (score > thres
-                        && triple.values().containsKey(H_LyChI_L3)
-                        && !triple.values().containsKey(H_LyChI_L4)) {
+                    boolean override = false;
+                    if (values.containsKey(H_LyChI_L4)) {
+                        Object l4 = values.get(H_LyChI_L4);
+                        Object delta = Util.delta(source.get(H_LyChI_L4), l4);
+                        
+                        int nonMetalSalt = 0;                   
+                        if (delta != null && delta != Util.NO_CHANGE) {
+                            for (int i = 0; i < Array.getLength(delta); ++i)
+                                if (Array.get
+                                    (delta, i).toString().endsWith("-N")) {
+                                    ++nonMetalSalt;
+                                }
+                        }
+                        
+                        delta = Util.delta(target.get(H_LyChI_L4), l4);
+                        if (delta != null && delta != Util.NO_CHANGE) {
+                            for (int i = 0; i < Array.getLength(delta); ++i)
+                                if (Array.get
+                                    (delta, i).toString().endsWith("-N")) {
+                                    ++nonMetalSalt;
+                                }
+                        }
+
+                        logger.info("=========> "+triple.source()+" "+triple.target()+" "+nonMetalSalt+" <==========");
+                        override = nonMetalSalt == 0;
+                    }
+                    else if (values.containsKey(H_LyChI_L3)) {
                         // adjust the score to require strong evidence if there
                         // might be a chance of structural problems
                         score /= 3.0; // eh..??
@@ -361,7 +390,10 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                                        +entry.score+" to "+score);
                     }
                     
-                    if (score > thres && union (target, source)) {
+                    if ((override || (values.size() > 1
+                                      // prevent rouge connection
+                                      && score >= thres))
+                        && union (target, source)) {
                         // now let's interogate this a big more 
                         logger.info("## merging "+source.getId()
                                     +" "+target.getId()+".. "+score);

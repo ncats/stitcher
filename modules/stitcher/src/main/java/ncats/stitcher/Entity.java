@@ -200,7 +200,7 @@ public class Entity extends CNode {
                     query.append("`"+keys[i]+"`");
                 }
             }
-            query.append("]-(m:"+AuxNodeType.ENTITY+") return distinct n,m");
+            query.append("]->(m:"+AuxNodeType.ENTITY+") return distinct n,m");
 
             Node root = getRoot (start._node);
             try (Result result = gdb.execute(query.toString())) {
