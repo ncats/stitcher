@@ -486,20 +486,6 @@ public class CNode implements Props, Comparable<CNode> {
         }
     }
 
-    static protected Molecule getMol (String molfile) {
-        try {
-            MolHandler mh = new MolHandler (molfile);
-            Molecule mol = mh.getMolecule();
-            if (mol.getDim() < 2)
-                mol.clean(2, null);
-            return mol;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            logger.warning("Not a valid molfile: "+molfile);
-        }
-        return null;
-    }
 
     static protected Molecule getMol (Node node) {
         Molecule mol = null;
@@ -507,7 +493,7 @@ public class CNode implements Props, Comparable<CNode> {
             for (String f : MOLFIELDS) {
                 String molfile = (String) node.getProperty(f, null);
                 if (molfile != null) {
-                    mol = getMol (molfile);
+                    mol = Util.getMol(molfile);
                     if (mol != null)
                         break;
                 }
@@ -545,7 +531,7 @@ public class CNode implements Props, Comparable<CNode> {
                 if (_node.hasLabel(AuxNodeType.ENTITY)) {
                     String molfile = getField ("StrucField");
                     if (molfile != null)
-                        mol = getMol (molfile);
+                        mol = Util.getMol(molfile);
                 }
                 tx.success();
             }
