@@ -11,13 +11,13 @@ sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db cache=dat
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/tocris.conf"
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
 # these add additional data for event calculator
-#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrx.conf"
-#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrem.conf"
-#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedotc.conf"
-#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ob.conf"
-#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrx.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrem.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedotc.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ob.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
 # now the stitching..
-#sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
+sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 # calculate events
-#sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
+sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
 
