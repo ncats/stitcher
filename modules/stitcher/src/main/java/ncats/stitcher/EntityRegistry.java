@@ -535,12 +535,16 @@ public class EntityRegistry extends EntityFactory {
                 Object value = map.get(strucField);
                 if (value != null) {
                     if (value instanceof Molecule) {
-                        lychify (ent, (Molecule)value);
+                        Molecule mol = (Molecule)value;
+                        if (mol.getAtomCount() > 0)
+                            lychify (ent, mol);
                     }
                     else {
                         try {
                             MolHandler mh = new MolHandler (value.toString());
-                            lychify (ent, mh.getMolecule());
+                            Molecule mol = mh.getMolecule();
+                            if (mol.getAtomCount() > 0)
+                                lychify (ent, mol);
                         }
                         catch (Exception ex) {
                             logger.warning

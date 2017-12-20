@@ -234,7 +234,7 @@ public class Stitch extends Entity {
         if (mol == null) {
             String molfile = (String) getField ("StrucField", parent);
             if (molfile != null)
-                return getMol (molfile);
+                return Util.getMol(molfile);
         }
         return mol;
     }
