@@ -88,7 +88,9 @@ public class TestRegistry extends EntityRegistry {
                     row.put(me.getKey(), vals);
                 }
                 else {
-                    row.put(me.getKey(), n.asText());
+                    String v = n.asText();
+                    if (v.length() > 0)
+                        row.put(me.getKey(), v);
                 }
             }
                 

@@ -69,21 +69,25 @@ public class UnionFind {
     }
 
     public long union (long p, long q) {
+        return union (p, q, true);
+    }
+
+    public long union (long p, long q, boolean maxrank) {
         long i = getRoot (p);
         long j = getRoot (q);
         long k;
         if (i != j) {
             int ri = rank.get(i);
             int rj = rank.get(j);
-            if (ri < rj) {
-                parent.put(i, j);
-                rank.put(j, ri+rj);
-                k = j;
-            }
-            else {
+            if (ri >= rj || !maxrank) { // preserve directionality
                 parent.put(j, i);
                 rank.put(i, ri+rj);
                 k = i;
+            }
+            else {
+                parent.put(i, j);
+                rank.put(j, ri+rj);
+                k = j;
             }
         }
         else

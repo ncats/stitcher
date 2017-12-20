@@ -137,10 +137,14 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                     Object v = Array.get(val, i);
                     if (v != null) {
                         Integer c = counts.get(v);
-                        assert c != null:
-                            "** stitch value \""+v+"\" has zero count!";
-                        t += Math.log(c/total);
-                        ++l;
+                        if (c != null) {
+                            t += Math.log(c/total);
+                            ++l;
+                        }
+                        else {
+                            logger.log(Level.SEVERE, 
+                                       "** stitch value \""+v+"\" has zero count!");
+                        }
                     }
                 }
                 s = (double)l/(Util.getLength(source.get(key))
@@ -148,11 +152,15 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             }
             else {
                 Integer c = counts.get(val);
-                assert c != null:
-                    "*** stitch value \""+val+"\" has zero count!";
-                t = Math.log(c/total);
-                s = 1.0/(Util.getLength(source.get(key))
-                         + Util.getLength(target.get(key)) - 1.0);
+                if (c != null) {
+                    t = Math.log(c/total);
+                    s = 1.0/(Util.getLength(source.get(key))
+                             + Util.getLength(target.get(key)) - 1.0);
+                }
+                else {
+                    logger.log(Level.SEVERE, 
+                               "*** stitch value \""+val+"\" has zero count!");
+                }
             }
             score += s*me.getKey().priority*t;
         }
@@ -188,6 +196,110 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
             total += v;
 
         logger.info("$$$$ total stitch count ==> "+total);
+    }
+
+    static void lychiSuffixes (Map<String, Integer> suffixes, Object value) {
+        if (value != null) {
+            if (value.getClass().isArray()) {
+                for (int i = 0; i < Array.getLength(value); ++i) {
+                    String v = Array.get(value, i).toString();
+                    String s = v.substring(v.length() - 2);
+                    Integer c = suffixes.get(s);
+                    suffixes.put(s, c==null ?1:c+1);
+                }
+            }
+            else {
+                String v = value.toString();
+                String s = v.substring(v.length() - 2);
+                Integer c = suffixes.get(s);
+                suffixes.put(s, c==null ? 1:c+1);
+            }
+        }
+    }
+
+    static Map<String, Integer> lychiSuffixes (Object value) {
+        Map<String, Integer> suffixes = new TreeMap<>();
+        lychiSuffixes (suffixes, value);
+        return suffixes;
+    }
+
+    static int countGroup1Metal (Entity ent) {
+        Object moieties = ent.get(MOIETIES);
+
+        int count = 0;
+        if (moieties != null) {
+            if (moieties.getClass().isArray()) {
+                int len = Array.getLength(moieties);
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(moieties, i);
+                    try {
+                        boolean g1 = Util.isGroup1Metal
+                            (Util.getMol(v.toString()));
+                        if (g1)
+                            ++count;
+                    }
+                    catch (Exception ex) {
+                        logger.log(Level.SEVERE, "Bogus moiety "+v, ex);
+                    }
+                }
+            }
+            else {
+                try {
+                    if (Util.isGroup1Metal
+                        (Util.getMol(moieties.toString())))
+                        ++count;
+                }
+                catch (Exception ex) {
+                    logger.log(Level.SEVERE, "Can't get process moieties: "
+                               +moieties, ex);
+                }
+            }
+        }
+
+        return count;
+    }
+
+    boolean checkStructureCompatibility 
+        (Object l4, Entity source, Entity target) {
+        Object delta = Util.delta(source.get(H_LyChI_L4), l4);
+        
+        Map<String, Integer> suffixes = new TreeMap<>();
+        if (delta != null && delta != Util.NO_CHANGE) {
+            lychiSuffixes (suffixes, delta);
+        }
+        
+        delta = Util.delta(target.get(H_LyChI_L4), l4);
+        if (delta != null && delta != Util.NO_CHANGE)
+            lychiSuffixes (suffixes, delta);
+        
+        boolean compatible = !suffixes.containsKey("-N")
+            && !suffixes.containsKey("-M");
+        logger.info("~~~~~~~ "+source.getId()+" "
+                    +target.getId() +" l4 suffixes="+Util.toString(suffixes)
+                    +" source="+Util.toString(source.get(H_LyChI_L4))
+                    +" target="+Util.toString(target.get(H_LyChI_L4))
+                    +" compatible="+compatible);
+
+        return compatible;
+    }
+
+    boolean transitiveStructureCompatibility 
+        (Object l4, Entity source, Entity target) {
+        for (Entity nb : source.neighbors()) {
+            if (!nb.equals(target) && uf.root(nb.getId()) != null) {
+                Map<StitchKey, Object> values = target.keys(nb);
+                if (values.containsKey(H_LyChI_L4)) {
+                    if (!checkStructureCompatibility 
+                        (values.get(H_LyChI_L4), nb, target)) {
+                        logger.info("!!!!!!! "+source.getId()+" " 
+                                    +target.getId()+" not l4 compatible "
+                                    +"due to "+nb.getId()+" !!!!!!!");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
@@ -277,15 +389,9 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                         logger.info("Entity "+target.getId()+" is root!");
                     }
                     
-                    if (/*score > threshold &&*/ !(a && b)) {
+                    if (!a && !b) {
                         triples.add(new TripleEntry (triple, score));
                     }
-                    /*
-                      else {
-                      if (!a) uf.add(source.getId());
-                      if (!b) uf.add(target.getId());
-                      }
-                    */
                 }
                 
                 return true;
@@ -348,39 +454,21 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                     Map<StitchKey, Object> values = triple.values();
 
                     logger.info("----- "+cnt+"/"+count
-                                +" "+triple.source()+" ("
-                                +uf.root(triple.source())+") "
-                                +triple.target()+" ("
-                                +uf.root(triple.target())+") "
-                                +entry.score+" -----");
-                    logger.info(Util.toString(values));
+                                +" "+triple.source() +" "+triple.target()
+                                +" "+entry.score+" -----\n"
+                                + Util.toString(values));
                     
                     double score = entry.score;
                     boolean override = false;
-                    if (values.containsKey(H_LyChI_L4)) {
-                        Object l4 = values.get(H_LyChI_L4);
-                        Object delta = Util.delta(source.get(H_LyChI_L4), l4);
-                        
-                        int nonMetalSalt = 0;                   
-                        if (delta != null && delta != Util.NO_CHANGE) {
-                            for (int i = 0; i < Array.getLength(delta); ++i)
-                                if (Array.get
-                                    (delta, i).toString().endsWith("-N")) {
-                                    ++nonMetalSalt;
-                                }
-                        }
-                        
-                        delta = Util.delta(target.get(H_LyChI_L4), l4);
-                        if (delta != null && delta != Util.NO_CHANGE) {
-                            for (int i = 0; i < Array.getLength(delta); ++i)
-                                if (Array.get
-                                    (delta, i).toString().endsWith("-N")) {
-                                    ++nonMetalSalt;
-                                }
-                        }
+                    int minval = 1;
 
-                        logger.info("=========> "+triple.source()+" "+triple.target()+" "+nonMetalSalt+" <==========");
-                        override = nonMetalSalt == 0;
+                    if (values.containsKey(H_LyChI_L5)) {
+                        override = true;
+                    }
+                    else if (values.containsKey(H_LyChI_L4)) {
+                        override = checkStructureCompatibility 
+                            (values.get(H_LyChI_L4), source, target);
+                        if (!override) ++minval;
                     }
                     else if (values.containsKey(H_LyChI_L3)) {
                         // adjust the score to require strong evidence if there
@@ -388,15 +476,37 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                         score /= 3.0; // eh..??
                         logger.warning("** score is adjusted from "
                                        +entry.score+" to "+score);
+                        ++minval;
+                    }
+                    else {
+                        ++minval;
                     }
                     
-                    if ((override || (values.size() > 1
-                                      // prevent rouge connection
-                                      && score >= thres))
-                        && union (target, source)) {
-                        // now let's interogate this a big more 
-                        logger.info("## merging "+source.getId()
-                                    +" "+target.getId()+".. "+score);
+                    if (override || (values.size() > minval
+                                     // prevent rouge connection
+                                     && score >= thres)) {
+                        Long scolor = uf.root(triple.source()), 
+                            tcolor = uf.root(triple.target());
+                        // now make sure this is compatible with existing
+                        // stitch
+                        boolean compatible = true;
+                        if (scolor != null) {
+                            compatible = transitiveStructureCompatibility 
+                                (values.get(H_LyChI_L4), source, target);
+                        }
+
+                        if (compatible && tcolor != null) {
+                            compatible = transitiveStructureCompatibility 
+                                (values.get(H_LyChI_L4), target, source);
+                        }
+                        
+                        if (compatible && union (target, source)) {
+                            // now let's interogate this a big more 
+                            logger.info("## merging ("+scolor+") "
+                                        +source.getId()
+                                        +" "+target.getId()+" ("+tcolor+").. "
+                                        +score +" "+Util.toString(values));
+                        }
                     }
                     else {
                         uf.add(source.getId());
