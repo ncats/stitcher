@@ -1019,6 +1019,36 @@ public class Util {
         return props;
     }
 
+    public static Molecule getMol (String molfile) {
+        try {
+            MolHandler mh = new MolHandler (molfile);
+            Molecule mol = mh.getMolecule();
+            if (mol.getDim() < 2)
+                mol.clean(2, null);
+            return mol;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            logger.warning("Not a valid molfile: "+molfile);
+        }
+        return null;
+    }
+
+    public static boolean isGroup1Metal (Molecule mol) {
+        for (MolAtom a : mol.getAtomArray()) {
+            switch (a.getAtno()) {
+            case 3: // Li
+            case 11: // Na
+            case 19: // K
+            case 37: // Rb
+            case 55: // Cs
+            case 87: // Fr
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String sha1 (Collection<Long> ids) {
         MessageDigest sha1 = sha1 ();
         byte[] data = new byte[8];

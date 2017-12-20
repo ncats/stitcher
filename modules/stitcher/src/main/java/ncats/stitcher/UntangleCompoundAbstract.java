@@ -89,14 +89,17 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                 if (u != null && v != null && !Util.equals(u, v))
                     return false; // bail..
 
-                ids.add(new long[]{P.getId(), Q.getId()});
+                if (q != null)
+                    ids.add(new long[]{Q.getId(), P.getId()});
+                else
+                    ids.add(new long[]{P.getId(), Q.getId()});
             }
         }
 
         for (long[] pair : ids) {
-            logger.info("..."+pair[0]+" ("+uf.root(pair[0])+") <-> "
+            logger.info("..."+pair[0]+" ("+uf.root(pair[0])+") <- "
                         +pair[1]+" ("+uf.root(pair[1])+")");
-            uf.union(pair[0], pair[1]);
+            uf.union(pair[0], pair[1], false);
         }
         
         return !ids.isEmpty();
