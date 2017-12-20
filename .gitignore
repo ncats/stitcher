@@ -1,0 +1,10 @@
+conf/evolutions/
+modules/build/
+modules/stitcher/target/
+project/project/
+project/target/
+repo.db/
+stitch.db/
+stitcher.ix/
+stitchv2.db/
+target/
