@@ -542,7 +542,7 @@ public class Entity extends CNode {
         return this;
     }
 
-    /**
+    /*
      * attach abritrary data to this entity. type is the relationship type.
      * props - properties associated with the edge
      * data - data
@@ -1066,7 +1066,7 @@ public class Entity extends CNode {
         }
     }
 
-    /**
+    /*
      * manually perform the stitch; if either of the nodes is already stitched
      * on the designated key, then the value is append to the existing values.
      */    
