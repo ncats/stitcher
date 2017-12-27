@@ -297,6 +297,9 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                         return false;
                     }
                 }
+                else if (values.containsKey(H_LyChI_L3)) {
+                    
+                }
             }
         }
         return true;

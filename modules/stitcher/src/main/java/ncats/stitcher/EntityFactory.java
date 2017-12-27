@@ -1579,12 +1579,12 @@ public class EntityFactory implements Props {
     }
     
     /**
-     * Untangles {@link UntangleComponent} and registers the {@link Stitch} into
+     * Untangles {@link UntangleAbstract} and registers the {@link Stitch} into
      * the datasource. If postProcess is specified, perform that operation on
      * the stitch as well.
      * 
      * 
-     * @param uc
+     * @param untangler
      * @param consumer
      */
     public void untangle (UntangleAbstract untangler,
@@ -1756,7 +1756,7 @@ public class EntityFactory implements Props {
         }
     }
 
-    /**
+    /*
      * traverse over each connected component in turn
      */
     public void traverse (EntityVisitor visitor, StitchKey... keys) {
@@ -1771,7 +1771,7 @@ public class EntityFactory implements Props {
         }
     }
     
-    /**
+    /*
      * iterate over entities of a particular data source
      */
     public Iterator<Entity> entities (DataSource source) {
@@ -1935,7 +1935,7 @@ public class EntityFactory implements Props {
         }
     }
     
-    /**
+    /*
      * iterate over entities regardless of data source
      */
     public Iterator<Entity> entities () {
