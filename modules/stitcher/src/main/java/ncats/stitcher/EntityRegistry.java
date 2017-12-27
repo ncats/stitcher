@@ -431,7 +431,7 @@ public class EntityRegistry extends EntityFactory {
         return ds;
     }
 
-    /**
+    /*
      * attach payload to an existing entity
      */
     public Entity attach (final Map<String, Object> map) {
