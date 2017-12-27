@@ -6,5 +6,5 @@ project/target/
 repo.db/
 stitch.db/
 stitcher.ix/
-stitchv2.db/
+stitchv*.db/
 target/
