@@ -7,7 +7,7 @@ curr_time=$(date +%s)
 
 echo $(date) > log.txt
 
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/broad.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
 sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
 
