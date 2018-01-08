@@ -6,8 +6,9 @@ db="stitchv20180107.db"
 curr_time=$(date +%s)
 
 echo $(date) > log.txt
+sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
+echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db data/dump-public-2017-10-14.gsrs"
-#log the time difference for each completed command
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data/hash.db data/rancho-export_2017-10-26_20-39.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
@@ -17,8 +18,7 @@ sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db ../
 echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db cache=data/hash.db ../inxight-planning/files/drugbank_all_full_database.xml.zip"
 echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
-sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
-echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+
 #sbt stitcher/"runMain ncats.stitcher.impl.IntegrityMoleculeEntityFactory $db cache=data/hash.db ../inxight-planning/files/integr.sdf.gz"
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/tocris.conf"
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
