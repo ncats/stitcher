@@ -6,5 +6,9 @@ project/target/
 repo.db/
 stitch.db/
 stitcher.ix/
-stitchv*.db/
+stitchv*
 target/
+hash.db/
+log.txt
+data/hash.db/
+stitch.out
