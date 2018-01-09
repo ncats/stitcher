@@ -1,6 +1,6 @@
 #!/bin/bash
 
-db="stitchv20180107.db"
+db="stitchv20180109.db"
 
 #keep track of current time
 curr_time=$(date +%s)
