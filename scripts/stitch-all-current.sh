@@ -1,6 +1,6 @@
 #!/bin/bash
 
-db="stitchv20180109.db"
+db="stitchv20180115.db"
 
 #keep track of current time
 curr_time=$(date +%s)
@@ -8,6 +8,8 @@ curr_time=$(date +%s)
 echo $(date) > log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
+echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db data/dump-public-2017-10-14.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data/hash.db data/rancho-export_2017-10-26_20-39.json"
