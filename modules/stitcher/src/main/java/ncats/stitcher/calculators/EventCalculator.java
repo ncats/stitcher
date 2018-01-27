@@ -82,7 +82,11 @@ public class EventCalculator implements StitchCalculator {
 
             if (e.comment != null)
                 data.put("comment", e.comment);
-            
+
+            if(e.route !=null){
+                data.put("route", e.route);
+            }
+
             labels.add(e.source);
             if (e.date != null && e.kind.isApproved()) {
                 cal.setTime(e.date);
@@ -141,6 +145,8 @@ public class EventCalculator implements StitchCalculator {
         public String jurisdiction;
         public String comment; // reference
 
+        public String route;
+
         public enum EventKind {
             Publication,
             Filing,
@@ -197,8 +203,9 @@ public class EventCalculator implements StitchCalculator {
         }
 
         void parseEvent (JsonNode n) {
-            if (n.has("HighestPhase") && "approved".equalsIgnoreCase
-                (n.get("HighestPhase").asText())) {
+            if (n.has("HighestPhase") && ("approved".equalsIgnoreCase
+                (n.get("HighestPhase").asText())) || ("phase IV".equalsIgnoreCase
+                    (n.get("HighestPhase").asText()))) {
                 event = new Event(name, id, Event.EventKind.Marketed);
                 if (n.has("HighestPhaseUri")) {
                     event.comment = n.get("HighestPhaseUri").asText();
@@ -229,6 +236,20 @@ public class EventCalculator implements StitchCalculator {
                                 "Can't parse date: "+d, ex);
                     }
                 }
+
+                if(n.has("InVivoUseRoute")){
+                    String route = n.get("InVivoUseRoute").asText();
+                    //InVivoUseRoute is a controlled vocabularly
+                    //if the value = "other" than use the field InVivoUseRouteOther
+                    //which is free text.
+                    if("other".equalsIgnoreCase(route)){
+                        route = n.get("InVivoUseRouteOther").asText();
+                    }
+                    if(route !=null && !route.trim().isEmpty()){
+                        event.route = route;
+                    }
+                }
+
             }
         }
 
