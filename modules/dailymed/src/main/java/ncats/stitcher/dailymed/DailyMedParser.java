@@ -84,6 +84,7 @@ public class DailyMedParser {
         public String approvalId;
         public String approvalAuthority;
         public String marketStatus;
+        public String marketingStatus;
         public Calendar marketDate;
         public String ndc;
         public String equivNDC;
@@ -453,12 +454,36 @@ public class DailyMedParser {
                     if (nl.getLength() > 0) {
                         nl = ((Element)nl.item(0))
                             .getElementsByTagName("code");
-                        if (nl.getLength() > 0) 
+                        if (nl.getLength() > 0) {
                             product.approvalAuthority = nl.item(0)
                                 .getAttributes().getNamedItem("code")
                                 .getTextContent();
+						}
                     }
-                    
+					
+					// <subjectOf>
+                        // <approval>
+                           // <id extension="part333A" root="2.16.840.1.113883.3.149"/>
+                           // <code code="C73604" codeSystem="2.16.840.1.113883.3.26.1.1" displayName="OTC monograph not final"/>
+                           // <author>
+                              // <territorialAuthority>
+                                 // <territory>
+                                    // <code code="USA" codeSystem="2.16.840.1.113883.5.28"/>
+                                 // </territory>
+                              // </territorialAuthority>
+                           // </author>
+                        // </approval>
+                     // </subjectOf>
+					 
+					//get what's called "Marketing Status" on the label on the website
+					nl = approval.getElementsByTagName("code");
+					if (nl.getLength() > 0) {
+						product.marketingStatus = nl.item(0)
+													.getAttributes()
+													.getNamedItem("displayName")
+													.getTextContent();
+                    }
+					
                     if (route != null) {
                         Node n = route.getAttributes()
                             .getNamedItem("displayName");
@@ -621,18 +646,20 @@ public class DailyMedParser {
                            && !seen.contains(i.substance.unii)*/) {
                     System.out.println
                         (i.substance.unii+"\t"
-                         +marketDate+"\t"
-                         +(label.initialApprovalYear != null 
-                          ? label.initialApprovalYear : "")+"\t"
-                         +i.code +"\t"+(p.approvalId!=null?p.approvalId:"")+"\t"
-                         +(p.equivNDC!=null?p.equivNDC:"")+"\t"
-                         +(p.ndc!=null?p.ndc:"")+"\t"
-                         +"\""+i.substance.name
-                         .replaceAll("\n","").toUpperCase().trim()
-                         +"\""+"\t"+(p.genericName != null ? 
-                                     ("\""+p.genericName
-                                      .replaceAll("\n","").toUpperCase().trim()
-                                      +"\""):""));
+                         + (p.marketingStatus != null ? p.marketingStatus:"")+"\t"
+                         + marketDate+"\t"
+                         + (label.initialApprovalYear != null 
+                           ? label.initialApprovalYear : "")+"\t"
+                         + i.code +"\t"
+						 + (p.approvalId != null ? p.approvalId:"")+"\t"
+                         + (p.equivNDC != null ? p.equivNDC:"")+"\t"
+                         + (p.ndc != null ? p.ndc:"")+"\t"
+                         + (p.route != null ? p.route:"")+"\t"
+                         + "\""+i.substance.name.replaceAll("\n","").toUpperCase().trim()
+                         + "\""+"\t"+(p.genericName != null ? 
+												   ("\""
+												   + p.genericName.replaceAll("\n","").toUpperCase().trim()
+												   + "\""):""));
                     //seen.add(i.substance.unii);
                 }
             }
@@ -745,12 +772,14 @@ public class DailyMedParser {
         }
 
         System.out.println("UNII\t"+
+		                   "MarketStatus\t"+
                            "MarketDate\t"+
                            "InitialYearApproval\t"+
                            "ActiveCode\t"+
                            "ApprovalAppId\t"+
                            "Equiv NDC\t"+
                            "NDC\t"+
+                           "Route\t"+
                            "ActiveMoietyName\t"+
                            "GenericProductName");
         

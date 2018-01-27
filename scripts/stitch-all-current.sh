@@ -21,9 +21,6 @@ echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db cache=data/hash.db ../inxight-planning/files/drugbank_all_full_database.xml.zip"
 echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 
-#sbt stitcher/"runMain ncats.stitcher.impl.IntegrityMoleculeEntityFactory $db cache=data/hash.db ../inxight-planning/files/integr.sdf.gz"
-#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/tocris.conf"
-#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
 # these add additional data for event calculator
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrx.conf"
 echo 'DailyMedRx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
@@ -35,6 +32,7 @@ sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ob.conf"
 echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
 echo 'CT:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+
 # now the stitching..
 sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
