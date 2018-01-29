@@ -556,7 +556,24 @@ public class EventCalculator implements StitchCalculator {
 
             Object content = null;
             Date date = null;
+
+
+
             try {
+
+                //Jan 2018 new columns for Route and MarketStatus
+                Object route = payload.get("Route");
+                if(route !=null){
+                    event.route = (String) route;
+                }
+                //Jan 2018 new columns for Route and MarketStatus
+                Object marketStatus = payload.get("MarketStatus");
+
+                boolean isVeterinaryProduct=false;
+                if(marketStatus !=null){
+                    isVeterinaryProduct = ((String) marketStatus).equalsIgnoreCase("bulk ingredient for animal drug compounding");
+                }
+
                 content = payload.get("InitialYearApproval");
                 if (content != null) {
                     date = SDF.parse((String) content + "-12-31");
@@ -568,8 +585,8 @@ public class EventCalculator implements StitchCalculator {
                     if (date == null || date.after(date2))
                         date = date2;
                 }
-                
-                if (date != null) {
+                //exclude veterinary products from approved and/or Marketed
+                if (!isVeterinaryProduct && date != null) {
                     Event.EventKind et = Event.EventKind.Marketed;
                     content = payload.get("ApprovalAppId");
                     if (content != null) {
@@ -602,10 +619,18 @@ public class EventCalculator implements StitchCalculator {
                         }
                     }
                     event = new Event(name, id, et);
-                    event.jurisdiction = "US";
+                    //if market Status is Export Only  remove Us jurisdiction
+                    if(marketStatus !=null && marketStatus instanceof String
+                            && ((String)(String) marketStatus).equalsIgnoreCase("export only")){
+                        event.jurisdiction = null;
+                    }else {
+                        event.jurisdiction = "US";
+                    }
                     event.date = date;
                     event.comment = (String)content;
                 }
+
+
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Can't parse date: "+content, ex);
             }
