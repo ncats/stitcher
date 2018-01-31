@@ -460,20 +460,6 @@ public class DailyMedParser {
                                 .getTextContent();
 						}
                     }
-					
-					// <subjectOf>
-                        // <approval>
-                           // <id extension="part333A" root="2.16.840.1.113883.3.149"/>
-                           // <code code="C73604" codeSystem="2.16.840.1.113883.3.26.1.1" displayName="OTC monograph not final"/>
-                           // <author>
-                              // <territorialAuthority>
-                                 // <territory>
-                                    // <code code="USA" codeSystem="2.16.840.1.113883.5.28"/>
-                                 // </territory>
-                              // </territorialAuthority>
-                           // </author>
-                        // </approval>
-                     // </subjectOf>
 					 
 					//get what's called "Marketing Status" on the label on the website
 					nl = approval.getElementsByTagName("code");
