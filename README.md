@@ -140,7 +140,7 @@ $ scp ncats-stitcher-master-20171110-400d1f1.zip centos@dev.ncats.io:/tmp
 ```console
 #navigate to the desired folder on the deployment server
 $ ssh centos@dev.ncats.io
-#upzip
+#unzip
 $ unzip /tmp/ncats-stitcher-master-20171110-400d1f1.zip
 ```
 
@@ -158,24 +158,35 @@ $ ssh centos@dev.ncats.io
 $ unzip /tmp/stitchv1db.zip
 ```
 
-3) Navigate to the stitcher distribution folder, create a symlink to the database in the parent directory, and start up the app.
+3) Navigate to the stitcher distribution folder.
 ```console
 #navigate to the dist folder
 $ cd ncats-stitcher-master-20171110-400d1f1/
+``` 
+
+4) Create a symlink to the database in the parent directory, and start up the app.
+```console
+$ bash restart-stitcher.sh stitchv1.db
+```
+
+NOTE: Alternatively, you can perform the start-up manually as follows.
+```console
 # remove the old link or a folder with the same name (if present)
-$ rm -r stitcher.ix/data.db
+$ rm stitcher.ix/data.db
 # create a new symlink
 $ ln -s ../stitchv1.db ../stitcher.ix/data.db
 # start the app
 $ sh ../stitcher.sh
 ```
 
+
 ### Summary 
-##### To run a new stitcher instance you need:
+##### To run a new stitcher instance you need, at minimum:
 
 1) A distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1`).  
 2) A database (e.g. `~/stitchv1.db`).  
-3) A symlink `~/stitcher.ix/data.db` pointing to the database (e.g. `data.db -> ../stitchv1.db`).  
+3) A symlink `~/stitcher.ix/data.db` pointing to the database (e.g. `data.db -> ../stitchv1.db`).   
+   Alternatively, a script in the distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1/restart-stitcher.sh`).
 4) Main script `~/stitcher.sh`.  
 
 
