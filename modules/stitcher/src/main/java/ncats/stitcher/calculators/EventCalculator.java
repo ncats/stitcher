@@ -547,7 +547,7 @@ public class EventCalculator implements StitchCalculator {
          * looks like anything in 3XX is for human consumption
          */
         private static Pattern CFR_21_OTC_PATTERN =
-            Pattern.compile("part3([1-9][0-9]).+");
+            Pattern.compile("part3([1-9][0-9]).*");
         
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
@@ -561,11 +561,7 @@ public class EventCalculator implements StitchCalculator {
 
             try {
 
-                //Jan 2018 new columns for Route and MarketStatus
-                Object route = payload.get("Route");
-                if(route !=null){
-                    event.route = (String) route;
-                }
+
                 //Jan 2018 new columns for Route and MarketStatus
                 Object marketStatus = payload.get("MarketStatus");
 
@@ -618,6 +614,7 @@ public class EventCalculator implements StitchCalculator {
                             }
                         }
                     }
+
                     event = new Event(name, id, et);
                     //if market Status is Export Only  remove Us jurisdiction
                     if(marketStatus !=null && marketStatus instanceof String
@@ -628,6 +625,13 @@ public class EventCalculator implements StitchCalculator {
                     }
                     event.date = date;
                     event.comment = (String)content;
+
+
+                    //Jan 2018 new columns for Route and MarketStatus
+                    Object route = payload.get("Route");
+                    if(route !=null){
+                        event.route = (String) route;
+                    }
                 }
 
 
