@@ -547,7 +547,7 @@ public class EventCalculator implements StitchCalculator {
          * looks like anything in 3XX is for human consumption
          */
         private static Pattern CFR_21_OTC_PATTERN =
-            Pattern.compile("part3([1-9][0-9]).+");
+            Pattern.compile("part3([1-9][0-9]).*");
         
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
