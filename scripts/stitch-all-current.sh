@@ -1,6 +1,6 @@
 #!/bin/bash
 
-db="stitchv$(date +'%Y%m%d').db"
+db="stitchv$(date +'%Y%m%d-%H%M%S').db"
 
 #keep track of current time
 curr_time=$(date +%s)
