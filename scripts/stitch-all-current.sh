@@ -1,42 +1,43 @@
 #!/bin/bash
-
-db="stitchv$(date +'%Y%m%d-%H%M%S').db"
+timestamp="$(date +'%Y%m%d-%H%M%S')"
+db="stitchv$timestamp.db"
+log="log$timestamp.txt"
 
 #keep track of current time
 curr_time=$(date +%s)
 
-echo $(date) > log.txt
+echo $(date) > $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
-echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
-echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db data/dump-public-2017-10-14.gsrs"
-echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db cache=data/hash.db data/rancho-export_2018-02-05_22-22.json"
-echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db cache=data/hash.db ../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
-echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db ../inxight-planning/files/PharmManuEncycl3rdEd.json"
-echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db cache=data/hash.db ../inxight-planning/files/drugbank_all_full_database.xml.zip"
-echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 # these add additional data for event calculator
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrx.conf"
-echo 'DailyMedRx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'DailyMedRx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedrem.conf"
-echo 'DailyMedRem:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'DailyMedRem:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/dailymedotc.conf"
-echo 'DailyMedOTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'DailyMedOTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ob.conf"
-echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
-echo 'CT:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'CT:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 # now the stitching..
 sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
-echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
+echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 # calculate events
 sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
-echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> log.txt
-echo $(date) >> log.txt
+echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+echo $(date) >> $log
