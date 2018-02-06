@@ -1,6 +1,11 @@
 import json
 import sys
 import hashlib
+
+#check that the python version is correct (need 2)
+if sys.version_info[0] > 2:
+    raise "Must be using Python 2! Aborting."
+
 conditions = [
     'ConditionName',
     'ConditionUri',
