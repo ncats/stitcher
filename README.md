@@ -186,7 +186,7 @@ $ sh ../stitcher.sh
 1) A distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1`).  
 2) A database (e.g. `~/stitchv1.db`).  
 3) A symlink `~/stitcher.ix/data.db` pointing to the database (e.g. `data.db -> ../stitchv1.db`).   
-   Alternatively, a script in the distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1/restart-stitcher.sh`).
+   Alternatively, a script in the distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1/restart-stitcher.sh`).  
 4) Main script `~/stitcher.sh`.  
 
 
