@@ -103,6 +103,8 @@ public class DailyMedParser {
     static public class DrugLabel {
         public String id;      
         public Integer initialApprovalYear;
+		public String productCategory;
+		public String url;
         public List<Product> products = new ArrayList<>();
         public List<Section> sections = new ArrayList<>();
     }
@@ -356,67 +358,67 @@ public class DailyMedParser {
             
             Element child = (Element)node;
             switch (child.getTagName()) {
-            case "code":
-                { Node n = child.getAttributes().getNamedItem("codeSystem");
-                    if (n != null && "2.16.840.1.113883.6.69"
-                        .equals(n.getTextContent())) {
-                        product.ndc = child.getAttributes()
-                            .getNamedItem("code").getTextContent();
-                    }
-                }
-                break;
-                
-            case "name":
-                product.name = child.getTextContent();
-                break;
-                
-            case "formCode":
-                product.formulation = child.getAttributes()
-                    .getNamedItem("displayName").getTextContent();
-                break;
-                
-            case "ingredient":
-                { Ingredient ingre = parseIngredient (child);
-                    if (ingre != null)
-                        product.ingredients.add(ingre);
-                }
-                break;
-                
-            case "asEntityWithGeneric":
-                { NodeList nl = child.getElementsByTagName("name");
-                    if (nl.getLength() > 0)
-                        product.genericName = nl.item(0).getTextContent();
-                }
-                break;
+				case "code":
+					{ Node n = child.getAttributes().getNamedItem("codeSystem");
+						if (n != null && "2.16.840.1.113883.6.69"
+							.equals(n.getTextContent())) {
+							product.ndc = child.getAttributes()
+										  .getNamedItem("code").getTextContent();
+						}
+					}
+					break;
+					
+				case "name":
+					product.name = child.getTextContent();
+					break;
+					
+				case "formCode":
+					product.formulation = child.getAttributes()
+						.getNamedItem("displayName").getTextContent();
+					break;
+					
+				case "ingredient":
+					{ Ingredient ingre = parseIngredient (child);
+						if (ingre != null)
+							product.ingredients.add(ingre);
+					}
+					break;
+					
+				case "asEntityWithGeneric":
+					{ NodeList nl = child.getElementsByTagName("name");
+						if (nl.getLength() > 0)
+							product.genericName = nl.item(0).getTextContent();
+					}
+					break;
 
-            case "asEquivalentEntity":
-                { NodeList nl = child.getElementsByTagName("code");
-                    for (int j = 0; j < nl.getLength(); ++j) {
-                        Node n = nl.item(j);
-                        Node cs = n.getAttributes().getNamedItem("codeSystem");
-                        if (cs != null  && "2.16.840.1.113883.6.69"
-                            .equals(cs.getTextContent())) {
-                            product.equivNDC = n.getAttributes()
-                                .getNamedItem("code").getTextContent();
-                        }
-                    }
-                }
-                break;
-                
-            case "asContent":
-                parsePackages (product.packages, child);
-                break;
+				case "asEquivalentEntity":
+					{ NodeList nl = child.getElementsByTagName("code");
+						for (int j = 0; j < nl.getLength(); ++j) {
+							Node n = nl.item(j);
+							Node cs = n.getAttributes().getNamedItem("codeSystem");
+							if (cs != null  && "2.16.840.1.113883.6.69"
+								.equals(cs.getTextContent())) {
+								product.equivNDC = n.getAttributes()
+									.getNamedItem("code").getTextContent();
+							}
+						}
+					}
+					break;
+					
+				case "asContent":
+					parsePackages (product.packages, child);
+					break;
 
-            case "part":
-                { NodeList nl = child.getElementsByTagName("partProduct");
-                    for (int j = 0; j < nl.getLength(); ++j) {
-                        Product p = parseProduct ((Element)nl.item(j));
-                        p.isPart = true;
-                        product.parts.add(p);
-                    }
-                }
-                break;
-            }
+				case "part":
+					{ NodeList nl = child.getElementsByTagName("partProduct");
+						for (int j = 0; j < nl.getLength(); ++j) {
+							Product p = parseProduct ((Element)nl.item(j));
+							p.isPart = true;
+							product.parts.add(p);
+						}
+					}
+					break;
+			}
         }
         return product;
     }
@@ -434,7 +436,8 @@ public class DailyMedParser {
                         Node n = nl.item(0).getAttributes()
                             .getNamedItem("extension");
                         if (n != null)
-                            product.approvalId = n.getTextContent();
+                            product.approvalId = n.getTextContent()
+												 .replace("part", "21 CFR ");
                         else {
                             nl = approval.getChildNodes();
                             for (int j = 0; j < nl.getLength(); ++j) {
@@ -588,8 +591,25 @@ public class DailyMedParser {
                     
                 case "id":
                     label.id = child.getAttributes()
-                        .getNamedItem("root").getTextContent();
+							   .getNamedItem("root").getTextContent();
                     break;
+					
+				case "setId":
+					{ Node n = child.getAttributes().getNamedItem("root");
+						if (n != null) {
+						  label.url = "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid="
+									  + n.getTextContent();
+						}
+					}
+					break;
+					
+				case "code":
+					{ Node n = child.getAttributes().getNamedItem("displayName");
+						if (n != null) {
+							label.productCategory = n.getTextContent().toUpperCase().trim();
+						}
+					}
+					break;
                 }
             }
         }
@@ -633,6 +653,7 @@ public class DailyMedParser {
                     System.out.println
                         (i.substance.unii+"\t"
                          + (p.marketingStatus != null ? p.marketingStatus:"")+"\t"
+                         + (label.productCategory != null ? label.productCategory:"")+"\t"
                          + marketDate+"\t"
                          + (label.initialApprovalYear != null 
                            ? label.initialApprovalYear : "")+"\t"
@@ -645,7 +666,8 @@ public class DailyMedParser {
                          + "\""+"\t"+(p.genericName != null ? 
 												   ("\""
 												   + p.genericName.replaceAll("\n","").toUpperCase().trim()
-												   + "\""):""));
+												   + "\""):"")+"\t"
+						 + (label.url != null ? label.url:""));
                     //seen.add(i.substance.unii);
                 }
             }
@@ -758,7 +780,8 @@ public class DailyMedParser {
         }
 
         System.out.println("UNII\t"+
-		                   "MarketStatus\t"+
+		                   "MarketingStatus\t"+
+		                   "ProductCategory\t"+
                            "MarketDate\t"+
                            "InitialYearApproval\t"+
                            "ActiveCode\t"+
@@ -767,7 +790,8 @@ public class DailyMedParser {
                            "NDC\t"+
                            "Route\t"+
                            "ActiveMoietyName\t"+
-                           "GenericProductName");
+                           "GenericProductName\t"+
+						   "URL");
         
         DailyMedParser daily = new DailyMedParser ();
         for (int i = 0; i < argv.length; ++i) {
