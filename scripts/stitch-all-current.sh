@@ -7,6 +7,8 @@ log="log$timestamp.txt"
 curr_time=$(date +%s)
 
 echo $(date) > $log
+sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/withdrawn.conf"
+echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
