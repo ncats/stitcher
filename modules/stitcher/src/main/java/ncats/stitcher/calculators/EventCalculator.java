@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ncats.stitcher.*;
 
+import java.io.*;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -137,7 +137,7 @@ public class EventCalculator implements StitchCalculator {
             return labels.toArray(new String[labels.size()]);
         }
     }
-    static class Event {
+    static class Event implements Cloneable{
         public EventKind kind;
         public String source;
         public Object id;
@@ -146,6 +146,32 @@ public class EventCalculator implements StitchCalculator {
         public String comment; // reference
 
         public String route;
+
+        public String approvalAppId;
+
+        public String marketingStatus;
+        public String productCategory;
+
+        public String NDC;
+        public String URL;
+
+        /**
+         * Create a deep clone.
+         * @return
+         * @throws CloneNotSupportedException
+         */
+        @Override
+        public Event clone()  {
+            Event e = null;
+            try {
+                e = (Event) super.clone();
+            } catch (CloneNotSupportedException e1) {
+                throw new RuntimeException(e1); //shouldn't happen
+            }
+            //date is mutable so make defensive copy
+            e.date = new Date(date.getTime());
+            return e;
+        }
 
         public enum EventKind {
             Publication,
@@ -163,7 +189,9 @@ public class EventCalculator implements StitchCalculator {
                 public boolean isApproved(){
                     return true;
                 }
-            }
+            },
+            Other,
+            Withdrawn
             ;
 
             public boolean isApproved(){
@@ -402,6 +430,8 @@ public class EventCalculator implements StitchCalculator {
             return events;
         }
     }
+
+
         
     static class DrugBankEventParser extends EventParser {
         public DrugBankEventParser() {
@@ -536,6 +566,122 @@ public class EventCalculator implements StitchCalculator {
         }
     }
 
+    private enum DevelopmentStatus{
+/*
+1 DevelopmentStatus
+  63 Other
+  12 US Approved OTC
+  16 US Approved Rx
+  38 US Unapproved, Marketed
+ */
+
+        Other("Other", Event.EventKind.Other),
+        US_Approved_OTC("US Approved OTC", Event.EventKind.ApprovalOTC),
+        US_Approved_Rx("US Approved Rx", Event.EventKind.ApprovalRx),
+        US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.Marketed)
+        ;
+        private static Map<String, DevelopmentStatus> map = new HashMap<>();
+
+        private String displayName;
+
+        private Event.EventKind kind;
+
+        static{
+            for(DevelopmentStatus s : values()){
+                map.put(s.displayName, s);
+            }
+        }
+        DevelopmentStatus(String displayName, Event.EventKind kind){
+            this.displayName = displayName;
+            this.kind = kind;
+        }
+
+        public String getDisplayName(){
+            return displayName;
+        }
+
+        public static DevelopmentStatus parse(String displayName){
+            return map.get(displayName);
+        }
+
+        public Event.EventKind getKind(){
+            return kind;
+        }
+
+    }
+
+
+    private static class WithdraenEventParser extends EventParser{
+        public WithdraenEventParser() {
+            super("combined_withdrawn_shortage_drugs.txt");
+        }
+
+        private static Pattern COUNTRY_DELIM = Pattern.compile("\\|");
+        @Override
+        public List<Event> getEvents(Map<String, Object> payload) {
+            List<Event> events = new ArrayList<>();
+            String unii = (String) payload.get("UNII");
+            if("Withdrawn".equals(payload.get("status"))){
+                Event e = new Event(name, unii, Event.EventKind.Withdrawn);
+                e.comment = (String) payload.get("reason_withdrawn");
+                String countries = (String) payload.get("country_withdrawn");
+                if(countries == null) {
+                    events.add(e);
+                }else{
+                    //lists of countries are pipe delimited
+                    String[] list = COUNTRY_DELIM.split(countries);
+                    for(String country : list){
+                        Event copy = e.clone();
+                        copy.jurisdiction = country;
+                        events.add(copy);
+                    }
+                }
+
+            }
+            return events;
+        }
+    }
+    private static class DevelopmentStatusLookup{
+        //MarketingStatus	ProductType	DevelopmentStatus
+
+
+
+        private final Map<String, Map<String, DevelopmentStatus>> map;
+
+        private DevelopmentStatusLookup(Map<String, Map<String, DevelopmentStatus>> map) {
+            this.map = map;;
+        }
+        private static Pattern DELIM = Pattern.compile("\t");
+        public static DevelopmentStatusLookup parse(InputStream in) throws IOException{
+            Objects.requireNonNull( in, "inputstream not found!");
+            Map<String, Map<String, DevelopmentStatus>> map = new HashMap<>();
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
+
+                String line;
+                while ((line = reader.readLine()) !=null){
+                    String[] cols = DELIM.split(line);
+
+                    map.computeIfAbsent(cols[0], k-> new HashMap<>())
+                            .put(cols[1], DevelopmentStatus.parse(cols[2]));
+                }
+            }
+
+            return new DevelopmentStatusLookup(map);
+        }
+
+        public Event.EventKind lookup(String marketingStatus, String productType){
+            Map<String, DevelopmentStatus> subMap = map.get(marketingStatus);
+            if(subMap !=null){
+                DevelopmentStatus status = subMap.get(productType);
+                if(status !=null){
+                    return status.getKind();
+                }
+            }
+
+            return null;
+        }
+    }
+
     static class DailyMedEventParser extends EventParser {
         public DailyMedEventParser (String source) {
             super (source);
@@ -548,7 +694,17 @@ public class EventCalculator implements StitchCalculator {
          */
         private static Pattern CFR_21_OTC_PATTERN =
             Pattern.compile("part3([1-9][0-9]).*");
-        
+
+        private static DevelopmentStatusLookup developmentStatusLookup;
+
+        static{
+            try{
+                developmentStatusLookup = DevelopmentStatusLookup.parse(new BufferedInputStream(new FileInputStream("data/dev_status_logic.txt")));
+            }catch(IOException e){
+                throw new UncheckedIOException(e);
+            }
+        }
+
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
             Event event = null;
@@ -583,34 +739,41 @@ public class EventCalculator implements StitchCalculator {
                 }
                 //exclude veterinary products from approved and/or Marketed
                 if (!isVeterinaryProduct && date != null) {
-                    Event.EventKind et = Event.EventKind.Marketed;
-                    content = payload.get("ApprovalAppId");
-                    if (content != null) {
-                        String contentStr = (String)content;
-                        if (contentStr.startsWith("NDA") ||
-                            contentStr.startsWith("ANDA") ||
-                            contentStr.startsWith("BA") ||
-                            contentStr.startsWith("BN") ||
-                            contentStr.startsWith("BLA")) {
-                            et = Event.EventKind.ApprovalRx;
-                        }
-                        else {
-                            Matcher matcher = CFR_21_OTC_PATTERN.matcher(contentStr);
-                            if(matcher.find()){
-                                //We include if it's 310.545. We exclude if it's any other 310.5XX
-                                if(contentStr.startsWith("310.5")) {
-                                    if (contentStr.equals("310.545")) {
+
+                    String productType = (String) payload.get("ProductCategory");
+                    Event.EventKind et=null;
+                    if(marketStatus !=null && productType !=null ){
+                        et = developmentStatusLookup.lookup((String) marketStatus, productType);
+                    }
+                    if(et ==null) {
+                        //use old logic
+                        et = Event.EventKind.Marketed;
+                        content = payload.get("ApprovalAppId");
+                        if (content != null) {
+                            String contentStr = (String) content;
+                            if (contentStr.startsWith("NDA") ||
+                                    contentStr.startsWith("ANDA") ||
+                                    contentStr.startsWith("BA") ||
+                                    contentStr.startsWith("BN") ||
+                                    contentStr.startsWith("BLA")) {
+                                et = Event.EventKind.ApprovalRx;
+                            } else {
+                                Matcher matcher = CFR_21_OTC_PATTERN.matcher(contentStr);
+                                if (matcher.find()) {
+                                    //We include if it's 310.545. We exclude if it's any other 310.5XX
+                                    if (contentStr.startsWith("310.5")) {
+                                        if (contentStr.equals("310.545")) {
+                                            et = Event.EventKind.ApprovalOTC;
+                                        }
+
+                                    } else {
                                         et = Event.EventKind.ApprovalOTC;
                                     }
-
-                                }  else{
-                                    et = Event.EventKind.ApprovalOTC;
+                                } else {
+                                    logger.log(Level.WARNING,
+                                            "Unusual approval app id: " + content
+                                                    + ": " + payload.toString());
                                 }
-                            }
-                            else {
-                                logger.log(Level.WARNING,
-                                           "Unusual approval app id: "+content
-                                           +": "+payload.toString());
                             }
                         }
                     }
@@ -626,7 +789,14 @@ public class EventCalculator implements StitchCalculator {
                     event.date = date;
                     event.comment = (String)content;
 
+                    event.approvalAppId = (String) payload.get("ApprovalAppId");
 
+                    event.marketingStatus = (String) marketStatus;
+
+                    event.productCategory = (String) payload.get("ProductCategory");
+
+                    event.NDC = (String) payload.get("NDC");
+                    event.URL = (String) payload.get("URL");
                     //Jan 2018 new columns for Route and MarketStatus
                     Object route = payload.get("Route");
                     if(route !=null){
@@ -730,6 +900,7 @@ public class EventCalculator implements StitchCalculator {
     }
 
     public static void main (String[] argv) throws Exception {
+
         if (argv.length < 2) {
             System.err.println("Usage: "+EventCalculator.class.getName()
                                +" DB VERSION");
