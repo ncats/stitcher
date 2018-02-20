@@ -695,7 +695,7 @@ public class EventCalculator implements StitchCalculator {
         private static Pattern CFR_21_OTC_PATTERN =
             Pattern.compile("part3([1-9][0-9]).*");
 
-        private static DevelopmentStatusLookup developmentStatusLookup;
+        static DevelopmentStatusLookup developmentStatusLookup;
 
         static{
             try{
@@ -719,7 +719,7 @@ public class EventCalculator implements StitchCalculator {
 
 
                 //Jan 2018 new columns for Route and MarketStatus
-                Object marketStatus = payload.get("MarketStatus");
+                Object marketStatus = payload.get("MarketingStatus");
 
                 boolean isVeterinaryProduct=false;
                 if(marketStatus !=null){
@@ -900,6 +900,7 @@ public class EventCalculator implements StitchCalculator {
     }
 
     public static void main (String[] argv) throws Exception {
+
 
         if (argv.length < 2) {
             System.err.println("Usage: "+EventCalculator.class.getName()
