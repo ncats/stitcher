@@ -5,6 +5,8 @@ if [ $# -eq 0 ]; then
     echo "Please, supply path to the .tsv file with Rancho export. Aborting."
     exit 1
 fi
+
+
  
 #run the script 
-python `dirname ${BASH_SOURCE[0]}`/rancho.py $1 > "rancho-${1/%tsv/json}"
+python `dirname ${BASH_SOURCE[0]}`/rancho.py $1 > "rancho-`basename ${1/%tsv/json}`"
