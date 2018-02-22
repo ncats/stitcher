@@ -611,8 +611,8 @@ public class EventCalculator implements StitchCalculator {
     }
 
 
-    private static class WithdraenEventParser extends EventParser{
-        public WithdraenEventParser() {
+    private static class WithdrawnEventParser extends EventParser{
+        public WithdrawnEventParser() {
             super("combined_withdrawn_shortage_drugs.txt");
         }
 
