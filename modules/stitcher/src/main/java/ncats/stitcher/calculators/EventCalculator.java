@@ -87,6 +87,21 @@ public class EventCalculator implements StitchCalculator {
                 data.put("route", e.route);
             }
 
+            if(e.approvalAppId !=null){
+                data.put("ApprovalAppId", e.approvalAppId);
+            }
+            if(e.marketingStatus !=null){
+                data.put("MarketingStatus", e.marketingStatus);
+            }
+            if(e.NDC !=null){
+                data.put("NDC", e.NDC);
+            }
+            if(e.URL !=null){
+                data.put("URL", e.URL);
+            }
+
+            if(e.)
+
             labels.add(e.source);
             if (e.date != null && e.kind.isApproved()) {
                 cal.setTime(e.date);
@@ -630,7 +645,6 @@ public class EventCalculator implements StitchCalculator {
             super("combined_withdrawn_shortage_drugs.txt");
         }
 
-        private static Pattern COUNTRY_DELIM = Pattern.compile("\\|");
         @Override
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
@@ -871,7 +885,7 @@ public class EventCalculator implements StitchCalculator {
                         event.jurisdiction = "US";
                     }
                     event.date = date;
-                    event.comment = (String)content;
+                    event.comment = (String)(content==null? "": content);
 
                     event.approvalAppId = (String) payload.get("ApprovalAppId");
 
