@@ -105,6 +105,7 @@ public class EventCalculator implements StitchCalculator {
                 new DailyMedRxEventParser(),
                 new DailyMedOtcEventParser(),
                 new DailyMedRemEventParser(),
+                new WithdrawnEventParser()
                 //new DrugBankXmlEventParser()
             }) {
             Integer year = approvals.get(ep.name);
@@ -612,6 +613,19 @@ public class EventCalculator implements StitchCalculator {
 
 
     private static class WithdrawnEventParser extends EventParser{
+
+
+        static WithdrawnStatusLookup withdrawnStatusLookup;
+        static{
+
+            try{
+                withdrawnStatusLookup = new WithdrawnStatusLookup(new BufferedInputStream(new FileInputStream("data/combined_withdrawn_shortage_drugs.txt")));
+            }catch(IOException e) {
+
+                throw new UncheckedIOException(e);
+            }
+        }
+
         public WithdrawnEventParser() {
             super("combined_withdrawn_shortage_drugs.txt");
         }
@@ -621,24 +635,86 @@ public class EventCalculator implements StitchCalculator {
         public List<Event> getEvents(Map<String, Object> payload) {
             List<Event> events = new ArrayList<>();
             String unii = (String) payload.get("UNII");
-            if("Withdrawn".equals(payload.get("status"))){
+            WithdrawnInfo info = withdrawnStatusLookup.getWithdrawnInfo(unii);
+            if(info !=null){
                 Event e = new Event(name, unii, Event.EventKind.Withdrawn);
-                e.comment = (String) payload.get("reason_withdrawn");
-                String countries = (String) payload.get("country_withdrawn");
-                if(countries == null) {
+                e.comment = info.getReason();
+
+                if(info.countriesWithdrawn.isEmpty()){
                     events.add(e);
-                }else{
-                    //lists of countries are pipe delimited
-                    String[] list = COUNTRY_DELIM.split(countries);
-                    for(String country : list){
-                        Event copy = e.clone();
-                        copy.jurisdiction = country;
-                        events.add(copy);
+                }else {
+                    for (String country : info.getCountriesWithdrawn()) {
+                        Event e2 = e.clone();
+                        e2.jurisdiction = country;
+                        events.add(e2);
                     }
                 }
-
             }
+
+
             return events;
+        }
+    }
+
+    private static class WithdrawnInfo{
+        private final List<String> countriesWithdrawn;
+        private final String reason;
+        //TODO add other fields like date withdrawn
+
+
+        public WithdrawnInfo(String reason, List<String> countriesWithdrawn) {
+            this.countriesWithdrawn = countriesWithdrawn;
+            this.reason = reason;
+        }
+
+        public List<String> getCountriesWithdrawn() {
+            return countriesWithdrawn;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+    }
+    private static class WithdrawnStatusLookup{
+        private final Map<String, WithdrawnInfo> withdrawnsById = new HashMap<>();
+
+        private static Pattern COL_PATTERN = Pattern.compile("\t");
+        private static Pattern COUNTRY_PATTERN = Pattern.compile("\\|");
+
+        WithdrawnStatusLookup(InputStream in) throws IOException{
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
+                String[] headerArray = COL_PATTERN.split(reader.readLine());
+                Map<String, Integer> header = new HashMap<>();
+                for( int i=0; i< headerArray.length; i++){
+                    header.put(headerArray[i], i);
+                }
+                //status	generic_name	brand_name	synonym	form	class	moa	indication	description	year_launched	date_launched	country_launched	date_shortage	year_shortage	URL	year_adr_report	year_withdrawn	date_withdrawn	country_withdrawn	reason_withdrawn	year_remarketed	source	unii	smiles
+
+                int uniiOffset = header.get("unii");
+                int reasonWithDrawn = header.get("reason_withdrawn");
+                int status = header.get("status");
+                int countryWithdrawn = header.get("country_withdrawn");
+
+
+                Map<String, List<String>> cache = new HashMap<>();
+                String line;
+                while( (line=reader.readLine()) !=null){
+                    String[] cols = COL_PATTERN.split(line);
+
+                    if("Withdrawn".equals(cols[status])){
+                        String id = cols[uniiOffset];
+                        withdrawnsById.put(id, new WithdrawnInfo(
+                                cols[reasonWithDrawn],
+                                cache.computeIfAbsent(cols[countryWithdrawn], k-> Arrays.asList(COUNTRY_PATTERN.split(k)))));
+
+
+                    }
+                }
+            }
+        }
+
+        public WithdrawnInfo getWithdrawnInfo(String unii){
+            return withdrawnsById.get(unii);
         }
     }
     private static class DevelopmentStatusLookup{
@@ -697,10 +773,18 @@ public class EventCalculator implements StitchCalculator {
 
         static DevelopmentStatusLookup developmentStatusLookup;
 
+        static WithdrawnStatusLookup withdrawnStatusLookup;
         static{
             try{
                 developmentStatusLookup = DevelopmentStatusLookup.parse(new BufferedInputStream(new FileInputStream("data/dev_status_logic.txt")));
             }catch(IOException e){
+                throw new UncheckedIOException(e);
+            }
+            //
+            try{
+                withdrawnStatusLookup = new WithdrawnStatusLookup(new BufferedInputStream(new FileInputStream("data/combined_withdrawn_shortage_drugs.txt")));
+            }catch(IOException e) {
+
                 throw new UncheckedIOException(e);
             }
         }
@@ -874,7 +958,9 @@ public class EventCalculator implements StitchCalculator {
         new DailyMedRxEventParser (),
         new DailyMedOtcEventParser (),
         new DailyMedRemEventParser (),
-        new DrugsAtFDAEventParser ()
+        new DrugsAtFDAEventParser (),
+
+            new WithdrawnEventParser()
     };
 
     List<Event> getEvents (Stitch stitch) {
