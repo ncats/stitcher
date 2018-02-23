@@ -2,14 +2,11 @@ package ncats.stitcher;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -17,10 +14,8 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.config.Setting;
 import org.neo4j.graphdb.event.*;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.IndexCreator;
@@ -185,14 +180,31 @@ public class GraphDb extends TransactionEventHandler.Adapter
         throws IOException {
         return getInstance (dir, null);
     }
-    
-    public static synchronized GraphDb getInstance
-        (File dir, CacheFactory cache) throws IOException {
-        GraphDb gdb = INSTANCES.get(dir);
-        if (gdb == null) {
-            INSTANCES.put(dir, gdb = new GraphDb (dir, cache));
-        }
-        return gdb;
+    interface ThrowingFunction<T, R, E extends Throwable>{
+        R apply(T t) throws E;
+    }
+
+    public static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+        throw (E) e;
+    }
+    private static <T,R, E extends Throwable> Function<T,R> uncheck(ThrowingFunction<T,R,E> f){
+        return t -> {
+            try {
+                return f.apply(t);
+            } catch (Throwable e) {
+                sneakyThrow(e);
+            }
+            return null; // can't happen but makes compiler happy
+        };
+    }
+    public static synchronized GraphDb getInstance(File dir, CacheFactory cache) throws IOException {
+
+        return INSTANCES.computeIfAbsent(dir, uncheck(f-> new GraphDb(f, cache)));
+//        GraphDb gdb = INSTANCES.get(dir);
+//        if (gdb == null) {
+//            INSTANCES.put(dir, gdb = new GraphDb (dir, cache));
+//        }
+//        return gdb;
     }
 
     public static GraphDb getInstance (GraphDatabaseService gdb) {

@@ -147,5 +147,10 @@ public class TestRegistry extends EntityRegistry {
             });
         return scores;
     }
+
+
+    public DataSource getDataSourceByVersion(int version){
+        return getDataSourceFactory().register("stitch_v" + version);
+    }
 }
 

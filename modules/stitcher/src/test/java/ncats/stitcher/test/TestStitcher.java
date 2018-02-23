@@ -31,11 +31,15 @@ public class TestStitcher {
 
         int total = 0;
         for (InputStream is : streams) {
-            JsonNode json = mapper.readTree(is);
-            total += json.get("count").asInt();
-            ArrayNode an = (ArrayNode)json.get("data");
-            for (int i = 0; i < an.size(); ++i)
-                data.add(an.get(i));
+            try {
+                JsonNode json = mapper.readTree(is);
+                total += json.get("count").asInt();
+                ArrayNode an = (ArrayNode) json.get("data");
+                for (int i = 0; i < an.size(); ++i)
+                    data.add(an.get(i));
+            }finally{
+                is.close();
+            }
         }
         assertTrue ("Expecting json to contain 6 elements in data but "
                     +"instead got "+data.size(), data.size() == total);
@@ -54,7 +58,7 @@ public class TestStitcher {
             assertTrue ("Expecting "+data.size()+" entities but instead got "
                         +count, data.size() == count);
             
-            DataSource ds = reg.getDataSourceFactory().register("stitch_v1");
+            DataSource ds = reg.getDataSourceByVersion(1);
             
             List<Long> comps = new ArrayList<>();
             int nc = reg.components(comps);
