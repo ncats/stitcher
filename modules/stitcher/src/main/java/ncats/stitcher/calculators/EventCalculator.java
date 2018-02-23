@@ -100,8 +100,6 @@ public class EventCalculator implements StitchCalculator {
                 data.put("URL", e.URL);
             }
 
-            if(e.)
-
             labels.add(e.source);
             if (e.date != null && e.kind.isApproved()) {
                 cal.setTime(e.date);
