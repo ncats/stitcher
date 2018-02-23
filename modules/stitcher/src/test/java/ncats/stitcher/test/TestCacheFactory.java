@@ -11,6 +11,7 @@ import ncats.stitcher.CacheFactory;
 
 import org.junit.Test;
 import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 import static org.junit.Assert.assertTrue;
 
@@ -21,15 +22,16 @@ public class TestCacheFactory {
     static {
         CacheFactory.addShutdownHook();
     }
-    
-    @Rule public TestName name = new TestName();
-    
+
+    @Rule
+    public TemporaryFolder tmpDir = new TemporaryFolder();
+
     public TestCacheFactory () {
     }
 
     @Test
     public void test1 () throws Exception {
-        File dir = TestUtil.createTempDir(name.getMethodName());
+        File dir = tmpDir.newFolder();
         CacheFactory cache = CacheFactory.getInstance(dir);
         cache.put("key1000", "value1000");
         assertTrue ("value1000".equals(cache.get("key1000")));

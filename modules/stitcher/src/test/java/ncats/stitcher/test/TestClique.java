@@ -17,7 +17,7 @@ import ncats.stitcher.impl.MapEntityFactory;
 import org.junit.Test;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestClique {
     @Rule public TestName name = new TestName();
@@ -31,10 +31,14 @@ public class TestClique {
         public EnumSet<StitchKey> keys = EnumSet.noneOf(StitchKey.class);
         public int ncliques;
 
+        public List<Set<StitchKey>> cliquesByKey = new ArrayList<>();
         MyCliqueVisitor () {}
         
         public boolean clique (Clique clique) {
-            this.keys.addAll(clique.values().keySet());
+            Set<StitchKey> stitchKeys = clique.values().keySet();
+            cliquesByKey.add(stitchKeys);
+
+            this.keys.addAll(stitchKeys);
             System.out.println("+++++++ "+String.format("%1$5d.", ++ncliques)
                                +" Clique ("+clique.size()+") ++++++++");
             System.out.println("## values: "+clique.values());
@@ -45,8 +49,7 @@ public class TestClique {
             return true;
         }
     }
-    
-    public TestClique () {}
+
 
     @Test
     public void testClique1 () throws Exception {
@@ -78,16 +81,21 @@ public class TestClique {
             reg.register(map);
 
             /*
-             * we should now have a clique of size 5 for I_CAS and another
-             * one of size 4 for {I_UNII, N_Synonym, N_Name}
+             * we should now have a clique of size 4 for I_CAS and another
+             * one of size 3 for {I_UNII, N_Name}
              */
             MyCliqueVisitor visitor = new MyCliqueVisitor ();
             reg.cliques(visitor);
-            assertTrue ("There should only be two cliques!",
-                        visitor.ncliques == 2);
+            assertEquals ("There should only be two cliques!", 2,
+                        visitor.ncliques);
             assertTrue ("Expecting "+keys.size()+" matching keys, but instead "
-                        +"got "+visitor.keys.size(),
-                        visitor.keys.containsAll(keys));
+                    +"got "+visitor.keys.size(),
+                    visitor.keys.containsAll(keys));
+
+            assertEquals(2, visitor.cliquesByKey.size());
+            assertEquals(EnumSet.of(StitchKey.N_Name, StitchKey.I_UNII), visitor.cliquesByKey.get(0));
+            assertEquals(EnumSet.of(StitchKey.I_CAS), visitor.cliquesByKey.get(1));
+
 
             ent.delete();
         }
