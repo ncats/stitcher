@@ -573,7 +573,18 @@ public class EventCalculator implements StitchCalculator {
                     if (!approved) {
                         ev.kind = Event.EventKind.Marketed;
                     }
-                    ev.comment = map.get("name")+" ["+map.get("labeller")+"]";
+                    //only inclue comment if it's present
+                    String name = map.get("name");
+                    if(name !=null){
+                        StringBuilder comment = new StringBuilder(name);
+
+                        String labeller = map.get("labeller");
+                        if(labeller !=null){
+                            comment.append(" [").append(labeller).append("]");
+                        }
+                        ev.comment = comment.toString();
+                    }
+//                    ev.comment = map.get("name")+" ["+map.get("labeller")+"]";
                 }
             }
             return ev;
