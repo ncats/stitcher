@@ -183,7 +183,9 @@ public class EventCalculator implements StitchCalculator {
                 throw new RuntimeException(e1); //shouldn't happen
             }
             //date is mutable so make defensive copy
-            e.date = new Date(date.getTime());
+            if(date != null) {
+                e.date = new Date(date.getTime());
+            }
             return e;
         }
 
@@ -656,8 +658,9 @@ public class EventCalculator implements StitchCalculator {
 
         @Override
         public List<Event> getEvents(Map<String, Object> payload) {
+
             List<Event> events = new ArrayList<>();
-            String unii = (String) payload.get("UNII");
+            String unii = (String) payload.get("unii");
             WithdrawnInfo info = withdrawnStatusLookup.getWithdrawnInfo(unii);
             if(info !=null){
                 Event e = new Event(name, unii, Event.EventKind.Withdrawn);
