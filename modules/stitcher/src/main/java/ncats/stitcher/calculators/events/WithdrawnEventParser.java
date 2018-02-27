@@ -87,15 +87,15 @@ public class WithdrawnEventParser extends EventParser{
 
         List<Event> events = new ArrayList<>();
         String unii = (String) payload.get("unii");
-
-        if("0QTW8Z7MCR".equals(unii)){
-            System.out.println("MERGED PAYLOAD = \n" + payload);
-        }
         WithdrawnInfo info = withdrawnStatusLookup.getWithdrawnInfo(unii);
         if(info !=null){
             Event e = new Event(name, unii, Event.EventKind.Withdrawn);
             e.comment = info.getReason();
 
+            Object withDrawnYear = payload.get("year_withdrawn");
+            if(withDrawnYear !=null){
+                e.withDrawnYear = Integer.parseInt((String) withDrawnYear);
+            }
             if(info.countriesWithdrawn.isEmpty()){
                 events.add(e);
             }else {
