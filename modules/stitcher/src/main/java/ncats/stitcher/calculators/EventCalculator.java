@@ -217,8 +217,7 @@ public class EventCalculator implements StitchCalculator {
 
         for (EventParser ep : eventParsers) {
             try {
-                Map<String, Object> payload = stitch.payload(ep.name);
-                if (payload != null) {
+                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)){
                     for (Event e: ep.getEvents(payload)) {
                         logger.info(ep.name + ": kind=" + e.kind
                                 + " date=" + e.date);

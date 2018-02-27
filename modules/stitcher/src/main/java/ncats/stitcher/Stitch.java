@@ -173,6 +173,51 @@ public class Stitch extends Entity {
     }
 
     /*
+    * stitch [1]->[n] payload -> entity
+    * from the stitch node, we go through the payload to get to the
+    * entity node. from there, we then iterate through all the payload
+    * that connect to this entity and find those that match the given
+    * source.
+    */
+    public List<Map<String, Object>> multiplePayloads (String source) {
+        List<Map<String, Object>> payloads = new ArrayList<>();
+        DataSource dsrc = dsf.getDataSource(source);
+        if (dsrc == null) {
+            throw new IllegalArgumentException
+                    ("Not a valid data source: " + source);
+        }
+        try (Transaction tx = gdb.beginTx()) {
+            for (Relationship rel : _node.getRelationships
+                    (Direction.BOTH, AuxRelType.STITCH)) {
+                Node n = rel.getOtherNode(_node); // payload
+                DataSource ds = dsf._getDataSource
+                        ((String)rel.getProperty(SOURCE, null));
+                if (dsrc.equals(ds)) {
+
+                    payloads.add(new TreeMap<>(n.getAllProperties()));
+                }
+                else {
+                    Node e = n.getSingleRelationship
+                            (AuxRelType.PAYLOAD, Direction.OUTGOING)
+                            .getOtherNode(n);
+                    for (Relationship prel : e.getRelationships
+                            (Direction.INCOMING, AuxRelType.PAYLOAD)) {
+                        Node p = prel.getOtherNode(e);
+                        ds = dsf._getDataSource
+                                ((String)prel.getProperty(SOURCE, null));
+                        if (dsrc.equals(ds)) {
+
+                            payloads.add(new TreeMap<>(p.getAllProperties()));
+                        }
+                    }
+                }
+            }
+            tx.success();
+        }
+        return payloads;
+    }
+
+    /*
      * stitch [1]->[n] payload -> entity
      * from the stitch node, we go through the payload to get to the
      * entity node. from there, we then iterate through all the payload
@@ -180,43 +225,11 @@ public class Stitch extends Entity {
      * source.
      */
     public Map<String, Object> payload (String source) {
-        DataSource dsrc = dsf.getDataSource(source);
-        if (dsrc == null)
-            throw new IllegalArgumentException
-                ("Not a valid data source: "+source);
-
-        Map<String, Object> payload = null;     
-        try (Transaction tx = gdb.beginTx()) {
-            for (Relationship rel : _node.getRelationships
-                     (Direction.BOTH, AuxRelType.STITCH)) {
-                Node n = rel.getOtherNode(_node); // payload
-                DataSource ds = dsf._getDataSource
-                    ((String)rel.getProperty(SOURCE, null));
-                if (dsrc.equals(ds)) {
-                    if (payload == null)
-                        payload = new TreeMap<>();
-                    payload.putAll(n.getAllProperties());
-                }
-                else {
-                    Node e = n.getSingleRelationship
-                        (AuxRelType.PAYLOAD, Direction.OUTGOING)
-                        .getOtherNode(n);
-                    for (Relationship prel : e.getRelationships
-                             (Direction.INCOMING, AuxRelType.PAYLOAD)) {
-                        Node p = prel.getOtherNode(e);
-                        ds = dsf._getDataSource
-                            ((String)prel.getProperty(SOURCE, null));
-                        if (dsrc.equals(ds)) {
-                            if (payload == null)
-                                payload = new TreeMap<>();
-                            payload.putAll(p.getAllProperties());
-                        }
-                    }
-                }
-            }
-            tx.success();
-        }
-        return payload;
+       Map<String, Object> merged = new TreeMap<>();
+       for(Map<String, Object> p : multiplePayloads(source)){
+           merged.putAll(p);
+       }
+       return merged;
     }
 
     public Map<DataSource, Integer> datasources () {
