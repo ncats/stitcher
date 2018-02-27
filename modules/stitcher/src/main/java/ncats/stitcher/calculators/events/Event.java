@@ -22,6 +22,8 @@ public class Event implements Cloneable{
     public String NDC;
     public String URL;
 
+    public Integer withDrawnYear;
+
     /**
      * Create a deep clone.
      * @return
