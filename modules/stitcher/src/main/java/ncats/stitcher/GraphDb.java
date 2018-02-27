@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import ncats.stitcher.lambdas.Uncheck;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -180,26 +181,13 @@ public class GraphDb extends TransactionEventHandler.Adapter
         throws IOException {
         return getInstance (dir, null);
     }
-    interface ThrowingFunction<T, R, E extends Throwable>{
-        R apply(T t) throws E;
-    }
 
-    public static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
-        throw (E) e;
-    }
-    private static <T,R, E extends Throwable> Function<T,R> uncheck(ThrowingFunction<T,R,E> f){
-        return t -> {
-            try {
-                return f.apply(t);
-            } catch (Throwable e) {
-                sneakyThrow(e);
-            }
-            return null; // can't happen but makes compiler happy
-        };
-    }
+
+
+
     public static synchronized GraphDb getInstance(File dir, CacheFactory cache) throws IOException {
 
-        return INSTANCES.computeIfAbsent(dir, uncheck(f-> new GraphDb(f, cache)));
+        return INSTANCES.computeIfAbsent(dir, Uncheck.throwingFunction(f-> new GraphDb(f, cache)));
 //        GraphDb gdb = INSTANCES.get(dir);
 //        if (gdb == null) {
 //            INSTANCES.put(dir, gdb = new GraphDb (dir, cache));

@@ -547,18 +547,18 @@ public class Entity extends CNode {
      * props - properties associated with the edge
      * data - data
      */
-    public Entity _addIfAbsent (String type, Map<String, Object> props, 
+    public Entity _addIfAbsent (String type, Map<String, Object> relationshipProps,
                                 Map<String, Object> data) {
-        if (!props.containsKey(ID) || !props.containsKey(SOURCE)) {
+        if (!relationshipProps.containsKey(ID) || !relationshipProps.containsKey(SOURCE)) {
             throw new IllegalArgumentException
                 ("props must contain "+ID+" and "+SOURCE+" properties!");
         }
 
-        Object id = props.get(ID);
+        Object id = relationshipProps.get(ID);
         if (id == null)
             throw new IllegalArgumentException (ID+" property can't be null!");
 
-        String source = (String)props.get(SOURCE);
+        String source = (String)relationshipProps.get(SOURCE);
         if (source == null)
             throw new IllegalArgumentException
                 (SOURCE+" property can't be null!");
@@ -573,13 +573,13 @@ public class Entity extends CNode {
         
         Node node = gdb.createNode(AuxNodeType.DATA);
         node.setProperty(CREATED, System.currentTimeMillis());
-        for (Map.Entry<String, Object> me : data.entrySet())
+        for (Map.Entry<String, Object> me : data.entrySet()) {
             node.setProperty(me.getKey(), me.getValue());
-
+        }
         Relationship rel = node.createRelationshipTo(_node, reltype);
         rel.setProperty(SOURCE, source);
         rel.setProperty(ID, id);
-        for (Map.Entry<String, Object> me : props.entrySet())
+        for (Map.Entry<String, Object> me : relationshipProps.entrySet())
             rel.setProperty(me.getKey(), me.getValue());
 
         return this;
