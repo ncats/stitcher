@@ -525,8 +525,14 @@ public class EntityRegistry extends EntityFactory {
         else {      
             ent = Entity._getEntity(_createNode ());
             String id = null;
-            if (idField != null && map.containsKey(idField))
-                id = map.get(idField).toString();
+            if (idField != null && map.containsKey(idField)) {
+                Object o =map.get(idField);
+                //do null value check incase it's missing!
+                if(o !=null){
+                    id = map.get(idField).toString();
+                }
+
+            }
             
             DefaultPayload payload = new DefaultPayload (getDataSource (), id);
             payload.putAll(map);

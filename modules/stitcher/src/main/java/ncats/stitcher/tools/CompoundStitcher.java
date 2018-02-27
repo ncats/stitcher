@@ -48,7 +48,11 @@ public class CompoundStitcher implements Consumer<Stitch> {
     
     final EntityFactory ef;
     final DataSourceFactory dsf;
-        
+
+    public CompoundStitcher(EntityFactory ef){
+        this.ef = ef;
+        this.dsf = ef.getDataSourceFactory();
+    }
     public CompoundStitcher (String db)  throws Exception {
         ef = new EntityFactory (GraphDb.getInstance(db));
         dsf = ef.getDataSourceFactory();

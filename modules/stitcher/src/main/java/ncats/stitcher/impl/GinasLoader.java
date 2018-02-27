@@ -75,6 +75,9 @@ public class GinasLoader extends MoleculeEntityFactory {
     public GinasLoader(String dir) throws IOException {
         super (dir);
     }
+    public GinasLoader(GraphDb db) throws IOException {
+        super (db);
+    }
 
     static public Molecule readJsonRecord(JsonNode record, String unii, String fullUrl)
             throws JsonProcessingException, MolFormatException, MolExportException {

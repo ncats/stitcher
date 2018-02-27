@@ -1786,7 +1786,42 @@ public class EntityFactory implements Props {
             return iter;
         }
     }
+    public void entities (DataSource source, Consumer<Entity> consumer) {
+        entities(source.getName(), consumer);
+    }
+    public void entities (String label, Consumer<Entity> consumer) {
+        Objects.requireNonNull(consumer);
+        try (Transaction tx = gdb.beginTx();
+             ResourceIterator<Node> iter = gdb.findNodes(Label.label(label))) {
 
+                  while(iter.hasNext()) {
+                      consumer.accept(Entity.getEntity(iter.next()));
+                  }
+            tx.success();
+
+        }
+    }
+
+    public void entities (Consumer<Entity> consumer) {
+        Objects.requireNonNull(consumer);
+        try (Transaction tx = gdb.beginTx();
+             ResourceIterator<Node> iter = gdb.findNodes(AuxNodeType.ENTITY)) {
+
+            while(iter.hasNext()) {
+                consumer.accept(Entity.getEntity(iter.next()));
+            }
+            tx.success();
+
+        }
+    }
+
+    /**
+     * perform a query to search for all entities with
+     * the given labels and for each one, call the given consumer.
+     * @param func the consumer function to call on each entity.
+     * @param labels the node labels to search for.
+     * @return
+     */
     public int maps (Consumer<Entity> func, String... labels) {
         StringBuilder query = new StringBuilder ("match(n");
         for (String l : labels) {
