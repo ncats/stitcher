@@ -268,6 +268,20 @@ public class MoleculeEntityFactory extends EntityRegistry {
         return ds;
     }
 
+    public DataSource register (String key, String name, File file) throws IOException {
+        logger.warning("I'm MoleculeEntityFactory");
+        DataSource ds = super.register(key, name, file);
+        register (ds);
+        return ds;
+    }
+
+    public DataSource register (String name, File file) throws IOException {
+        logger.warning("I'm MoleculeEntityFactory");
+        DataSource ds = super.register(name, file);
+        register (ds);
+        return ds;
+    }
+
     public DataSource register (URL url) throws IOException {
         DataSource ds = super.register(url);
         register (ds);

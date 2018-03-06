@@ -932,6 +932,16 @@ public class EntityRegistry extends EntityFactory {
         return source = getDataSourceFactory().register(file);
     }
 
+    public DataSource register (String key, String name, File file) throws IOException {
+        logger.warning("I'm EntityRegistry");
+        return source = getDataSourceFactory().register(key, name, file);
+    }
+
+    public DataSource register (String name, File file) throws IOException {
+        logger.warning("I'm EntityRegistry");
+        return source = getDataSourceFactory().register(name, file);
+    }
+
     public DataSource register (URL url) throws IOException {
         return source = getDataSourceFactory().register(url);
     }
