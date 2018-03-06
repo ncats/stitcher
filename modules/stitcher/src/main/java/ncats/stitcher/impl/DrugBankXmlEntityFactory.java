@@ -281,6 +281,7 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
         }
 
         DrugBankXmlEntityFactory mef = new DrugBankXmlEntityFactory (argv[0]);
+        String sourceName = null;
         try {
             for (int i = 1; i < argv.length; ++i) {
                 int pos = argv[i].indexOf('=');
@@ -289,12 +290,23 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
                     if (name.equalsIgnoreCase("cache")) {
                         mef.setCache(argv[i].substring(pos+1));
                     }
+                    else if (name.equalsIgnoreCase("name")) {
+                        sourceName = argv[i].substring(pos+1);
+                        System.out.println(sourceName);
+                    }
                     else {
                         logger.warning("** Unknown parameter \""+name+"\"!");
                     }
                 }
                 else {
-                    mef.register(argv[i]);
+                    File file = new File(argv[i]);
+
+                    if(sourceName != null){
+                        mef.register(sourceName, file);
+                    }
+                    else {
+                        mef.register(file);
+                    }
                 }
             }
         }

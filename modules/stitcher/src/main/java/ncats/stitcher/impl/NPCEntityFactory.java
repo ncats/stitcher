@@ -41,23 +41,38 @@ public class NPCEntityFactory extends MoleculeEntityFactory {
             System.exit(1);
         }
         
-        NPCEntityFactory nef = new NPCEntityFactory (argv[0]);
-        for (int i = 1; i < argv.length; ++i) {
-            int pos = argv[i].indexOf('=');
-            if (pos > 0) {
-                String name = argv[i].substring(0, pos);
-                if (name.equalsIgnoreCase("cache")) {
-                    nef.setCache(argv[i].substring(pos+1));
+        NPCEntityFactory mef = new NPCEntityFactory (argv[0]);
+        String sourceName = null;
+        try {
+            for (int i = 1; i < argv.length; ++i) {
+                int pos = argv[i].indexOf('=');
+                if (pos > 0) {
+                    String name = argv[i].substring(0, pos);
+                    if (name.equalsIgnoreCase("cache")) {
+                        mef.setCache(argv[i].substring(pos+1));
+                    }
+                    else if (name.equalsIgnoreCase("name")) {
+                        sourceName = argv[i].substring(pos+1);
+                        System.out.println(sourceName);
+                    }
+                    else {
+                        logger.warning("** Unknown parameter \""+name+"\"!");
+                    }
                 }
                 else {
-                    logger.warning("** Unknown parameter \""+name+"\"!");
+                     File file = new File(argv[i]);
+
+                    if(sourceName != null){
+                        mef.register(sourceName, file);
+                    }
+                    else {
+                        mef.register(file);
+                    }
                 }
             }
-            else {
-                logger.info("***** registering "+argv[i]+" ******");
-                nef.register(argv[i]);
-            }
         }
-        nef.shutdown();
+        finally{
+            mef.shutdown();
+        }
     }
 }

@@ -187,6 +187,25 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
         return ds;
     }
 
+    public DataSource register (String name, File file) throws IOException {
+        DataSource ds = super.register(name, file);
+        Integer instances = (Integer) ds.get(INSTANCES);
+        if (instances != null) {
+            logger.warning("### Data source "+ds.getName()
+                           +" has already been registered with "+instances
+                           +" entities!");
+        }
+        else {
+            instances = register (ds.openStream());
+            if (!props.isEmpty())
+                ds.set(PROPERTIES, props.toArray(new String[0]));
+            ds.set(INSTANCES, instances);
+            updateMeta (ds);
+            logger.info("$$$ "+instances+" entities registered for "+ds);
+        }
+        return ds;
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println
@@ -194,10 +213,38 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
             System.exit(1);
         }
         
-        PharmManuEncyl3rdEntityFactory pharm =
-            new PharmManuEncyl3rdEntityFactory (argv[0]);
-        logger.info("***** registering "+argv[1]+" ******");
-        pharm.register(new File (argv[1]));
-        pharm.shutdown();
+        PharmManuEncyl3rdEntityFactory mef = new PharmManuEncyl3rdEntityFactory (argv[0]);
+         String sourceName = null;
+        try {
+            for (int i = 1; i < argv.length; ++i) {
+                int pos = argv[i].indexOf('=');
+                if (pos > 0) {
+                    String name = argv[i].substring(0, pos);
+                    if (name.equalsIgnoreCase("cache")) {
+                        mef.setCache(argv[i].substring(pos+1));
+                    }
+                    else if (name.equalsIgnoreCase("name")) {
+                        sourceName = argv[i].substring(pos+1);
+                        System.out.println(sourceName);
+                    }
+                    else {
+                        logger.warning("** Unknown parameter \""+name+"\"!");
+                    }
+                }
+                else {
+                    File file = new File(argv[i]);
+
+                    if(sourceName != null){
+                        mef.register(sourceName, file);
+                    }
+                    else {
+                        mef.register(file);
+                    }
+                }
+            }
+        }
+        finally {
+            mef.shutdown();
+        }
     }
 }

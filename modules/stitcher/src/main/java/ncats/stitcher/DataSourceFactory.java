@@ -112,6 +112,17 @@ public class DataSourceFactory implements Props {
         }
     }
 
+    public DataSource register (String name, File file) throws IOException {
+        logger.warning("I'm DataSourceFactory");
+
+        DataSource ds = register (file);
+        ds.setName(name);
+
+        //System.out.println(ds.getName());
+
+        return ds;
+    }
+
     /*
      * register a key and name independent of the file
      */
