@@ -115,7 +115,9 @@ public class EventCalculator implements StitchCalculator {
             if(e.withDrawnYear !=null){
                 data.put("withdrawn_year", e.withDrawnYear);
             }
-
+            if(e.productCategory !=null){
+                data.put("ProductCategory", e.productCategory);
+            }
             labels.add(e.source);
             if (e.date != null && e.kind.isApproved()) {
                 cal.setTime(e.date);
