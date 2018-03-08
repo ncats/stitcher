@@ -17,12 +17,12 @@ public class DailyMedEventParser extends EventParser {
   16 US Approved Rx
   38 US Unapproved, Marketed
  */
-
         Other("Other", Event.EventKind.Other),
         US_Approved_OTC("US Approved OTC", Event.EventKind.ApprovalOTC),
         US_Approved_Rx("US Approved Rx", Event.EventKind.ApprovalRx),
         US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.Marketed)
         ;
+
         private static Map<String, DevelopmentStatus> map = new HashMap<>();
 
         private String displayName;
@@ -58,38 +58,42 @@ public class DailyMedEventParser extends EventParser {
 
 
 
-        private final Map<String, Map<String, DevelopmentStatus>> map;
+        private final Map<String, Map<String, Map<String, DevelopmentStatus>>> map;
 
-        private DevelopmentStatusLookup(Map<String, Map<String, DevelopmentStatus>> map) {
-            this.map = map;;
+        private DevelopmentStatusLookup(Map<String, Map<String, Map<String, DevelopmentStatus>>> map) {
+            this.map = map;
         }
         private static Pattern DELIM = Pattern.compile("\t");
         public static DevelopmentStatusLookup parse(InputStream in) throws IOException{
             Objects.requireNonNull( in, "inputstream not found!");
-            Map<String, Map<String, DevelopmentStatus>> map = new HashMap<>();
+            Map<String, Map<String, Map<String, DevelopmentStatus>>> map = new HashMap<>();
+
             try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
 
                 String line;
                 while ((line = reader.readLine()) !=null){
                     String[] cols = DELIM.split(line);
-
+                    
                     map.computeIfAbsent(cols[0], k-> new HashMap<>())
-                            .put(cols[1], DevelopmentStatus.parse(cols[2]));
+                            .computeIfAbsent(cols[1], l-> new HashMap<>())
+                            .put(cols[2], DevelopmentStatus.parse(cols[3]));
                 }
             }
 
             return new DevelopmentStatusLookup(map);
         }
 
-        public Event.EventKind lookup(String marketingStatus, String productType){
-            Map<String, DevelopmentStatus> subMap = map.get(marketingStatus);
+        public Event.EventKind lookup(String marketingStatus, String productType, String splComment){
+            Map<String, Map<String, DevelopmentStatus>> subMap = map.get(marketingStatus);
             if(subMap !=null){
-                DevelopmentStatus status = subMap.get(productType);
-                if(status !=null){
-                    return status.getKind();
+                Map<String, DevelopmentStatus> subMap2 = subMap.get(productType);
+                if(subMap2 !=null){
+                    DevelopmentStatus status = subMap2.get(splComment);
+                    if(status !=null){
+                        return status.getKind();
+                    }
                 }
             }
-
             return null;
         }
     }
@@ -153,9 +157,10 @@ public class DailyMedEventParser extends EventParser {
             if (!isVeterinaryProduct && date != null) {
 
                 String productType = (String) payload.get("ProductCategory");
+                String splComment = (String) payload.get("Comment");
                 Event.EventKind et=null;
-                if(marketStatus !=null && productType !=null ){
-                    et = developmentStatusLookup.lookup((String) marketStatus, productType);
+                if(marketStatus !=null && productType !=null && splComment !=null){
+                    et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
                 }
                 if(et ==null) {
                     //use old logic
