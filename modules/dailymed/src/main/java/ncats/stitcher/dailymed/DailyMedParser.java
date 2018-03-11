@@ -97,6 +97,7 @@ public class DailyMedParser {
     static public class Section {
         public String id;
         public String name;
+        public String title;
         public String text;
     }
 
@@ -104,7 +105,9 @@ public class DailyMedParser {
         public String id;      
         public Integer initialApprovalYear;
 		public String productCategory;
-		public String url;
+        public String url;
+        public String indications;
+		public String comment;
         public List<Product> products = new ArrayList<>();
         public List<Section> sections = new ArrayList<>();
     }
@@ -430,7 +433,7 @@ public class DailyMedParser {
             NodeList nodes = prod.getElementsByTagName("manufacturedProduct");
             if (nodes.getLength() == 0) {
                 Product product = parseProduct (prod);
-                if (product.name != null) {
+                if (product.name != null && approval != null) {
                     NodeList nl = approval.getElementsByTagName("id");
                     if (nl.getLength() > 0) {
                         Node n = nl.item(0).getAttributes()
@@ -541,11 +544,15 @@ public class DailyMedParser {
                     case "id":
                         sec.id = child.getAttributes()
                             .getNamedItem("root").getTextContent();
-                        break;
+                        break; 
                         
                     case "code":
                         sec.name = child.getAttributes()
                             .getNamedItem("displayName").getTextContent();
+                        break;
+
+                    case "title":
+                        sec.title = getText (child);
                         break;
                         
                     case "text":
@@ -565,8 +572,17 @@ public class DailyMedParser {
                 }
             }
             
-            if (sec.id != null)
+            if (sec.id != null) {
+                if (sec.title != null && sec.text != null && sec.title.toUpperCase().startsWith("INDICATIONS")) {
+                    label.indications = sec.text.replaceAll("\n","").replaceAll("\t"," ").trim();
+
+                    if (label.indications != null && label.indications.toUpperCase().contains("ALLERGENIC EXTRACT")) {
+                        label.comment = "ALLERGENIC";
+                    }
+                }
+
                 label.sections.add(sec);
+            }
         }
     }
 
@@ -667,7 +683,9 @@ public class DailyMedParser {
 												   ("\""
 												   + p.genericName.replaceAll("\n","").toUpperCase().trim()
 												   + "\""):"")+"\t"
-						 + (label.url != null ? label.url:""));
+						 + (label.url != null ? label.url:"")+"\t"
+                         + (label.indications != null ? label.indications:"")+"\t"
+                         + (label.comment != null ? label.comment:""));
                     //seen.add(i.substance.unii);
                 }
             }
@@ -791,7 +809,9 @@ public class DailyMedParser {
                            "Route\t"+
                            "ActiveMoietyName\t"+
                            "GenericProductName\t"+
-						   "URL");
+						   "URL\t"+
+                           "Indications\t"+
+                           "Comment");
         
         DailyMedParser daily = new DailyMedParser ();
         for (int i = 0; i < argv.length; ++i) {

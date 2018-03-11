@@ -36,9 +36,13 @@ echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
 echo 'CT:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-# now the stitching..
+# now the stitching...
 sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
+# make db copy before preparing events...
+cp -r $db NOEVENTS$db
+
 # calculate events
 sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
 echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
