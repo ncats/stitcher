@@ -17,13 +17,12 @@ public class DailyMedEventParser extends EventParser {
   16 US Approved Rx
   38 US Unapproved, Marketed
  */
-  /*
         Other("Other", Event.EventKind.Other),
         US_Approved_OTC("US Approved OTC", Event.EventKind.ApprovalOTC),
         US_Approved_Rx("US Approved Rx", Event.EventKind.ApprovalRx),
         US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.Marketed)
         ;
-*/
+
         private static Map<String, DevelopmentStatus> map = new HashMap<>();
 
         private String displayName;
