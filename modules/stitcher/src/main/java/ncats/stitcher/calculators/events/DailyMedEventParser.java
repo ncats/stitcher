@@ -17,12 +17,13 @@ public class DailyMedEventParser extends EventParser {
   16 US Approved Rx
   38 US Unapproved, Marketed
  */
+  /*
         Other("Other", Event.EventKind.Other),
         US_Approved_OTC("US Approved OTC", Event.EventKind.ApprovalOTC),
         US_Approved_Rx("US Approved Rx", Event.EventKind.ApprovalRx),
         US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.Marketed)
         ;
-
+*/
         private static Map<String, DevelopmentStatus> map = new HashMap<>();
 
         private String displayName;
@@ -132,8 +133,6 @@ public class DailyMedEventParser extends EventParser {
 
 
         try {
-
-
             //Jan 2018 new columns for Route and MarketStatus
             Object marketStatus = payload.get("MarketingStatus");
 
@@ -159,11 +158,25 @@ public class DailyMedEventParser extends EventParser {
                 String productType = (String) payload.get("ProductCategory");
                 String splComment = (String) payload.get("Comment");
                 Event.EventKind et=null;
-                if(marketStatus !=null && productType !=null && splComment !=null){
+                
+                //ProductType shouldn't ever be null
+                if(productType != null){
+                    //some fields may be null, so set the corresponding vars to empty strings for correct lookup 
+                    if(marketStatus == null){
+                        marketStatus = "";
+                    }
+                    if(splComment == null){
+                        splComment = "";
+                    }                    
                     et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
                 }
+
                 if(et ==null) {
                     //use old logic
+                    String UNII = (String) payload.get("UNII");
+                    System.out.println(UNII);
+                    System.out.println("FALLING BACK TO OLD LOGIC!!!");
+
                     et = Event.EventKind.Marketed;
                     content = payload.get("ApprovalAppId");
                     if (content != null) {
