@@ -1,6 +1,7 @@
 #!/bin/bash
 timestamp="$(date +'%Y%m%d-%H%M%S')"
 db="stitchv$timestamp.db"
+dbzip="stitchv$timestampdb.zip"
 log="log$timestamp.txt"
 
 #keep track of current time
@@ -47,3 +48,9 @@ cp -r $db NOEVENTS$db
 sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
 echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 echo $(date) >> $log
+
+#zip up the directory and copy over to centos
+zip -r $dbzip $db
+
+scp $dbzip centos@dev.ncats.io:/tmp
+
