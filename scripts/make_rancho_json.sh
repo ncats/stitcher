@@ -9,4 +9,4 @@ fi
 
  
 #run the script 
-python `dirname ${BASH_SOURCE[0]}`/rancho.py $1 > "rancho-`basename ${1/%tsv/json}`"
+python `dirname ${BASH_SOURCE[0]}`/rancho_tsv2json.py $1 > "rancho-`basename ${1/%tsv/json}`"

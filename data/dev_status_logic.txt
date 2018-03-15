@@ -2,8 +2,11 @@ MarketingStatus	ProductType	Comment	DevelopmentStatus
 BLA	VACCINE LABEL		US Approved Rx
 BLA	NON-STANDARDIZED ALLERGENIC LABEL	ALLERGENIC	US Unapproved, Marketed
 UNAPPROVED DRUG OTHER	NON-STANDARDIZED ALLERGENIC LABEL		US Unapproved, Marketed
-	MEDICAL DEVICE		Other
-	PLASMA DERIVATIVE		Other
+OTC monograph final	MEDICAL DEVICE		US Approved OTC
+OTC monograph not final	MEDICAL DEVICE		US Unapproved, Marketed
+NDA	MEDICAL DEVICE		US Unapproved, Marketed
+ANDA	MEDICAL DEVICE		US Unapproved, Marketed
+unapproved drug other	MEDICAL DEVICE		US Unapproved, Marketed
 BLA	PLASMA DERIVATIVE		US Approved Rx
 ANDA	VACCINE LABEL		US Approved Rx
 Exempt device	MEDICAL DEVICE		Other
@@ -13,44 +16,41 @@ BULK INGREDIENT FOR ANIMAL DRUG COMPOUNDING	BULK INGREDIENT		Other
 Dietary Supplement	DIETARY SUPPLEMENT		US Unapproved, Marketed
 BLA	LICENSED MINIMALLY MANIPULATED CELLS LABEL		Other
 DIETARY SUPPLEMENT	DIETARY SUPPLEMENT		US Unapproved, Marketed
-	DIETARY SUPPLEMENT		Other
-	COSMETIC		Other
+OTC monograph final	COSMETIC		US Approved OTC
 bulk ingredient for animal drug compounding	BULK INGREDIENT		Other
 cosmetic	COSMETIC		Other
 Medical Food	MEDICAL FOOD		US Unapproved, Marketed
-OTC monograph final	COSMETIC		US Approved OTC
 premarket notification	OTC MEDICAL DEVICE LABEL		Other
 premarket notification	PRESCRIPTION MEDICAL DEVICE LABEL		Other
 OTC monograph not final	COSMETIC		US Unapproved, Marketed
 exempt device	MEDICAL DEVICE		Other
-	VACCINE LABEL		Other
 dietary supplement	DIETARY SUPPLEMENT		US Unapproved, Marketed
 Bulk Ingredient For Animal Drug Compounding	BULK INGREDIENT		Other
 EXEMPT DEVICE	MEDICAL DEVICE		Other
-unapproved drug other	HUMAN COMPOUNDED DRUG LABEL		Other
+unapproved drug other	HUMAN COMPOUNDED DRUG LABEL		US Unapproved, Marketed
 premarket notification	MEDICAL DEVICE		Other
 MEDICAL FOOD	MEDICAL FOOD		US Unapproved, Marketed
-	PRESCRIPTION MEDICAL DEVICE LABEL		Other
+PREMARKET NOTIFICATION	PRESCRIPTION MEDICAL DEVICE LABEL		Other
 EXPORT ONLY	BULK INGREDIENT		Other
 Export only	BULK INGREDIENT		Other
 BLA	STANDARDIZED ALLERGENIC	ALLERGENIC	US Unapproved, Marketed
 unapproved drug other	STANDARDIZED ALLERGENIC		US Unapproved, Marketed
-	STANDARDIZED ALLERGENIC		Other
-	STANDARDIZED ALLERGENIC	ALLERGENIC	Other
-	NON-STANDARDIZED ALLERGENIC LABEL	ALLERGENIC	Other
+unapproved drug other	STANDARDIZED ALLERGENIC	ALLERGENIC	US Unapproved, Marketed
+unapproved drug other	NON-STANDARDIZED ALLERGENIC LABEL	ALLERGENIC	US Unapproved, Marketed
 Export only	LICENSED VACCINE BULK INTERMEDIATE LABEL		Other
 unapproved drug other	ANIMAL COMPOUNDED DRUG LABEL		US Unapproved, Marketed
 BLA	STANDARDIZED ALLERGENIC		US Unapproved, Marketed
 NADA	RECOMBINANT DEOXYRIBONUCLEIC ACID CONSTRUCT LABEL		US Unapproved, Marketed
-PREMARKET NOTIFICATION	PRESCRIPTION MEDICAL DEVICE LABEL		Other
 BLA	NON-STANDARDIZED ALLERGENIC LABEL		US Unapproved, Marketed
 export only	BULK INGREDIENT		Other
 Cosmetic	BULK INGREDIENT		Other
 EXEMPT DEVICE	PRESCRIPTION MEDICAL DEVICE LABEL		Other
 Export only	PLASMA DERIVATIVE		Other
+Unapproved drug for use in drug shortage	VACCINE LABEL		US Unapproved, Marketed
 Manufactures Non-Generics	BULK INGREDIENT		Other
 Premarket Notification	MEDICAL DEVICE		Other
 bulk ingredient for animal drug compounding	BULK INGREDIENT - ANIMAL DRUG		US Unapproved, Marketed
+Premarket Application	MEDICAL DEVICE		Other
 BLA	LICENSED VACCINE BULK INTERMEDIATE LABEL		US Approved Rx
 unapproved drug other	RECOMBINANT DEOXYRIBONUCLEIC ACID CONSTRUCT LABEL		US Unapproved, Marketed
 BLA	HUMAN PRESCRIPTION DRUG LABEL		US Approved Rx
@@ -60,8 +60,7 @@ ANDA	HUMAN PRESCRIPTION DRUG LABEL WITH HIGHLIGHTS		US Approved Rx
 NDA	HUMAN PRESCRIPTION DRUG LABEL		US Approved Rx
 NDA authorized generic	HUMAN PRESCRIPTION DRUG LABEL		US Approved Rx
 unapproved medical gas	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
-	HUMAN PRESCRIPTION DRUG LABEL		Other
-bulk ingredient	HUMAN PRESCRIPTION DRUG LABEL	ALLERGENIC	Other
+bulk ingredient	HUMAN PRESCRIPTION DRUG LABEL	ALLERGENIC	US Unapproved, Marketed
 OTC monograph not final	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 OTC monograph final	HUMAN PRESCRIPTION DRUG LABEL		US Approved OTC
 BLA	HUMAN PRESCRIPTION DRUG LABEL WITH HIGHLIGHTS		US Approved Rx
@@ -69,9 +68,9 @@ OTC MONOGRAPH NOT FINAL	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 unapproved drug other	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 UNAPPROVED DRUG OTHER	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 Unapproved drug other	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
-Unapproved other	HUMAN PRESCRIPTION DRUG LABEL		Other
-unapproved other	HUMAN PRESCRIPTION DRUG LABEL		Other
-UNAPPROVED OTHER	HUMAN PRESCRIPTION DRUG LABEL		Other
+Unapproved other	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
+unapproved other	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
+UNAPPROVED OTHER	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 UNAPPROVED MEDICAL GAS	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 Unapproved medical gas	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 Export only	HUMAN PRESCRIPTION DRUG LABEL		Other
@@ -79,10 +78,14 @@ Premarket Notification	HUMAN PRESCRIPTION DRUG LABEL		Other
 NDA AUTHORIZED GENERIC	HUMAN PRESCRIPTION DRUG LABEL		US Approved Rx
 Unapproved drug for use in drug shortage	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 OTC MONOGRAPH FINAL	HUMAN PRESCRIPTION DRUG LABEL		US Approved OTC
+Cosmetic	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 export only	HUMAN PRESCRIPTION DRUG LABEL		Other
+exempt device	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 UNAPPROVED DRUG FOR USE IN DRUG SHORTAGE	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 unapproved homeopathic	HUMAN PRESCRIPTION DRUG LABEL		Other
+DIETARY SUPPLEMENT	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 EXPORT ONLY	HUMAN PRESCRIPTION DRUG LABEL		Other
+dietary supplement	HUMAN PRESCRIPTION DRUG LABEL		US Unapproved, Marketed
 IND	HUMAN PRESCRIPTION DRUG LABEL		Other
 Approved Drug Product Manufactured Under Contract	HUMAN PRESCRIPTION DRUG LABEL		US Approved Rx
 APPROVED DRUG PRODUCT MANUFACTURED UNDER CONTRACT	HUMAN PRESCRIPTION DRUG LABEL		US Approved Rx
@@ -92,10 +95,9 @@ NDA	HUMAN OTC DRUG LABEL		US Approved OTC
 ANDA	HUMAN OTC DRUG LABEL		US Approved OTC
 OTC MONOGRAPH FINAL	HUMAN OTC DRUG LABEL		US Approved OTC
 Unapproved drug other	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
-Unapproved other	HUMAN OTC DRUG LABEL		Other
-	HUMAN OTC DRUG LABEL		Other
+Unapproved other	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
 OTC MONOGRAPH NOT FINAL	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
-unapproved other	HUMAN OTC DRUG LABEL		Other
+unapproved other	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
 unapproved drug other	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
 Export only	HUMAN OTC DRUG LABEL		Other
 unapproved medical gas	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
@@ -108,11 +110,14 @@ Unapproved medical gas	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
 export only	HUMAN OTC DRUG LABEL		Other
 OTC Monograph Drug Product Manufactured Exclusively for Private Label Distributor	HUMAN OTC DRUG LABEL		US Approved OTC
 EXPORT ONLY	HUMAN OTC DRUG LABEL		Other
+COSMETIC	HUMAN OTC DRUG LABEL		Other
+Cosmetic	HUMAN OTC DRUG LABEL		Other
+premarket notification	HUMAN OTC DRUG LABEL		US Unapproved, Marketed
 OTC Monograph Final	HUMAN OTC DRUG LABEL		US Approved OTC
 unapproved homeopathic	HUMAN OTC DRUG LABEL		Other
 UNAPPROVED HOMEOPATHIC	HUMAN OTC DRUG LABEL		Other
 Unapproved homeopathic	HUMAN OTC DRUG LABEL		Other
-Cosmetic	HUMAN OTC DRUG LABEL		Other
+exempt device	HUMAN OTC DRUG LABEL		Other
 NDA authorized generic	HUMAN OTC DRUG LABEL		US Approved OTC
 NDA AUTHORIZED GENERIC	HUMAN OTC DRUG LABEL		US Approved OTC
 APPROVED DRUG PRODUCT MANUFACTURED UNDER CONTRACT	HUMAN OTC DRUG LABEL		US Approved Rx

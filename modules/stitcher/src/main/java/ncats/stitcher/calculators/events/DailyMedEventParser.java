@@ -172,9 +172,9 @@ public class DailyMedEventParser extends EventParser {
 
                 if(et ==null) {
                     //use old logic
-                    String UNII = (String) payload.get("UNII");
-                    System.out.println(UNII);
-                    System.out.println("FALLING BACK TO OLD LOGIC!!!");
+                    //String UNII = (String) payload.get("UNII");
+                    //System.out.println(UNII);
+                    //System.out.println("FALLING BACK TO OLD LOGIC!!!");
 
                     et = Event.EventKind.Marketed;
                     content = payload.get("ApprovalAppId");
