@@ -13,9 +13,9 @@ sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/bro
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
 echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, February 2018\" cache=data/hash.db data/dump-public-2018-02-06.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, March 2018\" cache=data/hash.db data/dump-public-2018-03-05.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, February 2018\" cache=data/hash.db data/rancho-export_2018-02-20_22-20.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, March 2018\" cache=data/hash.db data/rancho-export_2018-03-15_05-16.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
 echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
