@@ -115,7 +115,6 @@ def rancho (file):
                                         hc.update(v)
                                     elif name in targets:
                                         ht.update(v)
-
                             #add value to corresponding variable in temp row object
                             x[name] = vals
                         elif name == 'Unii':
@@ -126,6 +125,9 @@ def rancho (file):
                                 x[name] = unii
                             else:
                                 x[name] = r
+                        #replace 'curative' treatment modality with 'primary'
+                        elif (name == 'TreatmentModality' and r.lower() == 'curative'):
+                            x[name] = 'Primary'
                         else:
                             if r.lower() == 'false':
                                 x[name] = False
