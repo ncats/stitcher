@@ -8,7 +8,7 @@ log="log$timestamp.txt"
 curr_time=$(date +%s)
 
 echo $(date) > $log
-sbt stitcher/'runMain ncats.stitcher.impl.NCGCEntityFactory stitchvNCGC.db data/ncgc.conf registry Scant20!7'
+sbt stitcher/'runMain ncats.stitcher.impl.NCGCEntityFactory $db data/ncgc.conf registry Scant20!7'
 echo 'ncgc:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/withdrawn.conf"
 echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
@@ -53,6 +53,6 @@ echo $(date) >> $log
 
 #zip up the directory and copy over to centos
 zip -r $dbzip $db
-
+wait
 scp $dbzip centos@dev.ncats.io:/tmp
 

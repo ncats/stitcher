@@ -51,6 +51,6 @@ echo $(date) >> $log
 
 #zip up the directory and copy over to centos
 zip -r $dbzip $db
-
+wait
 scp $dbzip centos@dev.ncats.io:/tmp
 
