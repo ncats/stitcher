@@ -431,8 +431,10 @@ public class EntityRegistry extends EntityFactory {
         return ds;
     }
 
-    /*
+    /**
      * attach payload to an existing entity
+     * @param map a map to attach to entity.
+     * @return returns an entity with an attached map.
      */
     public Entity attach (final Map<String, Object> map) {
         try (Transaction tx = gdb.beginTx()) {
