@@ -26,8 +26,8 @@ public class Event implements Cloneable{
 
     /**
      * Create a deep clone.
-     * @return
-     * @throws CloneNotSupportedException
+     * @return returns an event.
+     * @throws CloneNotSupportedException throw an exception if clone fails (shouldn't happen).
      */
     @Override
     public Event clone()  {
