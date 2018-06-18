@@ -1584,8 +1584,8 @@ public class EntityFactory implements Props {
      * the stitch as well.
      * 
      * 
-     * @param untangler
-     * @param consumer
+     * @param untangler UntangleAbstract object.
+     * @param consumer Consumer object of the Stitch type.
      */
     public void untangle (UntangleAbstract untangler,
                           Consumer<Stitch> consumer) {
@@ -1820,7 +1820,7 @@ public class EntityFactory implements Props {
      * the given labels and for each one, call the given consumer.
      * @param func the consumer function to call on each entity.
      * @param labels the node labels to search for.
-     * @return
+     * @return returns the value of the query result counter.
      */
     public int maps (Consumer<Entity> func, String... labels) {
         StringBuilder query = new StringBuilder ("match(n");
