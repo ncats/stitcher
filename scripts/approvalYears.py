@@ -249,15 +249,15 @@ if __name__=="__main__":
     drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
     print syscall
-    #os.system(syscall)
+    os.system(syscall)
     uniifile = maindir+"/temp/UNIIs-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+uniifile + " " + getUNIIZipURL()
     print syscall
-    #os.system(syscall)
+    os.system(syscall)
     obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+obfile + " " + getOBZipURL()
     print syscall
-    #os.system(syscall)
+    os.system(syscall)
     
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
@@ -572,3 +572,40 @@ if __name__=="__main__":
             comment = "Application:"+apptype+appno+" "+appsponsor+" "+appurl
             outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
             fp.write(outline)
+
+    # write out all products data
+    prod2UNIIs = dict()
+    for unii in UNII2prods.keys():
+        for prod in UNII2prods[unii]:
+            if not prod2UNIIs.has_key(prod):
+                prod2UNIIs[prod] = []
+            prod2UNIIs[prod].append(unii)
+    UNII2pt = dict()
+    for key in resolverCache.keys():
+        UNII2pt[resolverCache[key]] = key
+    for key in uniiPT.keys():
+        UNII2pt[uniiPT[key]] = key
+    productsfile = maindir+"/temp/products-"+getTimeStamp()+".txt"
+    fp = open(productsfile, 'w')
+    header = 'NDA\tProduct\tForm;Route\tStrength\tStatus\tAppl Type\tSponsor\tDate\tDate Ref\tUNIIs\tIngredients\n'
+    fp.write(header)
+    for prod in prods.keys():
+        uniis = []
+        if prod2UNIIs.has_key(prod): # ingreds that don't have uniis
+            uniis = prod2UNIIs[prod]
+        uniilist = '; '.join(uniis)
+        ingreds = []
+        for unii in uniis:
+            if not UNII2pt.has_key(unii):
+                print unii, uniilist, prod
+                sys.exit()
+            ingreds.append(UNII2pt[unii])
+        ingredlist = '; '.join(ingreds)
+        entry = prods[prod]
+        entry.append(uniilist)
+        entry.append(ingredlist)
+        outline = ""
+        for item in entry:
+            outline = outline + item + '\t'
+        fp.write(outline+'\n')
+    fp.close()
