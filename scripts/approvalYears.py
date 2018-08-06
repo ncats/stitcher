@@ -249,16 +249,28 @@ if __name__=="__main__":
     drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
     print syscall
-    os.system(syscall)
+    if not os.path.exists(drugsAtfdafile):
+        os.system(syscall)
     uniifile = maindir+"/temp/UNIIs-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+uniifile + " " + getUNIIZipURL()
     print syscall
-    os.system(syscall)
+    if not os.path.exists(uniifile):
+        os.system(syscall)
     obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+obfile + " " + getOBZipURL()
     print syscall
-    os.system(syscall)
-    
+    if not os.path.exists(obfile):
+        os.system(syscall)
+    appYrsfile = maindir+"/temp/approvalYears.txt"
+    if not os.path.exists(appYrsfile):
+        raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
+    gsrsDumpfile = maindir+'/temp/dump-public-2018-07-19.gsrs'
+    if not os.path.exists(gsrsDumpfile):
+        raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
+    fdaNMEfile = maindir+'/temp/FDA-NMEs-2018-08-05.txt'
+    if not os.path.exists(gsrsDumpfile):
+        raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
+        
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
     fp = zfp.open(names[-1], 'r')
@@ -447,12 +459,58 @@ if __name__=="__main__":
             print entry
             raise ValueError('Product in Orange Book not found in products:'+appl)        
 
+    #prods has format: key="NDA/prodno" : [0:NDA/prodno, 1:Prod name, 2:Form;Doseage, 3:Strength, 4:Availability (Prescription; Over-the-counter; Discontinued), 5:Appl type (NDA), 6:Sponsor, 7:Marketing date, 8: Marketing date ref]
+
+    # read in NME prod dates file
+    #Year	Trademark	Generic Name	UNII	Date [mm-dd-yy]	App Type	NDA/BLA No.	Sponsor	Date Ref
+    #0          1               2               3       4               5               6               7       8
+    fdaNMEs = readTabFile(fdaNMEfile)
+    fdaNMEdates = dict()
+    for entry in fdaNMEs['table']:
+        unii = entry[3]
+        year = entry[0]
+        date = year+"-12-31"
+        if entry[4] != '':
+            ts = time.strptime(entry[4], "%m-%d-%y")
+            date = time.strftime("%Y-%m-%d", ts)
+            if date[0:4] != year:
+                date = year + date[4:]
+        dateRef = entry[8].decode('latin-1').encode('ascii', 'replace')
+        product = entry[1]
+        sponsor = entry[7]
+        appNo = entry[6]
+        if appNo == '':
+            appNo = product+" ("+year+") " + sponsor
+        else:
+            appNo = appNo[:len(appNo)-4]+appNo[-3:]
+            while len(appNo) < 6:
+                appNo = "0" + appNo
+            fdaNMEdates[appNo] = [date, dateRef]
+            appNo =  appNo + " " + product+" ("+year+") " + sponsor
+        appType = entry[5]
+        prod = [appNo, product, '', '', '', appType, sponsor, date, dateRef]
+        prods[appNo] = prod
+        if not UNII2prods.has_key(unii):
+            UNII2prods[unii] = []
+        UNII2prods[unii].append(appNo)
+    for prod in prods.keys():
+        if prod[0:6] in fdaNMEdates:
+            nmeDate = fdaNMEdates[prod[0:6]]
+            date = prods[prod][-2]
+            method = prods[prod][-1]
+            if date == '' or (date == '1982-01-01' and method == 'OrangeBook'):
+                prods[prod][-2] = nmeDate[0]
+                prods[prod][-1] = nmeDate[1]
+            elif nmeDate[0] < date: # we should go back and curate these!
+                #print "different dates:",date, nmeDate, prods[prod]
+                prods[prod][-2] = nmeDate[0]
+                prods[prod][-1] = nmeDate[1]                
+    
     # TOO MUCH TROUBLE
     # fix 1982-01-01 OrangeBook dates with regression
     #prods = apprDateRegression(prods)
 
     # use predicted apprv date from previous approvalYears file
-    appYrsfile = maindir+"/temp/approvalYears.txt"
     appYrs = readTabFile(appYrsfile)
     appPredDate = dict()
     for entry in appYrs['table']:
@@ -468,13 +526,14 @@ if __name__=="__main__":
             pred = appPredDate[prod[0:6]]
             date = prods[prod][-2]
             method = prods[prod][-1]
-            if date == '' or (date == '1982-01-01' and method == 'OrangeBook') or pred < date:
+            if date == '' or (date == '1982-01-01' and method == 'OrangeBook') or pred < date: # these should be further curated!
                 prods[prod][-2] = pred
                 prods[prod][-1] = 'PREDICTED'
+                #print prods[prod]
     
     # get active moieties from tyler's dump file
     activeMoiety = dict()
-    with gzip.open( maindir+'/temp/dump-public-2018-07-19.gsrs', 'rb') as fp:
+    with gzip.open( gsrsDumpfile, 'rb') as fp:
         line = fp.readline()
         while line != "":
             r = json.loads(unicode(line, errors='ignore'))
@@ -493,7 +552,6 @@ if __name__=="__main__":
     print "read unii dump file"
 
     # validate against previous approvalYears file
-    appYrsfile = maindir+"/temp/approvalYears.txt"
     appYrs = readTabFile(appYrsfile)
     for entry in appYrs['table']:
         unii = entry[0]
@@ -515,7 +573,6 @@ if __name__=="__main__":
                         entry2 = prods[prod]
                         if entry2[-2] != '' and entry2[-2] < early[-2]:
                             early = entry2
-                            early.insert(0, prod)
             if date == early[-2] or date > early[-2]:
                 match = 0 # date is the same or earlier
             if date < early[-2]:
@@ -558,18 +615,24 @@ if __name__=="__main__":
                     entry = prods[prod]
                     if entry[-2] != '' and entry[-2] < early[-2]:
                         early = entry
+                    elif (entry[-2] == 'Drugs@FDA' or entry[-2] == 'OrangeBook') and entry[-2] == early[-2]:
+                        early = entry
         if early[-2] != getTimeStamp():
-            ts = time.strptime(early[-2], "%Y-%m-%d")
-            date = time.strftime("%m/%d/%Y", ts)
+            date = early[-2][5:7]+"/"+early[-2][8:]+"/"+early[-2][0:4]
             year = date[-4:]
             method = early[-1]
-            appno = early[0][0:6]
             apptype = early[-4]
             appsponsor = early[-3]
-            if method == "PREDICTED":
-                appsponsor = "[Approval Date Uncertain] "+appsponsor
-            appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
-            comment = "Application:"+apptype+appno+" "+appsponsor+" "+appurl
+            comment = ''
+            if apptype != '':
+                comment = apptype + ' '
+            comment = comment+early[0].decode('latin-1').encode('ascii', 'replace')+" "+method
+            if len(early[0]) > 6 and early[0][6] == '/':
+                appno = early[0][0:6]
+                if method == "PREDICTED":
+                    appsponsor = "[Approval Date Uncertain] "+appsponsor
+                appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
+                comment = "Application:"+apptype+appno+" "+appsponsor+" "+appurl
             outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
             fp.write(outline)
 
