@@ -62,7 +62,7 @@ for type in ${types[@]}; do
 	
 	#leave only active compounds (otherwise stitching later will take too long)
 	#by removing the ones with inactive (IACT) and NOT/MAY contain (CNTM) codes
-	cat spl$type.txt | sed '/\tIACT\t/d' | sed '/\tCNTM\t/d' > spl_acti$type.txt
+	cat spl$type.txt | sed '/\tIACT\t/d' | sed '/\tCNTM\t/d' | sed '/\tINGR\t/d' > spl_acti$type.txt
 	
 	#remove all lines starting with control elements (they are auxiliary)
 	sed -ie '/^[[:cntrl:]]/ d' spl_acti$type.txt 
