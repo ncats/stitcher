@@ -264,10 +264,10 @@ if __name__=="__main__":
     appYrsfile = maindir+"/temp/approvalYears.txt"
     if not os.path.exists(appYrsfile):
         raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
-    gsrsDumpfile = maindir+'/temp/dump-public-2018-07-19.gsrs'
+    gsrsDumpfile = maindir+'/data/dump-public-2018-07-19.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
-    fdaNMEfile = maindir+'/temp/FDA-NMEs-2018-08-07.txt'
+    fdaNMEfile = maindir+'/data/FDA-NMEs-2018-08-07.txt'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
         
