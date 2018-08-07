@@ -267,7 +267,7 @@ if __name__=="__main__":
     gsrsDumpfile = maindir+'/temp/dump-public-2018-07-19.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
-    fdaNMEfile = maindir+'/temp/FDA-NMEs-2018-08-05.txt'
+    fdaNMEfile = maindir+'/temp/FDA-NMEs-2018-08-07.txt'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
         
@@ -607,18 +607,27 @@ if __name__=="__main__":
     fp = open(outfile, 'w')
     header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
     fp.write(header)
+    outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
+    fperr = open(outfile2, 'w')
+    header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
+    fperr.write(header)
     for unii in activeMoiety.keys():
-        early = [getTimeStamp(), 'Not available']
+        early = [getTimeStamp(), '']
+        earlyDate = getTimeStamp()
         for otherunii in activeMoiety[unii]:
             if UNII2prods.has_key(otherunii):
                 for prod in UNII2prods[otherunii]:
                     entry = prods[prod]
-                    if entry[-2] != '' and entry[-2] < early[-2]:
+                    if entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
+                        if early[-1] == '' or (entry[-2] != '' and not entry[-2] > early[-2]):
+                            early = entry
+                    elif early[-1] == '':
                         early = entry
-                    elif (entry[-2] == 'Drugs@FDA' or entry[-2] == 'OrangeBook') and entry[-2] == early[-2]:
-                        early = entry
+                    if entry[-2] != '' and entry[-2] < earlyDate:
+                        earlyDate = entry[-2]
+                            
         if early[-2] != getTimeStamp():
-            date = early[-2][5:7]+"/"+early[-2][8:]+"/"+early[-2][0:4]
+            date = earlyDate[5:7]+"/"+earlyDate[8:]+"/"+earlyDate[0:4]
             year = date[-4:]
             method = early[-1]
             apptype = early[-4]
@@ -627,14 +636,17 @@ if __name__=="__main__":
             if apptype != '':
                 comment = apptype + ' '
             comment = comment+early[0].decode('latin-1').encode('ascii', 'replace')+" "+method
-            if len(early[0]) > 6 and early[0][6] == '/':
+            if len(early[0]) > 6 and early[0][6] == '/' or early[-1].find('https://www.accessdata.fda.gov/') > -1:
                 appno = early[0][0:6]
                 if method == "PREDICTED":
                     appsponsor = "[Approval Date Uncertain] "+appsponsor
                 appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
                 comment = "Application:"+apptype+appno+" "+appsponsor+" "+appurl
-            outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
-            fp.write(outline)
+                outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
+                fp.write(outline)
+            else:
+                outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
+                fperr.write(outline)
 
     # write out all products data
     prod2UNIIs = dict()
