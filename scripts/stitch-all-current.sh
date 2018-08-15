@@ -8,13 +8,15 @@ log="log$timestamp.txt"
 curr_time=$(date +%s)
 
 echo $(date) > $log
+#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/russian_medicines.conf"
+#echo 'Russian medicines:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/withdrawn.conf"
 echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/broad.conf"
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
 echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, March 2018\" cache=data/hash.db data/dump-public-2018-07-19.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db data/dump-public-2018-07-19.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, August 2018\" cache=data/hash.db data/rancho-export_2018-07-13_18-11.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
@@ -22,7 +24,7 @@ sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Phar
 echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" ../inxight-planning/files/PharmManuEncycl3rdEd.json"
 echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, November 2017\" cache=data/hash.db ../inxight-planning/files/drugbank_all_full_database.xml.zip"
+sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, July 2018\" cache=data/hash.db ../inxight-planning/files/drugbank_all_full_database.xml.zip"
 echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 # these add additional data for event calculator
@@ -51,6 +53,5 @@ echo $(date) >> $log
 
 #zip up the directory and copy over to centos
 zip -r $dbzip $db
-wait
 #scp $dbzip centos@dev.ncats.io:/tmp
 

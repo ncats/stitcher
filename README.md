@@ -117,78 +117,57 @@ $ sbt run
 
 3) When prompted in the console, navigate to http://localhost:9000/app/stitches/latest in your browser.
 
-
 ## Deployment  
 
 ### Build the Binary Distribution 
-##### (optional -- only do this if you have changed the stitcher code or starting anew)
+####(optional -- only do this if you have changed the stitcher code or starting anew)
 
-1) Make a distribution.
-```console
-$ sbt dist
+1) Make a distribution. In the `stitcher` directory run:
+```
+sbt dist
 ```
 It will be created in `stitcher/target/universal/` and have a name similar to `ncats-stitcher-master-20171110-400d1f1.zip`.
 
 2) Copy the archive to the deployment server (e.g. `dev.ncats.io`). For example:
-```console
-#navigate to git/stitcher/target/universal/ 
+```
+#navigate to path-to-stitcher-parent-directory/stitcher/target/universal/ 
 #scp to the server
 $ scp ncats-stitcher-master-20171110-400d1f1.zip centos@dev.ncats.io:/tmp
 ```
 
 3) Unzip into the desired folder (on `centos@dev.ncats.io`, it is `~`).
-```console
+```
 #navigate to the desired folder on the deployment server
 $ ssh centos@dev.ncats.io
 #unzip
 $ unzip /tmp/ncats-stitcher-master-20171110-400d1f1.zip
 ```
 
-### Update the Database
+### Deploy
 
-1) In the `stitcher` folder (where you have built the database), archive the database folder and copy it over to the deployment server.
-```console
+1) In the `stitcher` folder (where you have prepared the database), archive the database folder and copy it over to the deployment server.
+```
 $ zip -r stitchv1db.zip stitchv1.db/
 $ scp stitchv1db.zip centos@dev.ncats.io:/tmp
 ```
 
 2) On the deployment server, navigate to a directory containing the stitcher distribution folder and unzip the database.
-```console
+```
 $ ssh centos@dev.ncats.io
 $ unzip /tmp/stitchv1db.zip
 ```
 
-3) Navigate to the stitcher distribution folder.
-```console
-#navigate to the dist folder
-$ cd ncats-stitcher-master-20171110-400d1f1/
-``` 
-
-4) Create a symlink to the database in the parent directory, and start up the app.
-```console
-$ bash restart-stitcher.sh stitchv1.db
+3) Start up the app. The script takes the distribution and db folders as arguments.
 ```
-
-NOTE: Alternatively, you can perform the start-up manually as follows.
-```console
-# remove the old link or a folder with the same name (if present)
-$ rm stitcher.ix/data.db
-# create a new symlink
-$ ln -s ../stitchv1.db ../stitcher.ix/data.db
-# start the app
-$ sh ../stitcher.sh
+$ bash restart-stitcher.sh ncats-stitcher-master-20171110-400d1f1 stitchv1.db
 ```
-
 
 ### Summary 
-##### To run a new stitcher instance you need, at minimum:
-
-1) A distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1`).  
-2) A database (e.g. `~/stitchv1.db`).  
-3) A symlink `~/stitcher.ix/data.db` pointing to the database (e.g. `data.db -> ../stitchv1.db`).   
-   Alternatively, a script in the distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1/restart-stitcher.sh`).  
-4) Main script `~/stitcher.sh`.  
-
+#### To run a new stitcher instance you'll need in the same directory
+1) A distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1`).
+2) A database (e.g. `~/stitchv1.db`).
+3) A `files-for-stitcher.ix` folder with three files.
+4) The script for (re)starting stitcher `restart-stitcher.sh`.
 
 ## Useful links
 
