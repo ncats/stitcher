@@ -439,6 +439,7 @@ public class DailyMedParser {
             NodeList nodes = prod.getElementsByTagName("manufacturedProduct");
 
             if (nodes.getLength() == 0) {
+                /* if there isn't another enclosed manufacturedProduct tag */
                 Product product = parseProduct (prod);
                 if (product.name != null && approval != null) {
                     NodeList nl = approval.getElementsByTagName("id");
@@ -478,14 +479,13 @@ public class DailyMedParser {
 						}
                     }
 					 
-					//get what's called "Marketing Status" on the label on the website
+					//get Marketing Category (called "Marketing Status" on the website)
 					nl = approval.getElementsByTagName("code");
 					if (nl.getLength() > 0) {
 						product.marketingStatus = nl.item(0)
 													.getAttributes()
 													.getNamedItem("displayName")
 													.getTextContent();
-
                     }
 					
                     if (route != null) {
@@ -521,8 +521,13 @@ public class DailyMedParser {
                     }
 
                     if (!product.parts.isEmpty()){
-                        //if there are product parts, for each part add the elements
-                        //that have just been prepared in the parseProducts
+                        // if there are product parts, for each part add the elements
+                        // that have just been prepared in the parseProducts
+
+                        // DEPRECATED: apply some product-level properties to parts
+                        // DEPRECATED as the the product properties are derived from parts, 
+                        // and not the other way around
+                        /* 
                         for (Product ppart : product.parts){
                             ppart.approvalId = product.approvalId;
                             ppart.approvalAuthority = product.approvalAuthority;
@@ -531,8 +536,9 @@ public class DailyMedParser {
                             ppart.marketStatus = product.marketStatus;
                             ppart.marketDate = product.marketDate;
                         }
+                        */
 
-                        //then add each product part to the label as a separate product
+                        // then add each product part to the label as a separate product
                         label.products.addAll(product.parts);
                     }
                     else {
@@ -541,6 +547,11 @@ public class DailyMedParser {
                 }
             }
             else {
+                /* if there is another enclosed manufacturedProduct tag, get the common properties:
+                   approval
+                   marketing status (i.e. if it's marketed)
+                   route of administration
+                */
                 nodes = prod.getElementsByTagName("approval");
                 approval = nodes.getLength() > 0 ? (Element)nodes.item(0)
                     : null;

@@ -1,9 +1,14 @@
 #!/bin/bash
+
+# declare a directory where the original files will be saved 
+if [ $# -lt 1 ]; then
+	echo "Downloading DailyMed files into the current directory..."
+	save_to=.
+else 
+	save_to=$( cd $1 && pwd )
+fi
+
 ######################################## download ########################################
-
-#declare a directory where the original files will be saved 
-save_to=../
-
 #change into that directory for now
 pushd $save_to
 
