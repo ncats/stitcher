@@ -936,7 +936,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1966	Vepcyte	pipobroman	6Q99RDT97R	07-01-66	NDA	16-245	Abbott	OB NME Appendix 1950-1985		
 1966	Sulla	sulfameter	3L179F09D6	07-01-66	NDA	16-000	Robins	OB NME Appendix 1950-1993		
 1966	Tolinase	tolazamide	9LT1BRO48Q	07-18-66	NDA	15-500	Upjohn	OB NME Appendix 1950-1985		
-1961	Zyloprim	allopurinol	63CZ7GJN5I	08-19-61	NDA	16-084	Burroughs Wellcome	OB NME Appendix 1950-1985		
+1966	Zyloprim	allopurinol	63CZ7GJN5I	08-19-66	NDA	16-084	Burroughs Wellcome	OB NME Appendix 1950-1985		
 1966	Miochol	Acetylcholine Chloride	AF73293C2R	10-10-66	NDA	16-211	Smith Miller & Patch	OB NME Appendix 1950-1993		
 1966	Symmetrel 6	amantadine HCl	M6Q1EO9TD0	10-18-66	NDA	16-020	DuPont (Endo)	OB NME Appendix 1950-1985		
 1966	Levoprome	methotrimeprazine	9G0LAW7ATQ	10-18-66	NDA	15-865	Lederle	OB NME Appendix 1950-1985		
