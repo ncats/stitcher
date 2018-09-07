@@ -376,7 +376,6 @@ public class Util {
     
     public static Object merge (Object... values) {
         Class type = null;
-        Set unique = new HashSet ();
         for (Object val : values) {
             if (val == null)
                 ;
@@ -387,20 +386,38 @@ public class Util {
                     if (type == null)
                         type = v.getClass();
                     else if (!v.getClass().isAssignableFrom(type))
-                        throw new IllegalArgumentException
-                            ("Incompatible class; "+v.getClass().getName()
-                             +" is not assignable from "+type.getName());
-                    unique.add(v);
+		        type = String.class; // Use String class as a common demoninator here as we are mostly using this for combining primitive types
+		    // Problem was coming 2 PubChem CIDs, one provided as a long from Rancho (ALAFOSFALIN; 71957) and the other as a string from GSRS (XMK47YQG9R; 12757032)
+		      //                        throw new IllegalArgumentException
+		      //     ("Incompatible class; "+v.getClass().getName()
+                      //       +" is not assignable from "+type.getName()+": "+v+"|"+val+":"+Arrays.toString(unique.toArray()));
                 }
             }
             else {
                 if (type == null)
                     type = val.getClass();
-                unique.add(val);
+		else if (!val.getClass().isAssignableFrom(type))
+		    type = String.class;
             }
         }
-        
-        Object merged = Array.newInstance(type, unique.size());
+
+	Set unique = new HashSet ();
+	for (Object val : values) {
+            if (val == null)
+                ;
+            else if (val.getClass().isArray()) {
+                int len = Array.getLength(val);
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(val, i);
+                    unique.add(type == String.class ? v.toString() : type.cast(v));
+                }
+            }
+            else {
+	      unique.add(type == String.class ? val.toString() : type.cast(val));
+            }
+        }
+
+        /*Object merged = Array.newInstance(type, unique.size());
         int count = 0;
         for (Object val : values) {
             if (val == null)
@@ -410,14 +427,15 @@ public class Util {
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
                     if (unique.remove(v))
-                        Array.set(merged, count++, v);
+		      Array.set(merged, count++, v);
                 }
             }
             else if (unique.remove(val)) {
                 Array.set(merged, count++, val);
             }
-        }
-        return merged;
+	}
+        return merged;*/
+	return unique.toArray();
     }
 
     static public boolean equals (Object u, Object v) {

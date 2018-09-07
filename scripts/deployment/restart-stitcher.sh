@@ -1,22 +1,31 @@
-#!/bin/bash
+#! /bin/bash
 
 if [ $# -lt 2 ]; then
-    echo "Please, supply paths to the stitcher dist and the database as arguments. Aborting."
+    echo "Please, supply paths to the following:"
+    echo "a) current dist;"
+    echo "b) database;"
+    echo "c) [optional] new dist."
+    echo "Aborting."
     exit 1
+elif [ $# -gt 2 ]; then
+    dist=$( cd $3 && pwd )
+    curr_dist=$( cd $1 && pwd )
+elif [ $# -eq 2 ]; then
+    dist=$( cd $1 && pwd )
+    curr_dist=$dist
 fi
 
-dist=$( cd $1 && pwd )
 db=$( cd $2 && pwd )
-pidfile=${dist}/RUNNING_PID
+pidfile=${curr_dist}/RUNNING_PID
 
-#kill the running process (if running)
 if [ -e $pidfile ]; then
+    #kill the running process
     kill -TERM $( cat "$pidfile" )
 fi
 
-sleep 3 #it might take a moment
+sleep 3
 
-#remove symlinks to the old database and dist
+#remove symlink to the old database and dist
 rm -rf ./stitcher.ix/data.db
 rm -rf latest
 
@@ -25,11 +34,10 @@ if [ ! -e stitcher.ix ]; then
     cp files-for-stitcher.ix/* stitcher.ix
 fi
 
-#create symlinks to the dist and the new database
+#create symlink to a new database (and other symlinks if missing)
 ln -s $db ./stitcher.ix/data.db
 ln -s $dist latest
 
-#create other symlinks (if missing)
 if [ ! -e ${dist}/data.db ]; then
     ln -s ../stitcher.ix/data.db ${dist}/data.db
 fi
