@@ -275,7 +275,7 @@ if __name__=="__main__":
     names = zfp.namelist()
     fp = zfp.open(names[-1], 'r')
     line = fp.readline()
-    if line[:-2] != "NAME\tTYPE\tUNII\tPT":
+    if line[:-2] != "Name\tType\tUNII\tDisplay Name":
         raise ValueError('Problem reading UNII file:'+line)
     line = fp.readline()
     uniiPT = dict()
