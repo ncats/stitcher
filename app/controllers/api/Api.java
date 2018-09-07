@@ -259,18 +259,20 @@ public class Api extends Controller {
                 .filter("id", "'"+id+"'", "stitch_v"+ver);
             for (int i = 0; i < entities.length; ++i) {
                 JsonNode n = jsonCodec.encode(entities[i]);
-                if ("simple".equals(format)) n = jsonCodec.encodeSimple(entities[i]);
+                if ("simple".equals(format))
+                    n = jsonCodec.encodeSimple(entities[i]);
                 if (n.isArray()) {
                     // unwrap this array
-                    ArrayNode an = (ArrayNode)n;
+                    ArrayNode an = (ArrayNode) n;
                     for (int j = 0; j < an.size(); ++j) {
-                        ((ObjectNode)an.get(j)).put("node", entities[i].getId());
-                        ((ArrayNode)json).add(an.get(j));
+                        if ("simple".equals(format))
+                            ((ObjectNode) an.get(j)).put("node", entities[i].getId());
+                        ((ArrayNode) json).add(an.get(j));
                     }
-                }
-                else {
-                    ((ObjectNode)n).put("node", entities[i].getId());
-                    ((ArrayNode)json).add(n);
+                } else {
+                    if ("simple".equals(format))
+                        ((ObjectNode) n).put("node", entities[i].getId());
+                    ((ArrayNode) json).add(n);
                 }
             }
         }
