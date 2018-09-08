@@ -401,7 +401,7 @@ public class Util {
             }
         }
 
-	Set unique = new HashSet ();
+	Set unique = new HashSet();
 	for (Object val : values) {
             if (val == null)
                 ;
@@ -415,27 +415,26 @@ public class Util {
             else {
 	      unique.add(type == String.class ? val.toString() : type.cast(val));
             }
-        }
+    }
 
-        /*Object merged = Array.newInstance(type, unique.size());
-        int count = 0;
-        for (Object val : values) {
-            if (val == null)
-                ;
-            else if (val.getClass().isArray()) {
-                int len = Array.getLength(val);
-                for (int i = 0; i < len; ++i) {
-                    Object v = Array.get(val, i);
-                    if (unique.remove(v))
-		      Array.set(merged, count++, v);
-                }
+    Object merged = Array.newInstance(type, unique.size());
+    int count = 0;
+    for (Object val : values) {
+        if (val == null)
+            ;
+        else if (val.getClass().isArray()) {
+            int len = Array.getLength(val);
+            for (int i = 0; i < len; ++i) {
+                Object v = Array.get(val, i);
+                if (unique.remove(v))
+		            Array.set(merged, count++, v);
             }
-            else if (unique.remove(val)) {
-                Array.set(merged, count++, val);
-            }
-	}
-        return merged;*/
-	return unique.toArray();
+        } else if (unique.remove(val)) {
+            Array.set(merged, count++, val);
+        }
+    }
+    return merged;
+	//return unique.toArray(empty);
     }
 
     static public boolean equals (Object u, Object v) {
