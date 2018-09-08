@@ -383,10 +383,11 @@ public class Util {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
-                    if (type == null)
-                        type = v.getClass();
-                    else if (!v.getClass().isAssignableFrom(type))
-		        type = String.class; // Use String class as a common demoninator here as we are mostly using this for combining primitive types
+                    if (v != null)
+                        if (type == null)
+                            type = v.getClass();
+                        else if (!v.getClass().isAssignableFrom(type))
+		                    type = String.class; // Use String class as a common demoninator here as we are mostly using this for combining primitive types
 		    // Problem was coming 2 PubChem CIDs, one provided as a long from Rancho (ALAFOSFALIN; 71957) and the other as a string from GSRS (XMK47YQG9R; 12757032)
 		      //                        throw new IllegalArgumentException
 		      //     ("Incompatible class; "+v.getClass().getName()
@@ -409,7 +410,11 @@ public class Util {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
-                    unique.add(type == String.class ? v.toString() : type.cast(v));
+                    if (v != null)
+                        unique.add(type == String.class ? v.toString() : type.cast(v));
+                    else {
+                        v = null;
+                    }
                 }
             }
             else {
@@ -426,11 +431,15 @@ public class Util {
             int len = Array.getLength(val);
             for (int i = 0; i < len; ++i) {
                 Object v = Array.get(val, i);
+                v = type == String.class ? v.toString() : type.cast(v);
                 if (unique.remove(v))
 		            Array.set(merged, count++, v);
             }
-        } else if (unique.remove(val)) {
-            Array.set(merged, count++, val);
+        } else {
+            val = type == String.class ? val.toString() : type.cast(val);
+            if (unique.remove(val)) {
+                Array.set(merged, count++, val);
+            }
         }
     }
     return merged;
