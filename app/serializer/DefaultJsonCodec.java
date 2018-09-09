@@ -165,10 +165,10 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                     if (me.getValue().getClass().isArray()) {
                         int len = Array.getLength(me.getValue());
                         for (int i = 0; i < len; ++i)
-                            refs.put(Array.get(me.getValue(), i), n.getId());
+                            refs.put(Array.get(me.getValue(), i).toString(), n.getId());
                     }
                     else {
-                        refs.put(me.getValue(), n.getId());
+                        refs.put(me.getValue().toString(), n.getId());
                     }
                     
                     Object value = properties.get(me.getKey());
@@ -284,7 +284,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                         Object v = Array.get(value, i);
                         Map m = new TreeMap ();
                         m.put("value", v);
-                        m.put("node", refs.get(v));
+                        m.put("node", refs.get(v.toString()));
                         vals[i] = m;
                     }
                     value = vals;
@@ -292,7 +292,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 else {
                     Map m = new TreeMap ();
                     m.put("value", value);
-                    m.put("node", refs.get(value));
+                    m.put("node", refs.get(value.toString()));
                     value = m;
                 }
                 me.setValue(value);
