@@ -574,19 +574,16 @@ public class EntityRegistry extends EntityFactory {
                         case I_SID: // sigh.. should check by type instead!
                         case I_CID:
                         case I_PMID:
+                            Set<Long> ids = new TreeSet<Long>();
                             if (val instanceof Long) {
-                                ent._add(me.getKey(),
-                                         new StitchValue (prop, val));
+                                ids.add((Long)val);
                             }
                             else if (val.getClass().isArray()) {
                                 int len = Array.getLength(val);
                                 for (int i = 0; i < len; ++i) {
                                     Object v = Array.get(val, i);
                                     try {
-                                        ent._add
-                                            (me.getKey(), new StitchValue
-                                             (prop, Long.parseLong
-                                              (v.toString())));
+                                        ids.add(Long.parseLong(v.toString()));
                                     }
                                     catch (NumberFormatException ex) {
                                         logger.warning("Bogus long value: "+v);
@@ -595,14 +592,14 @@ public class EntityRegistry extends EntityFactory {
                             }
                             else {
                                 try {
-                                    ent._add(me.getKey(), new StitchValue
-                                             (prop,
-                                              Long.parseLong(val.toString())));
+                                    ids.add(Long.parseLong(val.toString()));
                                 }
                                 catch (NumberFormatException ex) {
                                     logger.warning("Bogus long value: "+val);
                                 }
                             }
+                            Object ary = ids.toArray(new Long[0]);
+                            ent._add(me.getKey(), new StitchValue (prop, ary));
                             break;
                             
                         case T_Keyword:
