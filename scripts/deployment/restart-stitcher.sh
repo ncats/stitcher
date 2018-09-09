@@ -1,22 +1,23 @@
 #! /bin/bash
 
-if [ $# -lt 2 ]; then
-    echo "Please, supply paths to the following:"
-    echo "a) current dist;"
-    echo "b) database;"
-    echo "c) [optional] new dist."
+if [ $# -lt 1 ]; then
+    echo "Please, supply paths to the database and [optional] new dist."
     echo "Aborting."
     exit 1
-elif [ $# -gt 2 ]; then
-    dist=$( cd $3 && pwd )
-    curr_dist=$( cd $1 && pwd )
-elif [ $# -eq 2 ]; then
-    dist=$( cd $1 && pwd )
-    curr_dist=$dist
+elif [ $# -gt 1 ]; then
+    new=$( cd $2 && pwd )
+elif [ $# -eq 1 ]; then
+	if [ -e latest]; then
+		new=$( cd latest && pwd )
+	else
+		echo "Could not find a current distribution."
+		echo "Please, restart and supply path to the database and the dist."
+		exit 1
+	fi
 fi
 
-db=$( cd $2 && pwd )
-pidfile=${curr_dist}/RUNNING_PID
+db=$( cd $1 && pwd )
+pidfile=latest/RUNNING_PID
 
 if [ -e $pidfile ]; then
     #kill the running process
@@ -36,18 +37,19 @@ fi
 
 #create symlink to a new database (and other symlinks if missing)
 ln -s $db ./stitcher.ix/data.db
-ln -s $dist latest
+ln -s $new latest
 
-if [ ! -e ${dist}/data.db ]; then
-    ln -s ../stitcher.ix/data.db ${dist}/data.db
+if [ ! -e ${new}/data.db ]; then
+    ln -s ../stitcher.ix/data.db ${new}/data.db
 fi
 
-if [ ! -e ${dist}/stitcher.ix ]; then
-    ln -s ../stitcher.ix ${dist}/stitcher.ix
+if [ ! -e ${new}/stitcher.ix ]; then
+    ln -s ../stitcher.ix ${new}/stitcher.ix
 fi
 
 #restart stitcher app/api
-nohup ${dist}/bin/ncats-stitcher \
+cd latest
+nohup ./bin/ncats-stitcher \
  -Dix.version.latest=1 \
  -Dhttp.port=9003 \
  -Dplay.http.secret.key=`head -c2096 /dev/urandom | sha256sum |cut -d' ' -f1` &
