@@ -688,7 +688,6 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
     void mergeSingletons (Collection<Entity> singletons, StitchKey... span) {
         logger.info("Merging singletons..."+singletons.size());
         for (Entity e : singletons) {
-            // only merge if this entity has multiple key span
             Map<StitchKey, Long> classes = new HashMap<>();
             for (StitchKey key : span) {
                 Entity[] nb = e.neighbors(key);
@@ -708,7 +707,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             }
 
             boolean merged = false;
-            if (classes.size() > 1) { // should we require unanimous?
+            // previously: only merge if this entity has multiple key span
+            if (classes.size() > 0) { // || classes.containsKey(StitchKey.I_UNII)) { // todo should we require unanimous?
                 Map.Entry<StitchKey, Long> max = Collections.max
                     (classes.entrySet(), (a, b) -> {
                         if (b.getValue() > a.getValue()) return 1;
