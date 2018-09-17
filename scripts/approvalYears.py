@@ -300,7 +300,9 @@ if __name__=="__main__":
         raise ValueError('Problem reading Products file:'+line)
     line = fp.readline()
     UNII2prods = dict()
-    prods = dict()
+    prods = dict() # prods[NDA/part no] = [NDA/part, prodName, form, strength, status, app type, sponsor, year, ref]
+    #['072437/001', 'FENOPROFEN CALCIUM', 'CAPSULE;ORAL', 'EQ 200MG BASE', 'Discontinued', 'ANDA', 'PAR PHARM', '1988-08-22', 'Drugs@FDA']
+
     missing = dict()
     while line != "":
         sline = line[:-2].split("\t")
@@ -409,12 +411,6 @@ if __name__=="__main__":
     sl['DISCN'] = 'Discontinued'
     for entry in obprods['table']:
         appl = entry[6]+'/'+entry[7]
-        # verify ingredients are mapped to this product
-        for ingred in parseIngred(entry[0], uniiPT, uniiALL, missing):
-            if not UNII2prods.has_key(ingred):
-                raise ValueError('Ingredient from Orange Book not found in products:'+ingred)        
-            if appl not in UNII2prods[ingred]:
-                raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl)        
         # other product info is updated
         ts = time.strptime("Jan 1, 1982", "%b %d, %Y")
         if entry[9] != "Approved Prior to Jan 1, 1982":
@@ -425,6 +421,17 @@ if __name__=="__main__":
             status = 'Discontinued FR'
             entry[4] = entry[4][:entry[4].find(" **")]
         sponsors[entry[3].strip()] = entry[13]
+        # verify ingredients are mapped to this product
+        for ingred in parseIngred(entry[0], uniiPT, uniiALL, missing):
+            if appl not in prods:
+                prods[appl] = [appl, entry[2], entry[1], entry[4], status, appTypes[entry[5]], entry[3], date, 'OrangeBook']   #['072437/001', 'FENOPROFEN CALCIUM', 'CAPSULE;ORAL', 'EQ 200MG BASE', 'Discontinued', 'ANDA', 'PAR PHARM', '1988-08-22', 'Drugs@FDA']
+                print "added orange book prod:", prods[appl]
+            if not UNII2prods.has_key(ingred):
+                UNII2prods[ingred] = []
+                #raise ValueError('Ingredient from Orange Book not found in products:'+ingred)
+            if appl not in UNII2prods[ingred]:
+                UNII2prods[ingred].append(appl)
+                #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred)      
         if prods.has_key(appl):
             # I've verified manually that these differences are not important
             #stop = -1
