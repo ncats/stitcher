@@ -216,12 +216,28 @@ public class Api extends Controller {
         }
         catch (Exception ex) {
             Entity[] entities = es.getEntityFactory()
-                .filter("id", "'"+id+"'", "stitch_v"+ver);
+                    .filter("id", "'"+id+"'", "stitch_v"+ver);
             if (entities.length > 0) {
-                if (entities.length > 1)
-                    Logger.warn(id+" yields "+entities.length
-                                +" matches!");
-                e = entities[0];
+                int index = 0;
+                if (entities.length > 1) {
+                    Logger.warn(id + " yields " + entities.length
+                            + " matches!");
+                    int highestrank = 0; // make which stitchnode is returned to be more deterministic
+                    for (int i = 0; i < entities.length; i++) {
+                        Entity ent = entities[i];
+                        Map props = ent.properties();
+                        int rank = 0;
+                        if (props.containsKey("rank"))
+                            rank = (Integer) props.get("rank");
+                        if (rank > highestrank) {
+                            highestrank = rank;
+                            index = i;
+                        } else if (rank == highestrank && ent.getId() < entities[index].getId()) {
+                            index = i;
+                        }
+                    }
+                }
+                e = entities[index];
             }
         }
         return e;
@@ -242,15 +258,22 @@ public class Api extends Controller {
             Entity[] entities = es.getEntityFactory()
                 .filter("id", "'"+id+"'", "stitch_v"+ver);
             for (int i = 0; i < entities.length; ++i) {
-                JsonNode n = jsonCodec.encodeSimple(entities[i]);
+                JsonNode n = jsonCodec.encode(entities[i]);
+                if ("simple".equals(format))
+                    n = jsonCodec.encodeSimple(entities[i]);
                 if (n.isArray()) {
                     // unwrap this array
-                    ArrayNode an = (ArrayNode)n;
-                    for (int j = 0; j < an.size(); ++j)
-                        ((ArrayNode)json).add(an.get(j));
+                    ArrayNode an = (ArrayNode) n;
+                    for (int j = 0; j < an.size(); ++j) {
+                        if ("simple".equals(format))
+                            ((ObjectNode) an.get(j)).put("node", entities[i].getId());
+                        ((ArrayNode) json).add(an.get(j));
+                    }
+                } else {
+                    if ("simple".equals(format))
+                        ((ObjectNode) n).put("node", entities[i].getId());
+                    ((ArrayNode) json).add(n);
                 }
-                else
-                    ((ArrayNode)json).add(n);
             }
         }
 
@@ -271,7 +294,17 @@ public class Api extends Controller {
             return badRequest ("No latest stitch version defined!");
         return getStitch (ver, id);
     }
-    
+
+    public Result getLatestStitches (String id, String format) {
+        String uri = routes.Api.getLatestStitches(id, format).url();
+        Logger.debug(uri);
+
+        Integer ver = service.getLatestVersion();
+        if (null == ver)
+            return badRequest ("No latest stitch version defined!");
+        return getStitches (ver, id, format);
+    }
+
     public Result getStitch (Integer ver, String id) {
         String uri = routes.Api.getStitch(ver, id).url();
         Logger.debug(uri);
