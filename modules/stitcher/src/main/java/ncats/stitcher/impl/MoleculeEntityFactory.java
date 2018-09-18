@@ -206,8 +206,12 @@ public class MoleculeEntityFactory extends EntityRegistry {
             }
             properties.add(prop);
         }
-        
-        payload.put(MOLFILE, mol.toFormat("mol"), false);
+
+        try {
+            payload.put(MOLFILE, mol.toFormat("mol"), false);
+        } catch (Exception ex) {
+            logger.warning("Can't export structure as mol!");
+        }
         try {
             payload.put(SMILES, mol.toFormat("smiles"), false);
         }
