@@ -296,7 +296,7 @@ if __name__=="__main__":
     #approvedStitches: Report on all the approved stitches from API
     
     tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches]
-
+    
     # initialize list of NMEs
     nmeList = open("../data/approvalYears.txt", "r").readlines()
     for entry in nmeList[1:]:
@@ -324,12 +324,13 @@ if __name__=="__main__":
     outputs = iterateStitches(tests)
 
     # remove unimportant output for uniiClashes
-    output = outputs[3]
+    outputindex = tests.index(uniiClashes)
+    output = outputs[outputindex]
     newoutput = dict()
     for key in output:
         if len(output[key]) > 2:
             newoutput[key] = output[key]
-    outputs[3] = newoutput
+    outputs[outputindex] = newoutput
             
     # write out results
     for i in range(len(tests)):
