@@ -583,7 +583,7 @@ public class Util {
                     if (sb.length() > 0) sb.append("\n");
                     sb.append(name);
 
-                    if (n.get("preferred").asBoolean()) {
+                    if (n.get("displayName").asBoolean()) {
                         mol.setProperty("PreferredName", name);
                     }
                 }
@@ -686,7 +686,7 @@ public class Util {
                         val = name;
                     map.put("Synonyms", val);
                     
-                    if (n.get("preferred").asBoolean()) {
+                    if (n.get("displayName").asBoolean()) {
                         map.put("PreferredName", name);
                     }
                 }
