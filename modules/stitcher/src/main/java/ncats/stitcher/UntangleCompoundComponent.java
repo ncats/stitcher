@@ -311,7 +311,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                             && (anyvalue
                                 || containsExactly (clique, key, value))
                             && (bestClique == null
-                                || bestClique.size() < clique.size())) {
+                                || bestClique.score() < clique.score())) {//bestClique.size() < clique.size())) {
                             bestClique = clique;
                             logger.info("## best clique updated: "
                                         +clique.getId()+" key="+key

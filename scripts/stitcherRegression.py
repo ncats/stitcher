@@ -70,19 +70,26 @@ def approvedStitches(approved, stitch):
         approved[unii] = [apprYear, parent, rank]
     return approved
 
-NMEs = []
-def nmeStitches(stitch2nmes, stitch):
+def nmeStitches(stitch2nmes, stitch, nmelist):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, July 2018' and node['id'] in NMEs:
-            entries.append(node['id'])
+        if node['source'] == 'G-SRS, July 2018':
+            if node['id'] in nmelist:
+                entries.append(node['id'])
     if len(entries) > 1:
         entries.sort()
         entries.insert(1, key)
         entries.insert(2, stitch['rank'])
         stitch2nmes[entries[0]] = entries[1:]
     return stitch2nmes
+
+NMEs = []
+NMEs2 = []
+def nmeClashes(stitch2nmes, stitch):
+    return nmeStitches(stitch2nmes, stitch, NMEs)
+def nmeClashes2(stitch2nmes, stitch):
+    return nmeStitches(stitch2nmes, stitch, NMEs2)
 
 def PMEClashes(stitch2pmes, stitch):
     key = stitch['id']
@@ -143,6 +150,12 @@ def iterateStitches(funcs):
     while skip < max:
         uri = site+'api/stitches/v1?top='+str(top)+'&skip='+str(skip)
         obj = requestJson(uri)
+        if not obj.has_key('contents'):
+            newobj = dict()
+            newobj['contents'] = []
+            newobj['contents'].append(obj)
+            obj = newobj
+            skip = max
         if obj is None:
             skip = skip
         elif len(obj['contents']) == 0:
@@ -282,15 +295,19 @@ if __name__=="__main__":
     #findOrphans: Some resource entries were supposed to be stitched, but are orphaned
     #approvedStitches: Report on all the approved stitches from API
     
-    tests = [nmeStitches, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches]
-
+    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches]
+    
     # initialize list of NMEs
-    #nmeList = open("../data/approvalYears.txt", "r").readlines()
-    nmeList = open('../data/FDA-NMEs-2018-08-07.txt', "r").readlines()
+    nmeList = open("../data/approvalYears.txt", "r").readlines()
     for entry in nmeList[1:]:
         sline = entry.split('\t')
-        if sline[3] not in NMEs:
-            NMEs.append(sline[3])
+        if sline[0] not in NMEs:
+            NMEs.append(sline[0])
+    nmeList2 = open('../data/FDA-NMEs-2018-08-07.txt', "r").readlines()
+    for entry in nmeList2[1:]:
+        sline = entry.split('\t')
+        if sline[3] not in NMEs2:
+            NMEs2.append(sline[3])
 
     # initialize UNII preferred terms
     uniis = dict()
@@ -307,12 +324,13 @@ if __name__=="__main__":
     outputs = iterateStitches(tests)
 
     # remove unimportant output for uniiClashes
-    output = outputs[3]
+    outputindex = tests.index(uniiClashes)
+    output = outputs[outputindex]
     newoutput = dict()
     for key in output:
         if len(output[key]) > 2:
             newoutput[key] = output[key]
-    outputs[3] = newoutput
+    outputs[outputindex] = newoutput
             
     # write out results
     for i in range(len(tests)):

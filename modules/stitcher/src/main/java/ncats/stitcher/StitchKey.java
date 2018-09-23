@@ -37,9 +37,9 @@ public enum StitchKey implements RelationshipType {
      * Compound hash
      */
     H_InChIKey(3), // InChIKey
-    H_LyChI_L1, // LyChI Layer 1
-    H_LyChI_L2, // LyChI layer 2
-    H_LyChI_L3, // LyChI layer 3
+    H_LyChI_L1(0), // LyChI Layer 1
+    H_LyChI_L2(0), // LyChI layer 2
+    H_LyChI_L3(0), // LyChI layer 3
     H_LyChI_L4(2), // LyChI layer 4
     H_LyChI_L5(3), // LyChI layer 4 with salt + solvent
 
