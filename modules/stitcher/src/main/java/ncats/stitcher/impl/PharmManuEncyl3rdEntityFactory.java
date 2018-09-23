@@ -48,9 +48,9 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
         setIdField ("UNII");
         setNameField ("Drug Substance");
         add (N_Name, "Common Name")
-            .add (N_Name, "Drug Substance")
-            .add (I_CAS, "CAS")
-            .add (N_Name, "Products")
+            //.add (N_Name, "Drug Substance")
+            //.add (I_CAS, "CAS")
+            //.add (N_Name, "Products")
             //.add (N_Name, "UNII PT")
             .add (I_UNII, "UNII")
             ;
