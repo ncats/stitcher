@@ -51,7 +51,7 @@ VDR09VTQ8U	Approval Year	1953		Application:NDA008848 FOUGERA PHARMS https://www.
 BG3F62OND5	Approval Year	1989		Application:NDA019880 CORDEN PHARMA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019880	03/03/1989	Drugs@FDA
 R0TAY3X631	Approval Year	2001		Application:NDA021180 JANSSEN PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021180	11/20/2001	Drugs@FDA
 320YC168LF	Approval Year	1981		Application:NDA017736 SCHERING https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017736	09/24/1981	Drugs@FDA
-78E4J5IB5J	Approval Year	1970		Application:NDA016885 BRISTOL MYERS SQUIBB https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016885	07/08/1970	Drugs@FDA
+78E4J5IB5J	Approval Year	1970		Application:NDA016885 LABORATOIRE HRA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016885	07/08/1970	Drugs@FDA
 IU5QR144QX	Approval Year	1942		Application:NDA004782 WYETH PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=004782	05/08/1942	Drugs@FDA
 0RLU3VTK5M	Approval Year	2015		Application:NDA205266 SUN PHARMA GLOBAL https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=205266	07/24/2015	Drugs@FDA
 4877X14G4C	Approval Year	1977		Application:NDA017806 LANTHEUS MEDCL https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017806	12/16/1977	Drugs@FDA
@@ -164,6 +164,7 @@ F85N2YHE4E	Approval Year	2014		Application:NDA205060 ASTRAZENECA PHARMS https://
 WJ68R08KX9	Approval Year	2001		Application:NDA021257 ALCON PHARMS LTD https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021257	03/16/2001	Drugs@FDA
 5QZO15J2Z8	Approval Year	1986		Application:NDA019462 VALEANT PHARMS NORTH https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019462	10/15/1986	Drugs@FDA
 BOD072YW0F	Approval Year	1964		Application:NDA050317 PHARMACIA AND UPJOHN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050317	12/29/1964	Drugs@FDA
+DL5J0B8VSS	Approval Year	2018		Application:NDA210795 GLAXOSMITHKLINE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210795	07/20/2018	Drugs@FDA
 16FL47B687	Approval Year	1989		Application:NDA019580 BAYER HLTHCARE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019580	12/07/1989	OrangeBook
 C045TQL4WP	Approval Year	1959		Application:NDA011613 UCB INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011613	05/04/1959	Drugs@FDA
 D99YVK4L0X	Approval Year	2014		Application:BLA125477 ELI LILLY AND CO https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125477	04/21/2014	Drugs@FDA
@@ -226,7 +227,7 @@ HUM6H389W0	Approval Year	1982		Application:NDA050562 BAYER PHARMS https://www.ac
 70BT6OQT2Q	Approval Year	1953		Application:NDA016635 MALLINCKRODT https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016635	12/31/1953	Drugs@FDA
 RHH3W8F1CO	Approval Year	1978		Application:NDA017982 GE HEALTHCARE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017982	08/23/1978	Drugs@FDA
 P93RUU11P7	Approval Year	2017		Application:BLA761040 WYETH PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761040	08/17/2017	Drugs@FDA
-D8TST4O562	Approval Year	2000		Application:NDA020987 WYETH PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020987	02/02/2000	Drugs@FDA
+D8TST4O562	Approval Year	2000		Application:NDA020987 WYETH PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020987	02/02/2000	Drugs@FDA
 VZI5B1W380	Approval Year	2000		Application:NDA021014 NOVARTIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021014	01/14/2000	Drugs@FDA
 359HUE8FJC	Approval Year	1996		Application:NDA020629 MYLAN PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020629	09/24/1996	Drugs@FDA
 Q32ZN48698	Approval Year	1965		Application:NDA013025 HOSPIRA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=013025	12/16/1965	Drugs@FDA
@@ -381,6 +382,7 @@ ZMZ79891ZH	Approval Year	2016		Application:NDA204630 PROVEPHARM SAS https://www.
 TZ47U051FI	Approval Year	1944		Application:NDA011522 TEVA WOMENS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011522	12/31/1944	Drugs@FDA
 6HT8U7K3AM	Approval Year	1999		Application:NDA020922 AQUA PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020922	12/10/1999	Drugs@FDA
 TK65WKS8HL	Approval Year	1986		Application:NDA018731 BRISTOL MYERS SQUIBB https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018731	09/29/1986	Drugs@FDA
+YI437801BE	Approval Year	2018		Application:BLA761051 KYOWA KIRIN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761051	08/08/2018	Drugs@FDA
 ACH35131L1	Approval Year	1976		Application:NDA017837 ISO TEX https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017837	02/23/1976	Drugs@FDA
 0G3DE8943Y	Approval Year	2007		Application:NDA022074 IPSEN PHARMA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022074	08/30/2007	Drugs@FDA
 3JGY52XJNA	Approval Year	2004		Application:NDA021322 EMD SERONO https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021322	10/08/2004	Drugs@FDA
@@ -514,6 +516,7 @@ B72HH48FLU	Approval Year	1998		Application:BLA103772 CENTOCOR INC https://www.ac
 242Z0PM79Y	Approval Year	1960		Application:NDA012382 WEST-WARD PHARMS INT https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012382	12/05/1960	Drugs@FDA
 0J9L7J6V8C	Approval Year	2005		Application:NDA021862 NOVARTIS PHARMS CORP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021862	08/19/2005	Drugs@FDA
 21925K482H	Approval Year	1959		Application:NDA011792 MYLAN SPECIALITY LP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011792	04/09/1959	Drugs@FDA
+R02XOT8V8I	Approval Year	2018		Application:NDA207223 BIOCODEX SA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=207223	08/20/2018	Drugs@FDA
 M5681Q5F9P	Approval Year	2009		Application:NDA022363 KOWA CO https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022363	08/03/2009	Drugs@FDA
 0T2EF4JQTU	Approval Year	1993		Application:NDA019650 FOREST LABS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019650	09/17/1993	Drugs@FDA
 UYE4T5I70X	Approval Year	2009		Application:NDA022287 TAKEDA PHARMS USA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022287	01/30/2009	Drugs@FDA
@@ -610,6 +613,7 @@ XV74C1N1AE	Approval Year	2002		Application:NDA021112 GALDERMA LABS LP https://ww
 585NM85KYM	Approval Year	2004		Application:NDA021415 GALDERMA LABS LP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021415	07/27/2004	Drugs@FDA
 CK0N3WH0SR	Approval Year	2001		Application:NDA021064 LANTHEUS MEDCL https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021064	07/31/2001	Drugs@FDA
 9G34HU7RV0	Approval Year	1953		Application:NDA008922 MEDICIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008922	07/16/1953	Drugs@FDA
+07896928ZC	Approval Year	2018		Application:NDA211109 TETRAPHASE PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211109	08/27/2018	Drugs@FDA
 6X4F561V3W	Approval Year	2000		Application:NDA021214 SUCAMPO PHARMA LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021214	08/03/2000	Drugs@FDA
 ULL76WPU5X	Approval Year	1954		Application:NDA009372 WYETH AYERST https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=009372	08/24/1954	OB NME Appendix 1950-1993
 N824AOU5XV	Approval Year	2003		Application:NDA021106 PHARMACIA AND UPJOHN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021106	03/25/2003	Drugs@FDA
@@ -933,7 +937,7 @@ E211KPY694	Approval Year	1991		Application:BLA103000 ALLERGAN https://www.access
 SV0CSG527L	Approval Year	1959		Application:NDA016851 ALLERGAN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016851	06/03/1959	Drugs@FDA
 30IW36W5B2	Approval Year	2002		Application:NDA021196 JAZZ PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021196	07/17/2002	Drugs@FDA
 S56D65XJ9G	Approval Year	2008		Application:NDA022291 NOVARTIS PHARMS CORP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022291	11/20/2008	Drugs@FDA
-D26OSN9Q4R	Approval Year	2014		Application:NDA206307 NOVARTIS PHARMS CORP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=206307	12/17/2014	Drugs@FDA
+D26OSN9Q4R	Approval Year	2014		Application:NDA206307 MERLION PHARMS GMBH https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=206307	12/17/2014	Drugs@FDA
 E6S1NJ4Y5Q	Approval Year	1982		Application:NDA018757 MISSION PHARMA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018757	12/28/1982	Drugs@FDA
 JKZ19V908O	Approval Year	2009		Application:NDA022117 FOREST LABS LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022117	08/13/2009	Drugs@FDA
 J2KLZ20U1M	Approval Year	1998		Application:NDA050762 PFIZER https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050762	12/18/1998	Drugs@FDA
@@ -1048,12 +1052,12 @@ R10H71BSWG	Approval Year	2005		Application:NDA021754 FUJISAWA HLTHCARE https://w
 843CEN85DI	Approval Year	1987		Application:NDA019779 NOVARTIS PHARMS CORP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019779	12/31/1987	Drugs@FDA
 R420KW629U	Approval Year	1946		Application:NDA006008 NOVARTIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=006008	10/23/1946	Drugs@FDA
 4E07GXB7AU	Approval Year	1977		Application:NDA017856 TARO PHARM INDS LTD https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017856	02/28/1977	Drugs@FDA
-63CZ7GJN5I	Approval Year	1961		Application:NDA016084 CASPER PHARMA LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016084	08/19/1961	OB NME Appendix 1950-1985
+63CZ7GJN5I	Approval Year	1966		Application:NDA016084 CASPER PHARMA LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016084	08/19/1966	Drugs@FDA
 K848JZ4886	Approval Year	1986		Application:NDA019523 HOSPIRA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019523	10/22/1986	Drugs@FDA
 51G6I8B902	Approval Year	1996		Application:NDA020169 CONCORDIA PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020169	09/19/1996	Drugs@FDA
 1306V2B0Q8	Approval Year	1953		Application:NDA008732 SHIRE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008732	04/02/1953	Drugs@FDA
 3XC8GUZ6CB	Approval Year	1950		Application:NDA007073 PHARMACIA AND UPJOHN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=007073	06/20/1950	Drugs@FDA
-C56709M5NH	Approval Year	1973		Application:NDA017247 NOVARTIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017247	06/14/1973	Drugs@FDA
+C56709M5NH	Approval Year	1973		Application:NDA017247 HEXIM https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017247	06/14/1973	Drugs@FDA
 5W8JGG2651	Approval Year	2006		Application:BLA125151 SHIRE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125151	07/24/2006	Drugs@FDA
 HPE317O9TL	Approval Year	1948		Application:NDA007953 [Approval Date Uncertain] ALLERGAN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=007953	12/31/1948	PREDICTED
 AGG2FN16EV	Approval Year	1991		Application:NDA019766 MSD MERCK CO https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019766	12/23/1991	Drugs@FDA
@@ -1081,6 +1085,7 @@ G2M7P15E5P	Approval Year	1984		Application:NDA019011 BRAINTREE https://www.acces
 91W6Z2N718	Approval Year	1988		Application:NDA050601 TAKEDA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050601	12/30/1988	OrangeBook
 Q8X02027X3	Approval Year	1981		Application:NDA018422 PFIZER PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018422	12/21/1981	Drugs@FDA
 ASW034S0B8	Approval Year	2002		Application:NDA021411 LILLY https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021411	11/26/2002	Drugs@FDA
+09Q5UV3747	Approval Year	2018		Application:NDA209627 THE POPULATION COUNCIL INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209627	08/10/2018	Drugs@FDA
 5D06587D6R	Approval Year	2003		Application:NDA021372 HELSINN HLTHCARE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021372	07/25/2003	Drugs@FDA
 1Y740ILL1Z	Approval Year	2012		Application:NDA203188 VERTEX PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=203188	01/31/2012	Drugs@FDA
 WR2TIP26VS	Approval Year	1998		Application:NDA020978 VIIV HLTHCARE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020978	12/17/1998	Drugs@FDA
@@ -1110,7 +1115,9 @@ G2B4VE5GH8	Approval Year	1986		Application:NDA050580 BRISTOL MYERS SQUIBB https:
 P0078O25A9	Approval Year	1939		Application:NDA000793 MYLAN SPECIALITY LP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=000793	06/05/1939	Drugs@FDA
 EDN2NBH5SS	Approval Year	1999		Application:NDA020837 OAK PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020837	03/25/1999	Drugs@FDA
 511IU0826Z	Approval Year	1952		Application:NDA008472 [Approval Date Uncertain] MERCK https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008472	12/31/1952	PREDICTED
+C4XNY919FW	Approval Year	2018		Application:NDA208623 AMICUS THERAPEUTICS US INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208623	08/10/2018	Drugs@FDA
 A0426J905J	Approval Year	2004		Application:NDA021256 CHIRHOCLIN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021256	04/09/2004	Drugs@FDA
+WO0YM16LKG	Approval Year	2018		Application:NDA210922 ALNYLAM PHARMA INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210922	08/10/2018	Drugs@FDA
 05V02F2KDG	Approval Year	1999		Application:NDA021071 SB PHARMCO https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021071	05/25/1999	Drugs@FDA
 1H09Y5WO1F	Approval Year	2017		Application:NDA209940 MERCK SHARP DOHME https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209940	11/08/2017	Drugs@FDA
 M15H03K69B	Approval Year	1995		Application:NDA020451 CONCORDIA LABS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020451	12/27/1995	Drugs@FDA
@@ -1240,8 +1247,10 @@ N0A3Z5XTC6	Approval Year	1960		Application:NDA012111 ALCON https://www.accessdat
 6LL5JFU42F	Approval Year	2018		Application:NDA210923 SHIONOGI INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210923	07/31/2018	Drugs@FDA
 2Z07MYW1AZ	Approval Year	1995		Application:NDA020541 ANI PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020541	12/27/1995	Drugs@FDA
 QS56V5Y7EC	Approval Year	1994		Application:NDA020240 SCHERING https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020240	12/29/1994	Drugs@FDA
+50FKX8CB2Y	Approval Year	2018		Application:NDA210922 ALNYLAM PHARMA INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210922	08/10/2018	Drugs@FDA
 Q6C979R91Y	Approval Year	1994		Application:NDA020388 PIERRE FABRE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020388	12/23/1994	Drugs@FDA
 R5O1XB5L3M	Approval Year	1987		Application:NDA019432 IMP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019432	12/24/1987	Drugs@FDA
+B6E7K36KT8	Approval Year	2018		Application:BLA761094 DOMPE FARMACEUTICI https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761094	08/22/2018	Drugs@FDA
 5NPJ6BPX36	Approval Year	1954		Application:NDA009309 GLAXOSMITHKLINE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=009309	05/17/1954	OB NME Appendix 1950-1985
 R3459K699K	Approval Year	2017		Application:NDA209363 LUPIN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209363	09/15/2017	Drugs@FDA
 I031V2H011	Approval Year	2010		Application:BLA125276 GENENTECH https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125276	01/08/2010	Drugs@FDA
@@ -1272,7 +1281,7 @@ A0E0NMA80F	Approval Year	1955		Application:NDA010010 [Approval Date Uncertain] B
 XZA9HY6Z98	Approval Year	1962		Application:NDA012516 NOVARTIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012516	02/12/1962	Drugs@FDA
 9G64RSX1XD	Approval Year	1981		Application:NDA018343 PAR PHARM https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018343	04/06/1981	Drugs@FDA
 2M36281008	Approval Year	1991		Application:NDA018922 WYETH PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018922	01/31/1991	Drugs@FDA
-NLE429IZUC	Approval Year	2015		Application:NDA206500 TESARO INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=206500	09/01/2015	Drugs@FDA
+NLE429IZUC	Approval Year	2015		Application:NDA206500 TERSERA THERAPS LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=206500	09/01/2015	Drugs@FDA
 R7GV3H6FQ4	Approval Year	1946		Application:NDA005856 ABBVIE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=005856	01/25/1946	Drugs@FDA
 WHE7A56U7K	Approval Year	1998		Application:NDA020771 PHARMACIA AND UPJOHN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020771	03/25/1998	Drugs@FDA
 2880D3468G	Approval Year	1990		Application:NDA020035 JANSSEN PHARMA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020035	06/18/1990	Drugs@FDA
@@ -1297,7 +1306,7 @@ S79426A41Z	Approval Year	1959		Application:NDA012034 SCHERING https://www.access
 7355X3ROTS	Approval Year	1954		Application:NDA011265 ANI PHARMS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011265	09/24/1954	Drugs@FDA
 Z3614QOX8W	Approval Year	1953		Application:NDA008578 VYERA PHARMS LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008578	01/23/1953	Drugs@FDA
 NDU3J18APO	Approval Year	2015		Application:NDA206316 DAIICHI SANKYO INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=206316	01/08/2015	Drugs@FDA
-3U6IO1965U	Approval Year	1950		Application:NDA007638 BAYER HEALTHCARE LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=007638	08/15/1950	Drugs@FDA
+3U6IO1965U	Approval Year	1949		Application:NDA006921 SCHERING https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=006921	07/13/1949	Drugs@FDA
 3JB47N2Q2P	Approval Year	2004		Application:BLA125104 BIOGEN IDEC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125104	11/23/2004	Drugs@FDA
 76LA80IG2G	Approval Year	1960		Application:NDA012122 LILLY https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012122	11/14/1960	Drugs@FDA
 80M03YXJ7I	Approval Year	1996		Application:NDA020665 NOVARTIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020665	12/23/1996	Drugs@FDA
@@ -1513,7 +1522,7 @@ LYR4M0NH37	Approval Year	1965		Application:NDA013025 HOSPIRA https://www.accessd
 5Z9SP3X666	Approval Year	2016		Application:NDA209531 BIOGEN IDEC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209531	12/23/2016	Drugs@FDA
 Y8335394RO	Approval Year	1972		Application:NDA016964 HOSPIRA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016964	10/03/1972	Drugs@FDA
 6532B86WFG	Approval Year	1984		Application:NDA050579 GLAXOSMITHKLINE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050579	05/23/1984	OrangeBook
-Q2PCN8MAM6	Approval Year	2018		Application:NDA211192 AGIOS PHARMACEUTICALS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192	07/20/2018	Drugs@FDA
+Q2PCN8MAM6	Approval Year	2018		Application:NDA211192 AGIOS PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211192	07/20/2018	Drugs@FDA
 XZ629S5L50	Approval Year	1996		Application:NDA020547 PAR PHARM INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020547	09/26/1996	Drugs@FDA
 4964UZ79MI	Approval Year	1953		Application:NDA019518 CHESEBROUGH PONDS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019518	08/19/1953	Drugs@FDA
 5GRO578KLP	Approval Year	1986		Application:NDA019404 ALLERGAN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019404	12/31/1986	Drugs@FDA
@@ -1552,6 +1561,7 @@ F38R0JR742	Approval Year	2009		Application:NDA022268 NOVARTIS https://www.access
 6Q205EH1VU	Approval Year	1958		Application:ANDA060180 ANI PHARMS INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=060180	11/14/1958	Drugs@FDA
 51086HBW8G	Approval Year	1998		Application:NDA020865 MERCK https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020865	06/29/1998	Drugs@FDA
 R4R8J0Q44B	Approval Year	1975		Application:NDA017609 ICU MEDICAL INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017609	08/13/1975	Drugs@FDA
+913P6LK81M	Approval Year	2018		Application:NDA210807 MERCK SHARP DOHME https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210807	08/30/2018	Drugs@FDA
 Y124TZ0513	Approval Year	1996		Application:NDA020162 FERRING https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020162	05/23/1996	Drugs@FDA
 7812FUQ8VK	Approval Year	1971		Application:NDA016090 BRACCO https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016090	12/01/1971	Drugs@FDA
 D3FM8FA78T	Approval Year	2005		Application:NDA021332 ASTRAZENECA AB https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021332	03/16/2005	Drugs@FDA
@@ -1717,7 +1727,7 @@ JR13W81H44	Approval Year	1985		Application:NDA018735 BRACCO https://www.accessda
 LW0TIW155Z	Approval Year	1991		Application:NDA019583 SMITHKLINE BEECHAM https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019583	12/24/1991	Drugs@FDA
 5Y5F15120W	Approval Year	1976		Application:NDA017638 ABBOTT https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017638	11/05/1976	Drugs@FDA
 W36ZG6FT64	Approval Year	1999		Application:NDA021083 PF PRISM CV https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021083	09/15/1999	Drugs@FDA
-262P8GS9L9	Approval Year	2018		Application:NDA210795 GLAXOSMITHKLINE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210795	07/20/2018	Drugs@FDA
+262P8GS9L9	Approval Year	2018		Application:NDA210607 60 DEGREES PHARMS LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210607	08/08/2018	Drugs@FDA
 QGP4HA4G1B	Approval Year	2013		Application:NDA202806 NOVARTIS PHARMS CORP https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=202806	05/29/2013	Drugs@FDA
 0RH81L854J	Approval Year	2004		Application:NDA021667 EMMAUS MEDCL https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021667	06/10/2004	Drugs@FDA
 9H05937G3X	Approval Year	1960		Application:NDA012259 PHARMACIA AND UPJOHN https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012259	05/12/1960	OB NME Appendix 1950-1985
@@ -1891,7 +1901,7 @@ R60L0SM5BC	Approval Year	1985		Application:NDA018654 HLR https://www.accessdata.
 3S12J47372	Approval Year	1978		Application:NDA017820 LILLY https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017820	07/18/1978	Drugs@FDA
 9L17Y0H71P	Approval Year	2016		Application:NDA208547 AAA USA INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208547	06/01/2016	Drugs@FDA
 50VV3VW0TI	Approval Year	1981		Application:NDA018240 ALVOGEN MALTA https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018240	08/19/1981	Drugs@FDA
-F925RR824R	Approval Year	2018		Application:NDA208627 SIGA TECHNOLOGIES INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208627	07/13/2018	Drugs@FDA
+F925RR824R	Approval Year	2018		Application:NDA208627 SIGA TECHNOLOGIES https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208627	07/13/2018	Drugs@FDA
 7673326042	Approval Year	1996		Application:NDA020571 PFIZER INC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020571	06/14/1996	Drugs@FDA
 7SEV7J4R1U	Approval Year	1997		Application:NDA020587 LYMOL MEDCL https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020587	12/24/1997	Drugs@FDA
 YBK48BXK30	Approval Year	1981		Application:NDA018207 PRAGMA PHARMS LLC https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018207	12/24/1981	Drugs@FDA

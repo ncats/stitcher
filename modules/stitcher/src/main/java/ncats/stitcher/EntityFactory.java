@@ -925,7 +925,11 @@ public class EntityFactory implements Props {
 
         @Override
         public Double score () {
-            return Math.pow(size(), 1. - CLIQUE_WEIGHT)
+            int priority = 1;
+            for (StitchKey sk: values.keySet())
+                if (priority < sk.priority)
+                    priority = sk.priority;
+            return priority * Math.pow(size(), 1. - CLIQUE_WEIGHT)
                 * Math.pow(values.size(), CLIQUE_WEIGHT);
         }
     }
