@@ -75,12 +75,12 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
         setIdField ("drugbank-id");
         setNameField ("name");
         setStrucField ("SMILES");
-        add (N_Name, "synonyms");
+        //add (N_Name, "synonyms");
         add (N_Name, "name");
-        add (I_CAS, "cas-number");
+        //add (I_CAS, "cas-number");
         add (I_UNII, "unii");
-        add (H_InChIKey, "InChIKey");
-        add (I_CODE, "drugbank-id-others");
+        //add (H_InChIKey, "InChIKey");
+        //add (I_CODE, "drugbank-id-others");
         add (T_Keyword, "groups");
     }
 
