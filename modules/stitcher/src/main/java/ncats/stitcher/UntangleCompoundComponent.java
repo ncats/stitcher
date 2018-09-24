@@ -436,15 +436,24 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         //dumpActiveMoieties ();
         dump ("##### active moiety stitching");
         
-        // collapse based on trusted stitch keys; e.g., lychi layer 5, unii
+        // collapse based on trusted stitch keys; e.g., unii
         component.stitches((source, target) -> {
-                union (source, target);
-                logger.info(source.getId() +" <-> "+target.getId()
-                            +" H_LyChI_5="
-                            +Util.toString(source.get(H_LyChI_L5)));
-            }, H_LyChI_L5);
-        dump ("##### L5 keys stitching");
-        
+            union (source, target);
+            logger.info(source.getId() +" <-> "+target.getId()
+                    +" I_UNII="
+                    +Util.toString(source.get(I_UNII)));
+            }, I_UNII);
+        dump ("##### UNII key stitching");
+
+//        // collapse based on trusted stitch keys; e.g., lychi layer 5, unii
+//        component.stitches((source, target) -> {
+//                union (source, target);
+//                logger.info(source.getId() +" <-> "+target.getId()
+//                            +" H_LyChI_5="
+//                            +Util.toString(source.get(H_LyChI_L5)));
+//            }, H_LyChI_L5);
+//        dump ("##### L5 keys stitching");
+
         component.stitches((source, target) -> {
                 Long s = uf.root(source.getId());
                 Long t = uf.root(target.getId());
@@ -469,7 +478,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
 
         // we need to do another pass over each component to see
         // if we have multi-value cliques that span components
-        mergeComponents (N_Name, I_CAS, I_UNII, I_DB, I_ChEMBL,
+        mergeComponents (N_Name, I_CAS, I_DB, I_ChEMBL,
                          I_CID, I_SID, H_LyChI_L4);
         //mergeCliqueComponents (H_LyChI_L3);
 
@@ -485,7 +494,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 if (transitive (e, H_LyChI_L4)) {
                     // 
                 }
-                else if (clique (e, N_Name, I_CAS, I_UNII,
+                else if (clique (e, N_Name, I_CAS,
                                  I_DB, I_ChEMBL, H_LyChI_L3)) {
                 }
                 /*
@@ -504,7 +513,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         dump ("##### number of unmapped nodes: "+singletons.size());
 
         // now merge singeltons
-        mergeSingletons (singletons, N_Name, I_CAS, I_UNII, I_DB, I_ChEMBL);
+        mergeSingletons (singletons, N_Name, I_CAS, I_DB, I_ChEMBL);
         
         // now handle unresolved nodes with multiple active moieties and
         // assign to the class with less references 
