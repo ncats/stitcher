@@ -156,6 +156,8 @@ def findOrphans(orphans, stitch):
                         sets.append(group['value'])
                     sets.sort()
                     status = '|'.join(sets)
+                if 'name' in  stitch['sgroup']['properties']:
+                    name =  stitch['sgroup']['properties']['name']['value']
             if node['source'] == 'Rancho BioSciences, August 2018':
                 if 'Conditions' in stitch['sgroup']['properties']:
                     status = '|has_conditions'
