@@ -7,8 +7,8 @@ import urllib2
 import zipfile
 import gzip
 import numpy
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
+#import matplotlib.pyplot as plt
+#from scipy.interpolate import interp1d
 
 resolverCache = dict()
 resolverCache["PEMETREXED SODIUM"] = "2PKU919BA9"
@@ -652,6 +652,16 @@ if __name__=="__main__":
                 outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
                 fp.write(outline)
             else:
+                for otherunii in activeMoiety[unii]:
+                    if UNII2prods.has_key(otherunii):
+                        for prod in UNII2prods[otherunii]:
+                            entry = prods[prod]
+                            if entry[0] == early[0]:
+                                unii = otherunii
+                comment = ''
+                if apptype != '':
+                    comment = apptype + '|'
+                comment = comment+early[0].decode('latin-1').encode('ascii', 'replace')+"|"+method
                 outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
                 fperr.write(outline)
 
