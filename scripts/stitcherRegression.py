@@ -133,11 +133,37 @@ def findOrphans(orphans, stitch):
         node = stitch['sgroup']['members'][0]
         if node['source'] in orphanList:
             name = ''
-            if not node.has_key('id'):
-                name = node['name']
+            id = ''
+            status = ''
+            if 'id' in node:
+                id = node['id']
             else:
-                name = node['id']
-            orphans[name] = [node['source']]
+                id = node['name']
+            if 'name' in node:
+                name = node['name']
+            if node['source'] == 'Broad Institute Drug List 2017-03-27':
+                if 'clinical_phase' in stitch['sgroup']['properties']:
+                    status = '|' + stitch['sgroup']['properties']['clinical_phase']['value']
+            if node['source'] == 'DrugBank, July 2018':
+                if 'groups' in stitch['sgroup']['properties']:
+                    status = ''
+                    for group in stitch['sgroup']['properties']['groups']:
+                        status = status + '|' + group['value']
+            if node['source'] == 'NCATS Pharmaceutical Collection, April 2012':
+                if 'DATASET' in stitch['sgroup']['properties']:
+                    sets = []
+                    for group in stitch['sgroup']['properties']['DATASET']:
+                        sets.append(group['value'])
+                    sets.sort()
+                    status = '|'.join(sets)
+                if 'name' in  stitch['sgroup']['properties']:
+                    name =  stitch['sgroup']['properties']['name']['value']
+            if node['source'] == 'Rancho BioSciences, August 2018':
+                if 'Conditions' in stitch['sgroup']['properties']:
+                    status = '|has_conditions'
+            item = node['source'] + status + "\t" + id
+            entry = [id, node['source'], status, name]
+            orphans[item] = entry
     return orphans
         
 def iterateStitches(funcs):
@@ -296,7 +322,7 @@ if __name__=="__main__":
     #approvedStitches: Report on all the approved stitches from API
     
     tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches]
-
+    
     # initialize list of NMEs
     nmeList = open("../data/approvalYears.txt", "r").readlines()
     for entry in nmeList[1:]:
@@ -324,12 +350,13 @@ if __name__=="__main__":
     outputs = iterateStitches(tests)
 
     # remove unimportant output for uniiClashes
-    output = outputs[3]
+    outputindex = tests.index(uniiClashes)
+    output = outputs[outputindex]
     newoutput = dict()
     for key in output:
         if len(output[key]) > 2:
             newoutput[key] = output[key]
-    outputs[3] = newoutput
+    outputs[outputindex] = newoutput
             
     # write out results
     for i in range(len(tests)):
@@ -343,7 +370,7 @@ if __name__=="__main__":
                 keyname = uniis[key]
             outline = test + "\t" + key.encode('ascii', 'ignore') + "\t" + keyname.encode('ascii', 'ignore')
             for item in output[key]:
-                outline = outline + "\t" + str(item)
+                outline = outline + "\t" + unicode(item).encode('ascii', 'ignore')
                 if uniis.has_key(item):
                     outline = outline + "\t" + uniis[item]
             print outline  
