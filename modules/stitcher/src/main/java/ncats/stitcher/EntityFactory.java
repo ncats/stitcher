@@ -1854,6 +1854,26 @@ public class EntityFactory implements Props {
         return count;
     }
 
+    public int maps (Consumer<Entity> func, long[] ids) {
+        int count = 0;
+        try (Transaction tx = gdb.beginTx()) {
+             Entity[] ents = _entities (ids);
+             for (Entity entity: ents) {
+                try {
+                    func.accept(entity);
+                    ++count;
+                }
+                catch (Exception ex) {
+                    // not a valid entity
+                    ex.printStackTrace();
+                }
+            }
+            tx.success();
+        }
+
+        return count;
+    }
+
     public Entity[] entities (long[] ids) {
         try (Transaction tx = gdb.beginTx()) {
             Entity[] ents = _entities (ids);

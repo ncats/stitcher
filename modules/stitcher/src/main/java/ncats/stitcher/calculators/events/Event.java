@@ -1,7 +1,9 @@
 package ncats.stitcher.calculators.events;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import ncats.stitcher.calculators.EventCalculator;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 
 public class Event implements Cloneable{
@@ -53,19 +55,33 @@ public class Event implements Cloneable{
                 return true;
             }
         },
-        Marketed,
+        Marketed {
+            @Override
+            public boolean wasMarketed(){
+                return true;
+            }
+        },
         ApprovalOTC {
             @Override
             public boolean isApproved(){
                 return true;
             }
         },
-        Other,
-        Withdrawn
+        Withdrawn {
+            @Override
+            public boolean wasMarketed(){
+                return true;
+            }
+        },
+        Other
         ;
 
         public boolean isApproved(){
             return false;
+        }
+
+        public boolean wasMarketed(){
+            return isApproved();
         }
     }
 
@@ -78,5 +94,32 @@ public class Event implements Cloneable{
 
     public Event(String source, Object id, EventKind kind) {
         this(source, id, kind, null);
+    }
+
+    public Event(JsonNode node) {
+        for (Field field: this.getClass().getDeclaredFields()) {
+            if (node.has(field.getName())) {
+                try {
+                    if (field.getType() == String.class || field.getType() == Object.class)
+                        field.set(this, node.get(field.getName()).textValue());
+                    else if (field.getType() == Date.class) {
+                        String str = node.get(field.getName()).textValue();
+                        int year = Integer.valueOf(str.substring(0, 4));
+                        int month = Integer.valueOf(str.substring(str.indexOf("-")+1,str.lastIndexOf("-")));
+                        int day = Integer.valueOf(str.substring(str.lastIndexOf("-")+1));
+                        Date date = new Date(year-1900, month-1, day);
+                        field.set(this, date);
+                    }
+                    else if (field.getType() == EventKind.class) {
+                        String str = node.get(field.getName()).textValue();
+                        EventKind kind = EventKind.valueOf(str);
+                        field.set(this, kind);
+                    }
+                    else throw new IllegalArgumentException();
+                } catch (Exception e) {
+                    System.err.println("Could not set:" + field.getName() + " to value " + node.get(field.getName()));
+                }
+            }
+        }
     }
 }
