@@ -3,9 +3,11 @@ package ncats.stitcher.calculators;
 import ncats.stitcher.*;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import ncats.stitcher.calculators.events.*;
 
@@ -14,16 +16,17 @@ import static ncats.stitcher.Props.*;
 public class EventCalculator implements StitchCalculator {
 
     static EventParser[] DEFAULT_EVENT_PARSERS = {
+            new GSRSEventParser(),
+            new DrugsAtFDAEventParser (),
+            new ClinicalTrialsEventParser(),
             new RanchoEventParser(),
             new NPCEventParser (),
             new PharmManuEventParser (),
-            //new DrugBankEventParser (),
+            //!! No longer loading this source: new DrugBankEventParser (),
             new DrugBankXmlEventParser (),
             new DailyMedRxEventParser (),
             new DailyMedOtcEventParser (),
             new DailyMedRemEventParser (),
-            new DrugsAtFDAEventParser (),
-
             new WithdrawnEventParser()
     };
 
@@ -35,8 +38,14 @@ public class EventCalculator implements StitchCalculator {
     final EntityFactory ef;
     final DataSourceFactory dsf;
 
-
     private List<EventParser> eventParsers = Arrays.asList(DEFAULT_EVENT_PARSERS);
+
+    // adapted from https://prsinfo.clinicaltrials.gov/definitions.html
+    public static Set<String> CLINICAL_PHASES = Arrays.asList(
+            "Not Applicable", "Early Phase 1", "Phase 1", "Phase 1/Phase 2",
+            "Phase 2", "Phase 2/Phase 3", "Phase 3", "Phase 4")
+            .stream()
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
     public EventCalculator(EntityFactory ef) {
         this.ef = ef;
@@ -87,40 +96,19 @@ public class EventCalculator implements StitchCalculator {
             labels.add(e.kind);
 
             Map<String, Object> data = new HashMap<>();
-            if (e.date != null)
-                data.put("date", SDF.format(e.date));
-
-            if (e.jurisdiction != null)
-                data.put("jurisdiction", e.jurisdiction);
-
-            if (e.comment != null)
-                data.put("comment", e.comment);
-
-            if(e.route !=null){
-                data.put("route", e.route);
-            }
-
-            if(e.approvalAppId !=null){
-                data.put("ApprovalAppId", e.approvalAppId);
-            }
-            if(e.marketingStatus !=null){
-                data.put("MarketingStatus", e.marketingStatus);
-            }
-            if(e.NDC !=null){
-                data.put("NDC", e.NDC);
-            }
-            if(e.URL !=null){
-                data.put("URL", e.URL);
-            }
-            if(e.withDrawnYear !=null){
-                data.put("withdrawn_year", e.withDrawnYear);
-            }
-            if(e.productCategory !=null){
-                data.put("ProductCategory", e.productCategory);
+            for (Field field: e.getClass().getDeclaredFields()) {
+                try {
+                    if (field.getType() == String.class && field.get(e) != null)
+                        data.put(field.getName(), field.get(e));
+                    if (field.getType() == Date.class && field.get(e) != null)
+                        data.put(field.getName(), SDF.format(field.get(e)));
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
+                }
             }
             labels.add(e.source);
-            if (e.date != null && e.kind.isApproved()) {
-                cal.setTime(e.date);
+            if (e.startDate != null && e.kind.isApproved()) {
+                cal.setTime(e.startDate);
                 approvals.put(e.source, cal.get(Calendar.YEAR));
             }
             
@@ -176,8 +164,7 @@ public class EventCalculator implements StitchCalculator {
             super ("drugbank-full-annotated.sdf");
         }
             
-        public List<Event> getEvents(Map<String, Object> payload) {
-            List<Event> events = new ArrayList<>();
+        public void produceEvents(Map<String, Object> payload) {
             Event event = null;
             Object id = payload.get("DATABASE_ID");
             if (id != null && id.getClass().isArray()
@@ -208,8 +195,8 @@ public class EventCalculator implements StitchCalculator {
                     event.comment = (String)content;
                 }
             }
-            if (event != null) events.add(event);
-            return events;
+            if (event != null) events.put(String.valueOf(System.identityHashCode(event)), event);
+            return;
         }
     }
 
@@ -219,20 +206,33 @@ public class EventCalculator implements StitchCalculator {
 
         for (EventParser ep : eventParsers) {
             try {
-                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)){
-                    for (Event e: ep.getEvents(payload)) {
-                        logger.info(ep.name + ": kind=" + e.kind
-                                + " date=" + e.date);
-                        events.add(e);
-                    }
+                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)) {
+                    ep.produceEvents(payload);
                 }
             } catch (IllegalArgumentException iae) {
                 logger.warning(ep.name + " not a valid data source");
             }
 
         }
+        for (EventParser ep : eventParsers) {
+            for (Event e: ep.events.values()) {
+                logger.info(ep.name + ": kind=" + e.kind
+                        + " startDate=" + e.startDate);
+                events.add(e);
+            }
+            ep.reset();
+        }
 
         return events;
+    }
+
+    // TODO Refactor into StitchCalculator interface
+    public int recalculateNodes (long[] nodes) {
+        logger.info("## recalculating node "+Arrays.toString(nodes)+"...");
+        return ef.maps(e -> {
+            Stitch s = Stitch._getStitch(e);
+            accept (s);
+        }, nodes);
     }
 
     public static void main (String[] argv) throws Exception {
@@ -246,8 +246,12 @@ public class EventCalculator implements StitchCalculator {
 
         EntityFactory ef = new EntityFactory (GraphDb.getInstance(argv[0]));
         EventCalculator ac = new EventCalculator(ef);
-        int version = Integer.parseInt(argv[1]);
-        int count = ac.recalculate(version);
+        //int version = Integer.parseInt(argv[1]);
+        //int count = ac.recalculate(version);
+        long[] nodes = new long[argv.length-1];
+        for (int i=1; i<argv.length; i++)
+            nodes[i-1] = Long.parseLong(argv[i]);
+        int count = ac.recalculateNodes(nodes);
         logger.info(count+" stitches recalculated!");
         ef.shutdown();
     }

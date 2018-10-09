@@ -2,49 +2,68 @@ package ncats.stitcher.calculators.events;
 
 import ncats.stitcher.calculators.EventCalculator;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
-public class DrugsAtFDAEventParser extends EventParser {
-    public DrugsAtFDAEventParser() {
-        super ("approvalYears.txt");
+public class ClinicalTrialsEventParser extends EventParser {
+
+    public ClinicalTrialsEventParser() {
+        super ("NCT_REPORT.txt.gz");
     }
 
-    public List<Event> getEvents(Map<String, Object> payload) {
-        List<Event> events = new ArrayList<>();
-        Event event = null;
-        Object id = payload.get("UNII");
-        Object content = payload.get("Date");
-        if (content != null) {
-            try {
-                Date date = EventCalculator.SDF2.parse((String)content);
-                event = new Event(name, id, Event.EventKind.ApprovalRx);
-                event.jurisdiction = "US";
-                event.startDate = date;
-                //event.endDate;
-                event.active = (String) payload.get("active");
-                event.source = (String) payload.get("Date_Method");
-                event.URL = (String) payload.get("Url");
-                event.approvalAppId = (String) payload.get("App_Type") +
-                        (String) payload.get("App_No");
-                event.product = (String) payload.get("Product");
-                event.sponsor = (String) payload.get("Sponsor");
-                //event.route;
-                //event.withDrawnYear;
-                //event.marketingStatus;
-                //event.productCategory;
-                event.comment = (String) payload.get("Comment");
-            }
-            catch (Exception ex) {
-                EventCalculator.logger.log(Level.SEVERE,
-                           "Can't parse startDate: \""+content+"\"", ex);
+    boolean earlyEvent(Event event, String status) {
+        if (EventCalculator.CLINICAL_PHASES.contains(status)) {
+            for (String phase : EventCalculator.CLINICAL_PHASES) {
+                if (phase.equals(status)) {
+                    if (events.containsKey(phase)) {
+                        if (events.get(phase).startDate.after(event.startDate)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return true;
+                    }
+                }
+                else if (events.containsKey(phase) &&
+                        events.get(phase).startDate.after(event.startDate)) {
+                    events.remove(phase);
+                }
             }
         }
+        return false;
+    }
 
-        if (event != null) events.add(event);
-        return events;
+    public void produceEvents(Map<String, Object> payload) {
+        Event event = null;
+        Object id = payload.get("UNII");
+        try {
+            String status = (String) payload.get("STATUS");
+            Object dateobj = payload.get("DATE");
+            Date date = EventCalculator.SDF.parse((String) dateobj);
+            Event.EventKind ek = Event.EventKind.Clinical;
+            if ("Phase 4".equals(status))
+                ek = Event.EventKind.Marketed;
+            event = new Event(name, id, ek);
+            //event.jurisdiction = "US";
+            event.startDate = date;
+            //event.endDate;
+            //event.active;
+            event.source = name;
+            event.URL = "https://clinicaltrials.gov/ct2/show/" + payload.get("NCT_ID");
+            //event.approvalAppId;
+            event.product = payload.get("NCT_ID") + ": " + status + " " + (String) payload.get("CONDITION");
+            //event.sponsor;
+            //event.route;
+            //event.comment;
+
+            if (earlyEvent(event, status))
+                events.put(status, event);
+        } catch (Exception ex) {
+            EventCalculator.logger.log(Level.SEVERE,
+                    "Can't parse clinicalTrials.gov entry: \"" + id + "\"", ex);
+        }
+
+        return;
     }
 }

@@ -1,5 +1,7 @@
 package ncats.stitcher.calculators.events;
 
+import ncats.stitcher.calculators.EventCalculator;
+
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -9,7 +11,7 @@ public class WithdrawnEventParser extends EventParser{
     private static class WithdrawnInfo{
         private final List<String> countriesWithdrawn;
         private final String reason;
-        //TODO add other fields like date withdrawn
+        //TODO add other fields like startDate withdrawn
 
 
         public WithdrawnInfo(String reason, List<String> countriesWithdrawn) {
@@ -83,31 +85,62 @@ public class WithdrawnEventParser extends EventParser{
     }
 
     @Override
-    public List<Event> getEvents(Map<String, Object> payload) {
+    public void produceEvents(Map<String, Object> payload) {
 
-        List<Event> events = new ArrayList<>();
         String unii = (String) payload.get("unii");
-        WithdrawnInfo info = withdrawnStatusLookup.getWithdrawnInfo(unii);
-        if(info !=null){
+//        WithdrawnInfo info = withdrawnStatusLookup.getWithdrawnInfo(unii);
+//        if(info !=null){
+        try {
             Event e = new Event(name, unii, Event.EventKind.Withdrawn);
-            e.comment = info.getReason();
+            //e.comment = info.getReason();
 
-            Object withDrawnYear = payload.get("year_withdrawn");
-            if(withDrawnYear !=null){
-                e.withDrawnYear = Integer.parseInt((String) withDrawnYear);
+            e.source = name;
+            //e.jurisdiction;
+            if (!"NA".equals(payload.get("date_launched")))
+                e.startDate = EventCalculator.SDF
+                        .parse((String)payload.get("date_launched"));
+            else if (!"NA".equals(payload.get("year_launched")))
+                e.startDate = EventCalculator.SDF
+                        .parse(payload.get("year_launched")+"-12-31");
+            if (!"NA".equals(payload.get("date_withdrawn")))
+                e.endDate = EventCalculator.SDF
+                        .parse((String)payload.get("date_withdrawn"));
+            else if (!"NA".equals(payload.get("year_withdrawn")))
+                e.endDate = EventCalculator.SDF
+                        .parse(payload.get("year_withdrawn")+"-12-31");
+            //e.active;
+            if (!"NA".equals(payload.get("URL")))
+                e.URL = (String)payload.get("URL");
+            //e.approvalAppId;
+            if (!"NA".equals(payload.get("brand_name")))
+                e.product = (String)payload.get("brand_name");
+            else if (!"NA".equals(payload.get("generic_name")))
+                e.product = (String)payload.get("generic_name");
+            //e.sponsor;
+            //e.route;
+            if (!"NA".equals(payload.get("source")))
+                e.comment = (String)payload.get("source");
+
+//            if(info.countriesWithdrawn.isEmpty()) {
+//                events.put(String.valueOf(System.identityHashCode(e)), e);
+//            }else {
+//                for (String country : info.getCountriesWithdrawn()) {
+//                    Event e2 = e.clone();
+//                    e2.jurisdiction = country;
+//                    events.put(String.valueOf(System.identityHashCode(e2)), e2);
+//                }
+//            }
+
+            if (!"NA".equals(payload.get("country_withdrawn"))) {
+                e.jurisdiction = (String) payload.get("country_withdrawn");
             }
-            if(info.countriesWithdrawn.isEmpty()){
-                events.add(e);
-            }else {
-                for (String country : info.getCountriesWithdrawn()) {
-                    Event e2 = e.clone();
-                    e2.jurisdiction = country;
-                    events.add(e2);
-                }
-            }
+            events.put(String.valueOf(System.identityHashCode(e)), e);
+
+        } catch (Exception ex) {
+          ex.printStackTrace();
         }
 
 
-        return events;
+        return;
     }
 }

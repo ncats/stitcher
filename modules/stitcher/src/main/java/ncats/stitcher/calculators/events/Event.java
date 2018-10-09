@@ -1,7 +1,6 @@
 package ncats.stitcher.calculators.events;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import ncats.stitcher.calculators.EventCalculator;
 
 import java.lang.reflect.Field;
 import java.util.Date;
@@ -10,7 +9,9 @@ public class Event implements Cloneable{
     public EventKind kind;
     public String source;
     public Object id;
-    public Date date;
+    public Date startDate;
+    public Date endDate;
+    public String active;
     public String jurisdiction;
     public String comment; // reference
 
@@ -18,13 +19,14 @@ public class Event implements Cloneable{
 
     public String approvalAppId;
 
-    public String marketingStatus;
-    public String productCategory;
-
-    public String NDC;
+    public String product;
+    public String sponsor;
     public String URL;
 
-    public Integer withDrawnYear;
+    @Deprecated public String marketingStatus;
+    @Deprecated public String productCategory;
+
+    //@Deprecated public Integer withDrawnYear;
 
     /**
      * Create a deep clone.
@@ -38,9 +40,12 @@ public class Event implements Cloneable{
         } catch (CloneNotSupportedException e1) {
             throw new RuntimeException(e1); //shouldn't happen
         }
-        //date is mutable so make defensive copy
-        if(date != null) {
-            e.date = new Date(date.getTime());
+        //startDate is mutable so make defensive copy
+        if(startDate != null) {
+            e.startDate = new Date(startDate.getTime());
+        }
+        if(endDate != null) {
+            e.endDate = new Date(endDate.getTime());
         }
         return e;
     }
@@ -49,6 +54,7 @@ public class Event implements Cloneable{
         Publication,
         Filing,
         Designation,
+        Clinical,
         ApprovalRx {
             @Override
             public boolean isApproved() {
@@ -73,6 +79,12 @@ public class Event implements Cloneable{
                 return true;
             }
         },
+        Discontinued {
+            @Override
+            public boolean wasMarketed(){
+                return true;
+            }
+        },
         Other
         ;
 
@@ -85,11 +97,11 @@ public class Event implements Cloneable{
         }
     }
 
-    public Event(String source, Object id, EventKind kind, Date date) {
+    public Event(String source, Object id, EventKind kind, Date startDate) {
         this.source = source;
         this.id = id != null ? id : "*";
         this.kind = kind;
-        this.date = date;
+        this.startDate = startDate;
     }
 
     public Event(String source, Object id, EventKind kind) {

@@ -1,54 +1,40 @@
 package ncats.stitcher.calculators.events;
 
-import ncats.stitcher.calculators.EventCalculator;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.reflect.Array;
 import java.util.Map;
-import java.util.logging.Level;
 
-public class ClinicalTrialsEventParser extends EventParser {
-    boolean visited = false;
-
-    public ClinicalTrialsEventParser() {
-        super ("NCT_REPORT.txt.gz");
+public class GSRSEventParser extends EventParser {
+    public GSRSEventParser() {
+        super ("dump-public-2018-07-19.gsrs");
     }
 
-    public List<Event> getEvents(Map<String, Object> payload) {
-        List<Event> events = new ArrayList<>();
-        if (visited) return events;
-        visited = true;
-        Event event = null;
-        Object id = payload.get("UNII");
-        Object status = payload.get("STATUS");
-        if ("Phase 4".equals(status)) {
-            try {
-                Object dateobj = payload.get("DATE");
-                Date date = EventCalculator.SDF.parse((String)dateobj);
-                event = new Event(name, id, Event.EventKind.Marketed);
-                //event.jurisdiction = "US";
-                event.startDate = date;
-                //event.endDate;
-                //event.active;
-                event.source = name;
-                event.URL = "https://clinicaltrials.gov/ct2/show/"+payload.get("NCT_ID");
-                //event.approvalAppId;
-                event.product = payload.get("NCT_ID") + ": " + status + " " + (String) payload.get("CONDITION");
-                //event.sponsor;
-                //event.route;
-                //event.withDrawnYear;
-                //event.marketingStatus;
-                //event.productCategory;
-                //event.comment;
+    public void produceEvents(Map<String, Object> payload) {
+        String unii = getFirstEntry(payload.get("UNII"));
+        Object syn = payload.get("Synonyms");
+        for (String type: types.keySet()) {
+            if (payload.containsKey(type)) {
+                String entry = getFirstEntry(payload.get(type));
+                Event event = minimalEvent(unii, entry, type, null,
+                        "https://ginas.ncats.nih.gov/ginas/app/substance/"+unii,
+                        types.get(type).kind, types.get(type).jurisdiction);
+                events.put(type, event);
             }
-            catch (Exception ex) {
-                EventCalculator.logger.log(Level.SEVERE,
-                           "Can't parse clinicalTrials.gov entry: \""+id+"\"", ex);
+        }
+        for (int i=0; i<Array.getLength(syn); i++) {
+            String name = Array.get(syn, i).toString();
+            if (name.indexOf(" [") > -1) {
+                String suffix = name.substring(
+                        name.lastIndexOf(" [")+2,
+                        name.lastIndexOf(']'));
+                if (types.containsKey(suffix)) {
+                    Event event = minimalEvent(unii, name, suffix, null,
+                            "https://ginas.ncats.nih.gov/ginas/app/substance/"+unii,
+                            types.get(suffix).kind, types.get(suffix).jurisdiction);
+                    events.put(suffix, event);
+                }
             }
         }
 
-        if (event != null) events.add(event);
-        return events;
+        return;
     }
 }

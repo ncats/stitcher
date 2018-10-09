@@ -121,15 +121,14 @@ public class DailyMedEventParser extends EventParser {
 
     }
 
-    public List<Event> getEvents(Map<String, Object> payload) {
-        List<Event> events = new ArrayList<>();
+    public void produceEvents(Map<String, Object> payload) {
         Event event = null;
-        Object id = payload.get("NDC");
+        Object id = "NDC "+payload.get("NDC");
+        if (id == null)
+            id = getFirstEntry(payload.get("GenericProductName"));
 
         Object content = null;
         Date date = null;
-
-
 
         try {
             //Jan 2018 new columns for Route and MarketStatus
@@ -166,11 +165,11 @@ public class DailyMedEventParser extends EventParser {
                     }
                     if(splComment == null){
                         splComment = "";
-                    }                    
+                    }
                     et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
                 }
 
-                if(et ==null) {
+                if(et == null) {
                     //use old logic
                     //String UNII = (String) payload.get("UNII");
                     //System.out.println(UNII);
@@ -215,8 +214,7 @@ public class DailyMedEventParser extends EventParser {
                 }else {
                     event.jurisdiction = "US";
                 }
-                event.date = date;
-                event.comment = (String)(content==null? "": content);
+                event.startDate = date;
 
                 event.approvalAppId = (String) payload.get("ApprovalAppId");
 
@@ -224,7 +222,8 @@ public class DailyMedEventParser extends EventParser {
 
                 event.productCategory = (String) payload.get("ProductCategory");
 
-                event.NDC = (String) payload.get("NDC");
+                event.product = getFirstEntry(payload.get("GenericProductName"));
+
                 event.URL = (String) payload.get("URL");
                 //Jan 2018 new columns for Route and MarketStatus
                 Object route = payload.get("Route");
@@ -235,10 +234,35 @@ public class DailyMedEventParser extends EventParser {
 
 
         } catch (Exception ex) {
-            EventCalculator.logger.log(Level.SEVERE, "Can't parse date: "+content, ex);
+            EventCalculator.logger.log(Level.SEVERE, "Can't parse startDate: "+content, ex);
         }
 
-        if (event != null) events.add(event);
-        return events;
+        if (event != null) {
+            String key = event.jurisdiction + ":" + event.route;
+            events.put(key + "|" + System.identityHashCode(event), event);
+        }
+        List<String> remove = new ArrayList();
+        for (String key1: events.keySet()) {
+            if (!remove.contains(key1))
+                for (String key2 : events.keySet()) {
+                    if (!remove.contains(key2) && !key1.equals(key2) &&
+                            key1.substring(0,key1.indexOf("|")).
+                                    equals(key2.substring(0,key2.indexOf("|")))) {
+                        Event ev1 = events.get(key1);
+                        Event ev2 = events.get(key2);
+                        if (ev1.startDate != null && ev2.startDate != null)
+                            if (!ev2.startDate.before(ev1.startDate)) {
+                                if (ev1.endDate == null ||
+                                        (ev2.endDate != null && !ev2.endDate.after(ev1.endDate))) {
+                                    remove.add(key2);
+                                }
+                            }
+                    }
+                }
+        }
+        for (String key: remove)
+            events.remove(key);
+
+        return;
     }
 }
