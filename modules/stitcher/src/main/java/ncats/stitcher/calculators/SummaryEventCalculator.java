@@ -25,9 +25,8 @@ import ncats.stitcher.calculators.summary.Tuple;
 import ncats.stitcher.calculators.summary.UtilInxight;
 import ncats.stitcher.calculators.summary.UtilInxight.Final;
 
-public class SummaryEventCalculator implements StitchCalculator {
+public class SummaryEventCalculator extends StitchCalculator {
 
-    final EntityFactory ef;
     final DataSourceFactory dsf;
     private static final String APPROVAL_YEAR = "Approval Year";
     private static final String IS_HIGHEST_PHASE_APPROVED = "Is Highest Phase Approved";
@@ -1076,22 +1075,6 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
         // Calculate Current Marketing Status
     }
 
-    public int recalculate (int version) {
-        logger.info("## recalculating stitch_v"+version+"...");
-        return ef.maps(e -> {
-            Stitch s = Stitch._getStitch(e);
-            accept (s);
-        }, "stitch_v"+version);
-    }
-
-    public int recalculateNodes (long... nodeID) {
-        logger.info("## recalculating node "+Arrays.toString(nodeID)+"...");
-        return ef.maps(e -> {
-            Stitch s = Stitch._getStitch(e);
-            accept (s);
-        }, nodeID);
-    }
-
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+SummaryEventCalculator.class.getName()
@@ -1102,8 +1085,11 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
         EntityFactory ef = new EntityFactory (GraphDb.getInstance(argv[0]));
         SummaryEventCalculator ac = new SummaryEventCalculator(ef);
         //int version = Integer.parseInt(argv[1]);
-        long nodeID = Long.parseLong(argv[1]);
-        int count = ac.recalculateNodes(nodeID);
+        //int count = ac.recalculate(version);
+        long[] nodes = new long[argv.length-1];
+        for (int i=1; i<argv.length; i++)
+            nodes[i-1] = Long.parseLong(argv[i]);
+        int count = ac.recalculateNodes(nodes);
         logger.info(count+" stitches recalculated!");
         ef.shutdown();
     }
