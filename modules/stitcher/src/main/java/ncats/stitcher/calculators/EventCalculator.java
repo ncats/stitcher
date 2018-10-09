@@ -13,7 +13,7 @@ import ncats.stitcher.calculators.events.*;
 
 import static ncats.stitcher.Props.*;
 
-public class EventCalculator implements StitchCalculator {
+public class EventCalculator extends StitchCalculator {
 
     static EventParser[] DEFAULT_EVENT_PARSERS = {
             new GSRSEventParser(),
@@ -35,7 +35,6 @@ public class EventCalculator implements StitchCalculator {
     public static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd");
     public static final SimpleDateFormat SDF2 = new SimpleDateFormat ("MM/dd/yyyy");
 
-    final EntityFactory ef;
     final DataSourceFactory dsf;
 
     private List<EventParser> eventParsers = Arrays.asList(DEFAULT_EVENT_PARSERS);
@@ -226,18 +225,7 @@ public class EventCalculator implements StitchCalculator {
         return events;
     }
 
-    // TODO Refactor into StitchCalculator interface
-    public int recalculateNodes (long[] nodes) {
-        logger.info("## recalculating node "+Arrays.toString(nodes)+"...");
-        return ef.maps(e -> {
-            Stitch s = Stitch._getStitch(e);
-            accept (s);
-        }, nodes);
-    }
-
     public static void main (String[] argv) throws Exception {
-
-
         if (argv.length < 2) {
             System.err.println("Usage: "+EventCalculator.class.getName()
                                +" DB VERSION");
