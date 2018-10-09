@@ -60,7 +60,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 Node n = rel.getOtherNode(_node);
                 if (rel.isType(AuxRelType.STITCH)
                     || rel.isType(AuxRelType.PAYLOAD)) {
-                    /*if (!n.hasProperty("CONDITION") && !n.hasProperty("NDC")
+                    /*if (!n.hasProperty("CONDITION") && !n.hasProperty("product")
                       && !n.hasProperty("Year")) {*/
                     ObjectNode obj = mapper.createObjectNode();
                     setJson (obj, n);
@@ -233,8 +233,12 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                         if (!py.equals(n)) {
                             ObjectNode on = Util.toJsonNode(py);
                             String source = (String)srel.getProperty(SOURCE);
-                            on.put(SOURCE, es.getDataSourceFactory()
-                                   .getDataSourceByKey(source).getName());
+                            DataSource ds2 = es.getDataSourceFactory()
+                                    .getDataSourceByKey(source);
+                            if (ds2 != null)
+                                on.put(SOURCE, ds2.getName());
+                            else
+                                on.put(SOURCE, "source not available");
                             data.add(on);
                         }
                     }
