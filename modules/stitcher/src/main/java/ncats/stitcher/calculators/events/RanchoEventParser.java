@@ -15,17 +15,17 @@ public class RanchoEventParser extends EventParser {
     Object id;
 
     public RanchoEventParser() {
-        super ("rancho-export_2017-10-26_20-39.json");
+        super ("rancho-export_2018-08-30_20-58.json");
     }
 
-    void parseEvent (JsonNode n) {
+    void parseCondition(JsonNode n) {
         if (n.has("HighestPhase") && ("approved".equalsIgnoreCase
             (n.get("HighestPhase").asText())) || ("phase IV".equalsIgnoreCase
                 (n.get("HighestPhase").asText()))) {
             event = new Event(name, id, Event.EventKind.Marketed);
             if (n.has("HighestPhaseUri")) {
-                event.comment = n.get("HighestPhaseUri").asText();
-                if (event.comment.contains("fda.gov")) {
+                event.URL = n.get("HighestPhaseUri").asText();
+                if (event.URL.contains("fda.gov")) {
                     event.jurisdiction = "US";
                 }
             }
@@ -41,61 +41,62 @@ public class RanchoEventParser extends EventParser {
                     event.comment += " "
                         + n.get("ConditionProductName").asText();
             }
+            if (n.has("ConditionProductName"))
+                event.product = n.get("ConditionProductName").asText();
             if (n.has("ConditionProductDate")) {
                 String d = n.get("ConditionProductDate").asText();
                 try {
                     Date date = EventCalculator.SDF.parse(d);
-                        event.date = date;
+                        event.startDate = date;
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     EventCalculator.logger.log(Level.SEVERE,
-                            "Can't parse date: "+d, ex);
+                            "Can't parse startDate: "+d, ex);
                 }
             }
-
-            if(n.has("InVivoUseRoute")){
-                String route = n.get("InVivoUseRoute").asText();
-                //InVivoUseRoute is a controlled vocabularly
-                //if the value = "other" than use the field InVivoUseRouteOther
-                //which is free text.
-                if("other".equalsIgnoreCase(route)){
-                    route = n.get("InVivoUseRouteOther").asText();
-                }
-                if(route !=null && !route.trim().isEmpty()){
-                    event.route = route;
-                }
-            }
-
         }
     }
 
-    void parseEvent (String content) throws Exception {
+    void parseCondition(String content) throws Exception {
         JsonNode node = mapper.readTree(decoder.decode(content));
         if (node.isArray()) {
             for (int i = 0; i < node.size(); ++i) {
                 JsonNode n = node.get(i);
-                parseEvent (n);
+                parseCondition(n);
             }
         }
         else
-            parseEvent (node);
+            parseCondition(node);
     }
 
-    public List<Event> getEvents(Map<String, Object> payload) {
-        List<Event> events = new ArrayList<>();
+    String parseObject (Object item) {
+        if (item != null) {
+            String value = "";
+            if (item.getClass().isArray()) {
+                for (int i = 0; i < Array.getLength(item); i++)
+                    value += (value.length() > 0 ? ";" : "") +
+                            Array.get(item, i).toString();
+            } else value = item.toString();
+            return value;
+        }
+        return null;
+    }
+
+    public void produceEvents(Map<String, Object> payload) {
         event = null;
         id = payload.get("Unii");
-        if (id != null && id.getClass().isArray()
-            && Array.getLength(id) == 1)
-            id = Array.get(id, 0);
+        if (id != null && id.getClass().isArray())
+            //&& Array.getLength(id) == 1)
+            id = Array.get(id, 0); //TODO Make Rancho UNII unique, for now assume first UNII is good surrogate
 
+        // First, find highest phase product from conditions list
         Object content = payload.get("Conditions");
         if (content != null) {
             if (content.getClass().isArray()) {
                 for (int i = 0; i < Array.getLength(content); ++i) {
                     String c = (String) Array.get(content, i);
                     try {
-                        parseEvent (c);
+                        parseCondition(c);
                     }
                     catch (Exception ex) {
                         EventCalculator.logger.log(Level.SEVERE,
@@ -105,7 +106,7 @@ public class RanchoEventParser extends EventParser {
             }
             else {
                 try {
-                    parseEvent ((String)content);
+                    parseCondition((String)content);
                 }
                 catch (Exception ex) {
                     EventCalculator.logger.log(Level.SEVERE,
@@ -113,7 +114,33 @@ public class RanchoEventParser extends EventParser {
                 }
             }
         }
-        if (event != null) events.add(event);
-        return events;
+
+        // Add back other payload info to event
+        if (event != null) {
+            Object item = payload.get("InVivoUseRoute");
+            String route = parseObject(item);
+            //InVivoUseRoute is a controlled vocabularly
+            //if the value = "other" than use the field InVivoUseRouteOther
+            //which is free text.
+            if("other".equalsIgnoreCase(route)) {
+                item = payload.get("InVivoUseRouteOther");
+                route = parseObject(item);
+            }
+            if(route !=null && !route.trim().isEmpty()){
+                event.route = route;
+            }
+            item = payload.get("Originator");
+            String sponsor = parseObject(item);
+            if(sponsor !=null && !sponsor.trim().isEmpty() &&
+                !sponsor.equals("Unknown"))
+                event.sponsor = sponsor;
+            item = payload.get("OriginatorUri");
+            String url = parseObject(item);
+            if (event.URL != null && url != null &&
+                    !url.trim().isEmpty() && !url.trim().equals("Unknown"))
+                event.URL = url;
+        }
+        if (event != null) events.put(String.valueOf(System.identityHashCode(event)), event);
+        return;
     }
 }

@@ -15,8 +15,7 @@ public class PharmManuEventParser extends EventParser {
         super ("PharmManuEncycl3rdEd.json");
     }
 
-    public List<Event> getEvents(Map<String, Object> payload) {
-        List<Event> events = new ArrayList<>();
+    public void produceEvents(Map<String, Object> payload) {
         Object id = payload.get("UNII");
 
         String content = (String) payload.get("Drug Products");
@@ -29,11 +28,11 @@ public class PharmManuEventParser extends EventParser {
                         String year = node.get("Year Introduced").asText();
                         try {
                             Date date = EventCalculator.SDF.parse(year+"-12-31");
-                            event.date = date;
+                            event.startDate = date;
                         }
                         catch (Exception ex) {
                             EventCalculator.logger.log(Level.SEVERE,
-                                       "Can't parse date: "+year, ex);
+                                       "Can't parse startDate: "+year, ex);
                         }
                     }
                     if (node.has("Country")) {
@@ -47,14 +46,16 @@ public class PharmManuEventParser extends EventParser {
                     if (node.has("Product")) {
                         event.comment =
                                 node.get("Product").asText();
+                        event.product = node.get("Product").asText();
                     }
                     if (node.has("Company")) {
+                        event.sponsor = node.get("Company").asText();
                         if (event.comment.length() > 0)
                             event.comment += " [" + node.get("Company").asText() + "]";
                         else event.comment +=
                                 node.get("Company").asText();
                     }
-                    events.add(event);
+                    events.put(String.valueOf(System.identityHashCode(event)), event);
                 }
             }
             catch (Exception ex) {
@@ -63,6 +64,6 @@ public class PharmManuEventParser extends EventParser {
             }
         }
 
-        return events;
+        return;
     }
 }

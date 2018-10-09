@@ -89,19 +89,13 @@ public class SummaryEventCalculator implements StitchCalculator {
         }
     }
 
-    public static Set<String> CLINICAL_PHASES = Arrays.asList("Phase I", "Phase II", "Phase III", "Not Provided")
-            .stream()
-            .collect(Collectors.toCollection(LinkedHashSet::new));
-
-    public static Set<String> SORTED_PHASES;
-
     enum PHASES {
         NOT_PROVIDED("Not Provided"),
         PHASE_I("Phase I"),
         PHASE_II("Phase II"),
         PHASE_III("Phase III"),
         PHASE_IV("Phase IV"),
-        APPROVIED_OFF_LABEL("Approved (off-label)"),
+        APPROVED_OFF_LABEL("Approved (off-label)"),
         APPROVED("Approved");
 
         private static final Map<String, PHASES> byDisplayName;
@@ -131,12 +125,6 @@ public class SummaryEventCalculator implements StitchCalculator {
 
             return Optional.empty();
         }
-    }
-
-    static {
-        SORTED_PHASES = new LinkedHashSet<>(CLINICAL_PHASES);
-        SORTED_PHASES.add("Approved (off-label)");
-        SORTED_PHASES.add("Approved");
     }
 
     public SummaryEventCalculator(EntityFactory ef) {
@@ -348,8 +336,8 @@ public class SummaryEventCalculator implements StitchCalculator {
             //100:  WITHDRAWN NON-US
             //Tie Breakers: if 2 events are tied:
             //   a. The one from the most trusted source is first (Orange Book + Drugs @ FDA)
-            //   b. If still tied, and only 1 has a date, return that one first
-            //   c. If still tied, and both have a date, return the older event first
+            //   b. If still tied, and only 1 has a startDate, return that one first
+            //   c. If still tied, and both have a startDate, return the older event first
 
             int o1 = this.getEffectiveOrder();
             int o2 = other.getEffectiveOrder();
@@ -433,7 +421,7 @@ public class SummaryEventCalculator implements StitchCalculator {
                     if (old == null || old.year == null) {
                         earliestApproved.set(rs);
 
-                        //Otherwise, use it only if the year is definitely before the old date
+                        //Otherwise, use it only if the year is definitely before the old startDate
                     } else if (rs.isCertainlyBefore(earliestApproved.get())) {
                         earliestApproved.set(rs);
                     }
@@ -551,7 +539,7 @@ public class SummaryEventCalculator implements StitchCalculator {
 kind: "ApprovalRx",
 id: "63020-078",
 source: "spl_acti_rx.txt",
-date: "2015-11-20",
+startDate: "2015-11-20",
 created: 1509266743019,
 jurisdiction: "US",
 comment: "NDA208462"
@@ -560,7 +548,7 @@ comment: "NDA208462"
 kind: "ApprovalRx",
 source: "approvalYears.txt",
 id: "46CWK97Z3K",
-date: "2015-11-20",
+startDate: "2015-11-20",
 created: 1509266743019,
 jurisdiction: "US",
 comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
@@ -916,14 +904,23 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
                 return Optional.empty();
             }
 
+            // TODO check ohase nomenclature is correct
             String hphase = jsn.at("/highestPhase").textValue();
+
+            List<String> CLINICAL_PHASES = Arrays.asList(
+                    "Phase I", "Phase II", "Phase III", "Phase IV");
+
+            Set<String> SORTED_PHASES;
+            SORTED_PHASES = new LinkedHashSet<>(CLINICAL_PHASES);
+            SORTED_PHASES.add("Approved (off-label)");
+            SORTED_PHASES.add("Approved");
 
             if ("Approved".equals(hphase)) {
                 ObjectNode on = (ObjectNode) jsn;
                 on.put("isHighestPhaseApproved", "true");
                 on.put("approvalSource", "RANCHO");
             } else {
-                if (SummaryEventCalculator.CLINICAL_PHASES.contains(hphase)) {
+                if (CLINICAL_PHASES.contains(hphase)) {
                     ObjectNode on = (ObjectNode) jsn;
                     on.put("isClinical", true);
                 }
@@ -1052,26 +1049,28 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
         Event initUSAppr = null;
         Event initAppr = null;
         for (Event e: events) {
-            if (e.date != null && e.jurisdiction.contains("US") && e.kind.isApproved()) {
-                if (initAppr == null || e.date.before(initAppr.date)) {
+            if (e.startDate != null && e.jurisdiction.contains("US") && e.kind.isApproved()) {
+                if (initAppr == null || e.startDate.before(initAppr.startDate)) {
                     initAppr = e;
                 }
-                if (initUSAppr == null || e.date.before(initUSAppr.date)) {
+                if (initUSAppr == null || e.startDate.before(initUSAppr.startDate)) {
                     initUSAppr = e;
                 }
             }
-            if (e.date != null && e.kind.wasMarketed()) {
-                if (initAppr == null || e.date.before(initAppr.date)) {
+            if (e.startDate != null && e.kind.wasMarketed()) {
+                if (initAppr == null || e.startDate.before(initAppr.startDate)) {
                     initAppr = e;
                 }
             }
         }
 
         if (initAppr != null) {
-            System.out.println("Initially marketed: "+(initAppr.date.getYear()+1900)+ " ("+initAppr.jurisdiction+")");
+            cal.setTime(initAppr.startDate);
+            System.out.println("Initially marketed: "+cal.get(Calendar.YEAR)+ " ("+initAppr.jurisdiction+")");
         }
-        if (initAppr != null && initAppr != initUSAppr) {
-            System.out.println("Initial US marketing: " + (initUSAppr.date.getYear()+1900));
+        if (initUSAppr != null && initAppr != initUSAppr) {
+            cal.setTime(initUSAppr.startDate);
+            System.out.println("Initial US marketing: "+cal.get(Calendar.YEAR));
         }
 
         // Calculate Current Marketing Status
