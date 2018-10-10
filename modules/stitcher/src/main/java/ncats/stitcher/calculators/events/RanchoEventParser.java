@@ -19,9 +19,9 @@ public class RanchoEventParser extends EventParser {
     }
 
     void parseCondition(JsonNode n) {
-        if (n.has("HighestPhase") && ("approved".equalsIgnoreCase
-            (n.get("HighestPhase").asText())) || ("phase IV".equalsIgnoreCase
-                (n.get("HighestPhase").asText()))) {
+        if (n.has("HighestPhase") && n.get("HighestPhase") != null &&
+                ("approved".equalsIgnoreCase(n.get("HighestPhase").asText())) ||
+                ("phase IV".equalsIgnoreCase(n.get("HighestPhase").asText()))) {
             event = new Event(name, id, Event.EventKind.Marketed);
             if (n.has("HighestPhaseUri")) {
                 event.URL = n.get("HighestPhaseUri").asText();
@@ -45,6 +45,7 @@ public class RanchoEventParser extends EventParser {
                 event.product = n.get("ConditionProductName").asText();
             if (n.has("ConditionProductDate")) {
                 String d = n.get("ConditionProductDate").asText();
+                if (!"Unknown".equals(d))
                 try {
                     Date date = EventCalculator.SDF.parse(d);
                         event.startDate = date;

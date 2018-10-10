@@ -1026,8 +1026,6 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
     // Perform Summary Calculation
     @Override
     public void accept(Stitch stitch) {
-        //CalculatorFactory.getCalculatorFactory(ef)
-        //        .process(Stitch.getStitch(t));
         Node _node = stitch._node();
         List<Event> events = new ArrayList<>();
         for (Relationship rel : _node.getRelationships(Direction.BOTH)) {
@@ -1048,7 +1046,7 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
         Event initUSAppr = null;
         Event initAppr = null;
         for (Event e: events) {
-            if (e.startDate != null && e.jurisdiction.contains("US") && e.kind.isApproved()) {
+            if (e.startDate != null && "US".equals(e.jurisdiction) && e.kind.isApproved()) {
                 if (initAppr == null || e.startDate.before(initAppr.startDate)) {
                     initAppr = e;
                 }
@@ -1056,7 +1054,7 @@ comment: "GOT FROM DRUGS@FDA + OB sep 13 2017"
                     initUSAppr = e;
                 }
             }
-            if (e.startDate != null && e.kind.wasMarketed()) {
+            if (e.startDate != null && (e.kind.isApproved() || e.kind == Event.EventKind.Marketed)) {
                 if (initAppr == null || e.startDate.before(initAppr.startDate)) {
                     initAppr = e;
                 }

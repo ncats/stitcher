@@ -105,7 +105,7 @@ public class EventCalculator extends StitchCalculator {
                     ex.printStackTrace();
                 }
             }
-            labels.add(e.source);
+            labels.add(e.source); // TODO e.source is coming in as null in some cases
             if (e.startDate != null && e.kind.isApproved()) {
                 cal.setTime(e.startDate);
                 approvals.put(e.source, cal.get(Calendar.YEAR));
@@ -149,7 +149,8 @@ public class EventCalculator extends StitchCalculator {
         }
 
         public void add(String label){
-            labels.add(label);
+            if (label != null)
+                labels.add(label);
         }
 
         public String[] getLabelNames(){

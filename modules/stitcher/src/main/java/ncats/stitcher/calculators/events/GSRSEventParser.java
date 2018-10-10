@@ -20,6 +20,7 @@ public class GSRSEventParser extends EventParser {
                 events.put(type, event);
             }
         }
+        if (syn != null)
         for (int i=0; i<Array.getLength(syn); i++) {
             String name = Array.get(syn, i).toString();
             if (name.indexOf(" [") > -1) {
