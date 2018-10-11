@@ -98,7 +98,7 @@ public class Event implements Cloneable{
     }
 
     public Event(String source, Object id, EventKind kind, Date startDate) {
-        this.source = source;
+        this.source = source != null ? source : "*";
         this.id = id != null ? id : "*";
         this.kind = kind;
         this.startDate = startDate;
