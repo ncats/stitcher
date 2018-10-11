@@ -619,9 +619,9 @@ if __name__=="__main__":
     #header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
     header = "UNII\tApproval_Year\tDate\tDate_Method\tApp_Type\tApp_No\tSponsor\tProduct\tUrl\tactive\tComment\n"
     fp.write(header)
-    outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
-    fperr = open(outfile2, 'w')
-    fperr.write(header)
+    #outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
+    #fperr = open(outfile2, 'w')
+    #fperr.write(header)
     for unii in activeMoiety.keys():
         early = [getTimeStamp(), '']
         earlyDate = getTimeStamp()

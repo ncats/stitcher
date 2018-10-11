@@ -89,6 +89,8 @@ public class EventCalculator extends StitchCalculator {
                 props.put(ID, e.id);
                 eventIndexes.put(ei, 1);
             }
+            if (e.source == null) // TODO e.source is coming in as null in some cases
+                e.source = "*!";
             props.put(SOURCE, e.source);
             props.put(KIND, e.kind.toString());
 
@@ -105,7 +107,7 @@ public class EventCalculator extends StitchCalculator {
                     ex.printStackTrace();
                 }
             }
-            labels.add(e.source); // TODO e.source is coming in as null in some cases
+            labels.add(e.source);
             if (e.startDate != null && e.kind.isApproved()) {
                 cal.setTime(e.startDate);
                 approvals.put(e.source, cal.get(Calendar.YEAR));
