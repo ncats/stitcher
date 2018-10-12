@@ -100,14 +100,22 @@ public class WithdrawnEventParser extends EventParser{
                 e.startDate = EventCalculator.SDF
                         .parse((String)payload.get("date_launched"));
             else if (!"NA".equals(payload.get("year_launched")))
-                e.startDate = EventCalculator.SDF
-                        .parse(payload.get("year_launched")+"-12-31");
+                try {
+                    e.startDate = EventCalculator.SDF
+                            .parse(payload.get("year_launched")+"-12-31");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             if (!"NA".equals(payload.get("date_withdrawn")))
                 e.endDate = EventCalculator.SDF
                         .parse((String)payload.get("date_withdrawn"));
             else if (!"NA".equals(payload.get("year_withdrawn")))
-                e.endDate = EventCalculator.SDF
-                        .parse(payload.get("year_withdrawn")+"-12-31");
+                try {
+                    e.endDate = EventCalculator.SDF
+                            .parse(payload.get("year_withdrawn") + "-12-31");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             //e.active;
             if (!"NA".equals(payload.get("URL")))
                 e.URL = (String)payload.get("URL");

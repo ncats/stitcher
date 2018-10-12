@@ -20,15 +20,19 @@ public class DrugsAtFDAEventParser extends EventParser {
         if (content != null) {
             try {
                 Date date = EventCalculator.SDF2.parse((String)content);
-                event = new Event(name, id, Event.EventKind.ApprovalRx);
+                event = new Event(name, id, Event.EventKind.Marketed);
                 event.jurisdiction = "US";
                 event.startDate = date;
                 //event.endDate;
                 event.active = (String) payload.get("active");
                 event.source = (String) payload.get("Date_Method");
                 event.URL = (String) payload.get("Url");
-                event.approvalAppId = (String) payload.get("App_Type") +
-                        (String) payload.get("App_No");
+                Object appType = payload.get("App_Type");
+                if (appType != null) {
+                    event.approvalAppId = (String) payload.get("App_Type") +
+                            (String) payload.get("App_No");
+                    event = new Event(name, id, Event.EventKind.ApprovalRx);
+                }
                 event.product = (String) payload.get("Product");
                 event.sponsor = (String) payload.get("Sponsor");
                 //event.route;

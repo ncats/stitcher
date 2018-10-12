@@ -3,6 +3,7 @@ package ncats.stitcher.calculators.events;
 import ncats.stitcher.calculators.EventCalculator;
 
 import java.io.*;
+import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -99,6 +100,9 @@ public class DailyMedEventParser extends EventParser {
     }
     public DailyMedEventParser(String source) {
         super (source);
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, 1938);
+        fdaOrigDate = c.getTime();
     }
 
     /**
@@ -121,6 +125,8 @@ public class DailyMedEventParser extends EventParser {
 
     }
 
+    static Date fdaOrigDate;
+
     public void produceEvents(Map<String, Object> payload) {
         Event event = null;
         Object id = "NDC "+payload.get("NDC");
@@ -141,7 +147,8 @@ public class DailyMedEventParser extends EventParser {
 
             content = payload.get("InitialYearApproval");
             if (content != null) {
-                date = EventCalculator.SDF.parse((String) content + "-12-31");
+                String year = Integer.toString(Float.valueOf(content.toString()).intValue());
+                date = EventCalculator.SDF.parse(year + "-12-31");
             }
 
             content = payload.get("MarketDate");
@@ -214,7 +221,9 @@ public class DailyMedEventParser extends EventParser {
                 }else {
                     event.jurisdiction = "US";
                 }
-                event.startDate = date;
+
+                if (!date.before(fdaOrigDate))
+                    event.startDate = date;
 
                 event.approvalAppId = (String) payload.get("ApprovalAppId");
 
@@ -222,7 +231,8 @@ public class DailyMedEventParser extends EventParser {
 
                 event.productCategory = (String) payload.get("ProductCategory");
 
-                event.product = getFirstEntry(payload.get("GenericProductName"));
+                if (payload.containsKey("GenericProductName") && payload.get("GenericProductName") != null)
+                    event.product = getFirstEntry(payload.get("GenericProductName"));
 
                 event.URL = (String) payload.get("URL");
                 //Jan 2018 new columns for Route and MarketStatus
