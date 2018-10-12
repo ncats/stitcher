@@ -55,14 +55,6 @@ public class EventCalculator extends StitchCalculator {
         this.eventParsers = new ArrayList<>(Objects.requireNonNull(parsers));
     }
 
-    public int recalculate (int version) {
-        logger.info("## recalculating stitch_v"+version+"...");
-        return ef.maps(e -> {
-                Stitch s = Stitch._getStitch(e);
-                accept (s);
-            }, "stitch_v"+version);
-    }
-
     /*
      * Consumer<Stitch>
      */
@@ -117,24 +109,39 @@ public class EventCalculator extends StitchCalculator {
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
 
-        stitch.set("approved", labels.isApproved);
-        
-        // sources that have approval dates; order by relevance
-        for (EventParser ep : new EventParser[]{
-                new DrugsAtFDAEventParser(),
-                new DailyMedRxEventParser(),
-                new DailyMedOtcEventParser(),
-                new DailyMedRemEventParser(),
-                new WithdrawnEventParser()
-                //new DrugBankXmlEventParser()
-            }) {
-            Integer year = approvals.get(ep.name);
-            if (year != null) {
-                stitch.set("approvedYear", year);
-                break;
+        // Calculate Initial Approval
+        Event initUSAppr = null;
+        Event initAppr = null;
+        for (Event e: events) {
+            if (e.startDate != null && "US".equals(e.jurisdiction) && e.kind.isApproved()) {
+                if (initAppr == null || e.startDate.before(initAppr.startDate)) {
+                    initAppr = e;
+                }
+                if (initUSAppr == null || e.startDate.before(initUSAppr.startDate)) {
+                    initUSAppr = e;
+                }
+            }
+            if (e.startDate != null && (e.kind.isApproved() || e.kind == Event.EventKind.Marketed)) {
+                if (initAppr == null || e.startDate.before(initAppr.startDate)) {
+                    initAppr = e;
+                }
             }
         }
-        
+
+        if (initUSAppr != null) {
+            cal.setTime(initUSAppr.startDate);
+            stitch.set("approved", Boolean.TRUE);
+            stitch.set("approvedYear", cal.get(Calendar.YEAR));
+            if (initAppr != initUSAppr)
+                System.out.println("Initial US marketing: "+cal.get(Calendar.YEAR));
+            cal.setTime(initAppr.startDate);
+            System.out.println("Initially marketed: " + cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
+        }
+        else if (initAppr != null) {
+            cal.setTime(initAppr.startDate);
+            System.out.println("Initially marketed: "+cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
+        }
+
         stitch.addLabel(labels.getLabelNames());
     }
 
