@@ -137,6 +137,7 @@ public class DrugBankXmlEventParser extends EventParser {
                     ex.printStackTrace();
                 }
 
+        ev.URL = "https://www.drugbank.ca/drugs/"+id;
         // handle apprCheck, generic, otc info
         if (vals.containsKey("endDate"))
             ev.kind = Event.EventKind.Discontinued;
@@ -145,11 +146,14 @@ public class DrugBankXmlEventParser extends EventParser {
             ev.kind = Event.EventKind.Marketed;
         else if (ev.jurisdiction.equals("US")) {
             if (vals.containsKey("otc") && vals.get("otc").
-                    equalsIgnoreCase("true"))
-                ev.kind = Event.EventKind.ApprovalOTC;
-            else if (vals.containsKey("apprCheck") && vals.get("apprCheck").
-                    equalsIgnoreCase("true"))
-                ev.kind = Event.EventKind.ApprovalRx;
+                    equalsIgnoreCase("true")) {
+                //ev.kind = Event.EventKind.ApprovalOTC; TODO Find out if this can be trusted
+                ev.kind = Event.EventKind.Marketed;
+            } else if (vals.containsKey("apprCheck") && vals.get("apprCheck").
+                    equalsIgnoreCase("true")) {
+                //ev.kind = Event.EventKind.ApprovalRx; TODO Find out if this can be trusted
+                ev.kind = Event.EventKind.Marketed;
+            }
         }
 
 //        if (!id.isEmpty())

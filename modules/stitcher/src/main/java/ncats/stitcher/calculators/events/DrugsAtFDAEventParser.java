@@ -31,7 +31,7 @@ public class DrugsAtFDAEventParser extends EventParser {
                 if (appType != null) {
                     event.approvalAppId = (String) payload.get("App_Type") +
                             (String) payload.get("App_No");
-                    event = new Event(name, id, Event.EventKind.ApprovalRx);
+                    event.kind = Event.EventKind.ApprovalRx;
                 }
                 event.product = (String) payload.get("Product");
                 event.sponsor = (String) payload.get("Sponsor");

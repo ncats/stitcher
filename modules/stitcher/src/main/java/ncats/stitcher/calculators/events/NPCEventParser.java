@@ -23,6 +23,7 @@ public class NPCEventParser extends EventParser {
                 types.get(type);
                 Event event = minimalEvent("NPC:"+id+":"+ingred, ingred, type, product,null,
                         types.get(type).kind, types.get(type).jurisdiction);
+                event.URL ="https://tripod.nih.gov/npc/#Download";
                 events.put(type, event);
             }
         }

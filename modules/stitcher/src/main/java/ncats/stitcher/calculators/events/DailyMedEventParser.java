@@ -152,7 +152,7 @@ public class DailyMedEventParser extends EventParser {
             }
 
             content = payload.get("MarketDate");
-            if (content != null) {
+            if (content != null && !"1900-01-01".equals(content)) {
                 Date date2 = EventCalculator.SDF.parse((String)content);
                 if (date == null || date.after(date2))
                     date = date2;
