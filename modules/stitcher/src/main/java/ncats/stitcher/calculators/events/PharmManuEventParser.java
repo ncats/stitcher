@@ -55,6 +55,7 @@ public class PharmManuEventParser extends EventParser {
                         else event.comment +=
                                 node.get("Company").asText();
                     }
+                    event.URL = "https://archive.org/details/Pharmaceutical_Manufacturing_Encyclopedia_Vols_12_2nd_Ed";
                     events.put(String.valueOf(System.identityHashCode(event)), event);
                 }
             }
