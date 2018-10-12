@@ -135,11 +135,17 @@ public class EventCalculator extends StitchCalculator {
             if (initAppr != initUSAppr)
                 System.out.println("Initial US marketing: "+cal.get(Calendar.YEAR));
             cal.setTime(initAppr.startDate);
+            // TODO watch out for null jurisdictions
             System.out.println("Initially marketed: " + cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
-        }
-        else if (initAppr != null) {
+            if ("1900".equals(cal.get(Calendar.YEAR))) {
+                System.out.println("whoops");
+            }
+        } else if (initAppr != null) {
             cal.setTime(initAppr.startDate);
             System.out.println("Initially marketed: "+cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
+            stitch.set("approved", Boolean.FALSE);
+        } else {
+            stitch.set("approved", Boolean.FALSE);
         }
 
         stitch.addLabel(labels.getLabelNames());
