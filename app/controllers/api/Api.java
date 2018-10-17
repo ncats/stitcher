@@ -221,30 +221,7 @@ public class Api extends Controller {
                 e = null;
         }
         catch (Exception ex) {
-            Entity[] entities = es.getEntityFactory()
-                    .filter("id", "'"+id+"'", "stitch_v"+ver);
-            if (entities.length > 0) {
-                int index = 0;
-                if (entities.length > 1) {
-                    Logger.warn(id + " yields " + entities.length
-                            + " matches!");
-                    int highestrank = 0; // make which stitchnode is returned to be more deterministic
-                    for (int i = 0; i < entities.length; i++) {
-                        Entity ent = entities[i];
-                        Map props = ent.properties();
-                        int rank = 0;
-                        if (props.containsKey("rank"))
-                            rank = (Integer) props.get("rank");
-                        if (rank > highestrank) {
-                            highestrank = rank;
-                            index = i;
-                        } else if (rank == highestrank && ent.getId() < entities[index].getId()) {
-                            index = i;
-                        }
-                    }
-                }
-                e = entities[index];
-            }
+            e = es.getEntityFactory().entity(ver, id);
         }
         return e;
     }
