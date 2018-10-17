@@ -45,7 +45,7 @@ public class ClinicalTrialsEventParser extends EventParser {
             if ("Phase 4".equals(status))
                 ek = Event.EventKind.Marketed;
             event = new Event(name, id, ek);
-            //event.jurisdiction = "US";
+            //event.jurisdiction;
             event.startDate = date;
             //event.endDate;
             //event.active;
@@ -55,7 +55,7 @@ public class ClinicalTrialsEventParser extends EventParser {
             event.product = payload.get("NCT_ID") + ": " + status + " " + (String) payload.get("CONDITION");
             //event.sponsor;
             //event.route;
-            //event.comment;
+            event.comment = status;
 
             if (earlyEvent(event, status))
                 events.put(status, event);

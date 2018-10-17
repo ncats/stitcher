@@ -2,9 +2,7 @@ package ncats.stitcher.calculators.events;
 
 import ncats.stitcher.calculators.EventCalculator;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -20,7 +18,7 @@ public class DrugsAtFDAEventParser extends EventParser {
         if (content != null) {
             try {
                 Date date = EventCalculator.SDF2.parse((String)content);
-                event = new Event(name, id, Event.EventKind.Marketed);
+                event = new Event(name, id, Event.EventKind.USPreviouslyMarketed);
                 event.jurisdiction = "US";
                 event.startDate = date;
                 //event.endDate;
@@ -28,10 +26,10 @@ public class DrugsAtFDAEventParser extends EventParser {
                 event.source = (String) payload.get("Date_Method");
                 event.URL = (String) payload.get("Url");
                 Object appType = payload.get("App_Type");
-                if (appType != null) {
+                if ("true".equals(event.active)) {
                     event.approvalAppId = (String) payload.get("App_Type") +
                             (String) payload.get("App_No");
-                    event.kind = Event.EventKind.ApprovalRx;
+                    event.kind = Event.EventKind.USApprovalRx;
                 }
                 event.product = (String) payload.get("Product");
                 event.sponsor = (String) payload.get("Sponsor");

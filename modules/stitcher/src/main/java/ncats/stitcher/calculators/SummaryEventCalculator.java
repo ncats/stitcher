@@ -36,8 +36,8 @@ public class SummaryEventCalculator extends StitchCalculator {
 
     enum DEV_STATUSES {
         WITHDRAWN("US Withdrawn", "Withdrawn", 0),
-        APPROVED_OTC("US Approved OTC", "ApprovalOTC", 1),
-        APPROVED_RX("US Approved Rx", "ApprovalRx", 2),
+        APPROVED_OTC("US Approved OTC", "USApprovalOTC", 1),
+        APPROVED_RX("US Approved Rx", "USApprovalRx", 2),
         MARKETED("US Unapproved, Marketed", "Marketed", 3),
         //  MARKETED("Marketed","Marketed",2),
         CLINICAL("Clinical", "ClinicalTrial", 4),
@@ -535,7 +535,7 @@ public class SummaryEventCalculator extends StitchCalculator {
                      
                      [
 {
-kind: "ApprovalRx",
+kind: "USApprovalRx",
 id: "63020-078",
 source: "spl_acti_rx.txt",
 startDate: "2015-11-20",
@@ -544,7 +544,7 @@ jurisdiction: "US",
 comment: "NDA208462"
 },
 {
-kind: "ApprovalRx",
+kind: "USApprovalRx",
 source: "approvalYears.txt",
 id: "46CWK97Z3K",
 startDate: "2015-11-20",
