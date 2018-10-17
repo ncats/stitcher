@@ -71,7 +71,6 @@ public abstract class EventParser {
 
     static HashMap<String, EventFormat> types = new HashMap();
     {
-        types.put("EVMPD", new EventFormat("EU", Event.EventKind.Marketed));
         types.put("HEALTH -CANADA NHP INGREDIENT MONOGRAPH", new EventFormat("Canada", Event.EventKind.Marketed));
         types.put("Canada", new EventFormat("Canada", Event.EventKind.Marketed));
         types.put("UK NHS", new EventFormat("UK", Event.EventKind.Marketed));
@@ -86,6 +85,9 @@ public abstract class EventParser {
         types.put("INN", new EventFormat(null, Event.EventKind.Clinical));
         types.put("USAN", new EventFormat("US", Event.EventKind.Clinical));
         types.put("JAN", new EventFormat("Japan", Event.EventKind.Clinical));
+        types.put("BAN", new EventFormat("UK", Event.EventKind.Clinical));
+        types.put("GREEN BOOK", new EventFormat("US", Event.EventKind.USAnimalDrug));
+        //types.put("EVMPD", new EventFormat("EU", Event.EventKind.Marketed));
         //types.put("MART.", new EventFormat(null, Event.EventKind.Marketed));
         //types.put("WHO-DD", new EventFormat(null, Event.EventKind.Marketed));
         //types.put("MI", new EventFormat(null, Event.EventKind.Marketed));

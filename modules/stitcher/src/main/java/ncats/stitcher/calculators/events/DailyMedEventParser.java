@@ -3,7 +3,6 @@ package ncats.stitcher.calculators.events;
 import ncats.stitcher.calculators.EventCalculator;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -19,9 +18,10 @@ public class DailyMedEventParser extends EventParser {
   38 US Unapproved, Marketed
  */
         Other("Other", Event.EventKind.Other),
-        US_Approved_OTC("US Approved OTC", Event.EventKind.ApprovalOTC),
-        US_Approved_Rx("US Approved Rx", Event.EventKind.ApprovalRx),
-        US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.Marketed)
+        US_Approved_OTC("US Approved OTC", Event.EventKind.USApprovalOTC),
+        US_Approved_Rx("US Approved Rx", Event.EventKind.USApprovalRx),
+        US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.USUnapproved),
+        US_Approved_Allergenic("US Approved Allergenic", Event.EventKind.USApprovalAllergenic)
         ;
 
         private static Map<String, DevelopmentStatus> map = new HashMap<>();
@@ -191,18 +191,18 @@ public class DailyMedEventParser extends EventParser {
                                 contentStr.startsWith("BA") ||
                                 contentStr.startsWith("BN") ||
                                 contentStr.startsWith("BLA")) {
-                            et = Event.EventKind.ApprovalRx;
+                            et = Event.EventKind.USApprovalRx;
                         } else {
                             Matcher matcher = CFR_21_OTC_PATTERN.matcher(contentStr);
                             if (matcher.find()) {
                                 //We include if it's 310.545. We exclude if it's any other 310.5XX
                                 if (contentStr.startsWith("310.5")) {
                                     if (contentStr.equals("310.545")) {
-                                        et = Event.EventKind.ApprovalOTC;
+                                        et = Event.EventKind.USApprovalOTC;
                                     }
 
                                 } else {
-                                    et = Event.EventKind.ApprovalOTC;
+                                    et = Event.EventKind.USApprovalOTC;
                                 }
                             } else {
                                 EventCalculator.logger.log(Level.WARNING,
@@ -224,6 +224,10 @@ public class DailyMedEventParser extends EventParser {
 
                 if (!date.before(fdaOrigDate))
                     event.startDate = date;
+
+                if (event.endDate == null)
+                    event.active = "true";
+                else event.active = "false";
 
                 event.approvalAppId = (String) payload.get("ApprovalAppId");
 

@@ -25,7 +25,7 @@ public class RanchoEventParser extends EventParser {
             event = new Event(name, id, Event.EventKind.Marketed);
             if (n.has("HighestPhaseUri")) {
                 event.URL = n.get("HighestPhaseUri").asText();
-                if (event.URL.contains("fda.gov")) {
+                if (event.URL.contains("fda.gov") || event.URL.contains("dailymed.nlm.nih.gov")) {
                     event.jurisdiction = "US";
                 }
             }

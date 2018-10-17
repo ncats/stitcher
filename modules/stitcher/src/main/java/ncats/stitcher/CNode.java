@@ -237,6 +237,21 @@ public class CNode implements Props, Comparable<CNode> {
         return _node.getProperty(name, null);
     }
 
+    public Object removeProperty (String name) {
+        Object value = null;
+        try (Transaction tx = getGraphDb().beginTx()) {
+            if (_node.hasProperty(name)) {
+                value = _node.removeProperty(name);
+            }
+            tx.success();
+            return value;
+        }
+    }
+
+    public Object _removeProperty (String name) {
+        return _node.removeProperty(name);
+    }
+
     public void set (String name, Object value) {
         set (name, value, false);
     }
