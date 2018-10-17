@@ -22,7 +22,7 @@ opener.addheaders = [
 ]
 
 site = 'https://stitcher.ncats.io/'
-#site = 'http://localhost:8080/'
+site = 'http://localhost:8080/'
 
 def requestJson(uri):
     try:
@@ -53,10 +53,12 @@ def uniiClashes(unii2stitch, stitch):
     return unii2stitch
 
 def approvedStitches(approved, stitch):
-    if stitch['approved'] == True:
+    if stitch['USapproved'] == True:
         apprYear = "not given"
-        if stitch.has_key('approvedYear'):
-            apprYear = stitch['approvedYear']
+        if stitch.has_key('initiallyMarketedUS'):
+            apprYear = stitch['initiallyMarketedUS']
+        elif stitch.has_key('initiallyMarketed'):
+            apprYear = stitch['initiallyMarketed']
         parent = stitch['sgroup']['parent']
         rank = stitch['rank']
         unii = ''
@@ -68,6 +70,23 @@ def approvedStitches(approved, stitch):
                     unii = node['id']
         name = getName(stitch)
         approved[unii] = [apprYear, parent, rank]
+    return approved
+
+def highestStatus(approved, stitch):
+    status = stitch['highestPhase']
+    parent = stitch['sgroup']['parent']
+    rank = stitch['rank']
+    unii = ''
+    name = ''
+    for node in stitch['sgroup']['members']:
+        if node['node'] == parent:
+            if not node.has_key('id'):
+                unii = node['name']
+            else:
+                unii = node['id']
+            name = getName(stitch)
+    if status != 'Other':
+        approved[unii] = [name, status, stitch['id'], rank]
     return approved
 
 def nmeStitches(stitch2nmes, stitch, nmelist):
@@ -312,17 +331,28 @@ def probeUniiClash():
 
 
 if __name__=="__main__":
-
+    #!!!TODO compare Broad node clinical_phase entries with highest phase
+    
     # list of tests to perform
-    #nmeStitches: Multiple NME approvals (from ApprovalYears.txt) that belong to a single stitch
+    #nmeClashes: Multiple NME approvals (from ApprovalYears.txt) that belong to a single stitch
+    #nmeClashes2: Multiple NME approvals (from FDA-NMEs-2018-08-07.txt) that belong to a single stitch
     #PMEClashes: Multiple PME entries that belong to a single stitch
     #activemoietyClashes: Multiple GSRS active moieties listed for a single stitch
     #uniiClashes: Different stitches (listed by id) that share a UNII - candidates for merge
     #findOrphans: Some resource entries were supposed to be stitched, but are orphaned
     #approvedStitches: Report on all the approved stitches from API
     
-    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches]
-    
+    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches, highestStatus]
+    testHeaders = dict()
+    testHeaders['nmeClashes'] = 'nmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
+    testHeaders['nmeClashes2'] = '\nnmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
+    testHeaders['PMEClashes'] = '\npmeClashes\tIngredient\t[Blank]\tStitch Node\tStitch Rank\tClash Ingredient 1\tClash Ingredient 2\tetc.'
+    testHeaders['activemoietyClashes'] = '\n[active moiety clash detection disabled?]'
+    testHeaders['uniiClashes'] = '\n[unii clash detection disabled?]'
+    testHeaders['findOrphans'] = '\nfindOrphans\tSource|Status\tIngredient\tSource\tStatus'
+    testHeaders['approvedStitches'] = '\napprovedStitches\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
+    testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
+
     # initialize list of NMEs
     nmeList = open("../data/approvalYears.txt", "r").readlines()
     for entry in nmeList[1:]:
@@ -361,6 +391,7 @@ if __name__=="__main__":
     # write out results
     for i in range(len(tests)):
         test = tests[i].__name__
+        print testHeaders[test]
         output = outputs[i]
         keys = output.keys()
         keys.sort()
