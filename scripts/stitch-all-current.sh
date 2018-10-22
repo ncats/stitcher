@@ -53,6 +53,9 @@ echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
 echo 'CT:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/otc.conf"
+echo 'OTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
 # make db copy before stitching...
 cp -r $db NOSTITCH$db
 
