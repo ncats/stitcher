@@ -18,6 +18,7 @@ public class EventCalculator extends StitchCalculator {
     static EventParser[] DEFAULT_EVENT_PARSERS = {
             new GSRSEventParser(),
             new DrugsAtFDAEventParser (),
+            new OTCMonographParser (),
             new ClinicalTrialsEventParser(),
             new RanchoEventParser(),
             new NPCEventParser (),
@@ -309,11 +310,11 @@ public class EventCalculator extends StitchCalculator {
         EventCalculator ac = new EventCalculator(ef);
         int count;
         int ver = Integer.parseInt(argv[1]);
-        if (argv.length == 2) {
+        if (ver < 3) {
             count = ac.recalculate(ver);
         } else {
             List<Long> nodeList = new ArrayList();
-            for (int i=2; i<argv.length; i++) {
+            for (int i=1; i<argv.length; i++) {
                 String id = argv[i];
                 Entity e = null;
                 try {
