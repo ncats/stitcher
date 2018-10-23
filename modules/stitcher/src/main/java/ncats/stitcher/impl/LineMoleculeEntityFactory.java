@@ -87,6 +87,7 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
                         || (strucField.length() > 0
                             && header[c].equals(strucField)))) {
                     try {
+                        if ("NA".equals(row[c].trim())) row[c] = "Not Available"; // Withdrawn file uses NA as not available, but this is a valid smiles
                         mh.setMolecule(row[c]);                         
                         if (molcol < 0) {
                             molcol = c;
