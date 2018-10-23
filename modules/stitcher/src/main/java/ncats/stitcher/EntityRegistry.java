@@ -548,6 +548,8 @@ public class EntityRegistry extends EntityFactory {
                             lychify (ent, mol);
                     }
                     else {
+                        if ("NA".equals(value.toString()))
+                            value = "Not Available"; // Withdrawn file uses NA as not available, but this is a valid smiles
                         try {
                             MolHandler mh = new MolHandler (value.toString());
                             Molecule mol = mh.getMolecule();
