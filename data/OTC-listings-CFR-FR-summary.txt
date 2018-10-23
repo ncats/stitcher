@@ -757,7 +757,7 @@ OTC_ID	UNII	OTC_Ingredient	OTC_Monograph	OTC_Status	OTC_Ref_Text	OTC_URL
 756	04Y7590D77	isoleucine	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 757		juniper, potassium extract	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 758	73W9IQY50Q	karaya gum	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
-759	7HU6337315	kelp	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
+759		kelp	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 760	J2B2A4N98G	lactose	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 761		lecithin	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 762	GMW67QNF9C	leucine	weight control	Previously Marketed	21 CFR 310.545(a)(20)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml

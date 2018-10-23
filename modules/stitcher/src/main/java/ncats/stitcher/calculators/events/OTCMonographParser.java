@@ -26,7 +26,7 @@ public class OTCMonographParser extends EventParser {
                     event.kind = Event.EventKind.USApprovalOTC;
                 else if ("Marketed".equals(status))
                     event.kind = Event.EventKind.Marketed;
-                event.source = (String) payload.get("source");
+                event.source = this.name;
                 event.URL = (String) payload.get("OTC_URL");
                 event.product = (String) payload.get("OTC_Ingredient");
                 event.sponsor = (String) payload.get("OTC_Monograph");
