@@ -53,12 +53,15 @@ def uniiClashes(unii2stitch, stitch):
     return unii2stitch
 
 def approvedStitches(approved, stitch):
-    if stitch['USapproved'] == True:
+    if stitch.has_key('USapproved') and stitch['USapproved'] != 'null':
         apprYear = "not given"
         if stitch.has_key('initiallyMarketedUS'):
             apprYear = stitch['initiallyMarketedUS']
         elif stitch.has_key('initiallyMarketed'):
             apprYear = stitch['initiallyMarketed']
+        for event in stitch['events']:
+            if event['id'] == apprYear:
+                apprYear = event['startDate'][0:4]
         parent = stitch['sgroup']['parent']
         rank = stitch['rank']
         unii = ''
@@ -73,7 +76,12 @@ def approvedStitches(approved, stitch):
     return approved
 
 def highestStatus(approved, stitch):
-    status = stitch['highestPhase']
+    status = 'Other'
+    if stitch.has_key('highestPhase'):
+        status = stitch['highestPhase']
+        for event in stitch['events']:
+            if event['id'] == status:
+                status = event['kind']
     parent = stitch['sgroup']['parent']
     rank = stitch['rank']
     unii = ''
@@ -142,6 +150,7 @@ def activemoietyClashes(stitch2ams, stitch):
         entries.sort()
         entries.insert(1, key)
         entries.insert(2, stitch['rank'])
+        stitch2ams[entries[0]] = entries[1:]
     return stitch2ams
 
 orphanList = ['Pharmaceutical Manufacturing Encyclopedia (Third Edition)', 'Broad Institute Drug List 2017-03-27', 'Rancho BioSciences, August 2018', 'DrugBank, July 2018', 'NCATS Pharmaceutical Collection, April 2012', 'Withdrawn and Shortage Drugs List Feb 2018']
@@ -342,13 +351,13 @@ if __name__=="__main__":
     #findOrphans: Some resource entries were supposed to be stitched, but are orphaned
     #approvedStitches: Report on all the approved stitches from API
     
-    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, findOrphans, approvedStitches, highestStatus]
+    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
     testHeaders = dict()
     testHeaders['nmeClashes'] = 'nmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
-    testHeaders['nmeClashes2'] = '\nnmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
-    testHeaders['PMEClashes'] = '\npmeClashes\tIngredient\t[Blank]\tStitch Node\tStitch Rank\tClash Ingredient 1\tClash Ingredient 2\tetc.'
-    testHeaders['activemoietyClashes'] = '\n[active moiety clash detection disabled?]'
-    testHeaders['uniiClashes'] = '\n[unii clash detection disabled?]'
+    testHeaders['nmeClashes2'] = '\nnmeClashes2\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
+    testHeaders['PMEClashes'] = '\nPMEClashes\tIngredient\t[Blank]\tStitch Node\tStitch Rank\tClash Ingredient 1\tClash Ingredient 2\tetc.'
+    testHeaders['activemoietyClashes'] = '\nactivemoietyClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
+    testHeaders['uniiClashes'] = '\nuniiClashes\tUNII\tPN\tStitch Node 1\tStitch Node 2\tetc.'
     testHeaders['findOrphans'] = '\nfindOrphans\tSource|Status\tIngredient\tSource\tStatus'
     testHeaders['approvedStitches'] = '\napprovedStitches\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
     testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
@@ -384,7 +393,7 @@ if __name__=="__main__":
     output = outputs[outputindex]
     newoutput = dict()
     for key in output:
-        if len(output[key]) > 2:
+        if len(output[key]) > 1:
             newoutput[key] = output[key]
     outputs[outputindex] = newoutput
             
