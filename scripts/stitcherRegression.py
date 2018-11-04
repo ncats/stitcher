@@ -88,10 +88,13 @@ def highestStatus(approved, stitch):
     name = ''
     for node in stitch['sgroup']['members']:
         if node['node'] == parent:
-            if not node.has_key('id'):
+            if 'id' in node:
+                unii = node['id']
+            elif 'name' in node:
                 unii = node['name']
             else:
-                unii = node['id']
+                sys.stderr.write("failed parent node: "+str(parent)+"\n")
+                sys.stderr.flush()
             name = getName(stitch)
     if status != 'Other':
         approved[unii] = [name, status, stitch['id'], rank]
@@ -165,13 +168,13 @@ def findOrphans(orphans, stitch):
             status = ''
             if 'id' in node:
                 id = node['id']
-            else:
+            elif 'name' in node:
                 id = node['name']
             if 'name' in node:
                 name = node['name']
             if node['source'] == 'Broad Institute Drug List 2017-03-27':
-                if 'clinical_phase' in stitch['sgroup']['properties']:
-                    status = '|' + stitch['sgroup']['properties']['clinical_phase']['value']
+                if 'status' in stitch['sgroup']['properties']:
+                    status = '|' + stitch['sgroup']['properties']['status']['value']
             if node['source'] == 'DrugBank, July 2018':
                 if 'groups' in stitch['sgroup']['properties']:
                     status = ''
