@@ -24,7 +24,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db data/dump-public-2018-07-19.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, August 2018\" cache=data/hash.db data/rancho-export_2018-08-30_20-58.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, November 2018\" cache=data/hash.db data/rancho-export_2018-11-11_04-51.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
@@ -53,6 +53,8 @@ echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/ct.conf"
 echo 'CT:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
+# make db copy before stitching...
+cp -r $db NOSTITCH$db
 
 # now the stitching...
 sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
@@ -64,12 +66,12 @@ echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 
 # calculate events
-sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
-echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-echo $(date) >> $log
+#sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
+#echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+#echo $(date) >> $log
 
 
 #zip up the directory and copy over to centos
-zip -r $dbzip $db
-scp $dbzip centos@dev.ncats.io:/tmp
+#zip -r $dbzip $db
+#scp $dbzip centos@dev.ncats.io:/tmp
 

@@ -3,27 +3,30 @@ package ncats.stitcher.calculators;
 import ncats.stitcher.*;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import ncats.stitcher.calculators.events.*;
 
 import static ncats.stitcher.Props.*;
 
-public class EventCalculator implements StitchCalculator {
+public class EventCalculator extends StitchCalculator {
 
     static EventParser[] DEFAULT_EVENT_PARSERS = {
+            new GSRSEventParser(),
+            new DrugsAtFDAEventParser (),
+            new ClinicalTrialsEventParser(),
             new RanchoEventParser(),
             new NPCEventParser (),
             new PharmManuEventParser (),
-            //new DrugBankEventParser (),
+            //!! No longer loading this source: new DrugBankEventParser (),
             new DrugBankXmlEventParser (),
             new DailyMedRxEventParser (),
             new DailyMedOtcEventParser (),
             new DailyMedRemEventParser (),
-            new DrugsAtFDAEventParser (),
-
             new WithdrawnEventParser()
     };
 
@@ -32,11 +35,16 @@ public class EventCalculator implements StitchCalculator {
     public static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd");
     public static final SimpleDateFormat SDF2 = new SimpleDateFormat ("MM/dd/yyyy");
 
-    final EntityFactory ef;
     final DataSourceFactory dsf;
 
-
     private List<EventParser> eventParsers = Arrays.asList(DEFAULT_EVENT_PARSERS);
+
+    // adapted from https://prsinfo.clinicaltrials.gov/definitions.html
+    public static Set<String> CLINICAL_PHASES = Arrays.asList(
+            "Not Applicable", "Early Phase 1", "Phase 1", "Phase 1/Phase 2",
+            "Phase 2", "Phase 2/Phase 3", "Phase 3", "Phase 4")
+            .stream()
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
     public EventCalculator(EntityFactory ef) {
         this.ef = ef;
@@ -45,14 +53,6 @@ public class EventCalculator implements StitchCalculator {
 
     public void setEventParsers(List<EventParser> parsers){
         this.eventParsers = new ArrayList<>(Objects.requireNonNull(parsers));
-    }
-
-    public int recalculate (int version) {
-        logger.info("## recalculating stitch_v"+version+"...");
-        return ef.maps(e -> {
-                Stitch s = Stitch._getStitch(e);
-                accept (s);
-            }, "stitch_v"+version);
     }
 
     /*
@@ -81,46 +81,27 @@ public class EventCalculator implements StitchCalculator {
                 props.put(ID, e.id);
                 eventIndexes.put(ei, 1);
             }
+            if (e.source == null) // TODO e.source is coming in as null in some cases
+                e.source = "*!";
             props.put(SOURCE, e.source);
             props.put(KIND, e.kind.toString());
 
             labels.add(e.kind);
 
             Map<String, Object> data = new HashMap<>();
-            if (e.date != null)
-                data.put("date", SDF.format(e.date));
-
-            if (e.jurisdiction != null)
-                data.put("jurisdiction", e.jurisdiction);
-
-            if (e.comment != null)
-                data.put("comment", e.comment);
-
-            if(e.route !=null){
-                data.put("route", e.route);
-            }
-
-            if(e.approvalAppId !=null){
-                data.put("ApprovalAppId", e.approvalAppId);
-            }
-            if(e.marketingStatus !=null){
-                data.put("MarketingStatus", e.marketingStatus);
-            }
-            if(e.NDC !=null){
-                data.put("NDC", e.NDC);
-            }
-            if(e.URL !=null){
-                data.put("URL", e.URL);
-            }
-            if(e.withDrawnYear !=null){
-                data.put("withdrawn_year", e.withDrawnYear);
-            }
-            if(e.productCategory !=null){
-                data.put("ProductCategory", e.productCategory);
+            for (Field field: e.getClass().getDeclaredFields()) {
+                try {
+                    if (field.getType() == String.class && field.get(e) != null)
+                        data.put(field.getName(), field.get(e));
+                    if (field.getType() == Date.class && field.get(e) != null)
+                        data.put(field.getName(), SDF.format(field.get(e)));
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
+                }
             }
             labels.add(e.source);
-            if (e.date != null && e.kind.isApproved()) {
-                cal.setTime(e.date);
+            if (e.startDate != null && e.kind.isApproved()) {
+                cal.setTime(e.startDate);
                 approvals.put(e.source, cal.get(Calendar.YEAR));
             }
             
@@ -128,24 +109,45 @@ public class EventCalculator implements StitchCalculator {
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
 
-        stitch.set("approved", labels.isApproved);
-        
-        // sources that have approval dates; order by relevance
-        for (EventParser ep : new EventParser[]{
-                new DrugsAtFDAEventParser(),
-                new DailyMedRxEventParser(),
-                new DailyMedOtcEventParser(),
-                new DailyMedRemEventParser(),
-                new WithdrawnEventParser()
-                //new DrugBankXmlEventParser()
-            }) {
-            Integer year = approvals.get(ep.name);
-            if (year != null) {
-                stitch.set("approvedYear", year);
-                break;
+        // Calculate Initial Approval
+        Event initUSAppr = null;
+        Event initAppr = null;
+        for (Event e: events) {
+            if (e.startDate != null && "US".equals(e.jurisdiction) && e.kind.isApproved()) {
+                if (initAppr == null || e.startDate.before(initAppr.startDate)) {
+                    initAppr = e;
+                }
+                if (initUSAppr == null || e.startDate.before(initUSAppr.startDate)) {
+                    initUSAppr = e;
+                }
+            }
+            if (e.startDate != null && (e.kind.isApproved() || e.kind == Event.EventKind.Marketed)) {
+                if (initAppr == null || e.startDate.before(initAppr.startDate)) {
+                    initAppr = e;
+                }
             }
         }
-        
+
+        if (initUSAppr != null) {
+            cal.setTime(initUSAppr.startDate);
+            stitch.set("approved", Boolean.TRUE);
+            stitch.set("approvedYear", cal.get(Calendar.YEAR));
+            if (initAppr != initUSAppr)
+                System.out.println("Initial US marketing: "+cal.get(Calendar.YEAR));
+            cal.setTime(initAppr.startDate);
+            // TODO watch out for null jurisdictions
+            System.out.println("Initially marketed: " + cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
+            if ("1900".equals(cal.get(Calendar.YEAR))) {
+                System.out.println("whoops");
+            }
+        } else if (initAppr != null) {
+            cal.setTime(initAppr.startDate);
+            System.out.println("Initially marketed: "+cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
+            stitch.set("approved", Boolean.FALSE);
+        } else {
+            stitch.set("approved", Boolean.FALSE);
+        }
+
         stitch.addLabel(labels.getLabelNames());
     }
 
@@ -162,7 +164,8 @@ public class EventCalculator implements StitchCalculator {
         }
 
         public void add(String label){
-            labels.add(label);
+            if (label != null)
+                labels.add(label);
         }
 
         public String[] getLabelNames(){
@@ -176,8 +179,7 @@ public class EventCalculator implements StitchCalculator {
             super ("drugbank-full-annotated.sdf");
         }
             
-        public List<Event> getEvents(Map<String, Object> payload) {
-            List<Event> events = new ArrayList<>();
+        public void produceEvents(Map<String, Object> payload) {
             Event event = null;
             Object id = payload.get("DATABASE_ID");
             if (id != null && id.getClass().isArray()
@@ -208,8 +210,8 @@ public class EventCalculator implements StitchCalculator {
                     event.comment = (String)content;
                 }
             }
-            if (event != null) events.add(event);
-            return events;
+            if (event != null) events.put(String.valueOf(System.identityHashCode(event)), event);
+            return;
         }
     }
 
@@ -219,25 +221,27 @@ public class EventCalculator implements StitchCalculator {
 
         for (EventParser ep : eventParsers) {
             try {
-                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)){
-                    for (Event e: ep.getEvents(payload)) {
-                        logger.info(ep.name + ": kind=" + e.kind
-                                + " date=" + e.date);
-                        events.add(e);
-                    }
+                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)) {
+                    ep.produceEvents(payload);
                 }
             } catch (IllegalArgumentException iae) {
                 logger.warning(ep.name + " not a valid data source");
             }
 
         }
+        for (EventParser ep : eventParsers) {
+            for (Event e: ep.events.values()) {
+                logger.info(ep.name + ": kind=" + e.kind
+                        + " startDate=" + e.startDate);
+                events.add(e);
+            }
+            ep.reset();
+        }
 
         return events;
     }
 
     public static void main (String[] argv) throws Exception {
-
-
         if (argv.length < 2) {
             System.err.println("Usage: "+EventCalculator.class.getName()
                                +" DB VERSION");
@@ -246,8 +250,16 @@ public class EventCalculator implements StitchCalculator {
 
         EntityFactory ef = new EntityFactory (GraphDb.getInstance(argv[0]));
         EventCalculator ac = new EventCalculator(ef);
-        int version = Integer.parseInt(argv[1]);
-        int count = ac.recalculate(version);
+        int count;
+        if ("1".equals(argv[1]) || "2".equals(argv[1])) {
+            int version = Integer.parseInt(argv[1]);
+            count = ac.recalculate(version);
+        } else {
+            long[] nodes = new long[argv.length - 1];
+            for (int i = 1; i < argv.length; i++)
+                nodes[i - 1] = Long.parseLong(argv[i]);
+            count = ac.recalculateNodes(nodes);
+        }
         logger.info(count+" stitches recalculated!");
         ef.shutdown();
     }

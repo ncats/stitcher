@@ -84,7 +84,11 @@ def resolveNameTripod(name):
     #else:
 
     request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib2.quote(name)+"$\""
-    response = urllib2.urlopen(request).read()
+    response = "{\"total\":0}"
+    try:
+        response = urllib2.urlopen(request).read()
+    except:
+        response
     r = json.loads(response)
     if int(r['total']) > 0:
         for i in range(0, int(r['total'])):
@@ -466,7 +470,7 @@ if __name__=="__main__":
             print entry
             raise ValueError('Product in Orange Book not found in products:'+appl)        
 
-    #prods has format: key="NDA/prodno" : [0:NDA/prodno, 1:Prod name, 2:Form;Doseage, 3:Strength, 4:Availability (Prescription; Over-the-counter; Discontinued), 5:Appl type (NDA), 6:Sponsor, 7:Marketing date, 8: Marketing date ref]
+    #prods has format: key="NDA/prodno" : [0:NDA/prodno, 1:Prod name, 2:Form;Doseage, 3:Strength, 4:Availability (Prescription; Over-the-counter; Discontinued), 5:Appl type (NDA), 6:Sponsor, 7:Marketing startDate, 8: Marketing startDate ref]
 
     # read in NME prod dates file
     #Year	Trademark	Generic Name	UNII	Date [mm-dd-yy]	App Type	NDA/BLA No.	Sponsor	Date Ref
@@ -509,7 +513,7 @@ if __name__=="__main__":
                 prods[prod][-2] = nmeDate[0]
                 prods[prod][-1] = nmeDate[1]
             elif nmeDate[0] < date: # we should go back and curate these!
-                #print "different dates:",date, nmeDate, prods[prod]
+                #print "different dates:",startDate, nmeDate, prods[prod]
                 prods[prod][-2] = nmeDate[0]
                 prods[prod][-1] = nmeDate[1]                
     
@@ -517,7 +521,7 @@ if __name__=="__main__":
     # fix 1982-01-01 OrangeBook dates with regression
     #prods = apprDateRegression(prods)
 
-    # use predicted apprv date from previous approvalYears file
+    # use predicted apprv startDate from previous approvalYears file
     appYrs = readTabFile(appYrsfile)
     appPredDate = dict()
     for entry in appYrs['table']:
@@ -581,13 +585,13 @@ if __name__=="__main__":
                         if entry2[-2] != '' and entry2[-2] < early[-2]:
                             early = entry2
             if date == early[-2] or date > early[-2]:
-                match = 0 # date is the same or earlier
+                match = 0 # startDate is the same or earlier
             if date < early[-2]:
                 for otherunii in activeMoiety[unii]:
                     if UNII2prods.has_key(otherunii):
                         for prod in UNII2prods[otherunii]:
                             if prod[0:6] == appl:
-                                match = 4 # appl is in list and date doesn't work
+                                match = 4 # appl is in list and startDate doesn't work
                 if match == 5:
                     for prod in prods.keys():
                         if prod[0:6] == appl:
@@ -612,12 +616,12 @@ if __name__=="__main__":
     # write out new approval years file
     outfile =  maindir+"/data/approvalYears-"+getTimeStamp()+".txt"
     fp = open(outfile, 'w')
-    header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
+    #header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
+    header = "UNII\tApproval_Year\tDate\tDate_Method\tApp_Type\tApp_No\tSponsor\tProduct\tUrl\tactive\tComment\n"
     fp.write(header)
-    outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
-    fperr = open(outfile2, 'w')
-    header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
-    fperr.write(header)
+    #outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
+    #fperr = open(outfile2, 'w')
+    #fperr.write(header)
     for unii in activeMoiety.keys():
         early = [getTimeStamp(), '']
         earlyDate = getTimeStamp()
@@ -639,31 +643,33 @@ if __name__=="__main__":
             method = early[-1]
             apptype = early[-4]
             appsponsor = early[-3]
-            comment = ''
-            if apptype != '':
-                comment = apptype + ' '
-            comment = comment+early[0].decode('latin-1').encode('ascii', 'replace')+" "+method
+            product = early[-8]
+            appno = ''
+            appurl = ''
+            active = "true"
+            outfp = fp
             if len(early[0]) > 6 and early[0][6] == '/' or early[-1].find('https://www.accessdata.fda.gov/') > -1:
                 appno = early[0][0:6]
                 if method == "PREDICTED":
-                    appsponsor = "[Approval Date Uncertain] "+appsponsor
+                    year = "[Approval Date Uncertain] "+year
                 appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
-                comment = "Application:"+apptype+appno+" "+appsponsor+" "+appurl
-                outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
-                fp.write(outline)
             else:
+                #outfp = fperr
+                active = "false"
+                if method.find('OB NME Appendix 1950-') > -1:
+                    appno = early[0][0:6]
                 for otherunii in activeMoiety[unii]:
                     if UNII2prods.has_key(otherunii):
                         for prod in UNII2prods[otherunii]:
                             entry = prods[prod]
                             if entry[0] == early[0]:
                                 unii = otherunii
-                comment = ''
-                if apptype != '':
-                    comment = apptype + '|'
-                comment = comment+early[0].decode('latin-1').encode('ascii', 'replace')+"|"+method
-                outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
-                fperr.write(outline)
+            #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
+            #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
+            #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
+            comment = early[0].decode('latin-1').encode('ascii', 'replace')
+            outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
+            outfp.write(outline)
 
     # write out all products data
     prod2UNIIs = dict()

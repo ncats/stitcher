@@ -49,7 +49,8 @@ lazy val commonDependencies = Seq(
   "org.freehep" % "freehep-vectorgraphics" % "2.4",
   "org.freehep" % "freehep-graphicsio" % "2.4",
   "org.freehep" % "freehep-graphicsio-svg" % "2.4",
-  "org.freehep" % "freehep-graphics2d" % "2.4"
+  "org.freehep" % "freehep-graphics2d" % "2.4",
+  "com.github.fge" % "json-patch" % "1.9"
 )
 
 lazy val root = (project in file("."))

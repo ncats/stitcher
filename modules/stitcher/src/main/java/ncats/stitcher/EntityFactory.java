@@ -1832,25 +1832,44 @@ public class EntityFactory implements Props {
             query.append(":`"+l+"`");
         }
         query.append(") return n");
-        
+
+        // Chunk call to func by batches of 1000 nodes to avoid out of memory issues
         int count = 0;
+        List<Long> nodes = new ArrayList();
         try (Transaction tx = gdb.beginTx();
              Result result = gdb.execute(query.toString())) {
             while (result.hasNext()) {
                 Map<String, Object> row = result.next();
-                try {
-                    Node n = (Node) row.get("n");                   
-                    func.accept(Entity._getEntity(n));
-                    ++count;
-                }
-                catch (Exception ex) {
-                    // not a valid entity
-                }
+                nodes.add(((Node) row.get("n")).getId());
             }
             result.close();
             tx.success();
         }
+        for (int i=0; i<nodes.size(); i=i+1000) {
+            long[] list = Arrays.stream(nodes.subList(i, Math.min(nodes.size(),i+1000)).toArray(new Long[0])).mapToLong(Long::longValue).toArray();
+            count = count + maps(func, list);
+        }
         
+        return count;
+    }
+
+    public int maps (Consumer<Entity> func, long[] ids) {
+        int count = 0;
+        try (Transaction tx = gdb.beginTx()) {
+             Entity[] ents = _entities (ids);
+             for (Entity entity: ents) {
+                try {
+                    func.accept(entity);
+                    ++count;
+                }
+                catch (Exception ex) {
+                    // not a valid entity
+                    ex.printStackTrace();
+                }
+            }
+            tx.success();
+        }
+
         return count;
     }
 

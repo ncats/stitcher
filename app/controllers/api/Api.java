@@ -69,6 +69,12 @@ public class Api extends Controller {
             ObjectNode node = mapper.createObjectNode();
             node.put("key", ds.getKey());
             node.put("name", ds.getName());
+            URI uri = ds.toURI();
+            node.put("source", uri == null ?
+                    null :
+                    uri.toString().indexOf('/') > -1 ?
+                            uri.toString() :
+                            uri.toString().substring(uri.toString().lastIndexOf('/')+1));
             /*
             if (null != ds.toURI()) {
                 node.put("uri", ds.toURI().toString());

@@ -20,6 +20,7 @@ public class CalculatorFactory {
         //eventually, move this to setup place
         
         calcs.add(new EventCalculator(ef));
+        //TODO calcs.add(new SummaryEventCalculator(ef));
         /*
          * calcs.add(s->{ s.set("justatest","somevalue"); });
          */
