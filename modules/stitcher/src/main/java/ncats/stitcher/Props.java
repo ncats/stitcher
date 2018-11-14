@@ -24,6 +24,7 @@ public interface Props {
     public static final String URI = "uri";
     public static final String INSTANCES = "instances";
     public static final String STITCHES = "stitches";
+    public static final String REFERENCES = "references";
     public static final String PROPERTIES = "properties";
 
     public static final String OLDVAL = "oldval";

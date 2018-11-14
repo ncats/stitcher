@@ -21,6 +21,7 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
     String[] header;
     int count, molcol;
     MolHandler mh = new MolHandler ();
+    Set<String> properties = new TreeSet();
     
     public LineMoleculeEntityFactory (String dir) throws IOException {
         super (dir);
@@ -58,6 +59,7 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
             instances = register (this.source.openStream(), delim, molcol);
             updateMeta (this.source);       
             this.source.set(INSTANCES, instances);
+            this.source.set(PROPERTIES, properties.toArray(new String[0]));
             logger.info
                 ("$$$ "+instances+" entities registered for "+this.source);
         }
@@ -104,13 +106,15 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
                                  +ex.getMessage());
                     }
                 }
-                props.put(header[c], row[c]); 
+                props.put(header[c], row[c]);
+                properties.add(header[c]);
             }
 
             Entity e = null;
             if (mol != null) {
-                for (Map.Entry<String, Object> me : props.entrySet())
-                    mol.setProperty(me.getKey(), (String)me.getValue());
+                for (Map.Entry<String, Object> me : props.entrySet()) {
+                    mol.setProperty(me.getKey(), (String) me.getValue());
+                }
                 e = register (mol);
             }
             else {
