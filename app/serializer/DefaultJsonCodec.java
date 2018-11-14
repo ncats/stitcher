@@ -64,6 +64,8 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                       && !n.hasProperty("Year")) {*/
                     ObjectNode obj = mapper.createObjectNode();
                     setJson (obj, n);
+                    //obj.put("relationship", rel.getType().name());
+                    //obj.put("id", n.getId());
                     node.add(obj);
                     //}
                 }

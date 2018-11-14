@@ -181,7 +181,7 @@ public class EntityRegistry extends EntityFactory {
         return this;
     }
     
-    public Set<String> getProperties (StitchKey key) {
+    public Set<String> getStitchProperty (StitchKey key) {
         return stitches.get(key);
     }
     
@@ -902,14 +902,23 @@ public class EntityRegistry extends EntityFactory {
     }
     
     protected void updateMeta (DataSource ds) {
+        stitchMappers.putAll(stitches); // just to double-check we have the stitches; MoleculeEntityFactory seems to skip this step otherwise
         StitchKey[] keys = stitchMappers.keySet().toArray(new StitchKey[0]);
         String[] sk = new String[keys.length];
         for (int i = 0; i < sk.length; ++i)
             sk[i] = keys[i].name();
-        ds.set(STITCHES, sk, true);
         for (Map.Entry<StitchKey, Set<String>> me : stitchMappers.entrySet()) {
-            ds.set(me.getKey().name(), me.getValue().toArray(new String[0]));
+            ds.set("_stitch_"+me.getKey().name(), me.getValue().toArray(new String[0]));
         }
+        ds.set(STITCHES, sk, true);
+        sk = new String[references.size()];
+        for (int i=0; i<references.size(); i++) {
+            sk[i] = references.get(i).key.name();
+            ds.set("_ref_"+sk[i], references.get(i).id);
+            ds.set("_refName_"+sk[i], references.get(i).ds.name());
+        }
+        ds.set(REFERENCES, sk, true);
+
         if (idField != null)
             ds.set("IdField", idField);
         if (nameField != null)

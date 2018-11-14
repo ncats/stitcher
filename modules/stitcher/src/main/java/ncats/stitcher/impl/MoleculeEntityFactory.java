@@ -261,6 +261,7 @@ public class MoleculeEntityFactory extends EntityRegistry {
             instances = register (ds.openStream());
             updateMeta (ds);
             ds.set(INSTANCES, instances);
+            ds.set(PROPERTIES, properties.toArray(new String[0]));
             logger.info("$$$ "+instances+" entities registered for "+ds);
         }
         return instances;
