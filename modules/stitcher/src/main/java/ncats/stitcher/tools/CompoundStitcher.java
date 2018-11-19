@@ -95,7 +95,19 @@ public class CompoundStitcher implements Consumer<Stitch> {
             }
         }
     }
-    
+
+    public void stitch (int version, Component comp) {
+        DataSource dsource = dsf.register("stitch_v"+version);
+        ef.untangle(new StitcherUntangleCompoundComponent
+                (dsource, comp), this);
+    }
+
+    public String testStitch (int version, Component comp) {
+        DataSource dsource = dsf.register("stitch_v"+version);
+        return ef.testUntangle(new StitcherUntangleCompoundComponent
+                (dsource, comp));
+    }
+
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+CompoundStitcher.class.getName()

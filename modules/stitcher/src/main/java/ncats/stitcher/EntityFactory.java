@@ -1604,6 +1604,18 @@ public class EntityFactory implements Props {
             });
     }
 
+    public String testUntangle (UntangleAbstract untangler) {
+        StringBuffer out = new StringBuffer();
+        untangler.untangle(this, (root, member) -> {
+            String comp = "root:"+root.toString()+" members:";
+            for (long l: member)
+                comp = comp + l + ",";
+            comp = comp + "\n";
+            out.append(comp);
+        });
+        return out.toString();
+    }
+
     public static Iterator<Entity> find (GraphDatabaseService gdb,
                                          String key, Object value) {
         return find (gdb, key, value, Stitchable.ANY);

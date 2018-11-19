@@ -78,7 +78,7 @@ public class EntityRegistry extends EntityFactory {
     protected String strucField;
     
     protected EnumMap<StitchKey, Set<String>> stitches;
-    protected Map<String, StitchKeyMapper> mappers;
+    protected Map<String, StitchKeyMapper> mappers; // TODO this is deprecated + should be removed
     // stitch key due to mappers
     protected EnumMap<StitchKey, Set<String>> stitchMappers;
     protected List<Reference> references = new ArrayList<>();
