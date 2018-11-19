@@ -71,7 +71,7 @@ public abstract class EventParser {
 
     static HashMap<String, EventFormat> types = new HashMap();
     {
-        types.put("EVMPD", new EventFormat("EU", Event.EventKind.Marketed));
+        // types.put("EVMPD", new EventFormat("EU", Event.EventKind.Marketed));
         types.put("HEALTH -CANADA NHP INGREDIENT MONOGRAPH", new EventFormat("Canada", Event.EventKind.Marketed));
         types.put("Canada", new EventFormat("Canada", Event.EventKind.Marketed));
         types.put("UK NHS", new EventFormat("UK", Event.EventKind.Marketed));
