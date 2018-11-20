@@ -7,13 +7,13 @@ if [ $# -lt 1 ]; then
 elif [ $# -gt 1 ]; then
     new=$( cd $2 && pwd )
 elif [ $# -eq 1 ]; then
-	if [ -e latest]; then
-		new=$( cd latest && pwd )
-	else
-		echo "Could not find a current distribution."
-		echo "Please, restart and supply path to the database and the dist."
-		exit 1
-	fi
+    if [ -e latest ]; then
+        new=$( cd latest && pwd -P )
+    else
+        echo "Could not find a current distribution."
+        echo "Please, restart and supply path to the database and the dist."
+        exit 1
+    fi
 fi
 
 db=$( cd $1 && pwd )
