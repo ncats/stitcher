@@ -12,3 +12,4 @@ hash.db/
 log.txt
 data/hash.db/
 stitch.out
+temp/
