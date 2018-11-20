@@ -13,3 +13,4 @@ log.txt
 data/hash.db/
 stitch.out
 .idea/
+temp/
