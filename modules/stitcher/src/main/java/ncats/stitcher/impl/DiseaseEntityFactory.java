@@ -62,6 +62,8 @@ public class DiseaseEntityFactory extends EntityRegistry {
                 }
                 else {
                     Object v = obj.asLiteral().getValue();
+                    if (!v.getClass().isAssignableFrom(Number.class))
+                        v = v.toString();
                     Object old = props.get(pname);
                     props.put(pname, old != null ? Util.merge(old, v) : v);
                 }
@@ -112,6 +114,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
     }
 
     Map<Resource, DiseaseResource> diseases = new HashMap<>();
+    List<DiseaseResource> others = new ArrayList<>();
     
     public DiseaseEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -153,11 +156,14 @@ public class DiseaseEntityFactory extends EntityRegistry {
         return v != null ? v : r.getURI();
     }
 
+    protected String transform (String value) {
+        if (value.startsWith("UMLS_CUI")) {
+            value = value.replaceAll("_CUI", "");
+        }
+        return value;
+    }
+    
     protected Entity _registerIfAbsent (DiseaseResource dr) {
-        Iterator<Entity> iter = find (FIELD_ID, dr.uri);
-        if (iter.hasNext())
-            return iter.next();
-
         Map<String, Object> data = new TreeMap<>();
         data.put(FIELD_ID, dr.uri);
         data.putAll(dr.props);
@@ -231,13 +237,13 @@ public class DiseaseEntityFactory extends EntityRegistry {
                     if (v.startsWith("ICD"))
                         icds.add(v);
                     else
-                        xrefs.add(v);
+                        xrefs.add(transform (v));
                 }
             }
             else {
                 String v = value.toString();
                 if (v.startsWith("ICD")) icds.add(v);
-                else xrefs.add(v);
+                else xrefs.add(transform (v));
             }
             
             if (!xrefs.isEmpty())
@@ -279,22 +285,34 @@ public class DiseaseEntityFactory extends EntityRegistry {
     }
 
     protected void _resolve (DiseaseResource dr) {
-        Entity ent = _registerIfAbsent (dr);
-        for (Map.Entry<String, Object> me : dr.links.entrySet()) {
-            if (DEFERRED_FIELDS.contains(me.getKey())) {
-                Object value = me.getValue();
-                if (value.getClass().isArray()) {
-                    int len = Array.getLength(value);
-                    for (int i = 0; i < len; ++i) {
-                        Resource res = (Resource) Array.get(value, i);
-                        _stitch (ent, me.getKey(), res);
+        List<Entity> entities = new ArrayList<>();
+        for (Iterator<Entity> iter = find (FIELD_ID, dr.uri); iter.hasNext();) {
+            Entity e = iter.next();
+            entities.add(e);
+        }
+
+        if (!entities.isEmpty()) {
+            for (Map.Entry<String, Object> me : dr.links.entrySet()) {
+                if (DEFERRED_FIELDS.contains(me.getKey())) {
+                    Object value = me.getValue();
+                    if (value.getClass().isArray()) {
+                        int len = Array.getLength(value);
+                        for (int i = 0; i < len; ++i) {
+                            Resource res = (Resource) Array.get(value, i);
+                            for (Entity e : entities)
+                                _stitch (e, me.getKey(), res);
+                        }
+                    }
+                    else {
+                        Resource res = (Resource) value;
+                        for (Entity e : entities)
+                            _stitch (e, me.getKey(), res);
                     }
                 }
-                else {
-                    Resource res = (Resource) value;
-                    _stitch (ent, me.getKey(), res);
-                }
             }
+        }
+        else {
+            logger.warning("Unable to resolve "+dr.uri);
         }
     }
 
@@ -320,15 +338,15 @@ public class DiseaseEntityFactory extends EntityRegistry {
         model.read(file);
 
         diseases.clear();
+        others.clear();
+        
         Set<DiseaseResource> axioms = new HashSet<>();
         logger.info("Loading resources...");
         for (ResIterator iter = model.listSubjects(); iter.hasNext();) {
             Resource res = iter.next();
+            
             DiseaseResource dr = new DiseaseResource (res);
-            if (dr.uri == null) {
-                logger.warning("Resource class ignored: "+res);
-            }
-            else if (dr.isAxiom()) {
+            if (dr.isAxiom()) {
                 res = (Resource) dr.links.get("annotatedSource");
                 DiseaseResource disease = diseases.get(res);
                 if (disease != null)
@@ -342,10 +360,11 @@ public class DiseaseEntityFactory extends EntityRegistry {
             else {
                 logger.warning("Resource type "
                                +dr.type+" not recognized:\n"+dr);
+                others.add(dr);
             }
         }
 
-        int unresolved = 0;
+        List<DiseaseResource> unresolved = new ArrayList<>();
         for (DiseaseResource dr : axioms) {
             Resource res = (Resource) dr.links.get("annotatedSource");
             DiseaseResource disease = diseases.get(res);
@@ -353,8 +372,8 @@ public class DiseaseEntityFactory extends EntityRegistry {
                 disease.axioms.add(dr);
             }
             else {
-                logger.warning("Unable to resolve axiom:\n"+dr);
-                ++unresolved;
+                //logger.warning("Unable to resolve axiom:\n"+dr);
+                unresolved.add(dr);
             }
         }
 
@@ -379,8 +398,12 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
         
         logger.info(diseases.size()+" disease classes!");
-        if (unresolved > 0)
-            logger.warning("!!!!! "+unresolved+" unresolved axioms !!!!!");
+        if (!unresolved.isEmpty()) {
+            logger.warning("!!!!! "+unresolved.size()
+                           +" unresolved axioms !!!!!");
+            for (DiseaseResource dr : unresolved)
+                System.out.println(dr);
+        }
 
         return ds;
     }
