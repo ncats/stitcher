@@ -55,14 +55,23 @@ public enum StitchKey implements RelationshipType {
      */
     U_Wikipedia, // Wikipedia URL
     U_DOI,  // DOI URL
+
+    /*
+     * Ontology relationships
+     */
+    R_subClassOf (1, true),
+    R_equivalentClass,
+    R_exactMatch,
+    R_closeMatch,
+    R_activeMoiety(5, true), // active moiety relationship (directed)
+    R_axiom,
     
     /*
      * Tag
      */
-    T_ActiveMoiety(5, true), // active moiety relationship (directed)
     T_Keyword // Keyword
     ;
-  
+    
     final public Class type;
     final public int priority; // priority 1 (lowest) to 5 (highest)
     final public boolean directed;
@@ -73,17 +82,14 @@ public enum StitchKey implements RelationshipType {
     StitchKey (int priority) {
         this (priority, String.class, false);
     }
-    StitchKey (int priority, Class type) {
-        this (priority, type, false);
-    }
     StitchKey (int priority, boolean directed) {
         this (priority, String.class, directed);
     }
     StitchKey (Class type) {
         this (1, type, false);
     }
-    StitchKey (Class type, boolean directed) {
-        this (1, type, directed);
+    StitchKey (int priority, Class type) {
+        this (priority, type, false);
     }
     StitchKey (int priority, Class type, boolean directed) {
         this.type = type;

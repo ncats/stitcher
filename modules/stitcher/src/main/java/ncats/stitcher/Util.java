@@ -411,16 +411,22 @@ public class Util {
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
                     if (v != null)
-                        unique.add(type == String.class ? v.toString() : type.cast(v));
+                        unique.add(type == String.class
+                                   ? v.toString() : type.cast(v));
                     else {
                         v = null;
                     }
                 }
             }
             else {
-                unique.add(type == String.class ? val.toString() : type.cast(val));
+                unique.add(type == String.class
+                           ? val.toString() : type.cast(val));
             }
         }
+
+        // this happens when all values are null
+        if (type == null)
+            return null;
 
         Object merged = Array.newInstance(type, unique.size());
         int count = 0;

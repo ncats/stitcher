@@ -43,7 +43,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         add (I_UNII, "UNII");
         add (I_CID, "PUBCHEM");
         add (T_Keyword, "Class");
-        //add (T_ActiveMoiety, "ActiveMoieties");
+        //add (R_activeMoiety, "ActiveMoieties");
     }
 
     void register (String line, int total) {
@@ -79,7 +79,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         Entity e = activeMoieties.get(a);
                         // create manual stitch from ent -> e
                         if (!ent.equals(e))
-                            ent.stitch(e, T_ActiveMoiety, a);
+                            ent.stitch(e, R_activeMoiety, a);
                     }
                     else {
                         Set<Entity> ents = unresolved.get(a);
@@ -109,7 +109,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                             Entity e = activeMoieties.get(a);
                             // create manual stitch from ent -> e
                             if (!ent.equals(e))
-                                ent.stitch(e, T_ActiveMoiety, a);
+                                ent.stitch(e, R_activeMoiety, a);
                         }
                         else {
                             Set<Entity> ents = unresolved.get(a);
@@ -128,7 +128,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         Entity e = activeMoieties.get(unii);
                         // create manual stitch from ent -> e
                         if (!ent.equals(e))
-                            ent.stitch(e, T_ActiveMoiety, unii);
+                            ent.stitch(e, R_activeMoiety, unii);
                     }
                     else {
                         Set<Entity> ents = unresolved.get(unii);
@@ -166,7 +166,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
             if (active != null) {
                 for (Entity e : me.getValue())
                     if (!active.equals(e))
-                        e.stitch(active, T_ActiveMoiety, me.getKey());
+                        e.stitch(active, R_activeMoiety, me.getKey());
             }
             else {
                 int cnt = 0;
@@ -175,7 +175,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                     active = it.next();
                     for (Entity e : me.getValue())
                         if (!active.equals(e))
-                            e.stitch(active, T_ActiveMoiety, me.getKey());
+                            e.stitch(active, R_activeMoiety, me.getKey());
                 }
                 
                 if (cnt == 0)
