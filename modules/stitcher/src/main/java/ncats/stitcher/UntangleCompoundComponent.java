@@ -395,8 +395,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         // collapse based on single/terminal active moieties
         Set<Entity> unsure = new TreeSet<>();
         component.stitches((source, target) -> {
-                Entity[] out = source.outNeighbors(T_ActiveMoiety);
-                Entity[] in = target.inNeighbors(T_ActiveMoiety);
+                Entity[] out = source.outNeighbors(R_activeMoiety);
+                Entity[] in = target.inNeighbors(R_activeMoiety);
                 logger.info(" ("+out.length+") "+source.getId()
                             +" -> "+target.getId()+" ["
                             +isRoot (target)+"] ("+in.length+")");
@@ -432,7 +432,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                         moieties.put(key, set = new TreeSet<>());
                     set.add(target);
                 }
-            }, T_ActiveMoiety);
+            }, R_activeMoiety);
         //dumpActiveMoieties ();
         dump ("##### active moiety stitching");
         
@@ -518,7 +518,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         // now handle unresolved nodes with multiple active moieties and
         // assign to the class with less references 
         for (Entity e : unsure) {
-            Entity[] nb = e.outNeighbors(T_ActiveMoiety);
+            Entity[] nb = e.outNeighbors(R_activeMoiety);
             if (nb.length > 1 && !uf.contains(e.getId())) {
                 Map<Long, Integer> votes = new HashMap<>();
                 for (Entity u : nb) {

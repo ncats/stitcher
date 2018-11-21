@@ -547,9 +547,11 @@ public class Entity extends CNode {
      * props - properties associated with the edge
      * data - data
      */
-    public Entity _addIfAbsent (String type, Map<String, Object> relationshipProps,
+    public Entity _addIfAbsent (String type,
+                                Map<String, Object> relationshipProps,
                                 Map<String, Object> data) {
-        if (!relationshipProps.containsKey(ID) || !relationshipProps.containsKey(SOURCE)) {
+        if (!relationshipProps.containsKey(ID)
+            || !relationshipProps.containsKey(SOURCE)) {
             throw new IllegalArgumentException
                 ("props must contain "+ID+" and "+SOURCE+" properties!");
         }

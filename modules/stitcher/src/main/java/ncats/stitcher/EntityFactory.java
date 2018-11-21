@@ -41,7 +41,7 @@ import ncats.stitcher.graph.UnionFind;
 
 // NOTE: methods and variables that begin with underscore "_" generally assume that a graph database transaction is already open!
 
-public class EntityFactory implements Props {
+public class EntityFactory implements Props, AutoCloseable {
     static final Logger logger = Logger.getLogger
         (EntityFactory.class.getName());
 
@@ -2007,6 +2007,10 @@ public class EntityFactory implements Props {
     
     public void shutdown () {
         graphDb.shutdown();
+    }
+
+    public void close () throws Exception {
+        shutdown ();
     }
 
     public void execute (Runnable r) {
