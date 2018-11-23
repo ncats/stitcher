@@ -37,15 +37,15 @@ public class DiseaseEntityFactory extends EntityRegistry {
         DEFERRED_FIELDS.add("closeMatch");
     }
 
-    static class DiseaseResource {
+    static class OntologyResource {
         final public Resource resource;
         final public String uri;
         final public String type;
         final public Map<String, Object> props = new TreeMap<>();
         final public Map<String, Object> links = new TreeMap<>();
-        final public List<DiseaseResource> axioms = new ArrayList<>();
+        final public List<OntologyResource> axioms = new ArrayList<>();
         
-        DiseaseResource (Resource res) {
+        OntologyResource (Resource res) {
             String t = null;
             for (StmtIterator it = res.listProperties(); it.hasNext(); ) {
                 Statement stm = it.next();
@@ -64,8 +64,10 @@ public class DiseaseEntityFactory extends EntityRegistry {
                     Object v = obj.asLiteral().getValue();
                     if (!v.getClass().isAssignableFrom(Number.class))
                         v = v.toString();
-                    Object old = props.get(pname);
-                    props.put(pname, old != null ? Util.merge(old, v) : v);
+                    if (!"".equals(v)) {
+                        Object old = props.get(pname);
+                        props.put(pname, old != null ? Util.merge(old, v) : v);
+                    }
                 }
             }
             this.uri = res.getURI();
@@ -75,14 +77,17 @@ public class DiseaseEntityFactory extends EntityRegistry {
 
         public int hashCode () { return resource.hashCode(); }
         public boolean equals (Object obj) {
-            if (obj instanceof DiseaseResource) {
-                return resource.equals(((DiseaseResource)obj).resource);
+            if (obj instanceof OntologyResource) {
+                return resource.equals(((OntologyResource)obj).resource);
             }
             return false;
         }
 
         public boolean isAxiom () { return "Axiom".equalsIgnoreCase(type); }
         public boolean isClass () { return "Class".equalsIgnoreCase(type); }
+        public boolean isOntology () {
+            return "Ontology".equalsIgnoreCase(type);
+        }
 
         public String toString () {
             StringBuilder sb = new StringBuilder ();
@@ -113,8 +118,9 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
     }
 
-    Map<Resource, DiseaseResource> diseases = new HashMap<>();
-    List<DiseaseResource> others = new ArrayList<>();
+    Map<Resource, OntologyResource> diseases = new HashMap<>();
+    List<OntologyResource> others = new ArrayList<>();
+    OntologyResource ontology;
     
     public DiseaseEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -142,8 +148,10 @@ public class DiseaseEntityFactory extends EntityRegistry {
             .add(N_Name, "hasRelatedSynonym")
             .add(I_CODE, "hasDbXref")
             .add(I_CODE, "id")
+            .add(I_CODE, "hasAlternativeId")
             .add(T_Keyword, "inSubset")
             .add(T_Keyword, "type")
+            .add(T_Keyword, "hasOBONamespace")
             .addBlacklist (I_CODE, "MONDO:LEXICAL"
                            ,"MONDO:PATTERNS/DISEASE_SERIES_BY_GENE"
                            ,"MONDO:DESIGN_PATTERN"
@@ -151,6 +159,12 @@ public class DiseaseEntityFactory extends EntityRegistry {
             ;
     }
 
+    protected void reset () {
+        ontology = null;
+        diseases.clear();
+        others.clear();
+    }
+    
     static String getResourceValue (Resource r) {
         String v = r.getLocalName();
         return v != null ? v : r.getURI();
@@ -163,12 +177,12 @@ public class DiseaseEntityFactory extends EntityRegistry {
         return value;
     }
     
-    protected Entity _registerIfAbsent (DiseaseResource dr) {
+    protected Entity _registerIfAbsent (OntologyResource or) {
         Map<String, Object> data = new TreeMap<>();
-        data.put(FIELD_ID, dr.uri);
-        data.putAll(dr.props);
+        data.put(FIELD_ID, or.uri);
+        data.putAll(or.props);
 
-        for (Map.Entry<String, Object> me : dr.links.entrySet()) {
+        for (Map.Entry<String, Object> me : or.links.entrySet()) {
             if (isDeferred (me.getKey()))
                 continue;
             
@@ -198,7 +212,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
 
         // now process all axioms that aren't deferred
-        for (DiseaseResource ax : dr.axioms) {
+        for (OntologyResource ax : or.axioms) {
             Resource r = (Resource) ax.links.get("annotatedProperty");
             String rn = r.getLocalName();
             if (!isDeferred (rn)) {
@@ -246,8 +260,33 @@ public class DiseaseEntityFactory extends EntityRegistry {
                 else xrefs.add(transform (v));
             }
             
-            if (!xrefs.isEmpty())
+            if (!xrefs.isEmpty()) {
+                String ns = ontology != null ? (String)ontology.props.get
+                    ("default-namespace") : null;
+
+                if ("human_phenotype".equals(ns)) {
+                    // for hpo, hasDbXref in axiom corresponds to curator or 
+                    // publication. don't stitch on these
+                    List<String> others = new ArrayList<>();
+                    List<String> useful = new ArrayList<>();
+                    for (String u : xrefs) {
+                        String x = u.toUpperCase();
+                        // sigh.. non-informative xrefs; why are these xrefs?
+                        if (x.startsWith("UMLS")
+                            || (x.startsWith("HP:")
+                                && !x.equals("HP:PROBINSON"))
+                            || x.startsWith("SNOMEDCT")
+                            || x.startsWith("MSH"))
+                            useful.add(u);
+                        else
+                            others.add(u);
+                    }
+                    xrefs = useful;
+                    if (!others.isEmpty())
+                        data.put("_hasDbXref", others.toArray(new String[0]));
+                }
                 data.put("hasDbXref", xrefs.toArray(new String[0]));
+            }
             
             if (!icds.isEmpty())
                 data.put("ICD", icds.toArray(new String[0]));
@@ -284,15 +323,15 @@ public class DiseaseEntityFactory extends EntityRegistry {
         return stitched;
     }
 
-    protected void _resolve (DiseaseResource dr) {
+    protected void _resolve (OntologyResource or) {
         List<Entity> entities = new ArrayList<>();
-        for (Iterator<Entity> iter = find (FIELD_ID, dr.uri); iter.hasNext();) {
+        for (Iterator<Entity> iter = find (FIELD_ID, or.uri); iter.hasNext();) {
             Entity e = iter.next();
             entities.add(e);
         }
 
         if (!entities.isEmpty()) {
-            for (Map.Entry<String, Object> me : dr.links.entrySet()) {
+            for (Map.Entry<String, Object> me : or.links.entrySet()) {
                 if (DEFERRED_FIELDS.contains(me.getKey())) {
                     Object value = me.getValue();
                     if (value.getClass().isArray()) {
@@ -312,21 +351,26 @@ public class DiseaseEntityFactory extends EntityRegistry {
             }
         }
         else {
-            logger.warning("Unable to resolve "+dr.uri);
+            logger.warning("Unable to resolve "+or.uri);
         }
     }
 
-    protected Entity registerIfAbsent (DiseaseResource dr) {
+    protected Entity registerIfAbsent (OntologyResource or) {
+        Entity ent = null;
         try (Transaction tx = gdb.beginTx()) {
-            Entity ent = _registerIfAbsent (dr);
+            ent = _registerIfAbsent (or);
             tx.success();
-            return ent;
         }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, "Can't register resource: "+or, ex);
+            throw new RuntimeException (ex);
+        }
+        return ent;
     }
 
-    protected void resolve (DiseaseResource dr) {
+    protected void resolve (OntologyResource or) {
         try (Transaction tx = gdb.beginTx()) {
-            _resolve (dr);
+            _resolve (or);
             tx.success();
         }
     }
@@ -337,54 +381,63 @@ public class DiseaseEntityFactory extends EntityRegistry {
         Model model = ModelFactory.createDefaultModel();
         model.read(file);
 
-        diseases.clear();
-        others.clear();
+        reset ();        
+        Set<OntologyResource> axioms = new HashSet<>();
         
-        Set<DiseaseResource> axioms = new HashSet<>();
         logger.info("Loading resources...");
         for (ResIterator iter = model.listSubjects(); iter.hasNext();) {
             Resource res = iter.next();
             
-            DiseaseResource dr = new DiseaseResource (res);
-            if (dr.isAxiom()) {
-                res = (Resource) dr.links.get("annotatedSource");
-                DiseaseResource disease = diseases.get(res);
+            OntologyResource or = new OntologyResource (res);
+            if (or.isAxiom()) {
+                res = (Resource) or.links.get("annotatedSource");
+                OntologyResource disease = diseases.get(res);
                 if (disease != null)
-                    disease.axioms.add(dr);
+                    disease.axioms.add(or);
                 else
-                    axioms.add(dr);
+                    axioms.add(or);
             }
-            else if (dr.isClass()) {
-                diseases.put(res, dr);
+            else if (or.isClass()) {
+                if (or.uri != null)
+                    diseases.put(res, or);
+                else
+                    logger.warning("Ignore class "+res);
+            }
+            else if (or.isOntology()) {
+                ontology = or;
+                for (Map.Entry<String, Object> me : or.props.entrySet())
+                    if (!"".equals(me.getKey()))
+                        ds.set(me.getKey(), me.getValue());
+                logger.info(">>>>>>> Ontology <<<<<<<<\n"+or);
             }
             else {
                 logger.warning("Resource type "
-                               +dr.type+" not recognized:\n"+dr);
-                others.add(dr);
+                               +or.type+" not recognized:\n"+or);
+                others.add(or);
             }
         }
 
-        List<DiseaseResource> unresolved = new ArrayList<>();
-        for (DiseaseResource dr : axioms) {
-            Resource res = (Resource) dr.links.get("annotatedSource");
-            DiseaseResource disease = diseases.get(res);
+        List<OntologyResource> unresolved = new ArrayList<>();
+        for (OntologyResource or : axioms) {
+            Resource res = (Resource) or.links.get("annotatedSource");
+            OntologyResource disease = diseases.get(res);
             if (disease != null) {
-                disease.axioms.add(dr);
+                disease.axioms.add(or);
             }
             else {
-                //logger.warning("Unable to resolve axiom:\n"+dr);
-                unresolved.add(dr);
+                //logger.warning("Unable to resolve axiom:\n"+or);
+                unresolved.add(or);
             }
         }
 
         // register entities
-        for (DiseaseResource dr : diseases.values()) {
-            System.out.print(dr);            
-            System.out.println("..."+dr.axioms.size()+" axiom(s)");
-            for (DiseaseResource ax : dr.axioms) {
+        for (OntologyResource or : diseases.values()) {
+            System.out.print(or);            
+            System.out.println("..."+or.axioms.size()+" axiom(s)");
+            for (OntologyResource ax : or.axioms) {
                 System.out.print("   "+ax);
             }
-            Entity ent = registerIfAbsent (dr);
+            Entity ent = registerIfAbsent (or);
             System.out.println("+++++++ "+ent.getId()+" +++++++");
             /*
             if (ent.getId() > 1000l)
@@ -393,16 +446,16 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
 
         // resolve entities
-        for (DiseaseResource dr : diseases.values()) {
-            resolve (dr);
+        for (OntologyResource or : diseases.values()) {
+            resolve (or);
         }
         
         logger.info(diseases.size()+" disease classes!");
         if (!unresolved.isEmpty()) {
             logger.warning("!!!!! "+unresolved.size()
                            +" unresolved axioms !!!!!");
-            for (DiseaseResource dr : unresolved)
-                System.out.println(dr);
+            for (OntologyResource or : unresolved)
+                System.out.println(or);
         }
 
         return ds;
@@ -472,12 +525,13 @@ public class DiseaseEntityFactory extends EntityRegistry {
     public static void main(String[] argv) throws Exception {
         if (argv.length < 2) {
             logger.info("Usage: "+DiseaseEntityFactory.class.getName()
-                        +" DBDIR [OWL|TTL]");
+                        +" DBDIR [OWL|TTL]...");
             System.exit(1);
         }
 
         try (DiseaseEntityFactory def = new DiseaseEntityFactory (argv[0])) {
-            def.register(argv[1]);
+            for (int i = 1; i < argv.length; ++i) 
+                def.register(argv[i]);
         }
         
         /*
