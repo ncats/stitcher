@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 import java.net.URI;
 
 public class CompoundStitcher implements Consumer<Stitch> {
+    ArrayList<Stitch> stitches = new ArrayList();
+
     static final Logger logger = Logger.getLogger
         (CompoundStitcher.class.getName());
 
@@ -96,13 +98,15 @@ public class CompoundStitcher implements Consumer<Stitch> {
         }
     }
 
-    public void stitch (int version, Component comp) {
+    public List<Stitch> stitch (int version, Component comp) {
         DataSource dsource = dsf.register("stitch_v"+version);
+        stitches = new ArrayList();
         ef.untangle(new StitcherUntangleCompoundComponent
                 (dsource, comp), this);
+        return stitches;
     }
 
-    public String testStitch (int version, Component comp) {
+    public List<String> testStitch (int version, Component comp) {
         DataSource dsource = dsf.register("stitch_v"+version);
         return ef.testUntangle(new StitcherUntangleCompoundComponent
                 (dsource, comp));
@@ -131,5 +135,6 @@ public class CompoundStitcher implements Consumer<Stitch> {
     public void accept(Stitch t) {
         CalculatorFactory.getCalculatorFactory(ef)
                          .process(Stitch.getStitch(t));
+        stitches.add(t);
     }
 }

@@ -10,6 +10,8 @@ GET	/stitches/latest/$id<[^.]+>.$format<(json|mol|simple)>	controllers.api.Api.g
 GET	/stitches/latest/:id	controllers.api.Api.getLatestStitch(id: String)
 GET	/stitches/v$ver<[0-9]+>/$id<[^.]+>.$format<(json|mol|simple)>	controllers.api.Api.getStitches(ver: Integer, id: String, format: String)
 GET	/stitches/v$ver<[0-9]+>/:id	controllers.api.Api.getStitch(ver: Integer, id: String)
+POST /stitches/v$ver<[0-9]+>/:id/@updateevents	controllers.api.Api.updateEvents(ver: Integer, id: String)
+POST /stitches/latest/:id/@updatevents	controllers.api.Api.updateLatestEvents(id: String)
 POST /stitches/v$ver<[0-9]+>/:id/@update	controllers.api.Api.updateStitch(ver: Integer, id: String)
 POST /stitches/latest/:id/@update	controllers.api.Api.updateLatestStitch(id: String)
 POST /stitches/v$ver<[0-9]+>/:id/@testupdate	controllers.api.Api.testUpdateStitch(ver: Integer, id: String)

@@ -420,6 +420,16 @@ public class Api extends Controller {
 
     }
 
+    public Result updateLatestEvents (String id) {
+        String uri = routes.Api.getLatestStitch(id).url();
+        Logger.debug(uri);
+
+        Integer ver = service.getLatestVersion();
+        if (null == ver)
+            return badRequest ("No latest stitch version defined!");
+        return updateEvents (ver, id);
+    }
+
     Object editProperty(Object value, String newVal, String oldVal) throws Exception {
         if (value.getClass().isArray()) {
             boolean found = false;
@@ -452,7 +462,10 @@ public class Api extends Controller {
     @Transactional
     @BodyParser.Of(value = BodyParser.TolerantJson.class)
     Result updateStitch(Integer ver, String id, boolean test) {
+        ObjectNode message = mapper.createObjectNode();
+        message.put("status", "ok");
         JsonNode update = request().body().asJson();
+        message.put("request", update);
         if (update != null && update.has("jsonPath") &&
                 update.get("jsonPath").asText().startsWith("$['properties'][?(@['key']==")) {
 
@@ -562,11 +575,11 @@ public class Api extends Controller {
                         }
 
                         if (sk != null) { // check if stitching needs to be redone
-                            ArrayList<Stitch> sL = new ArrayList();
+                            List<Stitch> sL = new ArrayList();
                             sL.add(updateNode.getStitch(ver));
 
                             updateNode.update(sk, oldVal, newVal);
-                            for (Entity e: updateNode.neighbors(sk, newVal)) {
+                            for (Entity e : updateNode.neighbors(sk, newVal)) {
                                 Stitch s = e.getStitch(ver);
                                 if (!sL.contains(s)) {
                                     sL.add(s);
@@ -578,37 +591,61 @@ public class Api extends Controller {
                                 }
                             }
                             long[] cn = new long[nodes.size()];
-                            for (int i=0; i<nodes.size(); i++)
+                            for (int i = 0; i < nodes.size(); i++)
                                 cn[i] = nodes.get(i);
                             CompoundStitcher cs = new CompoundStitcher(es.getEntityFactory());
                             Component comp = es.getEntityFactory().component(rootId, cn);
-                            response = cs.testStitch(ver, comp);
+                            List<String> nSL = cs.testStitch(ver, comp);
                             if (test) {
                                 // undo stitchkey update if just testing
                                 updateNode.update(sk, newVal, oldVal);
-                            } else if (response.split("root:").length != sL.size() + 1) {
-                                stitchNode.delete();
-                                cs.stitch(ver, comp);
-                                response = "updated payload, stitchkey and restitched node: "+response;
+                                response = "updating payload and stitchkey, does not affect stitching.";
+                                if (nSL.size() != sL.size()) {
+                                    response = "updating payload and stitchkey causes restitching of node.";
+                                    ArrayNode nSLA = mapper.createArrayNode();
+                                    for (String entry: nSL)
+                                        nSLA.add(entry);
+                                    message.put("newStitches", nSLA);
+                                    message.put("previousStitchCount", sL.size());
+                                }
+                            } else if (nSL.size() != sL.size()) {
+                                ArrayNode nSLA = mapper.createArrayNode();
+                                for (String entry: nSL)
+                                    nSLA.add(entry);
+                                message.put("newStitches", nSLA);
+                                message.put("previousStitchCount", sL.size());
+                                for (Stitch s : sL)
+                                    s.delete();
+                                sL = cs.stitch(ver, comp);
+                                response = "updated payload, stitchkey and restitched node.";
+                                for (Stitch s : sL)
+                                    for (Map me : s.members())
+                                        if (me.containsKey("parent") && me.get("parent").equals(updateNode.getId())) {
+                                            message.put("newStitch", jsonCodec.encode(s));
+                                        }
+                            } else {
+                                response = "updated payload and stitchkey, but stitching not affected.";
                             }
                         }
-                        return ok(response);
+                        message.put("status", response);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        return notAcceptable("Error stitching: " + root.getId() + "\n" + ex.getMessage() + "\n" + update.toString());
+                        message.put("status", "Error stitching: " + root.getId() + "\n" + ex.getMessage());
                     }
                 } else {
-                    return notFound("Can't find updateNode on stitch key: " + id + ":" + update.get("nodeSource").asText() + ":" + update.get("nodeId").asText());
+                    message.put("status", "Can't find updateNode on stitch key: " + id + ":" + update.get("nodeSource").asText() + ":" + update.get("nodeId").asText());
                 }
             } else {
-                return notFound("Unknown stitch key: " + id);
+                message.put("status", "Unknown stitch key: " + id);
             }
 
         } else {
-            updateEvents(ver, id);
+            message.put("status", "update does not contain \"jsonPath\"");
+            if (update == null)
+                message.put("status", "Update json object is missing, recalculating events");
         }
 
-        return noContent ();
+        return ok(message);
     }
 
     public Result updateStitch(Integer ver, String id) {
