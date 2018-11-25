@@ -29,4 +29,6 @@ public interface Props {
 
     public static final String OLDVAL = "oldval";
     public static final String NEWVAL = "newval";
+
+    public static final String CURATED = "Inxight Curated";
 }

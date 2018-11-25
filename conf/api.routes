@@ -16,6 +16,7 @@ POST /stitches/v$ver<[0-9]+>/:id/@update	controllers.api.Api.updateStitch(ver: I
 POST /stitches/latest/:id/@update	controllers.api.Api.updateLatestStitch(id: String)
 POST /stitches/v$ver<[0-9]+>/:id/@testupdate	controllers.api.Api.testUpdateStitch(ver: Integer, id: String)
 POST /stitches/latest/:id/@testupdate	controllers.api.Api.testUpdateLatestStitch(id: String)
+GET /curations	controllers.api.Api.dumpCuratedNodes(label: String ?= null, skip: Integer ?= null, top: Integer ?= 5)
 GET  	/stitches/latest		controllers.api.Api.latestStitches(skip: Integer ?= null, top: Integer ?= 5)
 GET	/stitches/v$ver<[0-9]+>		controllers.api.Api.stitches(ver: Integer, skip: Integer ?= null, top: Integer ?= 5)
 GET	/stitches/usapprovalrx/$id<[^.]+>.$format<(json|mol|simple)>	controllers.api.Api.getUsApprovalRx(id: String, format: String)

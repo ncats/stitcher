@@ -1,6 +1,7 @@
 package controllers.api;
 
 import java.lang.reflect.Array;
+import java.net.URLDecoder;
 import java.util.*;
 import java.io.*;
 import javax.inject.*;
@@ -464,7 +465,7 @@ public class Api extends Controller {
     Result updateStitch(Integer ver, String id, boolean test) {
         ObjectNode message = mapper.createObjectNode();
         message.put("status", "ok");
-        JsonNode update = request().body().asJson();
+        ObjectNode update = (ObjectNode)request().body().asJson();
         message.put("request", update);
         if (update != null && update.has("jsonPath") &&
                 update.get("jsonPath").asText().startsWith("$['properties'][?(@['key']==")) {
@@ -492,6 +493,7 @@ public class Api extends Controller {
                         entry.get("id").asText().equals(update.get("nodeId").asText())) {
                         if (Long.valueOf(update.get("node").asText()) != nodeId) {
                             Logger.warn("node ID has changed since original curation! "+item.name()+" "+update.get("node").asText());
+                            update.set("nodeId", entry.get("id"));
                         }
                         updateNode = es.getEntity(nodeId);
                     }
@@ -500,6 +502,16 @@ public class Api extends Controller {
 
                 if (updateNode != null) {
                     try {
+                        // remove auto-generated data by previous instance of database
+                        ArrayList<String> remove = new ArrayList();
+                        for (Iterator<String> i=update.fieldNames(); i.hasNext();) {
+                            String field = i.next();
+                            if (field.startsWith("_"))
+                                remove.add(field);
+                        }
+                        for (String field: remove)
+                            update.remove(field);
+
                         String response = "nothing happened; payload would have been updated";
 
                         String oldVal = update.has("oldValue") ? update.get("oldValue").asText() : null;
@@ -534,7 +546,8 @@ public class Api extends Controller {
                         // add the curation itself to the payload
                         String updateStr = update.toString();
                         updateStr = updateStr.substring(0, updateStr.length()-1) +
-                                ",\"_ver\":\""+ver+"\",\"_stitch\":\""+id+"\",\"_uri\":\""+request().uri()+"\"}";
+                                ",\"_ver\":\""+ver+"\",\"_stitch\":\""+id+"\",\"_uri\":\""+request().uri()+
+                                "\",\"_timestamp\":"+new Date().getTime()+"}";
                         Object value = updateNode.payload("_CURATION");
                         if (value == null) {
                             String[] upSA = new String[1];
@@ -571,6 +584,7 @@ public class Api extends Controller {
 
                         if (!test) {
                             updateNode.add(payload);
+                            updateNode.addLabel(Props.CURATED);
                             response = "payload updated";
                         }
 
@@ -664,6 +678,69 @@ public class Api extends Controller {
         if (null == ver)
             return badRequest ("No latest stitch version defined!");
         return updateStitch (ver, id, test);
+    }
+
+    public Result dumpCuratedNodes (final String label, Integer skip, Integer top) {
+        String uri = routes.Api.dumpCuratedNodes(label, skip, top).url();
+        Logger.debug(uri);
+
+        List<String> labels = new ArrayList<>();
+        labels.add(Props.CURATED);
+        if (label != null) {
+            String filterLabel = label;
+            try {
+                filterLabel = URLDecoder.decode(label, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+            }
+            if (filterLabel.charAt(0) == '"' && filterLabel.charAt(filterLabel.length()-1) == '"')
+                filterLabel = filterLabel.substring(1, filterLabel.length()-1);
+            labels.add(filterLabel);
+        }
+
+        Entity[] entities;
+        int s = skip != null ? skip : 0;
+        int t = top != null ? Math.min(top,1000) : 10;
+
+        String page = request().getQueryString("page");
+        if (page != null) {
+            try {
+                skip = (Integer.parseInt(page)-1)*t;
+                s = Math.max(0, skip);
+            }
+            catch (NumberFormatException ex) {
+                Logger.error("Bogus page number: "+page, ex);
+            }
+        }
+
+        entities = es.getEntityFactory()
+                    .entities(s, t, labels.toArray(new String[0]));
+
+        ArrayNode entries = mapper.createArrayNode();
+        for (Entity e : entities) {
+            ObjectNode entry = mapper.createObjectNode();
+            entry.put("id", e.getId());
+            entry.put("source", e.datasource().getKey());
+            entry.put("datasource", e.datasource().getName());
+            Map<String, Object> payload = e.payload();
+            if (e.payload().containsKey("_CURATION")) {
+                Object curation = e.payload().get("_CURATION");
+                ArrayNode an = mapper.createArrayNode();
+                if (curation.getClass().isArray())
+                    for (int i=0; i<Array.getLength(curation); i++)
+                        an.add(Array.get(curation, i).toString());
+                entry.put("_CURATION", an);
+            }
+            entries.add(entry);
+        }
+
+        ObjectNode result = mapper.createObjectNode();
+        result.put("skip", skip);
+        result.put("top", top);
+        result.put("count", entities.length);
+        result.put("uri", request().uri());
+        result.put("contents", entries);
+
+        return ok(result);
     }
 
     public Result updateLatestStitch (String id) {
