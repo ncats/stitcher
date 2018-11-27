@@ -524,7 +524,7 @@ public class Api extends Controller {
                         String newVal = update.at("/value").textValue();
                         if (newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
                             String[] yo = newVal.split("\"");
-                            updateProperty = yo[3].trim();
+                            newVal = yo[5].trim();
                         }
                         String operation = update.has("operation") ? update.get("operation").asText() : null;
                         if ("replace".equals(operation) && (oldVal == null || newVal == null)) {
