@@ -521,15 +521,28 @@ public class Api extends Controller {
                         String response = "nothing happened; payload would have been updated";
 
                         String oldVal = update.at("/oldValue").textValue();
-                        if (oldVal != null && oldVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
-                            String[] yo = oldVal.split("\"");
-                            oldVal = yo[5].trim();
+                        //String newVal = update.at("/value").textValue();
+                        //if (newVal != null && newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+                        //    String[] yo = newVal.split("\"");
+                        //    newVal = yo[3].trim();
+                        //}
+                        JsonNode newV = update.at("/value");
+                        String newVal;
+                        if (!newV.isNull() && !newV.isMissingNode()) {
+                            if (newV.isObject()) {
+                                newVal = newV.get(updateProperty).textValue();
+                            } else {
+                                try {
+                                    newVal = mapper.readTree(newV.textValue()).get(updateProperty).textValue();
+                                } catch (Exception ex) {
+                                    newVal = newV.textValue();
+                                }
+                            }
+                        } else {
+                            newVal = null;
                         }
-                        String newVal = update.at("/value").textValue();
-                        if (newVal != null && newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
-                            String[] yo = newVal.split("\"");
-                            newVal = yo[5].trim();
-                        }
+
+
                         String operation = update.has("operation") ? update.get("operation").asText() : null;
                         if ("replace".equals(operation) && (oldVal == null || newVal == null)) {
                             throw new Exception("Can't replace if old or new value is null");
