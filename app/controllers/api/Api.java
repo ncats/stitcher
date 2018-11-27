@@ -464,15 +464,21 @@ public class Api extends Controller {
     @BodyParser.Of(value = BodyParser.TolerantJson.class)
     Result updateStitch(Integer ver, String id, boolean test) {
         ObjectNode message = mapper.createObjectNode();
-        message.put("status", "ok");
+        message.put("statusMessage", "ok");
+        message.put("status", "no change");
         ObjectNode update = (ObjectNode)request().body().asJson();
+
         message.put("request", update);
         if (update != null && update.has("jsonPath") &&
-                update.get("jsonPath").asText().startsWith("$['properties'][?(@['key']==")) {
+                (update.get("jsonPath").asText().startsWith("$['properties'][?(@['key']==") ||
+                        update.get("jsonPath").asText().contains("$.properties"))) {
 
-            //"jsonPath": "$['properties'][?(@['key']=='CompoundUNII' )]['value']",
             String updateProperty = update.get("jsonPath").asText();
-            updateProperty = updateProperty.substring(29,updateProperty.indexOf("' )]['value']"));
+            if (updateProperty.contains("$.properties")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+                String[] yo = update.get("value").asText().split("\"");
+                updateProperty = yo[1].trim();
+            } else
+                updateProperty = updateProperty.substring(29,updateProperty.indexOf("' )]['value']"));
 
             Entity stitchNode = getStitchEntity(ver, id);
             if (stitchNode != null) {
@@ -514,8 +520,12 @@ public class Api extends Controller {
 
                         String response = "nothing happened; payload would have been updated";
 
-                        String oldVal = update.has("oldValue") ? update.get("oldValue").asText() : null;
-                        String newVal = update.has("value") ? update.get("value").asText() : null;
+                        String oldVal = update.at("/oldValue").textValue();
+                        String newVal = update.at("/value").textValue();
+                        if (newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+                            String[] yo = newVal.split("\"");
+                            updateProperty = yo[3].trim();
+                        }
                         String operation = update.has("operation") ? update.get("operation").asText() : null;
                         if ("replace".equals(operation) && (oldVal == null || newVal == null)) {
                             throw new Exception("Can't replace if old or new value is null");
@@ -641,22 +651,27 @@ public class Api extends Controller {
                                 response = "updated payload and stitchkey, but stitching not affected.";
                             }
                         }
-                        message.put("status", response);
+                        message.put("status", "success");
+                        message.put("statusMessage", response);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        message.put("status", "Error stitching: " + root.getId() + "\n" + ex.getMessage());
+                        message.put("status", "failure");
+                        message.put("statusMessage", "Error stitching: " + root.getId() + "\n" + ex.getMessage());
                     }
                 } else {
-                    message.put("status", "Can't find updateNode on stitch key: " + id + ":" + update.get("nodeSource").asText() + ":" + update.get("nodeId").asText());
+                    message.put("status", "failure");
+                    message.put("statusMessage", "Can't find updateNode on stitch key: " + id + ":" + update.get("nodeSource").asText() + ":" + update.get("nodeId").asText());
                 }
             } else {
-                message.put("status", "Unknown stitch key: " + id);
+                message.put("status", "failure");
+                message.put("statusMessage", "Unknown stitch key: " + id);
             }
 
         } else {
-            message.put("status", "update does not contain \"jsonPath\"");
+            message.put("status", "failure");
+            message.put("statusMessage", "update does not contain \"jsonPath\"");
             if (update == null)
-                message.put("status", "Update json object is missing, recalculating events");
+                message.put("statusMessage", "Update json object is missing, recalculating events");
         }
 
         return ok(message);
