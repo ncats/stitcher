@@ -521,8 +521,12 @@ public class Api extends Controller {
                         String response = "nothing happened; payload would have been updated";
 
                         String oldVal = update.at("/oldValue").textValue();
+                        if (oldVal != null && oldVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+                            String[] yo = oldVal.split("\"");
+                            oldVal = yo[5].trim();
+                        }
                         String newVal = update.at("/value").textValue();
-                        if (newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+                        if (newVal != null && newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
                             String[] yo = newVal.split("\"");
                             newVal = yo[5].trim();
                         }
