@@ -473,13 +473,6 @@ public class Api extends Controller {
                 (update.get("jsonPath").asText().startsWith("$['properties'][?(@['key']==") ||
                         update.get("jsonPath").asText().contains("$.properties"))) {
 
-            String updateProperty = update.get("jsonPath").asText();
-            if (updateProperty.contains("$.properties")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
-                String[] yo = update.get("value").asText().split("\"");
-                updateProperty = yo[1].trim();
-            } else
-                updateProperty = updateProperty.substring(29,updateProperty.indexOf("' )]['value']"));
-
             Entity stitchNode = getStitchEntity(ver, id);
             if (stitchNode != null) {
                 Entity updateNode = null;
@@ -528,11 +521,19 @@ public class Api extends Controller {
                         //}
                         JsonNode newV = update.at("/value");
                         String newVal;
+                        String updateProperty = update.get("jsonPath").asText();
+                        if (updateProperty.contains("$.properties")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+                            // do this below
+                        } else
+                            updateProperty = updateProperty.substring(29,updateProperty.indexOf("' )]['value']"));
+
                         if (!newV.isNull() && !newV.isMissingNode()) {
                             if (newV.isObject()) {
+                                updateProperty = newV.fieldNames().next();
                                 newVal = newV.get(updateProperty).textValue();
                             } else {
                                 try {
+                                    updateProperty = mapper.readTree(newV.textValue()).fieldNames().next();
                                     newVal = mapper.readTree(newV.textValue()).get(updateProperty).textValue();
                                 } catch (Exception ex) {
                                     newVal = newV.textValue();
