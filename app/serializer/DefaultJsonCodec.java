@@ -191,7 +191,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                     (AuxRelType.PAYLOAD, Direction.OUTGOING);
                 if (payrel != null) {
                     Node sn = payrel.getOtherNode(n);
-                    member.put("entityNode", sn.getId());
+                    member.put("node", sn.getId());
                     member.put("payloadNode", n.getId());
                     if (stitchParent == n.getId())
                         stitchParent = sn.getId();
