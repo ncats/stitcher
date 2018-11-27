@@ -595,7 +595,7 @@ public class Api extends Controller {
                             updateNode.update(sk, oldVal, newVal);
                             for (Entity e : updateNode.neighbors(sk, newVal)) {
                                 Stitch s = e.getStitch(ver);
-                                if (!sL.contains(s)) {
+                                if (s != null && !sL.contains(s)) {
                                     sL.add(s);
                                     for (Map m : s.members()) {
                                         Long member = Long.valueOf(m.get("parent").toString());
