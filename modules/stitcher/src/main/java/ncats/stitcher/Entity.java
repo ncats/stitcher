@@ -724,7 +724,12 @@ public class Entity extends CNode {
             else {
                 Object val = value.getValue();
                 _snapshot (key.name(), val);
-                _stitch (key, val);
+                Map<String, Object> attrs = null;
+                if (value.getName() != null) {
+                    attrs = new TreeMap<>();
+                    attrs.put(NAME, value.getName());
+                }
+                _stitch (key, val, attrs);
                 _node.setProperty(key.name(), val);
             }
         }
@@ -859,12 +864,17 @@ public class Entity extends CNode {
     }
 
     protected void _stitch (StitchKey key, Object value) {
+        _stitch (key, value, null);
+    }
+    
+    protected void _stitch (StitchKey key, Object value,
+                            Map<String, Object> attrs) {
         if (value.getClass().isArray()) {
             int size = Array.getLength(value);
             for (int i = 0; i < size; ++i) {
                 try {
                     Object v = Array.get(value, i);
-                    stitch (_node, key, v);
+                    stitch (_node, key, v, attrs);
                 }
                 catch (Exception ex) {
                     logger.log(Level.SEVERE,
@@ -873,7 +883,7 @@ public class Entity extends CNode {
             }
         }
         else {
-            stitch (_node, key, value);
+            stitch (_node, key, value, attrs);
         }
     }
 
@@ -924,7 +934,12 @@ public class Entity extends CNode {
                         delta = val;
                     _snapshot (key.name(), old, newVal);
                     _node.setProperty(key.name(), newVal);
-                    _stitch (key, delta);
+                    Map<String, Object> attrs = null;
+                    if (value.getName() != null) {
+                        attrs = new TreeMap<>();
+                        attrs.put(NAME, value.getName());
+                    }
+                    _stitch (key, delta, attrs);
                 }
             }
         }
@@ -955,10 +970,15 @@ public class Entity extends CNode {
         else 
             index.add(node, key.name(), value);
     }
-    
+
     public boolean stitch (Entity target, StitchKey key, Object value) {
+        return stitch (target, key, value, null);
+    }
+    
+    public boolean stitch (Entity target, StitchKey key, Object value,
+                           Map<String, Object> attrs) {
         try (Transaction tx = gdb.beginTx()) {
-            boolean ok = _stitch (target, key, value);
+            boolean ok = _stitch (target, key, value, attrs);
             tx.success();
             return ok;
         }
@@ -1008,7 +1028,8 @@ public class Entity extends CNode {
         union (_node, node, key, value);
     }
 
-    protected static void union (Node _node, Node node, StitchKey key, Object value) {
+    protected static void union (Node _node, Node node,
+                                 StitchKey key, Object value) {
         Node stats1 = getStatsNode (_node);
         Node stats2 = getStatsNode (node);
         Node root = union (_node, node);
@@ -1071,8 +1092,13 @@ public class Entity extends CNode {
     /*
      * manually perform the stitch; if either of the nodes is already stitched
      * on the designated key, then the value is append to the existing values.
-     */    
+     */
     public boolean _stitch (Entity target, StitchKey key, Object value) {
+        return _stitch (target, key, value, null);
+    }
+    
+    public boolean _stitch (Entity target, StitchKey key, Object value,
+                            Map<String, Object> attrs) {
         if (value == null)
             throw new IllegalArgumentException ("Stitch value can't be null!");
         
@@ -1087,6 +1113,10 @@ public class Entity extends CNode {
         Relationship rel = _node.createRelationshipTo(target._node, key);
         rel.setProperty(CREATED, System.currentTimeMillis());
         rel.setProperty(VALUE, value);
+        if (attrs != null) {
+            for (Map.Entry<String, Object> a : attrs.entrySet())
+                rel.setProperty(a.getKey(), a.getValue());
+        }
         
         RelationshipIndex relindx = _relationshipIndex (_node);
         relindx.add(rel, key.name(), value);
@@ -1166,8 +1196,13 @@ public class Entity extends CNode {
         
         return this;
     }
-    
+
     protected static void stitch (Node node, StitchKey key, Object value) {
+        stitch (node, key, value, null);
+    }
+    
+    protected static void stitch (Node node, StitchKey key,
+                                  Object value, Map<String, Object> attrs) {
         Index<Node> index = _nodeIndex (node);
         IndexHits<Node> hits = index.get(key.name(), value);
         try {
@@ -1179,7 +1214,13 @@ public class Entity extends CNode {
                     if (!node.equals(n)) {
                         Relationship rel = node.createRelationshipTo(n, key);
                         rel.setProperty(CREATED, System.currentTimeMillis());
-                        rel.setProperty(VALUE, value); 
+                        rel.setProperty(VALUE, value);
+                        if (attrs != null) {
+                            for (Map.Entry<String, Object> a
+                                     : attrs.entrySet()) {
+                                rel.setProperty(a.getKey(), a.getValue());
+                            }
+                        }
                         relindx.add(rel, key.name(), value);
                         union (n, node, key, value);
 

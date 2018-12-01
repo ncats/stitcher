@@ -65,6 +65,12 @@ public enum StitchKey implements RelationshipType {
     R_closeMatch,
     R_activeMoiety(5, true), // active moiety relationship (directed)
     R_axiom,
+
+    /*
+     * UMLS relationship attributes
+     * https://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/release/abbreviations.html
+     */
+    R_rel,
     
     /*
      * Tag

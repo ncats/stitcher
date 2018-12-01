@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Callable;
@@ -118,7 +119,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
     }
 
-    Map<Resource, OntologyResource> diseases = new HashMap<>();
+    Map<Resource, OntologyResource> resources = new HashMap<>();
     List<OntologyResource> others = new ArrayList<>();
     OntologyResource ontology;
     
@@ -149,19 +150,20 @@ public class DiseaseEntityFactory extends EntityRegistry {
             .add(I_CODE, "hasDbXref")
             .add(I_CODE, "id")
             .add(I_CODE, "hasAlternativeId")
+            .add(I_CODE, "SY")
+            .add(I_CODE, "RQ")
+            .add(I_CODE, "mapped_to")
+            //.add(I_CODE, "related_to")
+            .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "inSubset")
             .add(T_Keyword, "type")
             .add(T_Keyword, "hasOBONamespace")
-            .addBlacklist (I_CODE, "MONDO:LEXICAL"
-                           ,"MONDO:PATTERNS/DISEASE_SERIES_BY_GENE"
-                           ,"MONDO:DESIGN_PATTERN"
-                           )
             ;
     }
 
     protected void reset () {
         ontology = null;
-        diseases.clear();
+        resources.clear();
         others.clear();
     }
     
@@ -176,6 +178,292 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
         return value;
     }
+
+    protected static Object map (Object value, Function<Object, Object> f) {
+        if (value == null) {
+        }
+        else if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            for (int i = 0; i < len; ++i) {
+                Array.set(value, i, map (Array.get(value, i), f));
+            }
+        }
+        else {
+            value = f.apply(value);
+        }
+        return value;
+    }
+
+    /*
+     * TODO: NEED TO PUT ALL THESE RULES IN A CONFIG FILE!
+     */
+    protected Map<String, Object> sigh (Map<String, Object> data) {
+        // don't use ICD code for stitching
+        List<String> xrefs = new ArrayList<>();
+        List<String> icds = new ArrayList<>();
+        List<String> others = new ArrayList<>();
+        List<String> useful = new ArrayList<>();
+        
+        Object value = data.remove("hasDbXref");
+        if (value != null) {
+            if (value.getClass().isArray()) {
+                int len = Array.getLength(value);
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(value, i);
+                    if (v instanceof Resource) {
+                        others.add(((Resource)v).getURI());
+                    }
+                    else {
+                        String s = v.toString();
+                        if ("".equals(s));
+                        else if (s.startsWith("ICD"))
+                            icds.add(s);
+                        else
+                            xrefs.add(transform (s));
+                    }
+                }
+            }
+            else if (value instanceof Resource) {
+                others.add(((Resource)value).getURI());
+            }
+            else {
+                String v = value.toString();
+                if ("".equals(v));
+                else if (v.startsWith("ICD")) icds.add(v);
+                else xrefs.add(transform (v));
+            }
+        }
+
+        if (ontology == null) {
+        }
+        else if ("chebi_ontology".equals
+                 (ontology.props.get("default-namespace"))) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.equals("KEGG_COMPOUND")
+                    || u.equals("DRUGCENTRAL")
+                    || u.equals("IUPAC")
+                    || u.equals("CHEMIDPLUS")
+                    || u.equals("KEGG_DRUG")
+                    || u.equals("CHEBI")
+                    || u.equals("WHO_MEDNET")
+                    || u.equals("CHEMBL")
+                    || u.equals("PDBECHEM")
+                    || u.equals("NIST_CHEMISTRY_WEBBOOK")
+                    || u.equals("DRUGBANK")
+                    || u.equals("UNIPROT")
+                    || u.equals("LIPID_MAPS")
+                    || u.equals("METACYC")
+                    || u.equals("HMDB")
+                    || u.equals("SUBMITTER")
+                    || u.equals("JCBN")
+                    || u.equals("LECITHIN")
+                    || u.equals("PHOSPHATIDYLCHOLINE")
+                    || u.equals("SPHINGOMYELIN")
+                    || u.equals("KEGG_GLYCAN")
+                    || u.equals("MOLBASE")
+                    || u.equals("ALAN_WOOD'S_PESTICIDES")
+                    || u.equals("UM-BBD")
+                    || u.equals("CBN")
+                    || u.equals("SMID")
+                    || u.equals("IUBMB")
+                    || u.equals("KNAPSACK")
+                    || u.equals("PATENT")
+                    || u.equals("IUPHAR")
+                    || u.equals("RESID")
+                    || u.equals("COME")
+                    || u.equals("PDB")
+                    || u.equals("LINCS")
+                    || u.equals("EMBL")
+                    ) {
+                    others.add(x);
+                    Object old = data.get("inSubset");
+                    data.put("inSubset",
+                             old != null ? Util.merge(old, x) : x);
+                }
+                else if (u.startsWith("WIKIPEDIA:")
+                         || u.startsWith("METACYC:")) {
+                    int pos = x.indexOf(':');
+                    String n = x.substring(pos+1).replaceAll("_", " ");
+                    if (n.equalsIgnoreCase("LECITHIN")
+                        || n.equalsIgnoreCase("PHOSPHATIDYLCHOLINE")
+                        || n.equalsIgnoreCase("SPHINGOMYELIN")
+                        || n.equalsIgnoreCase("Phosphatidylinositols")
+                        || n.equalsIgnoreCase("TRIACYLGLYCEROLS")
+                        ) {
+                        Object old = data.get("inSubset");
+                        data.put("inSubset",
+                                 old != null ? Util.merge(old, n) :n);
+                    }
+                    else {
+                        Object old = data.get("hasExactSynonym");
+                        data.put("hasExactSynonym",
+                                 old != null ? Util.merge(old, n) : n);
+                        old = data.get("inSubset");
+                        data.put("inSubset",
+                                 old != null
+                                 ? Util.merge(old, x.substring(0, pos))
+                                 : x.substring(0, pos));
+                    }
+                }
+                else if (u.startsWith("PMID:")) {
+                    others.add(x);
+                }
+                else {
+                    useful.add(x);
+                }
+            }
+                
+            Object label = data.get("label");
+            if (label != null) {
+                Object obj = Util.delta(label, new String[]{
+                        "Europe PMC", "ChemIDplus", "Reaxys",
+                        "KEGG COMPOUND", "DrugCentral", "Beilstein",
+                        "KEGG DRUG", "ChEMBL", "Gmelin",
+                        "NIST Chemistry WebBook", "LIPID MAPS",
+                        "ChEMBL", "ChEBI", "HMDB", "KNApSAcK",
+                        "SUBMITTER", "MetaCyc", "DrugBank", "UM-BBD",
+                        "Alan Wood's Pesticides", "Diglyceride",
+                        "diglycerides", "Diacylglycerol", "SMID",
+                        "Triacylglycerol", "triglyceride", "diglyceride",
+                        "triglyceride", "Diglyceride"
+                    });
+                if (obj != Util.NO_CHANGE)
+                    data.put("label", obj);
+            }
+                
+            Object syn = data.get("hasRelatedSynonym");
+            if (syn != null) {
+                Object obj = Util.delta(syn, new String[]{
+                        "Lecithin", "Triacylglycerol", "Diacylglycerol"
+                    });
+                if (obj != Util.NO_CHANGE)
+                    data.put("hasRelatedSynonym", obj);
+            }
+        }
+        else if ("uberon".equals
+                 (ontology.props.get("default-namespace"))) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.equals("FMA:TA")
+                    || u.equals("ZFIN:CURATOR")
+                    || u.equals("ZFA:CURATOR")
+                    || u.equals("TAO:WD")
+                    || u.equals("MP:MP")
+                    || u.equals("CL:TM")
+                    || u.equals("MA:TH")
+                    || u.equals("NIFSTD:NEURONAMES_ABBREVSOURCE")
+                    || u.startsWith("NCBITAXON")
+                    || u.startsWith("ISBN")
+                    || u.startsWith("FEED")
+                    || u.startsWith("GOC:")
+                    || u.startsWith("FBC:")
+                    || (u.startsWith("AAO:")
+                        && !Character.isDigit(u.charAt(4)))
+                    || (u.startsWith("UBERON:")
+                        && !Character.isDigit(u.charAt(7)))
+                    || u.startsWith("PHENOSCAPE")
+                    || u.startsWith("MGI:")
+                    || u.startsWith("BGEE")
+                    || u.startsWith("XB:")
+                    || u.startsWith("OBOL:")
+                    || u.startsWith("HTTP")
+                    || u.startsWith("DORLANDS")
+                    )
+                    others.add(x);
+                else
+                    useful.add(x);
+            }
+        }
+        else if ("disease_ontology".equals
+                 (ontology.props.get("default-namespace"))) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.equals("MTH:NOCODE")
+                    || u.equals("LS:IEDB")
+                    || u.equals("SN:IEDB")
+                    || u.startsWith("URL")
+                    || u.startsWith("DO:")
+                    || u.startsWith("MTHICD9")
+                    || u.startsWith("JA:")
+                    || u.startsWith("HTTP")
+                    )
+                    others.add(x);
+                else
+                    useful.add(x);
+            }
+        }
+        else if ("human_phenotype".equals
+                 (ontology.props.get("default-namespace"))) {
+            // for hpo, hasDbXref in axiom corresponds to curator or 
+            // publication. don't stitch on these
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                // sigh.. non-informative xrefs; why are these xrefs?
+                if (u.startsWith("UMLS")
+                    || (u.startsWith("HP:")
+                        && !u.equals("HP:PROBINSON"))
+                    || u.startsWith("SNOMEDCT")
+                    ) {
+                    useful.add(x);
+                }
+                else if (u.startsWith("MSH")) {
+                    useful.add(x.replaceAll("MSH", "MESH"));
+                }
+                else
+                    others.add(x);
+            }
+        }
+        else if (ontology.props.get("title") != null
+                 && ((String)ontology.props.get("title"))
+                 .startsWith("MONDO")) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                // these are not stitch identifiers
+                if (u.startsWith("MONDO")
+                    || u.equals("NCIT:P378")
+                    || u.equals("MTH:NOCODE")
+                    || u.startsWith("DOI:")
+                    || u.startsWith("URL")
+                    || u.startsWith("HTTP")
+                    || u.startsWith("PMID")
+                    || u.startsWith("WIKIPEDIA")
+                    ) {
+                    others.add(x);
+                }
+                else
+                    useful.add(x);
+            }
+        }
+        else if ("MEDLINEPLUS".equals(ontology.props.get("label"))) {
+            Object obj = data.remove("prefLabel");
+            if (obj != null)
+                data.put("label", obj);
+            
+            for (String p : new String[]{"mapped_to",
+                                         "related_to",
+                                         "SY", "RQ"}) {
+                obj = data.remove(p);
+                if (obj != null) {
+                    data.put(p, map (obj, a -> "UMLS:"+a));
+                }
+            }
+        }
+        
+        if (!useful.isEmpty() || !others.isEmpty()) {
+            xrefs = useful;
+            if (!others.isEmpty())
+                data.put("_hasDbXref", others.toArray(new String[0]));
+        }
+        
+        if (!xrefs.isEmpty())
+            data.put("hasDbXref", xrefs.toArray(new String[0]));
+            
+        if (!icds.isEmpty())
+            data.put("ICD", icds.toArray(new String[0]));
+
+        return data;
+    } // sigh
     
     protected Entity _registerIfAbsent (OntologyResource or) {
         Map<String, Object> data = new TreeMap<>();
@@ -239,60 +527,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
             }
         }
 
-        // don't use ICD code for stitching
-        Object value = data.remove("hasDbXref");
-        if (value != null) {
-            List<String> xrefs = new ArrayList<>();
-            List<String> icds = new ArrayList<>();
-            if (value.getClass().isArray()) {
-                int len = Array.getLength(value);
-                for (int i = 0; i < len; ++i) {
-                    String v = Array.get(value, i).toString();
-                    if (v.startsWith("ICD"))
-                        icds.add(v);
-                    else
-                        xrefs.add(transform (v));
-                }
-            }
-            else {
-                String v = value.toString();
-                if (v.startsWith("ICD")) icds.add(v);
-                else xrefs.add(transform (v));
-            }
-            
-            if (!xrefs.isEmpty()) {
-                String ns = ontology != null ? (String)ontology.props.get
-                    ("default-namespace") : null;
-
-                if ("human_phenotype".equals(ns)) {
-                    // for hpo, hasDbXref in axiom corresponds to curator or 
-                    // publication. don't stitch on these
-                    List<String> others = new ArrayList<>();
-                    List<String> useful = new ArrayList<>();
-                    for (String u : xrefs) {
-                        String x = u.toUpperCase();
-                        // sigh.. non-informative xrefs; why are these xrefs?
-                        if (x.startsWith("UMLS")
-                            || (x.startsWith("HP:")
-                                && !x.equals("HP:PROBINSON"))
-                            || x.startsWith("SNOMEDCT")
-                            || x.startsWith("MSH"))
-                            useful.add(u);
-                        else
-                            others.add(u);
-                    }
-                    xrefs = useful;
-                    if (!others.isEmpty())
-                        data.put("_hasDbXref", others.toArray(new String[0]));
-                }
-                data.put("hasDbXref", xrefs.toArray(new String[0]));
-            }
-            
-            if (!icds.isEmpty())
-                data.put("ICD", icds.toArray(new String[0]));
-        }
-
-        return register (data);
+        return register (sigh (data));
     }
 
     boolean _stitch (Entity ent, String name, Resource res) {
@@ -391,15 +626,15 @@ public class DiseaseEntityFactory extends EntityRegistry {
             OntologyResource or = new OntologyResource (res);
             if (or.isAxiom()) {
                 res = (Resource) or.links.get("annotatedSource");
-                OntologyResource disease = diseases.get(res);
-                if (disease != null)
-                    disease.axioms.add(or);
+                OntologyResource ref = resources.get(res);
+                if (ref != null)
+                    ref.axioms.add(or);
                 else
                     axioms.add(or);
             }
             else if (or.isClass()) {
                 if (or.uri != null)
-                    diseases.put(res, or);
+                    resources.put(res, or);
                 else
                     logger.warning("Ignore class "+res);
             }
@@ -408,6 +643,24 @@ public class DiseaseEntityFactory extends EntityRegistry {
                 for (Map.Entry<String, Object> me : or.props.entrySet())
                     if (!"".equals(me.getKey()))
                         ds.set(me.getKey(), me.getValue());
+                
+                for (Map.Entry<String, Object> me : or.links.entrySet()) {
+                    Object value = me.getValue();
+                    if (value.getClass().isArray()) {
+                        int len = Array.getLength(value);
+                        String[] vals = new String[len];
+                        for (int i = 0; i < len; ++i) {
+                            Resource r = (Resource) Array.get(value, i);
+                            vals[i] = r.getURI();
+                        }
+                        ds.set(me.getKey(), vals);
+                    }
+                    else {
+                        Resource r = (Resource) me.getValue();
+                        if (res.getURI() != null)
+                            ds.set(me.getKey(), r.getURI());
+                    }
+                }
                 logger.info(">>>>>>> Ontology <<<<<<<<\n"+or);
             }
             else {
@@ -420,9 +673,9 @@ public class DiseaseEntityFactory extends EntityRegistry {
         List<OntologyResource> unresolved = new ArrayList<>();
         for (OntologyResource or : axioms) {
             Resource res = (Resource) or.links.get("annotatedSource");
-            OntologyResource disease = diseases.get(res);
-            if (disease != null) {
-                disease.axioms.add(or);
+            OntologyResource ref = resources.get(res);
+            if (ref != null) {
+                ref.axioms.add(or);
             }
             else {
                 //logger.warning("Unable to resolve axiom:\n"+or);
@@ -431,7 +684,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
         }
 
         // register entities
-        for (OntologyResource or : diseases.values()) {
+        for (OntologyResource or : resources.values()) {
             System.out.print(or);            
             System.out.println("..."+or.axioms.size()+" axiom(s)");
             for (OntologyResource ax : or.axioms) {
@@ -439,18 +692,23 @@ public class DiseaseEntityFactory extends EntityRegistry {
             }
             Entity ent = registerIfAbsent (or);
             System.out.println("+++++++ "+ent.getId()+" +++++++");
-            /*
-            if (ent.getId() > 1000l)
-                break;
-            */
+
+            /*if (ent.getId() > 2000l)
+              break;*/
         }
 
         // resolve entities
-        for (OntologyResource or : diseases.values()) {
+        for (OntologyResource or : resources.values()) {
             resolve (or);
         }
+
+        // resolve other references (if any)
+        for (OntologyResource or : others) {
+            if (or.uri != null)
+                resolve (or);
+        }
         
-        logger.info(diseases.size()+" disease classes!");
+        logger.info(resources.size()+" resource classes!");
         if (!unresolved.isEmpty()) {
             logger.warning("!!!!! "+unresolved.size()
                            +" unresolved axioms !!!!!");
