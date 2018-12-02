@@ -1,1 +1,6 @@
--Xmx1536M -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xss2M  -Duser.timezone=GMT
+-J-Xmx1536M 
+-J-XX:+UseConcMarkSweepGC 
+-J-XX:+CMSClassUnloadingEnabled 
+-J-XX:MaxPermSize=2G 
+-J-Xss2M  
+-J-Duser.timezone=GMT
