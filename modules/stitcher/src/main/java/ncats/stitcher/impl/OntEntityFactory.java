@@ -23,20 +23,30 @@ import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
 /**
- * sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.DiseaseEntityFactory ordo.owl"
+ * sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory ordo.owl"
  */
-public class DiseaseEntityFactory extends EntityRegistry {
+public class OntEntityFactory extends EntityRegistry {
     static final Logger logger =
-        Logger.getLogger(DiseaseEntityFactory.class.getName());
+        Logger.getLogger(OntEntityFactory.class.getName());
     
-    static final String FIELD_ID = "uri";
-    static final Set<String> DEFERRED_FIELDS = new TreeSet<>();
-    static {
-        DEFERRED_FIELDS.add("subClassOf");
-        DEFERRED_FIELDS.add("equivalentClass");
-        DEFERRED_FIELDS.add("exactMatch");
-        DEFERRED_FIELDS.add("closeMatch");
-    }
+    static final String[] _RELATIONS = {
+        "subClassOf",
+        "equivalentClass",
+        "exactMatch",
+        "closeMatch",
+        "manifestation_of",
+        "has_phenotype",
+        "allelic_variant_of",
+        "has_allelic_variant",
+        "has_inheritance_type",
+        "inheritance_type_of",
+        "phenotype_of",
+        "part_of",
+        "mapped_to",
+        "related_to"
+    };
+    static final Set<String> RELATIONS =
+        new TreeSet<>(Arrays.asList(_RELATIONS));
 
     static class OntologyResource {
         final public Resource resource;
@@ -123,41 +133,43 @@ public class DiseaseEntityFactory extends EntityRegistry {
     List<OntologyResource> others = new ArrayList<>();
     OntologyResource ontology;
     
-    public DiseaseEntityFactory(GraphDb graphDb) throws IOException {
+    public OntEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
     }
 
-    public DiseaseEntityFactory (String dir) throws IOException {
+    public OntEntityFactory (String dir) throws IOException {
         super (dir);
     }
 
-    public DiseaseEntityFactory (File dir) throws IOException {
+    public OntEntityFactory (File dir) throws IOException {
         super (dir);
     }
 
     static boolean isDeferred (String field) {
-        return DEFERRED_FIELDS.contains(field);
+        return RELATIONS.contains(field);
     }
     
     @Override
     protected void init () {
         super.init();
-        setIdField (FIELD_ID);
+        setIdField (Props.URI);
         setNameField ("label");
         add (N_Name, "label")
+            .add(N_Name, "altLabel")
             .add(N_Name, "hasExactSynonym")
             .add(N_Name, "hasRelatedSynonym")
             .add(I_CODE, "hasDbXref")
             .add(I_CODE, "id")
+            .add(I_CODE, "notation")
             .add(I_CODE, "hasAlternativeId")
             .add(I_CODE, "SY")
             .add(I_CODE, "RQ")
-            .add(I_CODE, "mapped_to")
-            //.add(I_CODE, "related_to")
+            .add(I_CODE, "cui")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "inSubset")
             .add(T_Keyword, "type")
             .add(T_Keyword, "hasOBONamespace")
+            .add(T_Keyword, "hasSTY")
             ;
     }
 
@@ -234,7 +246,45 @@ public class DiseaseEntityFactory extends EntityRegistry {
             }
         }
 
+        Object obj = data.remove("prefLabel");
+        if (obj != null)
+            data.put("label", obj);
+
+        for (String p : new String[]{"mapped_to", "related_to", "cui",
+                                     "SY", "RQ"}) {
+            obj = data.remove(p);
+            if (obj != null) {
+                data.put(p, map (obj, a -> "UMLS:"+a));
+            }
+        }
+        
         if (ontology == null) {
+        }
+        else if ("BrendaTissueOBO".equals
+                 (ontology.props.get("default-namespace"))) {
+            for (String x : xrefs) {
+                if (x.startsWith("http://purl.obolibrary.org/obo/BTO"))
+                    useful.add(x);
+                else
+                    others.add(x);
+            }
+        }
+        else if ("gene_ontology".equals
+                 (ontology.props.get("default-namespace"))) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.startsWith("GOC:")
+                    || u.startsWith("PMID")
+                    || u.startsWith("ISBN")
+                    || u.startsWith("HTTP")
+                    || u.startsWith("GO_REF")
+                    || (u.startsWith("GO:")
+                        && !Character.isDigit(u.charAt(3)))
+                    )
+                    others.add(x);
+                else
+                    useful.add(x);
+            }
         }
         else if ("chebi_ontology".equals
                  (ontology.props.get("default-namespace"))) {
@@ -316,7 +366,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
                 
             Object label = data.get("label");
             if (label != null) {
-                Object obj = Util.delta(label, new String[]{
+                obj = Util.delta(label, new String[]{
                         "Europe PMC", "ChemIDplus", "Reaxys",
                         "KEGG COMPOUND", "DrugCentral", "Beilstein",
                         "KEGG DRUG", "ChEMBL", "Gmelin",
@@ -334,7 +384,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
                 
             Object syn = data.get("hasRelatedSynonym");
             if (syn != null) {
-                Object obj = Util.delta(syn, new String[]{
+                obj = Util.delta(syn, new String[]{
                         "Lecithin", "Triacylglycerol", "Diacylglycerol"
                     });
                 if (obj != Util.NO_CHANGE)
@@ -436,18 +486,10 @@ public class DiseaseEntityFactory extends EntityRegistry {
             }
         }
         else if ("MEDLINEPLUS".equals(ontology.props.get("label"))) {
-            Object obj = data.remove("prefLabel");
-            if (obj != null)
-                data.put("label", obj);
-            
-            for (String p : new String[]{"mapped_to",
-                                         "related_to",
-                                         "SY", "RQ"}) {
-                obj = data.remove(p);
-                if (obj != null) {
-                    data.put(p, map (obj, a -> "UMLS:"+a));
-                }
-            }
+        }
+        else if ("OMIM".equals(ontology.props.get("label"))) {
+        }
+        else if ("MSH".equals(ontology.props.get("label"))) {
         }
         
         if (!useful.isEmpty() || !others.isEmpty()) {
@@ -462,12 +504,13 @@ public class DiseaseEntityFactory extends EntityRegistry {
         if (!icds.isEmpty())
             data.put("ICD", icds.toArray(new String[0]));
 
+        //logger.info("... registering: "+data);
         return data;
     } // sigh
     
     protected Entity _registerIfAbsent (OntologyResource or) {
         Map<String, Object> data = new TreeMap<>();
-        data.put(FIELD_ID, or.uri);
+        data.put(Props.URI, or.uri);
         data.putAll(or.props);
 
         for (Map.Entry<String, Object> me : or.links.entrySet()) {
@@ -534,7 +577,7 @@ public class DiseaseEntityFactory extends EntityRegistry {
         boolean stitched = false;
         String uri = res.getURI();
         if (uri != null) {
-            Iterator<Entity> iter = find (FIELD_ID, uri);
+            Iterator<Entity> iter = find (Props.URI, uri);
             if (iter.hasNext()) {
                 Entity e = iter.next();
                 switch (name) {
@@ -551,7 +594,11 @@ public class DiseaseEntityFactory extends EntityRegistry {
                     stitched = ent._stitch(e, R_closeMatch, uri);
                     break;
                 default:
-                    logger.warning("Unknown stitch relationship: "+name);
+                    { Map<String, Object> attr = new HashMap<>();
+                        attr.put(Props.NAME, name);
+                        stitched = ent._stitch(e, R_rel, uri, attr);
+                    }
+                    //logger.warning("Unknown stitch relationship: "+name);
                 }
             }
         }
@@ -560,14 +607,15 @@ public class DiseaseEntityFactory extends EntityRegistry {
 
     protected void _resolve (OntologyResource or) {
         List<Entity> entities = new ArrayList<>();
-        for (Iterator<Entity> iter = find (FIELD_ID, or.uri); iter.hasNext();) {
+        for (Iterator<Entity> iter = find (Props.URI, or.uri);
+             iter.hasNext();) {
             Entity e = iter.next();
             entities.add(e);
         }
 
         if (!entities.isEmpty()) {
             for (Map.Entry<String, Object> me : or.links.entrySet()) {
-                if (DEFERRED_FIELDS.contains(me.getKey())) {
+                if (RELATIONS.contains(me.getKey())) {
                     Object value = me.getValue();
                     if (value.getClass().isArray()) {
                         int len = Array.getLength(value);
@@ -583,6 +631,11 @@ public class DiseaseEntityFactory extends EntityRegistry {
                             _stitch (e, me.getKey(), res);
                     }
                 }
+                /*
+                else if (getStitchKey (me.getKey()) == null) {
+                    logger.warning("Unknown link resource: "+me.getKey());
+                }
+                */
             }
         }
         else {
@@ -782,12 +835,12 @@ public class DiseaseEntityFactory extends EntityRegistry {
     
     public static void main(String[] argv) throws Exception {
         if (argv.length < 2) {
-            logger.info("Usage: "+DiseaseEntityFactory.class.getName()
+            logger.info("Usage: "+OntEntityFactory.class.getName()
                         +" DBDIR [OWL|TTL]...");
             System.exit(1);
         }
 
-        try (DiseaseEntityFactory def = new DiseaseEntityFactory (argv[0])) {
+        try (OntEntityFactory def = new OntEntityFactory (argv[0])) {
             for (int i = 1; i < argv.length; ++i) 
                 def.register(argv[i]);
         }
