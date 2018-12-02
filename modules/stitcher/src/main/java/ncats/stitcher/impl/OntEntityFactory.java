@@ -43,7 +43,9 @@ public class OntEntityFactory extends EntityRegistry {
         "phenotype_of",
         "part_of",
         "mapped_to",
-        "related_to"
+        "mapped_from",
+        "related_to",
+        "isa"
     };
     static final Set<String> RELATIONS =
         new TreeSet<>(Arrays.asList(_RELATIONS));
@@ -486,10 +488,24 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
         else if ("MEDLINEPLUS".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null)
+                data.put("notation", map (obj, a -> "UMLS:"+a));
         }
         else if ("OMIM".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null) {
+                data.put("notation", map (obj, a -> {
+                            if (Character.isDigit(((String)a).charAt(0)))
+                                return "OMIM:"+a;
+                            return a;
+                        }));
+            }
         }
         else if ("MSH".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null)
+                data.put("notation", map (obj, a -> "MESH:"+a));
         }
         
         if (!useful.isEmpty() || !others.isEmpty()) {
