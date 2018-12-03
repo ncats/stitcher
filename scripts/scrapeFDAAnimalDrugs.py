@@ -938,7 +938,7 @@ if __name__=="__main__":
 
     out = ["AppNo", "Rx", "Status", "AppType", "Sponsor", "Trade Name", "Reference", "Routes", "Ingredients"]
     outFile = io.open(FDAanimalDrugstxt, 'w', encoding='utf8')
-    outFile.write(unicode("UNII\tIngredient\tAppNo\tRx\tStatus\tAppType\tSponsor\tTrade Name\tReference\tRoutes\tIngredients\n"))
+    outFile.write(unicode("NADA_ID\tUNII\tIngredient\tAppNo\tRx\tStatus\tAppType\tSponsor\tTrade Name\tReference\tRoutes\tIngredients\n"))
     for ingred in ingreds:
         app = ingreds[ingred]
         outline = u""
@@ -951,7 +951,7 @@ if __name__=="__main__":
                 if apps[app][item] != None:
                     outline = outline + apps[app][item]
         unii = resolveName(ingred)
-        outline = unii + "\t" + outline
+        outline = unii + apps[app]["AppNo"] + "\t" + unii + "\t" + outline
         outFile.write(outline)
         outFile.write(unicode("\n"))
         #data = json.dumps(apps[app], ensure_ascii=False, encoding='utf8')
