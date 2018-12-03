@@ -1,6 +1,6 @@
 #!/bin/sh
 
-owl="BrendaTissue.owl \
+owl="BrendaTissue.owl.gz \
    DOID.owl.gz \
    HPO.owl.gz \
    MEDLINEPLUS.ttl.gz \
