@@ -45,7 +45,27 @@ public class OntEntityFactory extends EntityRegistry {
         "mapped_to",
         "mapped_from",
         "related_to",
-        "isa"
+        "isa",
+        "inverse_isa",
+        "has_dose_form",
+        "has_ingredient",
+        "form_of",
+        "precise_ingredient_of",
+        "constitutes",
+        "has_tradename",
+        "tradename_of",
+        "consists_of",
+        "has_doseformgroup",
+        "has_part",
+        "ingredient_of",
+        "has_quantified_form",
+        "reformulated_to",
+        "reformulation_of",
+        "contains",
+        "contained_in",
+        "has_form",
+        "quantified_form_of",
+        "doseformgroup_of"
     };
     static final Set<String> RELATIONS =
         new TreeSet<>(Arrays.asList(_RELATIONS));
@@ -156,6 +176,7 @@ public class OntEntityFactory extends EntityRegistry {
         super.init();
         setIdField (Props.URI);
         setNameField ("label");
+        setStrucField ("smiles");
         add (N_Name, "label")
             .add(N_Name, "altLabel")
             .add(N_Name, "hasExactSynonym")
@@ -506,6 +527,16 @@ public class OntEntityFactory extends EntityRegistry {
             obj = data.remove("notation");
             if (obj != null)
                 data.put("notation", map (obj, a -> "MESH:"+a));
+        }
+        else if ("RXNORM".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null)
+                data.put("notation", map (obj, a -> "RXNORM:"+a));
+        }
+        else if ("VANDF".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null)
+                data.put("notation", map (obj, a -> "VANDF:"+a));
         }
         
         if (!useful.isEmpty() || !others.isEmpty()) {
