@@ -65,7 +65,8 @@ public class OntEntityFactory extends EntityRegistry {
         "contained_in",
         "has_form",
         "quantified_form_of",
-        "doseformgroup_of"
+        "doseformgroup_of",
+        "IAO_0100001" // term_replaced_by
     };
     static final Set<String> RELATIONS =
         new TreeSet<>(Arrays.asList(_RELATIONS));
@@ -522,6 +523,16 @@ public class OntEntityFactory extends EntityRegistry {
                             return a;
                         }));
             }
+            
+            obj = data.get("altLabel");
+            if (obj != null) {
+                obj = Util.delta(obj, new String[]{
+                        "VARIANT OF UNKNOWN SIGNIFICANCE",
+                        "RECLASSIFIED - VARIANT OF UNKNOWN SIGNIFICANCE"
+                    });
+                if (obj != Util.NO_CHANGE)
+                    data.put("altLabel", obj);
+            }
         }
         else if ("MSH".equals(ontology.props.get("label"))) {
             obj = data.remove("notation");
@@ -617,7 +628,13 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
 
-        return register (sigh (data));
+        Entity ent = register (sigh (data));
+        Boolean deprecated = (Boolean) data.get("deprecated");
+        if (deprecated != null && deprecated) {
+            ent.set(Props.STATUS, "deprecated");
+        }
+        
+        return ent;
     }
 
     boolean _stitch (Entity ent, String name, Resource res) {
@@ -627,25 +644,27 @@ public class OntEntityFactory extends EntityRegistry {
             Iterator<Entity> iter = find (Props.URI, uri);
             if (iter.hasNext()) {
                 Entity e = iter.next();
-                switch (name) {
-                case "subClassOf":
-                    stitched = ent._stitch(e, R_subClassOf, uri);
-                    break;
-                case "equivalentClass":
-                    stitched = ent._stitch(e, R_equivalentClass, uri);
-                    break;
-                case "exactMatch":
-                    stitched = ent._stitch(e, R_exactMatch, uri);
-                    break;
-                case "closeMatch":
-                    stitched = ent._stitch(e, R_closeMatch, uri);
-                    break;
-                default:
-                    { Map<String, Object> attr = new HashMap<>();
-                        attr.put(Props.NAME, name);
-                        stitched = ent._stitch(e, R_rel, uri, attr);
+                if (!e.equals(ent)) {
+                    switch (name) {
+                    case "subClassOf":
+                        stitched = ent._stitch(e, R_subClassOf, uri);
+                        break;
+                    case "equivalentClass":
+                        stitched = ent._stitch(e, R_equivalentClass, uri);
+                        break;
+                    case "exactMatch":
+                        stitched = ent._stitch(e, R_exactMatch, uri);
+                        break;
+                    case "closeMatch":
+                        stitched = ent._stitch(e, R_closeMatch, uri);
+                        break;
+                    default:
+                        { Map<String, Object> attr = new HashMap<>();
+                            attr.put(Props.NAME, name);
+                            stitched = ent._stitch(e, R_rel, uri, attr);
+                        }
+                        //logger.warning("Unknown stitch relationship: "+name);
                     }
-                    //logger.warning("Unknown stitch relationship: "+name);
                 }
             }
         }
