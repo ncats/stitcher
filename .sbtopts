@@ -1,6 +1,0 @@
--J-Xmx1536M 
--J-XX:+UseConcMarkSweepGC 
--J-XX:+CMSClassUnloadingEnabled 
--J-XX:MaxPermSize=2G 
--J-Xss2M  
--J-Duser.timezone=GMT
