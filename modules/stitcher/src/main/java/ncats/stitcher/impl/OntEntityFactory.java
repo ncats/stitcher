@@ -629,8 +629,8 @@ public class OntEntityFactory extends EntityRegistry {
         }
 
         Entity ent = register (sigh (data));
-        Boolean deprecated = (Boolean) data.get("deprecated");
-        if (deprecated != null && deprecated) {
+        Object deprecated = data.get("deprecated");
+        if (deprecated != null && "true".equalsIgnoreCase(deprecated.toString())) {
             ent.set(Props.STATUS, "deprecated");
         }
         
