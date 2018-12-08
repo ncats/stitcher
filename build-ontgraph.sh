@@ -9,7 +9,8 @@ owl="BrendaTissue.owl.gz \
    OMIM.ttl.gz \
    UBERON.owl.gz \
    ordo.owl.gz \
-   GO.owl.gz"
+   GO.owl.gz \
+   umls_semantictypes.ttl"
 owl_path="owl"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files

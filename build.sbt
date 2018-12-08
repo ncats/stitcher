@@ -51,7 +51,8 @@ lazy val commonDependencies = Seq(
   "org.freehep" % "freehep-graphicsio-svg" % "2.4",
   "org.freehep" % "freehep-graphics2d" % "2.4",
   "com.github.fge" % "json-patch" % "1.9",
-  "org.apache.jena" % "apache-jena-libs" % "3.9.0"
+  "org.apache.jena" % "apache-jena-libs" % "3.9.0",
+  "mysql" % "mysql-connector-java" % "5.1.31"
 )
 
 lazy val root = (project in file("."))
