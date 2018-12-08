@@ -189,6 +189,7 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_CODE, "SY")
             .add(I_CODE, "RQ")
             .add(I_CODE, "cui")
+            .add(I_GENE, "GENESYMBOL")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "inSubset")
             .add(T_Keyword, "type")
@@ -630,7 +631,8 @@ public class OntEntityFactory extends EntityRegistry {
 
         Entity ent = register (sigh (data));
         Object deprecated = data.get("deprecated");
-        if (deprecated != null && "true".equalsIgnoreCase(deprecated.toString())) {
+        if (deprecated != null
+            && "true".equalsIgnoreCase(deprecated.toString())) {
             ent.set(Props.STATUS, "deprecated");
         }
         
@@ -641,8 +643,8 @@ public class OntEntityFactory extends EntityRegistry {
         boolean stitched = false;
         String uri = res.getURI();
         if (uri != null) {
-            Iterator<Entity> iter = find (Props.URI, uri);
-            if (iter.hasNext()) {
+            for (Iterator<Entity> iter = find (Props.URI, uri);
+                 iter.hasNext();) {
                 Entity e = iter.next();
                 if (!e.equals(ent)) {
                     switch (name) {
@@ -709,6 +711,13 @@ public class OntEntityFactory extends EntityRegistry {
         }
     }
 
+    protected void resolve (OntologyResource or) {
+        try (Transaction tx = gdb.beginTx()) {
+            _resolve (or);
+            tx.success();
+        }
+    }
+    
     protected Entity registerIfAbsent (OntologyResource or) {
         Entity ent = null;
         try (Transaction tx = gdb.beginTx()) {
@@ -722,13 +731,6 @@ public class OntEntityFactory extends EntityRegistry {
         return ent;
     }
 
-    protected void resolve (OntologyResource or) {
-        try (Transaction tx = gdb.beginTx()) {
-            _resolve (or);
-            tx.success();
-        }
-    }
-
     public DataSource register (String file) throws Exception {
         DataSource ds = super.register(new File (file));
 
@@ -739,9 +741,9 @@ public class OntEntityFactory extends EntityRegistry {
         Set<OntologyResource> axioms = new HashSet<>();
         
         logger.info("Loading resources...");
-        for (ResIterator iter = model.listSubjects(); iter.hasNext();) {
-            Resource res = iter.next();
-            
+        ResIterator iter = model.listSubjects();
+        while (iter.hasNext()) {
+            Resource res = iter.nextResource();
             OntologyResource or = new OntologyResource (res);
             if (or.isAxiom()) {
                 res = (Resource) or.links.get("annotatedSource");
@@ -752,8 +754,13 @@ public class OntEntityFactory extends EntityRegistry {
                     axioms.add(or);
             }
             else if (or.isClass()) {
-                if (or.uri != null)
-                    resources.put(res, or);
+                if (or.uri != null) {
+                    OntologyResource old = resources.put(res, or);
+                    if (old != null) {
+                        logger.warning
+                            ("Class "+res+" already mapped to\n"+old);
+                    }
+                }
                 else
                     logger.warning("Ignore class "+res);
             }
@@ -788,6 +795,9 @@ public class OntEntityFactory extends EntityRegistry {
                 others.add(or);
             }
         }
+        iter.close();
+        logger.info("###### "+resources.size()+" class resources and "
+                    +axioms.size()+" axioms parsed!");
 
         List<OntologyResource> unresolved = new ArrayList<>();
         for (OntologyResource or : axioms) {
@@ -802,20 +812,19 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
 
-        // register entities
-        for (OntologyResource or : resources.values()) {
-            System.out.print(or);            
-            System.out.println("..."+or.axioms.size()+" axiom(s)");
-            for (OntologyResource ax : or.axioms) {
-                System.out.print("   "+ax);
-            }
-            Entity ent = registerIfAbsent (or);
-            System.out.println("+++++++ "+ent.getId()+" +++++++");
-
-            /*if (ent.getId() > 2000l)
-              break;*/
+        /*
+        for (Map.Entry<Resource, OntologyResource> me : resources.entrySet()) {
+            logger.info("-- "+me.getKey()+"\n"+me.getValue());
         }
-
+        */
+        
+        // register entities
+        for (Map.Entry<Resource, OntologyResource> me : resources.entrySet()) {
+            Entity ent = registerIfAbsent (me.getValue());
+            logger.info("+++++++ "+ent.getId()+" +++++++\n"
+                        +me.getKey()+"\n"+me.getValue());
+        }
+        
         // resolve entities
         for (OntologyResource or : resources.values()) {
             resolve (or);
@@ -827,7 +836,6 @@ public class OntEntityFactory extends EntityRegistry {
                 resolve (or);
         }
         
-        logger.info(resources.size()+" resource classes!");
         if (!unresolved.isEmpty()) {
             logger.warning("!!!!! "+unresolved.size()
                            +" unresolved axioms !!!!!");

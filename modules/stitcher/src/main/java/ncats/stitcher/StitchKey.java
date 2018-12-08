@@ -32,7 +32,7 @@ public enum StitchKey implements RelationshipType {
     I_NCT, // clinical trial NCT
     I_PMID(2, Long.class), // PubMed id
     I_ANY(Long.class), // Any numeric id
-    I_Gene, // gene id (e.g., HGNC:10002, NCBI:9628, OMIM:603894) or symbol (e.g., RGS6, 
+    I_GENE, // gene id (e.g., HGNC:10002, OMIM:603894) or symbol (e.g., RGS6) 
     
     /*
      * Compound hash

@@ -1105,9 +1105,26 @@ public class Entity extends CNode {
         for (Relationship rel : _node.getRelationships(key, Direction.BOTH)) {
             Node xn = rel.getOtherNode(_node);
             if (xn.equals(target._node)
-                && value.equals(rel.getProperty(VALUE, null)))
-                // already exist relationship and value to target node
-                return false;
+                && value.equals(rel.getProperty(VALUE, null))) {
+                
+                boolean updated = false;
+                if (attrs != null && !attrs.isEmpty()) {
+                    // find the relationship and update the attributes
+                    for (Map.Entry<String, Object> me : attrs.entrySet()) {
+                        if (rel.hasProperty(me.getKey())) {
+                            Object old = rel.getProperty(me.getKey());
+                            rel.setProperty
+                                (me.getKey(), Util.merge(old, me.getValue()));
+                        }
+                        else {
+                            rel.setProperty(me.getKey(), me.getValue());
+                        }
+                    }
+                    updated = true;
+                }
+                
+                return updated;
+            }
         }
         
         Relationship rel = _node.createRelationshipTo(target._node, key);
