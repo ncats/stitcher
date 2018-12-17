@@ -2,6 +2,8 @@ package ncats.stitcher.calculators.events;
 
 import ncats.stitcher.calculators.EventCalculator;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -40,7 +42,12 @@ public class FDAanimalDrugsParser extends EventParser {
                     app = "ANADA";
                 event.approvalAppId = app + " " + (String) payload.get("AppNo") + " "
                         + event.sponsor + " " + event.product;
-                event.route = (String) payload.get("Routes");
+                Object routes = payload.get("Routes");
+                if (routes != null) {
+                    if (routes.getClass().isArray())
+                        event.route = Arrays.toString((Object[]) routes);
+                    else event.route = routes.toString();
+                }
                 event.comment = event.approvalAppId + " " + payload.get("Rx") + " " + payload.get("Ingredient");
             }
             catch (Exception ex) {

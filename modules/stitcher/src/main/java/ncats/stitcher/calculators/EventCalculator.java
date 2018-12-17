@@ -20,6 +20,7 @@ public class EventCalculator extends StitchCalculator {
             new DrugsAtFDAEventParser (),
             new OTCMonographParser (),
             new FDAanimalDrugsParser (),
+            new FDAexcipientParser(),
             new ClinicalTrialsEventParser(),
             new RanchoEventParser(),
             new NPCEventParser (),

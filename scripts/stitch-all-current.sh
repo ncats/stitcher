@@ -59,6 +59,9 @@ echo 'OTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/FDAanimalDrugs.conf"
 echo 'NADA:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/FDAexcipients.conf"
+echo 'IIG:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
 # make db copy before stitching...
 cp -r $db NOSTITCH$db
 
