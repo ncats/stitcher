@@ -548,7 +548,8 @@ public class Api extends Controller {
                         if ("replace".equals(operation) && (oldVal == null || newVal == null)) {
                             throw new Exception("Can't replace if old or new value is null");
                         } else if ("remove".equals(operation) && newVal != null) {
-                            throw new Exception("New value must be null if removing");
+                            //throw new Exception("New value must be null if removing"); // TODO maybe fix this in Tongan's side
+                            newVal = null;
                         } else if (("replace".equals(operation) || "remove".equals(operation)) &&
                                 !updateNode.payload().containsKey(updateProperty)) {
                             throw new Exception("Payload does not contain property: "+updateProperty);
