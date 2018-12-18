@@ -18,8 +18,8 @@ opener.addheaders = [
                     'Windows NT 5.2; .NET CLR 1.1.4322)'))
 ]
 
-site = 'https://stitcher.ncats.io/'
-site = 'http://localhost:8080/'
+site = 'https://stitcher-dev.ncats.io/'
+# site = 'http://localhost:8080/'
 
 def requestJson(uri):
     try:
