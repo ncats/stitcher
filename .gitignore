@@ -1,8 +1,7 @@
 conf/evolutions/
 modules/build/
 modules/stitcher/target/
-project/project/
-project/target/
+project/
 repo.db/
 stitch.db/
 stitcher.ix/

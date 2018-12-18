@@ -7,8 +7,8 @@ if [ $# -lt 1 ]; then
 elif [ $# -gt 1 ]; then
     new=$( cd $2 && pwd )
 elif [ $# -eq 1 ]; then
-	if [ -e latest]; then
-		new=$( cd latest && pwd )
+	if [ -e latest ]; then
+		new=$( cd latest && pwd -P )
 	else
 		echo "Could not find a current distribution."
 		echo "Please, restart and supply path to the database and the dist."
@@ -31,6 +31,12 @@ rm -rf ./stitcher.ix/data.db
 rm -rf latest
 
 if [ ! -e stitcher.ix ]; then
+	if [ ! -e files-for-stitcher.ix ]; then
+		echo "Could not find neither 'stitcher.ix' nor 'files-for-stitcher.ix'."
+		echo "Aborting."
+		exit 1	
+	fi
+	
     mkdir stitcher.ix
     cp files-for-stitcher.ix/* stitcher.ix
 fi

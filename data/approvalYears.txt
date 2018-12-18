@@ -369,6 +369,7 @@ SP86R356CC	1886	12/31/1886	https://en.wikipedia.org/wiki/Acetanilide			A. Cahn a
 O414PZ4LPZ	1860	12/31/1860	Drugs@FDA	NDA	050719	CASPER PHARMA LLC	HELIDAC	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050719	true	050719/001
 VG2QF83CGL	2000	04/13/2000	Drugs@FDA	NDA	020938	BOEHRINGER INGELHEIM	MOBIC	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020938	true	020938/002
 LLT6XV39PY	1992	02/14/1992	Drugs@FDA	NDA	020166	US ARMY	SODIUM THIOSULFATE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020166	true	020166/001
+4G86Y4JT3F	2018	10/24/2018	Drugs@FDA	NDA	210854	GENENTECH INC	XOFLUZA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210854	true	210854/002
 971ZM8IPK1	1907	12/31/1907	https://books.google.com/books?id=zP5AAQAAMAAJ&pg=PA448&lpg=PA448&dq=AMYDRICAINE+discovery&source=bl&ots=21uRELiAee&sig=WVtAFIV55gfB-gaf5V6n0CiFfuw&hl=en&sa=X&ved=2ahUKEwj4j7_FncPcAhWHON8KHeNCA04Q6AEwAHoECAAQAQ#v=onepage&q=AMYDRICAINE%20discovery&f=false						false	 (1907) 
 01704YP3MO	1897	12/31/1897	https://en.wikipedia.org/wiki/Aminophenazone				Piramidon		false	Piramidon (1897) 
 C269C4G2ZQ	1957	12/31/1957	DeHaen 1940-1975 NMEs			Nordmark (Purdue Frederick)	Levonor		false	Levonor (1957) Nordmark (Purdue Frederick)
@@ -556,6 +557,7 @@ MHM278SD3E	1998	02/20/1998	Drugs@FDA	NDA	020830	MSD MERCK CO	SINGULAIR	https://w
 PGQ9BY2MDE	1952	01/15/1952	OB NME Appendix 1950-1985	NDA	008301	Parke Davis	Sunstick		false	008301 Sunstick (1952) Parke Davis
 FYS6T7F842	2002	12/31/2002	Drugs@FDA	BLA	125057	ABBVIE INC	HUMIRA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125057	true	125057/002
 2K5E7BGM8X	1957	12/31/1957	DeHaen 1940-1975 NMEs			Searle	Dartal		false	Dartal (1957) Searle
+K673DMO5H9	2018	11/21/2018	Drugs@FDA	NDA	210656	PFIZER INC	DAURISMO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210656	true	210656/002
 X8R2D92QP1	2017	04/27/2017	Drugs@FDA	BLA	761052	BIOMARIN PHARM	BRINEURA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761052	true	761052/001
 ADC79EK5Q8	1964	05/28/1964	Drugs@FDA	NDA	014005	ORGANON USA INC	MAXIBOLIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=014005	true	014005/002
 90I02KLE8K	[Approval Date Uncertain] 1963	08/07/1963	PREDICTED	NDA	017388	SOLVAY	GYNOREST	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017388	true	017388/001
@@ -567,7 +569,7 @@ V0LH498RFO	2017	12/11/2017	Drugs@FDA	NDA	208945	FERRER INTERNACIONAL	XEPI	https:
 FFL0D546HO	1987	12/31/1987	Drugs@FDA	NDA	018550	ROCHE	RIMADYL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018550	true	018550/003
 V74TEQ36CO	1959	05/20/1959	OB NME Appendix 1950-1993	NDA	011832	Mead Johnson	Vasodilan		false	011832 Vasodilan (1959) Mead Johnson
 EGX657432I	2007	12/13/2007	Drugs@FDA	NDA	022181	BIOMARIN PHARM	KUVAN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022181	true	022181/001
-495W7451VQ	2002	07/12/2002	Drugs@FDA	NDA	021282	RECKITT BENCKISER	MUCINEX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021282	true	021282/002
+495W7451VQ	2002	07/12/2002	Drugs@FDA	NDA	021282	RB HLTH	MUCINEX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021282	true	021282/002
 4GDQ854U53	2012	08/27/2012	Drugs@FDA	NDA	203100	GILEAD SCIENCES INC	STRIBILD	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=203100	true	203100/001
 2NX48Z0A9G	2002	12/20/2002	Drugs@FDA	NDA	021321	BAXTER HLTHCARE	EXTRANEAL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021321	true	021321/001
 0F32U78V2Q	1960	12/31/1960	DeHaen 1940-1975 NMEs			Fougera	Septiderm		false	Septiderm (1960) Fougera
@@ -643,6 +645,7 @@ UYE4T5I70X	2009	01/30/2009	Drugs@FDA	NDA	022287	TAKEDA PHARMS USA	DEXILANT	https
 28725X3PV8	1947	12/31/1947	DeHaen 1940-1975 NMEs			Hoffmann-La Roche	Thephorin		false	Thephorin (1947) Hoffmann-La Roche
 3214M86B2N	1955	07/05/1955	OB NME Appendix 1950-1993	NDA	009394	Kasdenol	Kasdenol		false	009394 Kasdenol (1955) Kasdenol
 1C6V77QF41	2000	05/18/2000	Drugs@FDA	NDA	021163	SANDOZ INC	INFUVITE ADULT	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021163	true	021163/001
+PF9462I9HX	2018	11/26/2018	Drugs@FDA	NDA	211710	LOXO ONCOLOGY INC	VITRAKVI	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211710	true	211710/001
 SLF0D9077S	1950	12/31/1950	Drugs@FDA	ANDA	060869	PROTER	OXYTETRACYCLINE HYDROCHLORIDE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=060869	true	060869/001
 0199MV609F	1992	11/16/1992	Drugs@FDA	NDA	020131	BRACCO	PROHANCE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020131	true	020131/001
 41UD74L59M	2013	07/12/2013	Drugs@FDA	NDA	201292	BOEHRINGER INGELHEIM	GILOTRIF	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=201292	true	201292/003
@@ -688,7 +691,7 @@ ND2M416302	2000	07/14/2000	Drugs@FDA	NDA	020832	BECTON DICKINSON CO	CHLORAPREP O
 X12LMJ1WYL	1953	12/31/1953	DeHaen 1940-1975 NMEs			Abbott	Sucaryl Calcium		false	Sucaryl Calcium (1953) Abbott
 W486SJ5824	2003	11/25/2003	Drugs@FDA	NDA	021320	SPECIALITY EUROPEAN	PLENAXIS	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021320	true	021320/001
 ER5I1W795A	1987	12/23/1987	Drugs@FDA	NDA	019530	B BRAUN	UCEPHAN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019530	true	019530/001
-TLA7312TOI	2014	03/19/2014	Drugs@FDA	NDA	204677	PIRAMAL IMAGING	NEURACEQ	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=204677	true	204677/001
+TLA7312TOI	2014	03/19/2014	Drugs@FDA	NDA	204677	LIFE MOLECULAR	NEURACEQ	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=204677	true	204677/001
 699121PHCA	1996	05/14/1996	Drugs@FDA	NDA	020449	SANOFI AVENTIS US	TAXOTERE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020449	true	020449/005
 S61K3P7B2V	1947	12/31/1947	Drugs@FDA	NDA	021078	GLAXOSMITHKLINE	MALARONE PEDIATRIC	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021078	true	021078/002
 L11651398J	[Approval Date Uncertain] 1959	08/06/1959	PREDICTED	NDA	006470	LILLY	CALCIUM GLUCEPTATE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=006470	true	006470/001
@@ -854,7 +857,7 @@ E90NZP2L9U	1954	12/31/1954	Drugs@FDA	ANDA	084100	LILLY	CRYSTODIGIN	https://www.a
 6995V82D0B	2002	09/27/2002	Drugs@FDA	NDA	021437	GD SEARLE LLC	INSPRA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021437	true	021437/003
 QZH7WR4VKJ	1993	07/09/1993	Drugs@FDA	NDA	020315	ROXANE	ORLAAM	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020315	true	020315/001
 OON1HFZ4BA	2000	08/11/2000	Drugs@FDA	NDA	021197	EMD SERONO INC	CETROTIDE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021197	true	021197/002
-S07O44R1ZM	2009	11/16/2009	Drugs@FDA	NDA	022395	ACORDA	QUTENZA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022395	true	022395/001
+S07O44R1ZM	2009	11/16/2009	Drugs@FDA	NDA	022395	AVERITAS	QUTENZA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022395	true	022395/001
 9WS5RD66HZ	2013	11/22/2013	Drugs@FDA	NDA	205123	JANSSEN PRODS	OLYSIO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=205123	true	205123/001
 83LCM6L2BY	1997	12/04/1997	Drugs@FDA	NDA	020696	PAR PHARM INC	ANTIZOL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020696	true	020696/001
 FO9CU4TX7J	1949	12/31/1949	DeHaen 1940-1975 NMEs			Breon	Nisulfazole		false	Nisulfazole (1949) Breon
@@ -874,6 +877,7 @@ Z67X93HJG1	1962	05/17/1962	Drugs@FDA	NDA	050356	ENDO PHARMS INC	COLY-MYCIN S	htt
 VED9E376NC	1960	12/31/1960	DeHaen 1940-1975 NMEs			McNeil	Twiston		false	Twiston (1960) McNeil
 C4DZ64560D	[Approval Date Uncertain] 1958	12/31/1958	PREDICTED	NDA	050332	PFIZER	TAO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050332	true	050332/001
 0CPP32S55X	1946	05/06/1946	Drugs@FDA	NDA	005939	AKORN	BAL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=005939	true	005939/001
+G2AE2VE07O	2018	11/09/2018	Drugs@FDA	NDA	210598	THERAVANCE BIOPHARMA	YUPELRI	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210598	true	210598/001
 3Z6FS3IK0K	1979	04/04/1979	Drugs@FDA	NDA	050522	LILLY	CECLOR	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050522	true	050522/002
 8KOG53Z5EM	1949	12/31/1949	Drugs@FDA	NDA	006343	BAXTER HLTHCARE	WYDASE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=006343	true	006343/006
 0DHU5B8D6V	1998	07/17/1998	Drugs@FDA	NDA	020822	ALLERGAN SALES LLC	CELEXA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020822	true	020822/004
@@ -928,7 +932,7 @@ Q41OR9510P	1964	01/17/1964	Drugs@FDA	NDA	014691	APOTEX INC	ALKERAN	https://www.a
 3OWL53L36A	[Approval Date Uncertain] 1950	04/14/1950	PREDICTED	NDA	005620	MERCK	MANNITOL 25%	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=005620	true	005620/001
 P0YP7XQ8XB	1976	02/23/1976	Drugs@FDA	NDA	017835	ISO TEX	CHROMALBIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017835	true	017835/003
 OG645J8RVW	1986	12/30/1986	Drugs@FDA	NDA	019009	VALEANT PHARMS	MAXAIR	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019009	true	019009/001
-G3P28OML5I	1997	04/15/1997	Drugs@FDA	NDA	020579	BOEHRINGER INGELHEIM	FLOMAX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020579	true	020579/001
+G3P28OML5I	1997	04/15/1997	Drugs@FDA	NDA	020579	SANOFI AVENTIS US	FLOMAX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020579	true	020579/001
 25W8454H16	1953	10/28/1953	Drugs@FDA	NDA	008565	WYETH AYERST	THIOSULFIL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008565	true	008565/004
 82KUB0583F	2012	12/21/2012	Drugs@FDA	NDA	203858	AEGERION	JUXTAPID	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=203858	true	203858/006
 0EB439235F	2004	01/30/2004	Drugs@FDA	NDA	021395	BOEHRINGER INGELHEIM	SPIRIVA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021395	true	021395/001
@@ -1113,6 +1117,7 @@ QVO4N8484O	[Approval Date Uncertain] 1953	04/23/1953	PREDICTED	NDA	009217	MEDPOI
 LT369U66CE	2018	03/06/2018	Drugs@FDA	BLA	761065	TAIMED BIOLOGICS USA	TROGARZO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761065	true	761065/001
 459384H98V	2000	03/27/2000	Drugs@FDA	NDA	020789	SUNOVION PHARMS INC	ZONEGRAN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020789	true	020789/003
 Q153V49P3Z	2008	05/20/2008	Drugs@FDA	NDA	021775	CUBIST PHARMS	ENTEREG	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021775	true	021775/001
+DU69T8ZZPA	2018	11/16/2018	Drugs@FDA	NDA	210910	COSMO TECHNOLOGIES LTD	AEMCOLO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210910	true	210910/001
 YU55MQ3IZY	1981	10/16/1981	Drugs@FDA	NDA	018276	PHARMACIA AND UPJOHN	XANAX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018276	true	018276/004
 JGH8MYC891	2001	11/21/2001	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125029	BLA	125029		Xigris	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125029	true	125029 Xigris (2001) 
 LR24G6354G	2010	11/15/2010	Drugs@FDA	NDA	201532	EISAI INC	HALAVEN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=201532	true	201532/001
@@ -1341,6 +1346,7 @@ U0476M545B	1955	08/18/1955	Drugs@FDA	NDA	010060	CASPER PHARMA LLC	FLORINEF	https
 364P9RVW4X	1991	09/27/1991	Drugs@FDA	NDA	020068	CLINIGEN HLTHCARE	FOSCAVIR	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020068	true	020068/001
 S62U433RMH	1999	08/13/1999	Drugs@FDA	NDA	020859	PFIZER	SONATA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020859	true	020859/002
 99T03J52W0	1976	05/17/1976	Drugs@FDA	NDA	017478	LANTHEUS MEDCL	GALLIUM CITRATE GA 67	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017478	true	017478/001
+3S252O2Z4X	2018	11/20/2018	Drugs@FDA	BLA	761107	NOVIMMUNE S.A.	GAMIFANT	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761107	true	761107/002
 UF599785JZ	1967	12/23/1967	Drugs@FDA	NDA	016619	AKORN	SUBLIMAZE PRESERVATIVE FREE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016619	true	016619/001
 V901LV1K7D	1991	09/23/1991	Drugs@FDA	NDA	019568	VALEANT PHARMS NORTH	DERMATOP	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019568	true	019568/001
 09ERP08I3W	2015	12/22/2015	Drugs@FDA	NDA	207988	IRONWOOD PHARMS INC	ZURAMPIC	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=207988	true	207988/001
@@ -1368,6 +1374,7 @@ D27V6190PM	1996	12/18/1996	Drugs@FDA	NDA	020688	NOVARTIS PHARMS CORP	PATANOL	htt
 A4028U842W	1959	12/31/1959	Drugs@FDA	NDA	050294	PARKE DAVIS	ELASE-CHLOROMYCETIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050294	true	050294/001
 L6JW2TJG99	1930	12/31/1930	https://archive.org/details/newnonofficialre39coun						false	 (1931) 
 F5N0ALI65V	1953	12/31/1953	DeHaen 1940-1975 NMEs			Lederle	Hibicon		false	Hibicon (1953) Lederle
+66D92MGC8M	2018	11/28/2018	Drugs@FDA	NDA	211349	ASTELLAS	XOSPATA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211349	true	211349/001
 H670S81Z1V	1960	12/31/1960	DeHaen 1940-1975 NMEs			"Irwin, Neisler (Mallinckrodt)"	Analexin Syrup		false	Analexin Syrup (1961) "Irwin, Neisler (Mallinckrodt)"
 PDC6A3C0OX	1982	05/06/1982	Drugs@FDA	NDA	018582	B BRAUN	PROCALAMINE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018582	true	018582/001
 RP4A60D26L	1967	07/24/1967	Drugs@FDA	NDA	016194	HOSPIRA	TALWIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=016194	true	016194/001
@@ -1420,6 +1427,7 @@ L0A22B22FT	1975	07/01/1975	OB NME Appendix 1950-1993	NDA	016893	Warner/Chilcott	
 PPM8SX5Q3V	1954	12/31/1954	DeHaen 1940-1975 NMEs			Searle	Mictine (Mincard)		false	Mictine (Mincard) (1954) Searle
 BZ6KL0Q8UD	1947	12/31/1947	DeHaen 1940-1975 NMEs	NDA		Hoffmann-La Roche	Sedulon		false	006151 Sedulon (1947) Hoffmann-La Roche
 0BE71HM000	1957	12/31/1957	Drugs@FDA	NDA	050294	PARKE DAVIS	ELASE-CHLOROMYCETIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050294	true	050294/001
+OSP71S83EU	2018	11/02/2018	Drugs@FDA	NDA	210868	PFIZER INC	LORBRENA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210868	true	210868/002
 7Z6522T8N9	1953	12/24/1953	Drugs@FDA	NDA	009165	ENDO PHARMS	DELATESTRYL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=009165	true	009165/003
 Q16TT9C5BK	2013	10/03/2013	Drugs@FDA	NDA	022247	WYETH PHARMS	DUAVEE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022247	true	022247/001
 A7D84513GV	1960	12/21/1960	Drugs@FDA	NDA	012542	NOVARTIS	TANDEARIL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012542	true	012542/004
@@ -1501,7 +1509,7 @@ G7H20TKI67	2010	05/28/2010	Drugs@FDA	NDA	022555	PHOTOCURE ASA	CYSVIEW KIT	https:
 8237F3U7EH	2016	12/19/2016	Drugs@FDA	NDA	209115	CLOVIS ONCOLOGY INC	RUBRACA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209115	true	209115/003
 2P471X1Z11	2003	06/20/2003	Drugs@FDA	BLA	103976	GENENTECH	XOLAIR	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=103976	true	103976/001
 95M8R751W8	1999	04/23/1999	Drugs@FDA	NDA	020766	CHEPLAPHARM	XENICAL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020766	true	020766/001
-9NDF7JZ4M3	2011	07/01/2011	Drugs@FDA	NDA	022406	JANSSEN PHARMS	XARELTO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022406	true	022406/003
+9NDF7JZ4M3	2011	07/01/2011	Drugs@FDA	NDA	022406	JANSSEN PHARMS	XARELTO	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022406	true	022406/004
 B76N6SBZ8R	1996	05/15/1996	Drugs@FDA	NDA	020509	LILLY	GEMZAR	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020509	true	020509/002
 K14444371C	1980	10/29/1980	OB NME Appendix 1950-1993	NDA	050502	Schering	Siseptin		false	050502 Siseptin (1980) Schering
 7X8MDV4S8A	1958	12/31/1958	DeHaen 1940-1975 NMEs			Lederle	Kynex Acetyl		false	Kynex Acetyl (1958) Lederle
@@ -1538,7 +1546,7 @@ QX62KLI41N	1995	12/15/1995	Drugs@FDA	NDA	020551	ABBVIE	NIMBEX PRESERVATIVE FREE	
 2KNI5N06TI	1955	01/21/1955	Drugs@FDA	ANDA	080157	DAVA PHARMS INC	PYRAZINAMIDE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=080157	true	080157/001
 UX6OWY2V7J	1952	01/21/1952	Drugs@FDA	NDA	008306	ANI PHARMS	PHENERGAN VC W/ CODEINE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008306	true	008306/005
 VH2L779W8Q	2015	03/06/2015	Drugs@FDA	NDA	207501	ASTELLAS	CRESEMBA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=207501	true	207501/001
-6U5EA9RT2O	2007	05/25/2007	Drugs@FDA	NDA	022064	SANOFI-AVENTIS US	XYZAL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022064	true	022064/001
+6U5EA9RT2O	2007	05/25/2007	Drugs@FDA	NDA	022064	SANOFI AVENTIS US	XYZAL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=022064	true	022064/001
 PH41D05744	1942	12/31/1942	DeHaen 1940-1975 NMEs			Parke-Davis	Phemerol Chloride		false	Phemerol Chloride (1942) Parke-Davis
 7KYV510875	2001	12/13/2001	Drugs@FDA	NDA	021302	VALEANT BERMUDA	ELIDEL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021302	true	021302/001
 6EIM3851UZ	1955	01/12/1955	Drugs@FDA	NDA	010021	ABBVIE	PLACIDYL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=010021	true	010021/010
@@ -1635,7 +1643,7 @@ F66XUI6GZL	1933	12/31/1933	https://archive.org/details/newnonofficialre39coun			
 5YVB0POT2H	1952	12/31/1952	Drugs@FDA	NDA	009435	FRESENIUS KABI USA	NESACAINE-MPF	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=009435	true	009435/007
 8ETK1WAF6R	1961	07/18/1961	Drugs@FDA	NDA	012753	NOVARTIS	TORECAN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012753	true	012753/001
 04XPW8C0FL	1993	12/29/1993	Drugs@FDA	NDA	020304	BAYER HLTHCARE	TRASYLOL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020304	true	020304/001
-19GBJ60SN5	2018	06/25/2018	Drugs@FDA	NDA	210365	GW RESEARCH LTD	EPIDIOLEX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210365	true	210365/001
+19GBJ60SN5	2018	06/25/2018	Drugs@FDA	NDA	210365	GW RES LTD	EPIDIOLEX	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210365	true	210365/001
 T7D4876IUE	1948	12/31/1948	DeHaen 1940-1975 NMEs			Merck	Dihydrostreptomycin Sulfate		false	Dihydrostreptomycin Sulfate (1948) Merck
 W733B0S9SD	1959	01/26/1959	Drugs@FDA	NDA	011721	LEDERLE	NEPTAZANE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011721	true	011721/002
 T432289GYZ	2006	10/31/2006	Drugs@FDA	NDA	021902	FOUGERA PHARMS INC	VEREGEN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021902	true	021902/001
@@ -1798,7 +1806,7 @@ P341G6W9NB	2017	04/03/2017	Drugs@FDA	NDA	208082	TEVA BRANDED PHARM	AUSTEDO	https
 UMD07X179E	2008	04/22/2008	Drugs@FDA	BLA	125160	UCB INC	CIMZIA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125160	true	125160/001
 057EZR4Z7Q	1958	12/31/1958	DeHaen 1940-1975 NMEs			"Pitman-Moore (Dow Chem., USA)"	Capsebon		false	Capsebon (1958) "Pitman-Moore (Dow Chem., USA)"
 C4V974V932	1959	02/09/1959	Drugs@FDA	NDA	011525	AKORN	IC-GREEN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011525	true	011525/004
-0IEO0F56LV	2018	10/05/2018	Drugs@FDA	NDA	211172	IONIS PHARMS INC	TEGSEDI	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211172	true	211172/001
+0IEO0F56LV	2018	10/05/2018	Drugs@FDA	NDA	211172	AKCEA THERAPS	TEGSEDI	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=211172	true	211172/001
 LIJ4CT1Z3Y	2015	12/11/2015	Drugs@FDA	NDA	208434	HOFFMANN-LA ROCHE	ALECENSA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208434	true	208434/001
 TLE294X33A	2003	10/02/2003	Drugs@FDA	NDA	021626	HEYL CHEMISCH	RADIOGARDASE (PRUSSIAN BLUE)	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021626	true	021626/001
 48I5LU4ZWD	1980	06/25/1980	Drugs@FDA	NDA	018006	PARKE DAVIS	MECLOMEN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=018006	true	018006/002
@@ -1856,6 +1864,7 @@ XZ629S5L50	1996	09/26/1996	Drugs@FDA	NDA	020547	PAR PHARM INC	ACCOLATE	https://w
 181R97MR71	2018	06/27/2018	Drugs@FDA	NDA	210498	ARRAY BIOPHARMA INC	MEKTOVI	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=210498	true	210498/001
 RU3FE2Y4XI	2013	10/08/2013	Drugs@FDA	NDA	204819	BAYER HLTHCARE	ADEMPAS	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=204819	true	204819/005
 X4OV71U42S	1999	07/15/1999	Drugs@FDA	NDA	021073	TAKEDA PHARMS USA	ACTOS	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=021073	true	021073/003
+RU4S6E2G0J	2018	11/28/2018	Drugs@FDA	NDA	208078	CATALYST PHARMA INC	FIRDAPSE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=208078	true	208078/001
 1FQ2RY5YHH	2015	10/21/2015	Drugs@FDA	NDA	205739	RELYPSA INC	VELTASSA	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=205739	true	205739/003
 U4RY8MRX7C	1988	12/22/1988	Drugs@FDA	NDA	019357	QOL MEDCL	ETHAMOLIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019357	true	019357/001
 66974FR9Q1	1950	12/08/1950	Drugs@FDA	NDA	050156	PARKEDALE	CHLOROMYCETIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050156	true	050156/001
@@ -2248,7 +2257,7 @@ P40015Y3WW	1991	03/07/1991	Drugs@FDA	NDA	019946	ABBVIE	NUROMAX	https://www.acces
 004F72P8F4	1948	10/12/1948	Drugs@FDA	NDA	006536	ODYSSEY PHARMS	URECHOLINE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=006536	true	006536/005
 J6292F8L3D	1967	04/12/1967	Drugs@FDA	NDA	015922	ORTHO MCNEIL	HALDOL	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=015922	true	015922/001
 564C0W9848	1960	12/21/1960	OB NME Appendix 1950-1985	NDA	012459	McNeil	Nacton		false	012459 Nacton (1960) McNeil
-N8ZUB7XE0H	1977	08/22/1977	Drugs@FDA	NDA	017765	PROMIUS PHARMA LLC	CLODERM	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017765	true	017765/001
+N8ZUB7XE0H	1977	08/22/1977	Drugs@FDA	NDA	017765	EPI HLTH	CLODERM	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017765	true	017765/001
 20ED16GHEB	1970	12/31/1970	Drugs@FDA	NDA	017067	FRESENIUS KABI USA	CHORIONIC GONADOTROPIN	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017067	true	017067/004
 B4OB0JHI1X	1953	07/01/1953	Drugs@FDA	NDA	008883	APOTHECON	OPHTHAINE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008883	true	008883/001
 4BXX0XNP9R	1955	12/31/1955	DeHaen 1940-1975 NMEs			Merrell (MerrellNational)	Frenquel		false	Frenquel (1955) Merrell (MerrellNational)
