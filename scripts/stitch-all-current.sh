@@ -1,8 +1,8 @@
 #!/bin/bash
 timestamp="$(date +'%Y%m%d-%H%M%S')"
-db="stitchv$timestamp.db"
+db="stitchv${timestamp}.db"
 dbzip="stitchv${timestamp}db.zip"
-log="log$timestamp.txt"
+log="log${timestamp}.txt"
 
 #keep track of current time
 curr_time=$(date +%s)
@@ -24,7 +24,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db data/dump-public-2018-07-19.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, November 2018\" cache=data/hash.db data/rancho-export_2018-11-11_04-51.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, December 2018\" cache=data/hash.db data/rancho-export_2018-12-18_06-13.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
@@ -59,25 +59,20 @@ echo 'OTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/FDAanimalDrugs.conf"
 echo 'NADA:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/FDAexcipients.conf"
+echo 'IIG:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
 # make db copy before stitching...
 cp -r $db NOSTITCH$db
 
 # now the stitching...
 sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
 echo $(date) >> $log
 
-# make db copy before preparing events...
-#cp -r $db NOEVENTS$db
 
-
-# calculate events -- not necessary anymore
-#sbt stitcher/"runMain ncats.stitcher.calculators.EventCalculator $db 1"
-#echo 'EventCalculator:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-#echo $(date) >> $log
-
-
-#zip up the directory and copy over to centos
-#zip -r $dbzip $db
-#scp $dbzip centos@dev.ncats.io:/tmp
+# zip up the directory and copy over to centos
+# zip -r $dbzip $db
+# scp $dbzip centos@dev.ncats.io:/tmp
 
