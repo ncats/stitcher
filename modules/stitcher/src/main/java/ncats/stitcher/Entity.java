@@ -1137,7 +1137,7 @@ public class Entity extends CNode {
     }
 
     public Entity _update (StitchKey key, Object oldVal, Object newVal) {
-        if (!_node.hasProperty(key.name())) 
+        if (oldVal!=null && !_node.hasProperty(key.name()))
             throw new IllegalArgumentException
                 ("Entity doesn't have "+key+" property");
         
