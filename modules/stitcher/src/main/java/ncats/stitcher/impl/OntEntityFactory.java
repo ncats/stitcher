@@ -843,6 +843,9 @@ public class OntEntityFactory extends EntityRegistry {
                 System.out.println(or);
         }
 
+        ds.set(INSTANCES, resources.size());
+        updateMeta (ds);
+
         return ds;
     }
 
