@@ -524,8 +524,14 @@ public class Api extends Controller {
                         String updateProperty = update.get("jsonPath").asText();
                         if (updateProperty.contains("$.properties")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
                             // do this below
-                        } else
-                            updateProperty = updateProperty.substring(29,updateProperty.indexOf("' )]['value']"));
+                        } else if (updateProperty.indexOf("' && @['value']") > -1) {
+                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("' && @['value']"));
+                        } else if (updateProperty.indexOf("' )]['value']") > -1) {
+                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("' )]['value']"));
+                        } else {
+                            Logger.warn("Not sure, but proceeding to try and parse this unexpected jsonPath: "+updateProperty);
+                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("'"));
+                        }
 
                         if (!newV.isNull() && !newV.isMissingNode()) {
                             if (newV.isObject()) {

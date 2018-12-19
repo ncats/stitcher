@@ -1137,11 +1137,17 @@ public class Entity extends CNode {
     }
 
     public Entity _update (StitchKey key, Object oldVal, Object newVal) {
-        if (oldVal!=null && !_node.hasProperty(key.name()))
+        if (oldVal != null && !_node.hasProperty(key.name()))
             throw new IllegalArgumentException
                 ("Entity doesn't have "+key+" property");
         
-        Object value = _node.getProperty(key.name());
+        Object value = null;
+        try { // if this is an entirely new value, then an exception will be thrown
+              // org.neo4j.graphdb.NotFoundException: NODE[...] has no property with propertyKey="...".
+              // at org.neo4j.kernel.impl.core.NodeProxy.getProperty(NodeProxy.java:470)
+            value = _node.getProperty(key.name());
+        } catch (NotFoundException nfe) {}
+
         if (newVal == null) {
             // remove from value all elements in oldVal
             Object delta = Util.delta(value, oldVal);
