@@ -101,7 +101,10 @@ public class InxightEntityFactory extends EntityRegistry {
                             }
                             else {
                                 if (header[i].equals("ClinicalTrial")) {
-                                    data.put("ClinicalTrialRef", value);
+                                    if (value.startsWith("NCT"))
+                                        data.put(header[i], value);
+                                    else
+                                        data.put("ClinicalTrialRef", value);
                                 }
                                 else {
                                     data.put(header[i], value);
@@ -169,7 +172,7 @@ public class InxightEntityFactory extends EntityRegistry {
 
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
-            logger.info("Usage: "+GARDEntityFactory.class.getName()
+            logger.info("Usage: "+InxightEntityFactory.class.getName()
                         +" DBDIR RANCHO-DISEASE-DRUG");
             System.exit(1);
         }
