@@ -182,6 +182,7 @@ public class OntEntityFactory extends EntityRegistry {
             .add(N_Name, "altLabel")
             .add(N_Name, "hasExactSynonym")
             .add(N_Name, "hasRelatedSynonym")
+            .add(N_Name, "IAO_0000118") // alternative term
             .add(I_CODE, "hasDbXref")
             .add(I_CODE, "id")
             .add(I_CODE, "notation")
@@ -190,6 +191,7 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_CODE, "RQ")
             .add(I_CODE, "cui")
             .add(I_GENE, "GENESYMBOL")
+            .add(I_CAS, "CAS")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "inSubset")
             .add(T_Keyword, "type")
@@ -284,6 +286,18 @@ public class OntEntityFactory extends EntityRegistry {
         }
         
         if (ontology == null) {
+        }
+        else if (ontology.links.containsKey("versionIRI")
+                 && ontology.links.get("versionIRI")
+                 .toString().endsWith("pato.owl")) {
+            for (String x : xrefs) {
+                if ("-".equals(x))
+                    ;
+                else if (x.startsWith("PATOC:") || x.startsWith("PATO:"))
+                    others.add(x);
+                else
+                    useful.add(x);
+            }
         }
         else if ("BrendaTissueOBO".equals
                  (ontology.props.get("default-namespace"))) {
@@ -385,6 +399,9 @@ public class OntEntityFactory extends EntityRegistry {
                     others.add(x);
                 }
                 else {
+                    if (x.startsWith("CAS:")) {
+                        data.put("CAS", x.substring(4));
+                    }
                     useful.add(x);
                 }
             }
@@ -415,6 +432,11 @@ public class OntEntityFactory extends EntityRegistry {
                 if (obj != Util.NO_CHANGE)
                     data.put("hasRelatedSynonym", obj);
             }
+            
+            Object old = data.get("inSubset");
+            Object dif = Util.delta(old, "_STAR");
+            if (dif != Util.NO_CHANGE)
+                data.put("inSubset", dif);
         }
         else if ("uberon".equals
                  (ontology.props.get("default-namespace"))) {
@@ -489,6 +511,16 @@ public class OntEntityFactory extends EntityRegistry {
                     others.add(x);
             }
         }
+        else if ("protein".equals(ontology.props.get("default-namespace"))) {
+            for (String x : xrefs) {
+                if (x.startsWith("PRO:")) {
+                    others.add(x);
+                }
+                else {
+                    useful.add(x);
+                }
+            }
+        }
         else if (ontology.props.get("title") != null
                  && ((String)ontology.props.get("title"))
                  .startsWith("MONDO")) {
@@ -510,6 +542,15 @@ public class OntEntityFactory extends EntityRegistry {
                     useful.add(x);
             }
         }
+        else if (ontology.props.get("title") != null
+                 && ((String)ontology.props.get("title")).startsWith("OGG")) {
+            for (String x : xrefs) {
+                if (x.startsWith("MIM:"))
+                    useful.add("O"+x);
+                else
+                    useful.add(x);
+            }
+        }        
         else if ("MEDLINEPLUS".equals(ontology.props.get("label"))) {
             obj = data.remove("notation");
             if (obj != null)
@@ -913,12 +954,18 @@ public class OntEntityFactory extends EntityRegistry {
     public static void main(String[] argv) throws Exception {
         if (argv.length < 2) {
             logger.info("Usage: "+OntEntityFactory.class.getName()
-                        +" DBDIR [OWL|TTL]...");
+                        +" DBDIR [cache=DIR] [OWL|TTL]...");
             System.exit(1);
         }
 
         try (OntEntityFactory def = new OntEntityFactory (argv[0])) {
-            for (int i = 1; i < argv.length; ++i) 
+            int i = 1;
+            if (argv[i].startsWith("cache=")) {
+                def.setCache(argv[i].substring(6));
+                ++i;
+            }
+
+            for (; i < argv.length; ++i)
                 def.register(argv[i]);
         }
         

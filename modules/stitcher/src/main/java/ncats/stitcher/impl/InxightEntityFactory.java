@@ -142,6 +142,7 @@ public class InxightEntityFactory extends EntityRegistry {
                 }
 
                 disent.stitch(drugent, R_rel, "indication_of", data);
+                ++count;
             }
         }
         return count;
@@ -173,12 +174,20 @@ public class InxightEntityFactory extends EntityRegistry {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             logger.info("Usage: "+InxightEntityFactory.class.getName()
-                        +" DBDIR RANCHO-DISEASE-DRUG");
+                        +" DBDIR [cache=DIR] RANCHO-DISEASE-DRUG");
             System.exit(1);
         }
         
         try (InxightEntityFactory ief = new InxightEntityFactory (argv[0])) {
-            ief.register(new File (argv[1]));
+            int i = 1;
+            if (argv[i].startsWith("cache=")) {
+                ief.setCache(argv[i].substring(6));
+                if (++i >= argv.length) {
+                    logger.warning("No input file specified!");
+                    System.exit(1);
+                }
+            }
+            ief.register(new File (argv[i]));
         }
     }
 }

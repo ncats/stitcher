@@ -63,12 +63,21 @@ public class HPOEntityFactory extends EntityRegistry {
                 attr.put("gene", toks[1]);
                 for (Entity p : phenotypes) {
                     for (Entity d : diseases) {
-                        d.stitch(p, R_rel, "has_phenotype", attr);
+                        if (!p.equals(d)) {
+                            d.stitch(p, R_rel, "has_phenotype", attr);
+                            d.addLabel(source.getName());
+                        }
                     }
+                    
                     for (Entity g : genes) {
-                        g.stitch(p, R_rel, "has_phenotype", attr);
+                        if (!p.equals(g)) {
+                            g.stitch(p, R_rel, "has_phenotype", attr);
+                            g.addLabel(source.getName());
+                        }
                     }
+                    p.addLabel(source.getName());
                 }
+                ++count;
             }
         }
         return count;

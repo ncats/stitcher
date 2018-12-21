@@ -1,5 +1,6 @@
 #!/bin/sh
 
+version="v1"
 owl="BrendaTissue.owl.gz \
    DOID.owl.gz \
    HPO.owl.gz \
@@ -10,17 +11,31 @@ owl="BrendaTissue.owl.gz \
    UBERON.owl.gz \
    ordo.owl.gz \
    GO.owl.gz \
-   umls_semantictypes.ttl"
+   ogg.owl.gz \
+   ogms.owl \
+   pato.owl.gz \
+   pr.owl.gz"
 owl_path="owl"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
 
-out="ncatskg.db"
+out="ncatskg-v1.db"
+cache="cache=hash.db"
+
 # load ontologies
 sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
 
+#load ChEBI
+sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache chebi.xrdf.gz"
+
 #load rancho
-sbt stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out data/rancho-disease-drug_2018-12-18_13-30.txt"
+sbt stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/rancho-disease-drug_2018-12-18_13-30.txt"
 
 #load hpo annotations
-sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt
+sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt"
+
+#load GHR
+sbt stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
+
+#load GARD
+#sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory $out jdbc:mysql://garddb-dev.ncats.io/gard?user=XXX&password=ZZZZ"
