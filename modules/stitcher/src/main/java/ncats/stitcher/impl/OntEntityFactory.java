@@ -434,9 +434,11 @@ public class OntEntityFactory extends EntityRegistry {
             }
             
             Object old = data.get("inSubset");
-            Object dif = Util.delta(old, "_STAR");
-            if (dif != Util.NO_CHANGE)
-                data.put("inSubset", dif);
+            if (old != null) {
+                Object dif = Util.delta(old, "_STAR");
+                if (dif != Util.NO_CHANGE)
+                    data.put("inSubset", dif);
+            }
         }
         else if ("uberon".equals
                  (ontology.props.get("default-namespace"))) {
