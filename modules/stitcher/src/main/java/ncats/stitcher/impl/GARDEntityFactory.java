@@ -87,8 +87,8 @@ public class GARDEntityFactory extends EntityRegistry {
                 List<String> names = new ArrayList<>();
                 while (rset.next()) {
                     String s = rset.getString(1);
-                    if (s != null)
-                        names.add(s.replaceAll("\"", ""));
+                    if (s != null && s.length() > 3)
+                        names.add(s.replaceAll("\"", "").trim());
                 }
                 
                 if (!names.isEmpty())
