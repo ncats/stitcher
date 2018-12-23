@@ -28,6 +28,11 @@ import static ncats.stitcher.StitchKey.*;
 public class OntEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(OntEntityFactory.class.getName());
+
+    /*
+     * minimum length for xref
+     */
+    static final int MIN_XREF_LENGTH = 5;
     
     static final String[] _RELATIONS = {
         "subClassOf",
@@ -254,7 +259,7 @@ public class OntEntityFactory extends EntityRegistry {
                     }
                     else {
                         String s = v.toString();
-                        if ("".equals(s));
+                        if ("".equals(s) || s.length() < MIN_XREF_LENGTH);
                         else if (s.startsWith("ICD"))
                             icds.add(s);
                         else
@@ -267,7 +272,7 @@ public class OntEntityFactory extends EntityRegistry {
             }
             else {
                 String v = value.toString();
-                if ("".equals(v));
+                if ("".equals(v) || v.length() < MIN_XREF_LENGTH);
                 else if (v.startsWith("ICD")) icds.add(v);
                 else xrefs.add(transform (v));
             }

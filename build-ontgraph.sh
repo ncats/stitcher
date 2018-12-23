@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v1"
+version="v2"
 owl="BrendaTissue.owl.gz \
    DOID.owl.gz \
    HPO.owl.gz \
@@ -19,14 +19,14 @@ owl_path="owl"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
 
-out="ncatskg-v1.db"
+out="ncatskg-$version.db"
 cache="cache=hash.db"
 
 # load ontologies
 sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
 
 #load ChEBI
-sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache chebi.xrdf.gz"
+sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.xrdf.gz"
 
 #load rancho
 sbt stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/rancho-disease-drug_2018-12-18_13-30.txt"
