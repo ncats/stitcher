@@ -5,6 +5,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Callable;
@@ -238,6 +239,37 @@ public class OntEntityFactory extends EntityRegistry {
         return value;
     }
 
+    protected static Object filter (Object value, Predicate predicate) {
+        if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            List vals = new ArrayList ();
+            Class type = null;
+            for (int i = 0; i < len; ++i) {
+                Object v = Array.get(value, i);
+                if (predicate.test(v)) {
+                    if (type == null)
+                        type = v.getClass();
+                    vals.add(v);
+                }
+            }
+            
+            if (!vals.isEmpty()) {
+                value = Array.newInstance(type, vals.size());
+                for (int i = 0; i < vals.size(); ++i)
+                    Array.set(value, i, vals.get(i));
+            }
+            else {
+                value = null;
+            }
+        }
+        else if (predicate.test(value)) {
+        }
+        else {
+            value = null;
+        }
+        return value;
+    }
+
     /*
      * TODO: NEED TO PUT ALL THESE RULES IN A CONFIG FILE!
      */
@@ -288,6 +320,16 @@ public class OntEntityFactory extends EntityRegistry {
             if (obj != null) {
                 data.put(p, map (obj, a -> "UMLS:"+a));
             }
+        }
+        
+        obj = data.get("hasRelatedSynonym");
+        if (obj != null) {
+            obj = filter (obj, p -> {
+                    String s = (String)p;
+                    return s.length() >= MIN_XREF_LENGTH;
+                });
+            if (obj != null)
+                data.put("hasRelatedSynonym", obj);
         }
         
         if (ontology == null) {
@@ -431,11 +473,14 @@ public class OntEntityFactory extends EntityRegistry {
                 
             Object syn = data.get("hasRelatedSynonym");
             if (syn != null) {
-                obj = Util.delta(syn, new String[]{
-                        "Lecithin", "Triacylglycerol", "Diacylglycerol"
+                syn = filter (syn, p -> {
+                        String s = (String)p;
+                        return !(s.equalsIgnoreCase("Lecithin")
+                                 || s.equalsIgnoreCase("Triacylglycerol")
+                                 || s.equalsIgnoreCase("Diacylglycerol"));
                     });
-                if (obj != Util.NO_CHANGE)
-                    data.put("hasRelatedSynonym", obj);
+                if (syn != null)
+                    data.put("hasRelatedSynonym", syn);
             }
             
             Object old = data.get("inSubset");
