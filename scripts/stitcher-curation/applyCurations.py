@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 import cookielib
@@ -5,6 +7,36 @@ import urllib
 import urllib2
 import json
 import time
+import argparse
+
+# check that the python version is correct (need 2)
+if sys.version_info[0] > 2:
+    raise "Must be using Python 2! Aborting."
+
+# check for arguments
+args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
+args_p.add_argument('addr',
+                    help="""a full Stitcher address OR
+                            a shorthand: 'prod', 'dev', 'test' or 'local'""")
+
+args_p.add_argument('--filename',
+                    default="dbCurations.txt",
+                    help="name of the file with curations to apply to stitcher database")
+
+site_arg = args_p.parse_args().addr
+filename = args_p.parse_args().filename
+
+switcher = {
+    "prod": "https://stitcher.ncats.io/",
+    "dev": "https://stitcher-dev.ncats.io/",
+    "test": "https://stitcher-test.ncats.io/",
+    "local": "http://localhost:8080/"
+    }
+
+if site_arg in switcher:
+    site = switcher[site_arg]
+else:
+    site = site_arg
 
 cookies = cookielib.CookieJar()
 
@@ -18,8 +50,6 @@ opener.addheaders = [
                     'Windows NT 5.2; .NET CLR 1.1.4322)'))
 ]
 
-site = 'https://stitcher-dev.ncats.io/'
-# site = 'http://localhost:8080/'
 
 def requestJson(uri):
     try:
@@ -58,12 +88,10 @@ def applyCuration(sline):
 
 if __name__=="__main__":
 
-    filename = "dbCurations.txt"
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-    
     fp = open(filename, "r")
+
     line = fp.readline()
+
     while line != "":
         applyCuration(line.split('\t'))
         line = fp.readline()
