@@ -38,7 +38,7 @@ public class InxightEntityFactory extends EntityRegistry {
             .add(N_Name, "ConditionName")
             .add(N_Name, "ConditionDoValue")
             .add(N_Name, "ConditionMeshValue")
-            .add(N_Name, "OfflabelUse")
+            .add(N_Name, "OfflabelConditionName")
             .add(I_UNII, "Unii")
             .add(I_CAS, "Cas")
             .add(I_NCT, "ClinicalTrial")
@@ -140,8 +140,33 @@ public class InxightEntityFactory extends EntityRegistry {
                                 +condition.get("ConditionName")
                                 +"\" registered ("+disent.getId()+") ####");
                 }
-
                 disent.stitch(drugent, R_rel, "indication_of", data);
+
+                String offlabel = (String) drug.get("OfflabelUse");
+                if (offlabel != null) {
+                    for (String cond : offlabel.split("\\|")) {
+                        disent = getEntity ("ConditionName", cond);
+                        if (disent == null) {
+                            condition.clear();
+                            condition.put("type", "Condition");
+                            condition.put("ConditionName", cond);
+                            disent = register (condition);
+                            logger.info
+                                ("#### Offlabel Condition \""
+                                 +condition.get("ConditionName")
+                                 +"\" registered ("+disent.getId()+") ####");
+                        }
+                        data.clear();
+                        
+                        Object uri = drug.remove("OfflabelUseUri");
+                        if (uri != null && !"".equals(uri))
+                            data.put("OfflabelUseUri", uri);
+                        Object comment = drug.remove("OfflabelUseComment");
+                        if (comment != null && !"".equals(comment))
+                            data.put("OfflabelUseComment", comment);
+                        drugent.stitch(disent, R_rel, "offlabel_for", data);
+                    }
+                }
                 ++count;
             }
         }
