@@ -22,6 +22,12 @@ owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 
+#load GARD
+sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory\$Register $out"
+
+#load GHR
+sbt stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
+
 # load ontologies
 sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
 
@@ -33,9 +39,3 @@ sbt stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/
 
 #load hpo annotations
 sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt"
-
-#load GHR
-sbt stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
-
-#load GARD
-#sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory $out jdbc:mysql://garddb-dev.ncats.io/gard?user=XXX&password=ZZZZ"
