@@ -1790,19 +1790,19 @@ public class EntityFactory implements Props, AutoCloseable {
             return iter;
         }
     }
+    
     public void entities (DataSource source, Consumer<Entity> consumer) {
         entities(source.getName(), consumer);
     }
+    
     public void entities (String label, Consumer<Entity> consumer) {
         Objects.requireNonNull(consumer);
         try (Transaction tx = gdb.beginTx();
              ResourceIterator<Node> iter = gdb.findNodes(Label.label(label))) {
-
-                  while(iter.hasNext()) {
-                      consumer.accept(Entity.getEntity(iter.next()));
-                  }
+            while(iter.hasNext()) {
+                consumer.accept(Entity.getEntity(iter.next()));
+            }
             tx.success();
-
         }
     }
 
@@ -1831,26 +1831,32 @@ public class EntityFactory implements Props, AutoCloseable {
         for (String l : labels) {
             query.append(":`"+l+"`");
         }
-        query.append(") return n");
+        query.append(") return n skip {skip} limit {top}");
 
-        // Chunk call to func by batches of 1000 nodes to avoid out of memory issues
-        int count = 0;
-        List<Long> nodes = new ArrayList();
-        try (Transaction tx = gdb.beginTx();
-             Result result = gdb.execute(query.toString())) {
-            while (result.hasNext()) {
-                Map<String, Object> row = result.next();
-                nodes.add(((Node) row.get("n")).getId());
+        // Chunk call to func by batches of 1000 nodes to avoid out of
+        // memory issues
+        int count = 0, top = 100, skip = 0;
+        Map<String, Object> params = new HashMap<>();
+        params.put("top", top);
+        do {
+            params.put("skip", skip);
+            try (Transaction tx = gdb.beginTx();
+                 Result result = gdb.execute(query.toString(), params)) {
+                count = 0;
+                while (result.hasNext()) {
+                    Map<String, Object> row = result.next();
+                    Entity e = Entity._getEntity((Node)row.get("n"));
+                    func.accept(e);
+                    ++count;
+                }
+                result.close();
+                tx.success();
             }
-            result.close();
-            tx.success();
+            skip += count;
         }
-        for (int i=0; i<nodes.size(); i=i+1000) {
-            long[] list = Arrays.stream(nodes.subList(i, Math.min(nodes.size(),i+1000)).toArray(new Long[0])).mapToLong(Long::longValue).toArray();
-            count = count + maps(func, list);
-        }
+        while (count == top);
         
-        return count;
+        return skip+count;
     }
 
     public int maps (Consumer<Entity> func, long[] ids) {
