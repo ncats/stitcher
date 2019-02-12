@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v2"
+version="v1"
 owl="BrendaTissue.owl.gz \
    DOID.owl.gz \
    HPO.owl.gz \
@@ -23,13 +23,20 @@ out="ncatskg-$version.db"
 cache="cache=hash.db"
 
 #load GARD
-sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory\$Register $out"
+gard_credentials=
+if test -f "gard-credentials.txt"; then
+    gard_credentials=`cat gard-credentials.txt`
+fi
+sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory\$Register $out $gard_credentials"
 
 #load GHR
 sbt stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
 
 # load ontologies
-sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
+#sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
+for f in $owl_files; do
+    sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $f"
+done
 
 #load ChEBI
 sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.xrdf.gz"

@@ -18,17 +18,16 @@ import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
 /*
- * sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory DBDIR JDBC"
- * where JDBC is in the format
- *   jdbc:mysql://garddb-dev.ncats.io/gard?user=XXX&password=ZZZZ
+ * sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory DBDIR"
  */
 public class GARDEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(GARDEntityFactory.class.getName());
 
+    static final String DEFAULT_JDBC_AUTH =
+        "integratedSecurity=true;authenticationScheme=JavaKerberos";
     static final String GARD_JDBC =
-        "jdbc:sqlserver://ncatswnsqldvv02.nih.gov;databaseName=ORDRGARD_DEV;"
-        +"integratedSecurity=true;authenticationScheme=JavaKerberos";
+        "jdbc:sqlserver://ncatswnsqldvv02.nih.gov;databaseName=ORDRGARD_DEV;";
 
     static class GARD_Old implements AutoCloseable {
         String[] questions = {
@@ -407,16 +406,37 @@ public class GARDEntityFactory extends EntityRegistry {
         public static void main (String[] argv) throws Exception {
             if (argv.length < 1) {
                 logger.info("Usage: "+Register.class.getName()
-                            +" DBDIR [VERSION=1,2,..]");
+                            +" DBDIR [user=USERNAME] [password=PASSWORD]"
+                            +" [VERSION=1,2,..]");
                 System.exit(1);
             }
 
             int version = 1;
-            if (argv.length > 1)
-                version = Integer.parseInt(argv[1]);
+            String user = null, password = null;
+            for (int i = 1; i < argv.length; ++i) {
+                if (argv[i].startsWith("user=")) {
+                    user = argv[i].substring(5);
+                }
+                else if (argv[i].startsWith("password=")) {
+                    password = argv[i].substring(9);
+                }
+                else if (argv[i].startsWith("version=")) {
+                    version = Integer.parseInt(argv[i].substring(8));
+                }
+            }
+
+            String jdbcUrl = GARD_JDBC;
+            if (user != null && password != null) {
+                jdbcUrl += "user="+user+";password="+password;
+                logger.info("#### using credential "+user);
+            }
+            else {
+                jdbcUrl += DEFAULT_JDBC_AUTH;
+                logger.info("#### using default credentials");
+            }
             
             try (GARDEntityFactory gef = new GARDEntityFactory (argv[0]);
-                 Connection con = DriverManager.getConnection(GARD_JDBC)) {
+                 Connection con = DriverManager.getConnection(jdbcUrl)) {
                 gef.register(con, version);
             }
         }
