@@ -9,6 +9,8 @@ import json
 import time
 import argparse
 import pandas as pd
+import base64
+from tqdm import tqdm
 
 # check that the python version is correct (need 2)
 if sys.version_info[0] > 2:
@@ -18,7 +20,7 @@ if sys.version_info[0] > 2:
 args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
 args_p.add_argument('addr',
                     help="""a full Stitcher address OR
-                            a shorthand: 'prod', 'dev', or 'local'""")
+                            a shorthand: 'prod', 'dev', 'test' or 'local'""")
 args_p.add_argument('--unii',
                     nargs="?",
                     default="../../temp/UNIIs-2018-09-07/UNII Names 31Aug2018.txt",
@@ -34,14 +36,22 @@ args_p.add_argument("--fdanme",
                     default="../../data/FDA-NMEs-2018-08-07.txt",
                     help="path to a file with unii names")
 
+args_p.add_argument('--maxsubs',
+                    nargs="?",
+                    type=int,
+                    default=100000,
+                    help="maximum number of substances to evaluate")
+
 site_arg = args_p.parse_args().addr
 unii_path = args_p.parse_args().unii
 appyears_path = args_p.parse_args().appyears
 fdanme_path = args_p.parse_args().fdanme
+max_subs = args_p.parse_args().maxsubs
 
 switcher = {
     "prod": "https://stitcher.ncats.io/",
     "dev": "https://stitcher-dev.ncats.io/",
+    "test": "https://stitcher-test.ncats.io/",
     "local": "http://localhost:8080/"
     }
 
@@ -148,7 +158,7 @@ def nmeStitches(stitch2nmes, stitch, nmelist):
     entries = []
 
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, July 2018':
+        if "g-srs" in node['source'].lower():
             if node['id'] in nmelist:
                 # print node['id']
                 # add the UNII and its preferred name to the list
@@ -188,8 +198,7 @@ def PMEClashes(stitch2pmes, stitch):
     entries = []
 
     for node in stitch['sgroup']['members']:
-        if node['source'] == ("Pharmaceutical Manufacturing Encyclopedia "
-                              "(Third Edition)"):
+        if "manufacturing" in node['source'].lower():
             entries.append(node['name'])
 
     # if more than one PME entry found,
@@ -208,7 +217,7 @@ def activemoietyClashes(stitch2ams, stitch):
     entries = []
 
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, July 2018':
+        if "g-srs" in node['source'].lower():
             if 'T_ActiveMoiety' in node['stitches']:
                 item = node['stitches']['T_ActiveMoiety']
 
@@ -271,18 +280,18 @@ def findOrphans(orphans, stitch):
             if 'name' in node:
                 name = node['name']
 
-            if node['source'] == 'Broad Institute Drug List 2017-03-27':
+            if "broad" in node['source'].lower():
                 if 'clinical_phase' in stitch['sgroup']['properties']:
                     status = '|' + stitch['sgroup']['properties']['clinical_phase']['value']
 
-            if node['source'] == 'DrugBank, July 2018':
+            if "drugbank" in node['source'].lower():
                 if 'groups' in stitch['sgroup']['properties']:
                     status = ''
 
                     for group in stitch['sgroup']['properties']['groups']:
                         status = status + '|' + group['value']
 
-            if node['source'] == 'NCATS Pharmaceutical Collection, April 2012':
+            if "collection" in node['source'].lower():
                 if 'DATASET' in stitch['sgroup']['properties']:
                     sets = []
 
@@ -294,7 +303,7 @@ def findOrphans(orphans, stitch):
                 if 'name' in stitch['sgroup']['properties']:
                     name = stitch['sgroup']['properties']['name']['value']
 
-            if node['source'] == 'Rancho BioSciences, August 2018':
+            if "rancho" in node['source'].lower():
                 if 'Conditions' in stitch['sgroup']['properties']:
                     status = '|has_conditions'
 
@@ -308,11 +317,11 @@ def findOrphans(orphans, stitch):
 def iterateStitches(funcs):
     dicts = [{} for d in range(len(funcs))]
 
-    skip = 0
     top = 10
-    max_subs = 300000
+    # max_subs = get_max_subs(100000, top)
+    # max_subs = 100000
 
-    while skip < max_subs:
+    for skip in tqdm(xrange(0, max_subs, top), ncols=100):
         uri = site+'api/stitches/v1?top='+str(top)+'&skip='+str(skip)
         obj = requestJson(uri)
 
@@ -327,13 +336,52 @@ def iterateStitches(funcs):
                 for i in range(len(funcs)):
                     funcs[i](dicts[i], stitch)
 
-        sys.stderr.write(uri+"\n")
-        sys.stderr.flush()
-
-        skip = skip + top
+        # sys.stderr.write(uri+"\n")
+        # sys.stderr.flush()
 
     return dicts
 
+
+def get_site_obj(top, skip):
+    
+    uri = site + 'api/stitches/v1?top=' + str(top) + '&skip=' + str(skip)
+    
+    sys.stderr.write("Getting " + uri + "\n")
+    sys.stderr.flush()
+
+    obj = requestJson(uri)
+
+    return obj
+
+# TODO: possibly add a way to find the max number of pages
+# helpful for a decent progress bar
+def get_max_subs(startmax, top):
+    precision = 1000
+
+    # check the page using a start maximum
+
+    "Trying to guess the max number of pages to navigate..."
+
+    obj = get_site_obj(top, startmax)
+    
+    # if not contents object present, reduce page number
+    # or the other way around
+    if 'contents' not in obj or len(obj['contents']) == 0:
+        newmax = startmax - precision
+        sys.stderr.write(str(startmax) + " - too high!\n")
+        sys.stderr.flush()
+    else:
+        newmax = startmax + precision
+        sys.stderr.write(str(startmax) + " - too low!\n")
+        sys.stderr.flush()
+
+    if abs(newnewmax - startmax) > precision:
+        # now if you call the same function 
+        # and it returns the same number (startmax)
+
+        startmax = get_max_subs(newmax, top)
+
+    return newmax
 
 def getName(obj):
     name = ""
@@ -494,6 +542,110 @@ def output2df(output, test_name, header):
 
     return output_df
 
+def ranchoShouldBeApproved(rancho_drugs2check, stitch):
+    '''  defined in main
+    header = [UNII -- UNII PT]
+    '''
+    # if it's an approved drug...
+    if stitch["USapproved"] != "null":
+        # set a unii and gsrs name just in case
+        # unii = "UNKNOWN"
+        # gsrs_name = "UNKNOWN"
+
+        # get the stitch id for debugging
+        stitch_id = stitch["id"]
+
+        rancho = {}
+        gsrs = {}
+
+        # have to be in the right order!
+        phases = ["approved",
+                  "withdrawn",
+                  "phase iv",
+                  "phase iii",
+                  "phase ii",
+                  "phase i",
+                  "preclinical",
+                  "basic research",
+                  "natural metabolite",
+                  "not provided",
+                  "unknown",
+                  "no highest phase"
+                  ]
+
+        # there can be multiple members per source
+        for member in stitch["sgroup"]["members"]:
+            # check if it has a node coming from rancho
+            if "rancho" in member["source"].lower():
+                rancho[member["payloadNode"]] = {"name": member["name"],
+                                                 "highest_phase": []}
+
+            # get gsrs uniis and names for all such members
+            if "g-srs" in member["source"].lower():
+                gsrs[member["id"]] = member.get("name", "MISSING")
+
+        if len(rancho) == 0:
+            return rancho_drugs2check
+
+        if "Conditions" in stitch["sgroup"]["properties"]: 
+            # iterate over conditions if available                
+            # conditions are stored all together for all members;
+            # so check condition belongs to current member
+            for condition in stitch["sgroup"][
+                                    "properties"][
+                                    "Conditions"]:
+
+                # condition node = rancho payload node id
+                cond_node = condition["node"]
+
+                # decode conditions 
+                cond_obj = json.loads(base64
+                                      .b64decode(condition["value"]))
+
+                try:
+                    highest_phase = cond_obj["HighestPhase"].lower()
+
+                    if highest_phase == "approved":
+                        return rancho_drugs2check
+
+                    (rancho[cond_node]["highest_phase"]
+                        .append(phases.index(highest_phase)))
+
+                except ValueError:
+                    # if highest phase is not present in the list
+                    # add unknown
+                    # (this should not happen)
+                    (rancho[cond_node]["highest_phase"]
+                        .append(phases.index("unknown")))
+
+                except KeyError:
+                    # if highest phase key does not exist
+                    (rancho[cond_node]["highest_phase"]
+                        .append(phases.index("no highest phase")))           
+
+        for node_id in rancho:
+            rancho[node_id]["highest_phase"].sort()
+
+            try:
+                rancho[node_id]["highest_phase"] = phases[rancho[node_id]["highest_phase"][0]]
+
+            except IndexError:
+                rancho[node_id]["highest_phase"] = "no conditions"
+
+        # for each appropriate stitch, 
+        # (approved drug, but not approved by rancho)
+        # add gsrs and rancho data
+        rancho_drugs2check[stitch_id] = [stitch_id,
+                                         "\015".join(gsrs.keys()),
+                                         "\015".join(gsrs.values()),
+                                         "\015".join([x["name"] for x in rancho.values()]), 
+                                         ("\015".join([x["highest_phase"] 
+                                                      for x in rancho.values()])
+                                                .upper())
+                                        ]
+
+    return rancho_drugs2check
+
 
 if __name__ == "__main__":
 
@@ -510,13 +662,16 @@ if __name__ == "__main__":
     # but are orphaned
     # approvedStitches: Report on all the approved stitches from API
 
-    tests = [nmeClashes,
-             nmeClashes2,
-             PMEClashes,
-             activemoietyClashes,
-             uniiClashes,
-             findOrphans,
-             approvedStitches]
+    # tests = [nmeClashes,
+    #          nmeClashes2,
+    #          PMEClashes,
+    #          activemoietyClashes,
+    #          uniiClashes,
+    #          findOrphans,
+    #          approvedStitches,
+    #          ranchoShouldBeApproved]
+
+    tests = [ranchoShouldBeApproved]
 
     headers = {"nmeClashes": ["UNII -- UNII PT",
                               "Stitch",
@@ -539,7 +694,13 @@ if __name__ == "__main__":
                "approvedStitches": ["UNII -- UNII PT",
                                     "Approval Year",
                                     "Stitch",
-                                    "Rank"]}
+                                    "Rank"],
+               "ranchoShouldBeApproved": ["Stitch ID",
+                                          "UNIIs",
+                                          "G-SRS Names",
+                                          "Rancho Names",
+                                          "Highest Phases"]
+               }
 
     # initialize list of NMEs
     nmeList = open(appyears_path, "r").readlines()
@@ -569,10 +730,10 @@ if __name__ == "__main__":
                 if len(v) > 3
             }
 
-    xl_writer = pd.ExcelWriter("_".join([date,
-                                         "regression",
-                                         site_arg,
-                                         ".xlsx"]))
+    xl_writer = pd.ExcelWriter("".join([date,
+                                        "_regression_",
+                                        site_arg,
+                                        ".xlsx"]))
 
     for test_index in range(len(tests)):
         test_name = tests[test_index].__name__
