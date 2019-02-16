@@ -1,7 +1,7 @@
 package ncats.stitcher.impl;
 
 import java.io.*;
-import java.net.URL;
+import java.net.*;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.function.Function;
@@ -9,6 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Callable;
 import java.lang.reflect.Array;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.sql.*;
 import org.neo4j.graphdb.Label;
@@ -183,7 +188,7 @@ public class GARDEntityFactory extends EntityRegistry {
 
         public Map<String, Object> instrument (long id) throws SQLException {
             Map<String, Object> data = new TreeMap<>();
-            data.put("gard_id", String.format("GARD:%1$05d", id));
+            data.put("gard_id", String.format("GARD:%1$07d", id));
             data.put("id", id);
             identifiers (data);
             categories (data);
@@ -303,6 +308,18 @@ public class GARDEntityFactory extends EntityRegistry {
         }
     } // GARD
 
+    static class UMLS {
+        public final JsonNode json;
+        
+        UMLS (String name) throws Exception {
+            URL url = new URL
+                ("https://blackboard.ncats.io/ks/umls/api/concepts/"
+                 +name.replaceAll(" ", "%20"));
+            URLConnection con = url.openConnection();
+            ObjectMapper mapper = new ObjectMapper ();
+            json = mapper.readTree(con.getInputStream());
+        }
+    }
     
     public GARDEntityFactory (GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -394,12 +411,174 @@ public class GARDEntityFactory extends EntityRegistry {
         return ds;
     }
 
-    public void dump (int version) {
+    public void checkGARD (int version) {
+        List<Entity> notmatched = new ArrayList<>();
         int count = maps (e -> {
-                Map<String, Object> data = e.payload();
-                System.out.println(data.get("id")+": "+data.get("name"));
+                int c = dump (e);
+                if (c == 0)
+                    notmatched.add(e);
             }, "GARD_v"+version);
-        logger.info("####### "+count+" entries!");
+        
+        logger.info("####### "+count+" entries; "+notmatched.size()
+                    +" entries has no neighbors!");
+        resolveUMLS (System.out, notmatched);
+    }
+
+    int calcScore (Map<StitchKey, Object> sv) {
+        int score = 0;
+        for (Map.Entry<StitchKey, Object> me : sv.entrySet()) {
+            StitchKey key = me.getKey();
+            Object value = me.getValue();
+            switch (key) {
+            case I_CODE:
+                if (value.getClass().isArray()) {
+                    score += 10*Array.getLength(value);
+                }
+                else {
+                    score += 10;
+                }
+                break;
+                
+            case N_Name:
+                if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    for (int i = 0; i < len; ++i)
+                        score += ((String)Array.get(value, i)).length();
+                }
+                else {
+                    score += ((String)value).length();
+                }
+                break;
+            }
+        }
+        return score;
+    }
+
+    public void showComponents () {
+        final Label[] sources = {
+            Label.label("GHR_v1"),
+            Label.label("DOID.owl.gz"),
+            Label.label("GARD_v1"),
+            Label.label("MESH.ttl.gz"),
+            Label.label("MEDLINEPLUS.ttl.gz"),
+            Label.label("MESH.ttl.gz"),
+            Label.label("MONDO.owl.gz"),
+            Label.label("OMIM.ttl.gz"),
+            Label.label("ordo.owl.gz")
+        };
+
+        final Label[] types = {
+            Label.label("T028"), // gngm - gene or genome
+            Label.label("T033"), // finding
+            Label.label("T116"), // Amino Acid, Peptide, or Protein
+            Label.label("T123"), // Biologically Active Substance
+            Label.label("T129"), // Immunologic Factor
+            Label.label("T086"), // Nucleotide Sequence
+            Label.label("T126"), // Enzyme
+            Label.label("T131"), // Hazardous or Poisonous Substance
+            Label.label("T191"), // Neoplastic Process
+            Label.label("T109"), // Organic Chemical
+            Label.label("T121"), // Pharmacologic Substance
+            Label.label("T046"), // Pathologic Function
+            Label.label("T125"), // Hormone
+            Label.label("T192"), // Receptor
+            Label.label("T048"), // Mental or Behavioral Dysfunction
+        };
+
+        Predication rule1 = new Predication () {
+                public int score
+                    (Entity source, Map<StitchKey, Object> sv, Entity target) {
+                    int score = 0;
+                    if (!"deprecated".equals(source._get(STATUS))
+                        && !"deprecated".equals(target._get(STATUS))
+                        && source._hasAnyLabels(sources)
+                        && target._hasAnyLabels(sources)
+                        && !source._hasAnyLabels(types)
+                        && !target._hasAnyLabels(types)) {
+                        score = calcScore (sv);
+                    }
+                    return score;
+                }
+            };
+
+        logger.info("######### generating strongly connected components...");
+        for (Iterator<Entity[]> it = connectedComponents(rule1);
+             it.hasNext();) {
+            Entity[] comp = it.next();
+            System.out.println("--");
+            System.out.print("** "+comp.length+": [");
+            Map<String, Integer> labels = new TreeMap<>();
+            for (int i = 0; i < comp.length; ++i) {
+                System.out.print(comp[i].getId());
+                if (i+1<comp.length)
+                    System.out.print(",");
+                for (String l : comp[i].labels()) {
+                    Integer c = labels.get(l);
+                    labels.put(l, c==null ? 1:(c+1));
+                }
+            }
+            System.out.println("]");
+            System.out.println("## "+labels);
+        }
+    }
+
+    JsonNode resolveUMLS (String name) throws Exception {
+        JsonNode json = null;
+        UMLS umls = new UMLS (name);
+        if (umls.json.size() == 1 && !umls.json.has("score")) {
+            json = umls.json.get(0).get("concept");
+        }
+        return json;
+    }
+
+    void resolveUMLS (OutputStream os, Collection<Entity> entities) {
+        PrintStream ps = new PrintStream (os);
+        ps.println("GARD ID\tDisease Name\tCUI\tType\tUMLS Concept");
+        for (Entity e : entities) {
+            Map<String, Object> data = e.payload();
+            String name = (String) data.get("name");
+            try {
+                JsonNode json = resolveUMLS (name);
+                if (json != null) {
+                    ps.print(data.get("id")+"\t"+name);
+                    ps.print("\t"+json.get("cui").asText()+"\t");
+                    JsonNode types = json.get("semanticTypes");
+                    for (int i = 0; i < types.size(); ++i) {
+                        ps.print(types.get(i).get("name").asText());
+                        if (i+1 < types.size())
+                            ps.print(";");
+                    }
+                    ps.print("\t"+json.get("name").asText());
+                    ps.println();
+                }
+            }
+            catch (Exception ex) {
+                logger.log(Level.SEVERE,
+                           "Can't resolve GARD entity "+data.get("id"), ex);
+            }
+        }
+    }
+
+    int dump (Entity e) {
+        Map<String, Object> data = e.payload();
+        System.out.println(data.get("id")+": "+data.get("name"));
+        Map<StitchKey, Object> keys = e.keys();
+        for (Map.Entry<StitchKey, Object> me : keys.entrySet()) {
+            System.out.print("   "+me.getKey());
+            Object val = me.getValue();
+            if (val.getClass().isArray()) {
+                int len = Array.getLength(val);
+                System.out.println(" "+len);
+                for (int i = 0; i < len; ++i)
+                    System.out.println("      "+Array.get(val, i));
+            }
+            else {
+                System.out.println(" 1");
+                System.out.println("      "+val);
+            }
+        }
+        System.out.println();
+        return keys.size();
     }
 
     public static class Register {
@@ -407,7 +586,7 @@ public class GARDEntityFactory extends EntityRegistry {
             if (argv.length < 1) {
                 logger.info("Usage: "+Register.class.getName()
                             +" DBDIR [user=USERNAME] [password=PASSWORD]"
-                            +" [VERSION=1,2,..]");
+                            +" [version=1,2,..]");
                 System.exit(1);
             }
 
@@ -450,7 +629,8 @@ public class GARDEntityFactory extends EntityRegistry {
         }
         
         try (GARDEntityFactory gef = new GARDEntityFactory (argv[0])) {
-            gef.dump(1);
+            //gef.checkGARD(1);
+            gef.showComponents();
         }
     }
 }

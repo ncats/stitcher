@@ -76,10 +76,13 @@ public class Entity extends CNode {
         final long source, target;
         final Set<StitchKey> flip = EnumSet.noneOf(StitchKey.class);
         final Map<StitchKey, Object> values = new EnumMap<>(StitchKey.class);
+        final transient Node sourceNode, targetNode;
         
         Triple (Node source, Node target) {
             this.source = source.getId();
             this.target = target.getId();
+            sourceNode = source;
+            targetNode = target;
         }
         
         void add (StitchKey key, Object value, boolean flip) {
@@ -116,6 +119,8 @@ public class Entity extends CNode {
                 return flip.contains(key) ? source : target;
             return target;
         }
+        public Entity getSource () { return Entity.getEntity(sourceNode); }
+        public Entity getTarget () { return Entity.getEntity(targetNode); }
 
         public boolean contains (StitchKey key) {
             return values.containsKey(key);
