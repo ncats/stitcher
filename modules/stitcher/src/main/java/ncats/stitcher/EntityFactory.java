@@ -114,29 +114,44 @@ public class EntityFactory implements Props, AutoCloseable {
         }
     }
 
-    static class ConnectedComponents implements Iterator<Entity[]> {
+    static class StronglyConnectedComponents implements Iterator<Entity[]> {
         int current;
         long[][] components;
         long[] singletons;
         final GraphDatabaseService gdb;
-        
-        ConnectedComponents (GraphDatabaseService gdb) {
+
+        StronglyConnectedComponents (GraphDatabaseService gdb,
+                                     final Predication predication) {
             try (Transaction tx = gdb.beginTx()) {
                 UnionFind eqv = new UnionFind ();
                 List<Long> singletons = new ArrayList<Long>();
-
+                
                 gdb.findNodes(AuxNodeType.ENTITY).stream().forEach(node -> {
-                        int edges = 0;
-                        for (Relationship rel
-                                 : node.getRelationships(Direction.BOTH,
-                                                         Entity.KEYS)) {
-                            eqv.union(rel.getStartNode().getId(),
-                                      rel.getEndNode().getId());
-                            ++edges;
-                        }
-                        
-                        if (edges == 0) {
+                        Map<Node, Map<StitchKey, Object>> sv =
+                            stitchValues (node);
+                        if (sv.isEmpty()) {
                             singletons.add(node.getId());
+                        }
+                        else {
+                            Entity n = Entity._getEntity(node);
+                            Node bestNode = null;
+                            int bestScore = 0;
+                            for (Map.Entry<Node, Map<StitchKey, Object>>
+                                     me : sv.entrySet()) {
+                                Entity m = Entity._getEntity(me.getKey());
+                                // we should properly make sure directionality
+                                // is correct here
+                                int score = predication.score
+                                    (n, me.getValue(), m);
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestNode = me.getKey();
+                                }
+                            }
+
+                            if (bestScore > 0) {
+                                eqv.union(node.getId(), bestNode.getId());
+                            }
                         }
                     });
                 
@@ -147,6 +162,47 @@ public class EntityFactory implements Props, AutoCloseable {
                 tx.success();
             }
             this.gdb = gdb;
+        }
+
+        Map<Node, Map<StitchKey, Object>> stitchValues (Node node) {
+            Map<Node, Map<StitchKey, List>> edges = new HashMap<>();
+            for (Relationship rel : node.getRelationships(Entity.KEYS)) {
+                StitchKey type =  StitchKey.valueOf(rel.getType().name());
+                Node start = rel.getStartNode();
+                Node end = rel.getEndNode();
+                
+                Node n = start.equals(node) ? end : start;
+                Map<StitchKey, List> values = edges.get(n);
+                if (values == null) {
+                    values = new EnumMap (StitchKey.class);
+                    edges.put(n, values);
+                }
+                
+                List lv = values.get(type);
+                if (lv == null) {
+                    values.put(type, lv = new ArrayList ());
+                }
+                Object v = rel.getProperty(VALUE);
+                if (v != null) lv.add(v);
+            }
+
+            Map<Node, Map<StitchKey, Object>> sv = new HashMap<>();
+            for (Map.Entry<Node, Map<StitchKey, List>> me : edges.entrySet()) {
+                Map<StitchKey, Object> values = new TreeMap<>();
+                for (Map.Entry<StitchKey, List> le: me.getValue().entrySet()) {
+                    List lv = le.getValue();
+                    if (!lv.isEmpty()) {
+                        if (lv.size() == 1)
+                            values.put(le.getKey(), lv.get(0));
+                        else
+                            values.put(le.getKey(), lv.toArray(new Object[0]));
+                    }
+                }
+                
+                if (!values.isEmpty())
+                    sv.put(me.getKey(), values);
+            }
+            return sv;
         }
 
         public long[][] components () {
@@ -1327,8 +1383,8 @@ public class EntityFactory implements Props, AutoCloseable {
         return count;
     }
 
-    public Iterator<Entity[]> connectedComponents () {
-        return new ConnectedComponents (gdb);
+    public Iterator<Entity[]> connectedComponents (Predication predication) {
+        return new StronglyConnectedComponents (gdb, predication);
     }
 
     public Collection<Component> components () {
