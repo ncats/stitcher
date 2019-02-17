@@ -113,14 +113,22 @@ public class FDAOrphanDesignationEntityFactory extends EntityRegistry {
     @Override
     protected void init () {
         super.init();
-        add(I_CODE, "DesignationCUI")
-            .add(I_CODE, "ApprovedIndicationCUI")
-            .add(T_Keyword, "FDA Approval Status")
+        setNameField ("Designation");
+        add (I_UNII, "UNII")
+            .add(I_UNII, "Rancho Drug UNII")
+            .add(I_CODE, "GARD_ID")
+            .add(N_Name, "Generic Name")
+            .add(N_Name, "Generic Name Other")
+            .add(N_Name, "Rancho Drug Name")
+            .add(N_Name, "Trade Name")
+            .add(N_Name, "GSRS PREFERRED NAME")
             .add(T_Keyword, "Orphan Drug Status")
+            .add(T_Keyword, "FDA Approval Status")
+            .add(T_Keyword, "type")
             ;
     }
     
-    public DataSource register (InputStream is, String version)
+    public DataSource registerAndResolve (InputStream is, String version)
         throws Exception {
         DataSource ds = getDataSourceFactory()
             .register("OrphanDrugDesignation_"+version);
@@ -153,21 +161,98 @@ public class FDAOrphanDesignationEntityFactory extends EntityRegistry {
         byte[] data = (OOPD_FORM+date.replaceAll("/", "%2F")).getBytes("utf8");
         http.setRequestProperty("Content-Length", String.valueOf(data.length));
         http.getOutputStream().write(data, 0, data.length);
-        return register (http.getInputStream(), date);
+        return registerAndResolve (http.getInputStream(), date);
+    }
+
+    public int register (InputStream is) throws IOException {
+        int count = 0;
+
+        String[] drugFields = {
+            "Generic Name",
+            "UNII",
+            "GSRS PREFERRED NAME",
+            "Generic Name Other",
+            "Rancho Drug Name",
+            "Rancho Drug Source",
+            "Rancho Drug Status",
+            "Rancho Drug UNII",
+            "Trade Name",
+            "bdnum",
+            "bdnum__1",
+            "Orphan Drug Status",
+            "Rancho Drug Comment"
+        };
+        
+        LineTokenizer tokenizer = new LineTokenizer ();
+        tokenizer.setInputStream(is);
+        String[] header = null;
+        for (int line = 0; tokenizer.hasNext(); ++line) {
+            String[] toks = tokenizer.next();
+            if (header == null) header = toks;
+            else if (header.length != toks.length) {
+                logger.warning(line+": Expect "+header.length
+                               +" tokens but instead got "+toks.length
+                               +"; skip line!");
+            }
+            else {
+                Map<String, Object> row = new TreeMap<>();
+                for (int i = 0; i < header.length; ++i) {
+                    if ("".equals(toks[i])
+                        || "n/a".equalsIgnoreCase(toks[i])) {
+                        row.put(header[i], null);
+                    }
+                    else {
+                        if (toks[i] != null
+                            && "GARD Disease ID".equals(header[i])) {
+                            row.put("GARD_ID", String.format
+                                    ("GARD:%1$07d", Integer.parseInt(toks[i])));
+                        }
+                        row.put(header[i], toks[i]);
+                    }
+                }
+                
+                logger.info("######### "+line+": "+row.get("Designation"));
+                register (row);
+                ++count;
+            }
+        }
+        return count;
+    }
+    
+    @Override
+    public DataSource register (File file) throws IOException {
+        DataSource ds = super.register(file);
+        Integer count = (Integer)ds.get(INSTANCES);
+        if (count == null || count == 0) {
+            count = register (ds.openStream());
+            ds.set(INSTANCES, count);
+            updateMeta (ds);
+        }
+        else {
+            logger.info("### Data source "+ds.getName()+" ("+ds.getKey()+") "
+                        +"is already registered with "+count+" entities!");
+        }
+        return ds;
     }
     
     public static void main (String[] argv) throws Exception {
         if (argv.length < 1) {
             logger.info("Usage: "
                         +FDAOrphanDesignationEntityFactory.class.getName()
-                        +" DBDIR");
+                        +" DBDIR [FILE]");
             System.exit(1);
         }
 
-        logger.info("Registering "+OOPD_URL+"...");
         try (FDAOrphanDesignationEntityFactory oopd =
              new FDAOrphanDesignationEntityFactory (argv[0])) {
-            DataSource ds = oopd.register();
+            if (argv.length > 1) {
+                logger.info("Registering "+argv[1]+"...");
+                oopd.register(new File (argv[1]));
+            }
+            else {
+                logger.info("Registering "+OOPD_URL+"...");
+                oopd.register();
+            }
         }
     }
 }

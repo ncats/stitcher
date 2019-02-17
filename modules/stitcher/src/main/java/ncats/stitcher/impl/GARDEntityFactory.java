@@ -67,7 +67,7 @@ public class GARDEntityFactory extends EntityRegistry {
 
         public Map<String, Object> instrument (long id) throws SQLException {
             Map<String, Object> data = new TreeMap<>();
-            data.put("gard_id", String.format("GARD:%1$05d", id));
+            data.put("gard_id", String.format("GARD:%1$07d", id));
             data.put("id", id);
             for (Map.Entry<String, PreparedStatement> me : pstms.entrySet()) {
                 String field = me.getKey().replaceAll("GARD_", "");
@@ -213,6 +213,10 @@ public class GARDEntityFactory extends EntityRegistry {
                         synonyms.add(value);
                     }
                     else {
+                        if ("orphanet".equalsIgnoreCase(type)) {
+                            // make sure we have ORPHA:XXX and ORPHANET:XXX 
+                            xrefs.add("ORPHA:"+value); 
+                        }
                         xrefs.add(type.toUpperCase()+":"+value);
                     }
                 }
@@ -360,7 +364,8 @@ public class GARDEntityFactory extends EntityRegistry {
         setDataSource (ds);
         try (ResultSet rset = stm.executeQuery
              ("select * from RD_tblDisease where StatusID=4 and isSpanish=0 "
-              +"and isRare = 1");
+              //+"and isRare = 1"
+              );
              GARD gard = new GARD (con)) {
             int count = 0;
             Map<Long, Entity> entities = new HashMap<>();
@@ -368,8 +373,11 @@ public class GARDEntityFactory extends EntityRegistry {
             for (; rset.next(); ++count) {
                 long id = rset.getLong("DiseaseID");
                 String name = rset.getString("DiseaseName");
+                
                 Map<String, Object> data = gard.instrument(id);
                 data.put("name", name);
+                data.put("is_rare", rset.getInt("isRare") == 1);
+                
                 Entity ent = register (data);
                 logger.info
                     ("+++++ "+data.get("id")+": "+name+" ("+ent.getId()+")");
