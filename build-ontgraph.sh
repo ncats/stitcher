@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v1"
+version="v2"
 owl="BrendaTissue.owl.gz \
    DOID.owl.gz \
    HPO.owl.gz \
@@ -43,6 +43,9 @@ sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEn
 
 #load rancho
 sbt stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/rancho-disease-drug_2018-12-18_13-30.txt"
+
+# load orphan designation
+sbt stitcher/"runMain ncats.stitcher.impl.FDAOrphanDesignationEntityFactory $out data/FDAOrphanGARD_20190216.txt"
 
 #load hpo annotations
 sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt"
