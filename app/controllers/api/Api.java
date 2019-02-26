@@ -8,22 +8,14 @@ import javax.inject.*;
 import java.net.URI;
 import java.util.concurrent.Callable;
 
+import akka.actor.ActorSystem;
+import akka.stream.Materializer;
 import ncats.stitcher.Props;
 import ncats.stitcher.tools.CompoundStitcher;
-import org.h2.mvstore.DataUtils;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import play.*;
-import play.mvc.*;
-import play.cache.*;
-import play.libs.ws.*;
-import static play.mvc.Http.MultipartFormData.*;
 import play.db.ebean.Transactional;
-import play.libs.streams.ActorFlow;
-import akka.actor.*;
-import akka.stream.*;
-import akka.actor.ActorRef;
+import play.mvc.*;
+import static play.mvc.Http.MultipartFormData.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,15 +26,12 @@ import services.EntityService;
 import services.SchedulerService;
 import services.CacheService;
 import services.CoreService;
-import services.WebSocketConsoleActor;
-import services.WebSocketEchoActor;
 import services.jobs.*;
 
 import ncats.stitcher.*;
 import ncats.stitcher.calculators.CalculatorFactory;
 import serializer.JsonCodec;
 
-import models.*;
 import controllers.Util;
 import chemaxon.struc.Molecule;
 
@@ -317,7 +306,12 @@ public class Api extends Controller {
     public Result getStitch (Integer ver, String id) {
         String uri = routes.Api.getStitch(ver, id).url();
         Logger.debug(uri);
-        
+
+        try {
+            id = URLDecoder.decode(id, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         Entity e = getStitchEntity (ver, id);
         return e != null ? ok (jsonCodec.encode(e))
             : notFound ("Unknown stitch key: "+id);
@@ -408,7 +402,12 @@ public class Api extends Controller {
     public Result updateEvents(Integer ver, String id) {
         String uri = routes.Api.updateStitch(ver, id).url();
         Logger.debug(uri);
-        
+
+        try {
+            id = URLDecoder.decode(id, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         Entity e = getStitchEntity(ver, id);
 
         if (e != null) {
@@ -463,6 +462,11 @@ public class Api extends Controller {
     @Transactional
     @BodyParser.Of(value = BodyParser.TolerantJson.class)
     Result updateStitch(Integer ver, String id, boolean test) {
+        try {
+            id = URLDecoder.decode(id, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         ObjectNode message = mapper.createObjectNode();
         message.put("statusMessage", "ok");
         message.put("status", "no change");
