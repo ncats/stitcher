@@ -487,6 +487,53 @@ public class Entity extends CNode {
         return neighbors.toArray(new Entity[0]);
     }
 
+    public double similarity (Entity other, StitchKey... keys) {
+        if (keys == null || keys.length == 0) {
+            keys = KEYS;
+        }
+        
+        int a = 0, b = 0, ov = 0;
+        for (StitchKey key : keys) {
+            Set set = new HashSet ();
+            Object value = other.get(key.name());
+            if (value != null) {
+                if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    for (int i = 0; i < len; ++i)
+                        set.add(Array.get(value, i));
+                }
+                else {
+                    set.add(value);
+                }
+            }
+            
+            value = get (key.name());
+            if (value != null) {
+                if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(value, i);
+                        if (set.contains(v))
+                            ++ov;
+                    }
+                    a += len;
+                }
+                else {
+                    if (set.contains(value))
+                        ++ov;
+                    ++a;
+                }
+            }
+            b += set.size();
+        }
+
+        double sim = 0.0;
+        if (a+b > 0) {
+            sim = (double)ov/(a+b-ov);
+        }
+        return sim;
+    }
+    
     public boolean contains (StitchKey key, Object value) {
         try (Transaction tx = gdb.beginTx()) {
             boolean ret = _contains (key, value);
