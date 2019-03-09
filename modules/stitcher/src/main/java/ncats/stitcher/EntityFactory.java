@@ -114,7 +114,7 @@ public class EntityFactory implements Props, AutoCloseable {
         }
     }
 
-    static class StronglyConnectedComponents implements Iterator<Entity[]> {
+    static class StronglyConnectedComponents implements Iterator<Component> {
         int current;
         long[][] components;
         long[] singletons;
@@ -134,7 +134,7 @@ public class EntityFactory implements Props, AutoCloseable {
                         }
                         else {
                             Entity n = Entity._getEntity(node);
-                            Node bestNode = null;
+                            List<Node> bestNodes = new ArrayList<>();
                             int bestScore = 0;
                             for (Map.Entry<Node, Map<StitchKey, Object>>
                                      me : sv.entrySet()) {
@@ -143,14 +143,24 @@ public class EntityFactory implements Props, AutoCloseable {
                                 // is correct here
                                 int score = predication.score
                                     (n, me.getValue(), m);
-                                if (score > bestScore) {
+                                if (score == 0) {
+                                }
+                                else if (score > bestScore) {
                                     bestScore = score;
-                                    bestNode = me.getKey();
+                                    bestNodes.clear();
+                                    bestNodes.add(me.getKey());
+                                }
+                                else if (score == bestScore) {
+                                    bestNodes.add(me.getKey());
                                 }
                             }
-
-                            if (bestScore > 0) {
-                                eqv.union(node.getId(), bestNode.getId());
+                            
+                            if (!bestNodes.isEmpty()) {
+                                for (Node bn : bestNodes)
+                                    eqv.union(node.getId(), bn.getId());
+                            }
+                            else {
+                                singletons.add(node.getId());
                             }
                         }
                     });
@@ -220,32 +230,18 @@ public class EntityFactory implements Props, AutoCloseable {
             }
             return next;
         }
-        
-        public Entity[] next () {
-            Entity[] comp;
+
+        public Component next () {
+            long[] comp;
             if (current < components.length) {
-                long[] cc = components[current];
-                
-                comp = new Entity[cc.length];
-                try (Transaction tx = gdb.beginTx()) {
-                    for (int i = 0; i < cc.length; ++i) {
-                        comp[i] = new Entity (gdb.getNodeById(cc[i]));
-                    }
-                    tx.success();
-                }
+                comp = components[current];
             }
             else {
-                comp = new Entity[1];
-                try (Transaction tx = gdb.beginTx()) {
-                    comp[0] = new Entity
-                        (gdb.getNodeById
-                         (singletons[current-components.length]));
-                    tx.success();
-                }
+                comp = new long[1];
+                comp[0] = singletons[current-components.length];
             }
             ++current;
-            
-            return comp;
+            return new ComponentImpl (gdb, comp);
         }
         
         public void remove () {
@@ -520,8 +516,13 @@ public class EntityFactory implements Props, AutoCloseable {
         }
 
         public Component _filter (StitchKey key, Object value) {
-            return new ComponentImpl
-                (gdb, EntityFactory.nodes(gdb, key.name(), value));
+            long[] nodes = EntityFactory.nodes(gdb, key.name(), value);
+            Set<Long> subset = new TreeSet<>();
+            // restrict to be subset of this component
+            for (int i = 0; i < nodes.length; ++i)
+                if (this.nodes.contains(nodes[i]))
+                    subset.add(nodes[i]);
+            return new ComponentImpl (gdb, Util.toArray(subset));
         }
         
         public Iterator<Entity> iterator () {
@@ -565,13 +566,15 @@ public class EntityFactory implements Props, AutoCloseable {
                     for (Relationship rel :
                              n.getRelationships(Direction.BOTH, key)) {
                         if (!seen.contains(rel.getId())) {
-                            //Node xn = rel.getOtherNode(n);
-                            Object val = rel.getProperty(VALUE, null);
-                            if (val != null) {
-                                Integer c = stats.get(val);
-                                stats.put(val, c == null ? 1 : (c+1));
+                            Node xn = rel.getOtherNode(n);
+                            if (nodes.contains(xn.getId())) {
+                                Object val = rel.getProperty(VALUE, null);
+                                if (val != null) {
+                                    Integer c = stats.get(val);
+                                    stats.put(val, c == null ? 1 : (c+1));
+                                }
+                                seen.add(rel.getId());
                             }
-                            seen.add(rel.getId());
                         }
                     }
                 }
@@ -905,6 +908,7 @@ public class EntityFactory implements Props, AutoCloseable {
                 tx.success();
             }
             id = Util.sha1(nodes).substring(0, 9);
+            this.gdb = gdb;
         }
 
         void update (Node[] nodes, StitchKey key) {
@@ -1260,6 +1264,14 @@ public class EntityFactory implements Props, AutoCloseable {
                 return true;
         return false;
     }
+
+    public Component getComponent (long[] nodes) {
+        return new ComponentImpl (gdb, nodes);
+    }
+
+    public Component getComponent (Long... nodes) {
+        return new ComponentImpl (gdb, nodes);
+    }
     
     /*
      * return the top k stitched values for a given stitch key
@@ -1383,7 +1395,7 @@ public class EntityFactory implements Props, AutoCloseable {
         return count;
     }
 
-    public Iterator<Entity[]> connectedComponents (Predication predication) {
+    public Iterator<Component> connectedComponents (Predication predication) {
         return new StronglyConnectedComponents (gdb, predication);
     }
 
@@ -1660,6 +1672,54 @@ public class EntityFactory implements Props, AutoCloseable {
             });
     }
 
+    public int stitchCount (StitchKey key, Object value) {
+        return stitchCount (key.name(), value);
+    }
+    
+    public int stitchCount (StitchKey key, Object value, Label... labels) {
+        return stitchCount (key.name(), value, labels);
+    }
+    
+    public int stitchCount (String key, Object value) {
+        return stitchCount (gdb, key, value, AuxNodeType.ENTITY);
+    }
+
+    public int stitchCount (String key, Object value, Label... labels) {
+        return stitchCount (gdb, key, value, labels);
+    }
+
+    public static int stitchCount (GraphDatabaseService gdb,
+                                   String key, Object value,
+                                   Label... labels) {
+        try (Transaction tx = gdb.beginTx();
+             IndexHits<Relationship> hits = gdb.index()
+             .forRelationships(Entity.relationshipIndexName())
+             .get(key, value)) {
+            int size = 0;
+            if (labels == null || labels.length == 0) {
+                size = hits.size();
+            }
+            else {
+                for (Relationship rel : hits) {
+                    Node n = rel.getStartNode();
+                    Node m = rel.getEndNode();
+                    int nl = 0, ml = 0;
+                    for (Label l : labels) {
+                        if (n.hasLabel(l)) ++nl;
+                        if (m.hasLabel(l)) ++ml;
+                        if (nl > 0 && ml > 0)
+                            break;
+                    }
+                    
+                    if (nl > 0 && ml > 0)
+                        ++size;
+                }
+            }
+            tx.success();
+            return size;
+        }
+    }
+    
     public static Iterator<Entity> find (GraphDatabaseService gdb,
                                          String key, Object value) {
         return find (gdb, key, value, Stitchable.ANY);

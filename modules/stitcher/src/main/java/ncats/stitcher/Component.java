@@ -2,9 +2,11 @@ package ncats.stitcher;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -41,6 +43,17 @@ public interface Component extends Iterable<Entity> {
         return nodeSet().contains(id);
     }
 
+    default Map<String, Integer> labels () {
+        Map<String, Integer> labels = new TreeMap<>();
+        for (Entity e : this) {
+            for (String l : e.labels()) {
+                Integer c = labels.get(l);
+                labels.put(l, c==null ? 1:(c+1));
+            }
+        }
+        return labels;
+    }
+    
     /*
      * unique set of values that span the given stitch key
      */
@@ -89,6 +102,16 @@ public interface Component extends Iterable<Entity> {
     default void stitches (StitchVisitor visitor, StitchKey... keys) {
         throw new UnsupportedOperationException
             ("stitches() is not supported for this implementation");
+    }
+
+    default double similarity (Component other) {
+        Set<Long> ns = other.nodeSet();
+        int ov = 0;
+        for (Long n : nodeSet ()) {
+            if (ns.contains(n))
+                ++ov;
+        }
+        return (double)ov/(size() + ns.size() - ov);
     }
 
     /*
@@ -180,6 +203,11 @@ public interface Component extends Iterable<Entity> {
             ("add() is not supported for this implementation");
     }
 
+    default Component filter (StitchKey key, Object value) {
+        throw new UnsupportedOperationException
+            ("filter() is not supported for this implementation");
+    }
+    
     default Stream<Entity> stream () {
         return Stream.of(entities ());
     }

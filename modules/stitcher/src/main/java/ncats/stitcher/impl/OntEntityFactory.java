@@ -125,6 +125,9 @@ public class OntEntityFactory extends EntityRegistry {
 
         public boolean isAxiom () { return "Axiom".equalsIgnoreCase(type); }
         public boolean isClass () { return "Class".equalsIgnoreCase(type); }
+        public boolean isRestriction () {
+            return "Restriction".equalsIgnoreCase(type);
+        }
         public boolean isOntology () {
             return "Ontology".equalsIgnoreCase(type);
         }
@@ -135,8 +138,9 @@ public class OntEntityFactory extends EntityRegistry {
             if (isClass()) sb.append(resource.getLocalName()+" "+uri);
             else if (isAxiom()) sb.append(resource.getId());
             else sb.append(resource.toString());
-            sb.append("\n");
+            sb.append("\n...properties\n");
             toString (sb, props);
+            sb.append("...links\n");
             toString (sb, links);
             return sb.toString();
         }
@@ -845,6 +849,19 @@ public class OntEntityFactory extends EntityRegistry {
                     ref.axioms.add(or);
                 else
                     axioms.add(or);
+            }
+            else if (or.isRestriction()) {
+                // TODO: finish implementation here!
+                res = (Resource) or.links.get("onProperty");
+                String val = (String)or.props.get("hasValue");
+                if (val != null) {
+                }
+                else if (or.links.containsKey("someValuesFrom")) {
+                    
+                }
+                else {
+                    logger.warning("Restriction "+res+" not processed!");
+                }
             }
             else if (or.isClass()) {
                 if (or.uri != null) {

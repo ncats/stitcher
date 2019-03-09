@@ -19,6 +19,7 @@ import java.sql.*;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 
+import ncats.stitcher.graph.UnionFind;
 import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
@@ -34,103 +35,99 @@ public class GARDEntityFactory extends EntityRegistry {
     static final String GARD_JDBC =
         "jdbc:sqlserver://ncatswnsqldvv02.nih.gov;databaseName=ORDRGARD_DEV;";
 
-    static class GARD_Old implements AutoCloseable {
-        String[] questions = {
-            "GARD_Cause",
-            "GARD_Diagnosis",
-            "GARD_Inheritance",
-            "GARD_Prognosis",
-            "GARD_Summary",
-            "GARD_SymptomText",
-            "GARD_Treatments"
-        };
-        Map<String, PreparedStatement> pstms = new HashMap<>();
-        PreparedStatement otherNames;
-        PreparedStatement categories;
+    class UntangleComponent {
+        final public Component comp;
+        final public Map<StitchKey, Map<Object, Set<Long>>> values =
+            new LinkedHashMap<>();
+        final public PrintStream ps;
+
+        UntangleComponent (Component comp, StitchKey... stitches) {
+            this (null, comp, stitches);
+        }
         
-        GARD_Old (Connection con) throws SQLException {
-            for (String q : questions) {
-                PreparedStatement pstm = con.prepareStatement
-                    ("select a.* from GARD_Questions a, "+q+" b "
-                     +"where a.QuestionID = b.QuestionID "
-                     +"and b.DiseaseID = ? and a.isDeleted = 0 "
-                     +"and a.isSpanish = 0");
-                pstms.put(q, pstm);
+        UntangleComponent (PrintStream ps,
+                           Component comp, StitchKey... stitches) {
+            if (stitches == null || stitches.length == 0)
+                throw new IllegalArgumentException ("keys must not be empty!");
+            
+            List keys = new ArrayList ();            
+            for (StitchKey key : stitches) {
+                final Map<Object, Integer> stats = comp.stats(key);
+                List order = new ArrayList (stats.keySet());
+                Collections.sort(order, (a,b) -> stats.get(b) - stats.get(a));
+                if (!stats.isEmpty()) {
+                    Map<Object, Set<Long>> map = values.get(key);
+                    if (map == null)
+                        values.put(key, map = new LinkedHashMap<>());
+                    for (Object k : order) {
+                        Component c = comp.filter(key, k);
+                        map.put(k, c.nodeSet());
+                    }
+                }
             }
-            otherNames = con.prepareStatement
-                ("select DiseaseIdentifier "
-                 +"from GARD_OtherNames where DiseaseID = ?");
-            categories = con.prepareStatement
-                ("select diseasetypename,source "
-                 +"from GARD_Categories where DiseaseID = ?");
+            this.comp = comp;
+            this.ps = ps == null ? System.out : ps;
         }
 
-        public Map<String, Object> instrument (long id) throws SQLException {
-            Map<String, Object> data = new TreeMap<>();
-            data.put("gard_id", String.format("GARD:%1$07d", id));
-            data.put("id", id);
-            for (Map.Entry<String, PreparedStatement> me : pstms.entrySet()) {
-                String field = me.getKey().replaceAll("GARD_", "");
-                PreparedStatement pstm = me.getValue();
-                pstm.setLong(1, id);
-                try (ResultSet rset = pstm.executeQuery()) {
-                    List<String> texts = new ArrayList<>();
-                    while (rset.next()) {
-                        String text = rset.getString("Answer");
-                        if (text != null)
-                            texts.add(text.replaceAll("\"", ""));
-                    }
-                    
-                    if (texts.isEmpty()) {
-                    }
-                    else if (texts.size() == 1) {
-                        data.put(field, texts.get(0));
-                    }
-                    else data.put(field, texts.toArray(new String[0]));
-                }
-            }
+        public void mergeStitches () {
+            List keys = new ArrayList ();
+            Map<Integer, Component> map = new TreeMap<>();
             
-            otherNames.setLong(1, id);
-            try (ResultSet rset = otherNames.executeQuery()) {
-                List<String> names = new ArrayList<>();
-                while (rset.next()) {
-                    String s = rset.getString(1);
-                    if (s != null && s.length() > 3)
-                        names.add(s.replaceAll("\"", "").trim());
+            UnionFind uf = new UnionFind ();
+            for (Map.Entry<StitchKey, Map<Object, Set<Long>>> me
+                     : values.entrySet()) {
+                ps.println(".. ["+me.getKey()+"]");
+                for (Map.Entry<Object, Set<Long>> ve
+                         : me.getValue().entrySet()) {
+                    Component c = getComponent
+                        (ve.getValue().toArray(new Long[0]));
+                    Map<Object, Integer> stats = c.stats(me.getKey());
+                    ps.println("....\""+ve.getKey()+"\"="
+                               +stats.get(ve.getKey())+"/"
+                               +stitchCount (me.getKey(), ve.getKey())
+                               +" "+c.getId()+" ("+c.size()+") "+c.nodeSet());
+                    int q = keys.size();
+                    for (Map.Entry<Integer, Component> qe : map.entrySet()) {
+                        double sim = c.similarity(qe.getValue());
+                        if (sim > 0.) {
+                            ps.println
+                                ("     "+String.format("%1$.3f", sim)
+                                 +" \""+keys.get(qe.getKey())+"\"");
+                            if (sim > 0.4) {
+                                uf.union(qe.getKey(), q);
+                            }
+                        }
+                    }
+                    map.put(q, c);
+                    keys.add(ve.getKey());
                 }
-                
-                if (!names.isEmpty())
-                    data.put("synonyms", names.toArray(new String[0]));
+                ps.println();
             }
-            
-            categories.setLong(1, id);
-            try (ResultSet rset = categories.executeQuery()) {
-                Set<String> cats = new TreeSet<>();
-                Set<String> sources = new TreeSet<>();
-                while (rset.next()) {
-                    String t = rset.getString("diseasetypename");
-                    if (t != null)
-                        cats.add(t.replaceAll("\"",""));
+
+            long[][] ccs = uf.components();
+            ps.println("**** "+ccs.length+" component(s)!");
+            Map<Long, BitSet> hc = new TreeMap<>();
+            for (int n = 0; n < ccs.length; ++n) {
+                long[] c = ccs[n];
+                ps.println("### component "+n+" ("+c.length+")");
+                for (int i = 0; i < c.length; ++i) {
+                    int ki = (int)c[i];
+                    Object k = keys.get(ki);
+                    Component kc = map.get(ki);
+                    ps.println("......"+k+" "+kc.nodeSet());
                     
-                    String s = rset.getString("source");
-                    if (s != null && !"null".equalsIgnoreCase(s))
-                        sources.add(s);
+                    for (Long id : kc.nodeSet()) {
+                        BitSet bs = hc.get(id);
+                        if (bs == null)
+                            hc.put(id, bs = new BitSet (ccs.length));
+                        bs.set(n);
+                    }
                 }
-                
-                if (!cats.isEmpty())
-                    data.put("categories", cats.toArray(new String[0]));
-                
-                if (!sources.isEmpty())
-                    data.put("sources", sources.toArray(new String[0]));
             }
-            return data;
+            ps.println("*** "+hc);
         }
 
-        public void close () throws Exception {
-            for (PreparedStatement pstm : pstms.values())
-                pstm.close();
-            otherNames.close();
-            categories.close();
+        public void mergeEntities () {
         }
     }
 
@@ -188,7 +185,7 @@ public class GARDEntityFactory extends EntityRegistry {
 
         public Map<String, Object> instrument (long id) throws SQLException {
             Map<String, Object> data = new TreeMap<>();
-            data.put("gard_id", String.format("GARD:%1$07d", id));
+            data.put("gard_id", format (id));
             data.put("id", id);
             identifiers (data);
             categories (data);
@@ -312,6 +309,10 @@ public class GARDEntityFactory extends EntityRegistry {
         }
     } // GARD
 
+    static String format (long id) {
+        return String.format("GARD:%1$07d", id);
+    }
+
     static class UMLS {
         public final JsonNode json;
         
@@ -396,8 +397,10 @@ public class GARDEntityFactory extends EntityRegistry {
                     for (int i = 0; i < len; ++i) {
                         Long id = (Long)Array.get(pval, i);
                         Entity p = (Entity)entities.get(id);
-                        if (p != null)
-                            ent.stitch(p, R_subClassOf, "GARD:"+id);
+                        if (p != null) {
+                            if (!ent.equals(p))
+                                ent.stitch(p, R_subClassOf, format (id));
+                        }
                         else
                             logger.warning("Can't find parent entity: "+id);
                     }
@@ -405,8 +408,10 @@ public class GARDEntityFactory extends EntityRegistry {
                 else {
                     Long id = (Long)pval;
                     Entity p = (Entity)entities.get(id);
-                    if (p != null)
-                        ent.stitch(p, R_subClassOf, "GARD:"+id);
+                    if (p != null) {
+                        if (!ent.equals(p))
+                            ent.stitch(p, R_subClassOf, format (id));
+                    }
                     else
                         logger.warning("Can't find parent entity: "+id);
                 }
@@ -510,24 +515,116 @@ public class GARDEntityFactory extends EntityRegistry {
             };
 
         logger.info("######### generating strongly connected components...");
-        for (Iterator<Entity[]> it = connectedComponents(rule1);
+        for (Iterator<Component> it = connectedComponents(rule1);
              it.hasNext();) {
-            Entity[] comp = it.next();
+            Component comp = it.next();
             System.out.println("--");
-            System.out.print("** "+comp.length+": [");
-            Map<String, Integer> labels = new TreeMap<>();
-            for (int i = 0; i < comp.length; ++i) {
-                System.out.print(comp[i].getId());
-                if (i+1<comp.length)
-                    System.out.print(",");
-                for (String l : comp[i].labels()) {
-                    Integer c = labels.get(l);
-                    labels.put(l, c==null ? 1:(c+1));
+            System.out.println("++ component "+comp.size()+": "+comp.nodeSet());
+            //dump (System.out, comp);
+            UntangleComponent uc = new UntangleComponent (comp, N_Name, I_CODE);
+            uc.mergeStitches();
+            System.out.println();
+        }
+    }
+
+    void dump (OutputStream os, Component comp) {
+        PrintStream ps = new PrintStream (os);
+        ps.println("## "+comp.labels());
+
+        /*
+        Entity[] entities = comp.entities();
+        final Map<String, Double> simmat = new HashMap<>();
+        for (int i = 0; i < entities.length; ++i) {
+            for (int j = i+1; j < entities.length; ++j) {
+                String key = "["
+                    +(entities[i].getId() < entities[j].getId()
+                      ? entities[i].getId()+","+entities[j].getId()
+                      : entities[j].getId()+","+entities[i].getId())
+                    +"]";
+                simmat.put(key, entities[i].similarity(entities[j]));
+            }
+        }
+        List<String> pairs = new ArrayList<>(simmat.keySet());
+        Collections.sort(pairs, (a,b) -> {
+                double s0 = simmat.get(a);
+                double s1 = simmat.get(b);
+                if (s1 > s0) return 1;
+                if (s1 < s0) return -1;
+                return a.compareTo(b);
+            });
+        for (String k : pairs) {
+            ps.println(".. "+String.format("%1$.3f", simmat.get(k))+" "+k);
+        }
+        */
+        
+        Map<Object, Component> values = new LinkedHashMap<>();
+        List keys = new ArrayList ();
+        UnionFind uf = new UnionFind ();
+        for (StitchKey key : Entity.KEYS) {
+            final Map<Object, Integer> stats = comp.stats(key);
+            if (!stats.isEmpty()) {
+                ps.println(".. ["+key+"]");
+                List order = new ArrayList (stats.keySet());
+                Collections.sort(order, (a,b) -> stats.get(b) - stats.get(a));
+                for (Object k : order) {
+                    Component c = comp.filter(key, k);
+                    ps.println("....\""+k+"\"="+stats.get(k)+"/"
+                               +stitchCount (key, k)
+                               +" "+c.getId()+" ("+c.size()+") "+c.nodeSet());
+                    switch (key) {
+                    case I_CODE:
+                    case N_Name:
+                        {   int q = keys.size();
+                            for (Map.Entry<Object, Component> me
+                                     : values.entrySet()) {
+                                double sim = c.similarity(me.getValue());
+                                if (sim > 0.) {
+                                    ps.println
+                                        ("     "+String.format("%1$.3f", sim)
+                                         +" \""+me.getKey()+"\"");
+                                    if (sim >= .4) { 
+                                        int p = keys.indexOf(me.getKey());
+                                        
+                                        if (p < 0) {
+                                            logger.warning
+                                                ("BOGUS KEY: "+me.getKey());
+                                        }
+                                        else {
+                                            uf.union(p, q);
+                                        }
+                                    }
+                                }
+                            }
+
+                            keys.add(k);
+                            values.put(k, c);
+                        }
+                    }
+                }
+                ps.println();
+            }
+        }
+        
+        long[][] ccs = uf.components();
+        ps.println("**** "+ccs.length+" component(s)!");
+        Map<Long, BitSet> hc = new TreeMap<>();
+        for (int n = 0; n < ccs.length; ++n) {
+            long[] c = ccs[n];
+            ps.println("### component "+n+" ("+c.length+")");
+            for (int i = 0; i < c.length; ++i) {
+                Object k = keys.get((int)c[i]);
+                Component kc = values.get(k);
+                ps.println("......"+k+" "+kc.nodeSet());
+            
+                for (Long id : kc.nodeSet()) {
+                    BitSet bs = hc.get(id);
+                    if (bs == null)
+                        hc.put(id, bs = new BitSet (ccs.length));
+                    bs.set(n);
                 }
             }
-            System.out.println("]");
-            System.out.println("## "+labels);
         }
+        ps.println("*** "+hc);
     }
 
     JsonNode resolveUMLS (String name) throws Exception {
