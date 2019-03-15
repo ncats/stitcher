@@ -31,3 +31,11 @@ match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_
 match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`OMIM.ttl.gz`:T047) return count(distinct n) as `GARD`,count(distinct a) as `OMIM`
 
 match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`DOID.owl.gz`) where not exists(a.status) return count(distinct n) as `GARD`,count(distinct a) as `DO`
+
+match(n:`MESH.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MEDLINEPLUS.ttl.gz`:T047) return count(distinct n) as `MESH`,count(distinct a) as `MEDLINE`
+
+match(n:`MESH.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `MESH`,count(distinct a) as `MONDO`
+
+match(n:`OMIM.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `OMIM`,count(distinct a) as `MONDO`
+
+match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`HPO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `OMIM`,count(distinct a) as `HPO`
