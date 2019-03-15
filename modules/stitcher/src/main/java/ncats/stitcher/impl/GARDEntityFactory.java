@@ -40,6 +40,7 @@ public class GARDEntityFactory extends EntityRegistry {
         final public Map<StitchKey, Map<Object, Set<Long>>> values =
             new LinkedHashMap<>();
         final public PrintStream ps;
+        final StitchKey[] stitches;
 
         UntangleComponent (Component comp, StitchKey... stitches) {
             this (null, comp, stitches);
@@ -67,13 +68,14 @@ public class GARDEntityFactory extends EntityRegistry {
             }
             this.comp = comp;
             this.ps = ps == null ? System.out : ps;
+            this.stitches = stitches;
         }
 
         public void mergeStitches () {
             List keys = new ArrayList ();
             Map<Integer, Component> map = new TreeMap<>();
-            
             UnionFind uf = new UnionFind ();
+            
             for (Map.Entry<StitchKey, Map<Object, Set<Long>>> me
                      : values.entrySet()) {
                 ps.println(".. ["+me.getKey()+"]");
@@ -86,7 +88,10 @@ public class GARDEntityFactory extends EntityRegistry {
                                +stats.get(ve.getKey())+"/"
                                +stitchCount (me.getKey(), ve.getKey())
                                +" "+c.getId()+" ("+c.size()+") "+c.nodeSet());
+                    
                     int q = keys.size();
+                    uf.union(q, q);
+                    
                     for (Map.Entry<Integer, Component> qe : map.entrySet()) {
                         double sim = c.similarity(qe.getValue());
                         if (sim > 0.) {
@@ -98,6 +103,7 @@ public class GARDEntityFactory extends EntityRegistry {
                             }
                         }
                     }
+                    
                     map.put(q, c);
                     keys.add(ve.getKey());
                 }
@@ -110,6 +116,7 @@ public class GARDEntityFactory extends EntityRegistry {
             for (int n = 0; n < ccs.length; ++n) {
                 long[] c = ccs[n];
                 ps.println("### component "+n+" ("+c.length+")");
+                Set<Long> members = new TreeSet<>();
                 for (int i = 0; i < c.length; ++i) {
                     int ki = (int)c[i];
                     Object k = keys.get(ki);
@@ -122,10 +129,107 @@ public class GARDEntityFactory extends EntityRegistry {
                             hc.put(id, bs = new BitSet (ccs.length));
                         bs.set(n);
                     }
+                    members.addAll(kc.nodeSet());
+                }
+                ps.println(":: "+members.size()+" "+members);
+            }
+            
+            ps.println("*** "+hc);
+            Map<Integer, Set<Long>> comps = new TreeMap<>();
+            Set<Long> multi = new TreeSet<>();
+            for (Map.Entry<Long, BitSet> me : hc.entrySet()) {
+                BitSet bs = me.getValue();
+                if (1 == bs.cardinality()) {
+                    int c = bs.nextSetBit(0); 
+                    Set<Long> s = comps.get(c);
+                    if (s == null)
+                        comps.put(c, s = new TreeSet<>());
+                    s.add(me.getKey());
+                }
+                else {
+                    multi.add(me.getKey());
                 }
             }
-            ps.println("*** "+hc);
-        }
+            
+            for (Map.Entry<Integer, Set<Long>> me : comps.entrySet()) {
+                if (!me.getValue().isEmpty()) {
+                    ps.println
+                        (String.format("%1$3d: %2$d ", me.getKey(),
+                                       me.getValue().size())+me.getValue());
+                }
+            }
+
+            int ncomps = ccs.length;
+            for (Long id : multi) {
+                BitSet bs = hc.get(id);
+                ps.println("~~~ "+id+"="+bs);
+                Entity e = entity (id);
+                
+                double maxscore = 0.;
+                int maxc = -1;
+                for (int c = bs.nextSetBit(0); c >= 0; c = bs.nextSetBit(c+1)) {
+                    if (!comps.containsKey(c)) {
+                        Set<Long> s = new TreeSet<> ();
+                        long[] cc = ccs[c];
+                        for (int i = 0; i < cc.length; ++i) {
+                            Component ci = map.get((int)cc[i]);
+                            s.addAll(ci.nodeSet());
+                        }
+                        comps.put(c, s);
+                    }
+
+                    double score = 0.;
+                    for (Long oid : comps.get(c)) {
+                        if (!id.equals(oid)) {
+                            Entity f = entity (oid);
+                            double sim = e.similarity(f, stitches);
+                            ps.println
+                                ("......"+String.format("%1$.3f", sim)+" "
+                                 +oid+" {"+c+"}");
+                            score += sim;
+                        }
+                    }
+                            
+                    if (score < maxscore) {
+                    }
+                    else if (score > maxscore) {
+                        maxscore = score;
+                        maxc = c;
+                    }
+                    else {
+                        //
+                    }
+                }
+
+                if (maxc >= 0) {
+                    ps.println("~~~ maxscore="+String.format("%1$.3f", maxscore)
+                               +" in component "+maxc);
+                    for (int c = bs.nextSetBit(0); c >= 0;
+                         c = bs.nextSetBit(c+1)) {
+                        if (c != maxc)
+                            comps.get(c).remove(id);
+                    }
+                    comps.get(maxc).add(id);
+                }
+            }
+
+            ncomps = 0;
+            Set<Long> unique = new HashSet<>();
+            for (Map.Entry<Integer, Set<Long>> me : comps.entrySet()) {
+                Set<Long> set = me.getValue();
+                ps.println(String.format("%1$3d: %2$d ", me.getKey(),
+                                         set.size())+set);
+                if (!set.isEmpty())
+                    ++ncomps;
+                for (Long id : set) {
+                    if (unique.contains(id))
+                        ps.println(id+" is not uniquely assigned to a component!");
+                    unique.add(id);
+                }
+            }
+            ps.println("*** "+unique.size()+" elements spanning "+ncomps+
+                       " components!");
+        } // mergeStitches ()
 
         public void mergeEntities () {
         }
@@ -523,6 +627,7 @@ public class GARDEntityFactory extends EntityRegistry {
             //dump (System.out, comp);
             UntangleComponent uc = new UntangleComponent (comp, N_Name, I_CODE);
             uc.mergeStitches();
+            uc.mergeEntities();
             System.out.println();
         }
     }
