@@ -41,8 +41,8 @@
       \emph{indication} $\cdots$
     \item Numerous ontologies: MeSH, OMIM, Disease Ontology, Orphanet,
       GARD, UMLS, HPO, MONDO, $\ldots$
-    \item Entity resolution and ontology matching are still unsolved
-      problems
+    \item Entity resolution/normalization and ontology matching are
+      still unsolved problems
     \end{itemize}
   \end{block}
   \begin{block}{Baby steps...}
@@ -102,7 +102,7 @@
 \begin{frame}
   \frametitle{A closer look at GARD}
     
-  \begin{block}{Total 6,763 diseases; 6,504 are considered rare}
+  \begin{block}{GARD diseases by content feature}
     \begin{center}
       \begin{tabular}{cc}\toprule
         Content Feature & Count\\ \midrule
@@ -115,9 +115,13 @@
         Prognosis & 568\\ \bottomrule
       \end{tabular}
     \end{center}
+    Total 6,763 diseases, of which 6,504 are considered rare. Out of
+    6,504 rare diseases, there are 480 that do not map to anything (e.g.,
+    \emph{Hillig syndrome}). It turns out that about 58 of these do map
+    to UMLS exactly; e.g., \emph{Webster Deming syndrome} (GARD 428)
+    maps to \emph{Craniofrontonasal dysplasia with Poland anomaly
+      syndrome} (C4303859).
   \end{block}
-  
-  \centerline{\href{https://rarediseases.info.nih.gov/}{\texttt{https://rarediseases.info.nih.gov/}}}
 \end{frame}
 
 \begin{frame}
@@ -161,8 +165,32 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Disease resources}
+  \begin{center}
+    \begin{tabular}{rl}
+      GARD &
+      \href{https://rarediseases.info.nih.gov/}{\texttt{https://rarediseases.info.nih.gov/}}\\
+      Orphanet &
+      \href{https://www.orpha.net}{\texttt{https://www.orpha.net}}\\
+      GHR&
+      \href{https://ghr.nlm.nih.gov/}{\texttt{https://ghr.nlm.nih.gov/}}\\
+      Disease Ontology (DO) &
+      \href{http://disease-ontology.org/}{\texttt{http://disease-ontology.org/}}\\
+      OMIM & \href{https://omim.org/}{\texttt{https://omim.org/}}\\
+      MeSH &
+      \href{https://meshb.nlm.nih.gov}{\texttt{https://meshb.nlm.nih.gov}}\\
+      MEDLINE+ &
+      \href{https://medlineplus.gov/}{\texttt{https://medlineplus.gov/}}\\
+      MONDO &
+      \href{http://monarchinitiative.org/}{\texttt{http://monarchinitiative.org/}}\\
+      HPO & \href{https://hpo.jax.org}{\texttt{https://hpo.jax.org}}\\
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}
   \frametitle{Disease overlap matrix}
-  \begin{block}{Direct match by synonym or code}
+  \begin{block}{Direct match by synonyms or identifiers}
     \begin{center}
       \tiny
       \begin{tabular}{rccccccccc}\toprule
@@ -171,24 +199,58 @@
         Orphanet &4,299&\textbf{9,290}&616&3,301&4,427&3,613&280&8,973&858\\
         GHR &829&616&\textbf{1,287}&620&556&876&99&1,125&143\\
         DO &2,506&3,554&617&\textbf{8,699}&3,473&3,295&722&8,679&1,502\\
-        OMIM &4,850&7,313&883&5,842&\textbf{12,883}&&&&\\
-        MeSH &3,889&3,330&836&3,140&&\textbf{8,892}&&&\\
-        MEDLINE+ &310&414&99&966&&&\textbf{2,238}&\\
-        MONDO &6,573&11,856&1,245&10,776&&&&\textbf{21,826}&\\
-        HPO &730&868&143&1,510&&&&&\textbf{13,725}\\ \bottomrule
+        OMIM &4,850&7,313&883&5,842&\textbf{12,883}&8,505&664&11,374&2,491\\
+        MeSH &3,889&3,330&836&3,140&5,871&\textbf{8,892}&653&7,882&1,153\\
+        MEDLINE+ &310&414&99&966&495&743&\textbf{2,238}&662&440\\
+        MONDO &6,573&11,856&1,245&10,776&8,696&8,555&645&\textbf{21,826}&2,385\\
+        HPO &730&868&143&1,510&1,458&1,382&379&2,237&\textbf{13,725}\\ \bottomrule
       \end{tabular}
     \end{center}
-    Matrix is not symmetric due to $1-n$ and/or $m-1$ mappings; e.g.,
+    The matrix is asymmetric due to $1-n$ and/or $m-1$ mappings; e.g.,
     there are $4,377$ GARD diseases that mapped to $4,299$ diseases in
-    Orphanet.
+    Orphanet. These numbers improve as we extend the
+    matching indirectly to two-, three-, four-neighbor. 
   \end{block}
 \end{frame}
 
 \begin{frame}
   \frametitle{Disease harmonization challenges}
   \begin{block}{How many ``distinct'' diseases are here?}
-    \includegraphics[width=9cm]{graph1}
+    \centerline{\includegraphics[width=9cm]{graph1}}
   \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A strategy for harmonization}
+  \begin{enumerate}
+  \item Generate \emph{strongly connected components}
+    \begin{itemize}
+    \item Perform transitive closure on nearest (weighted) neighbors
+    \end{itemize}
+  \item For each strongly connected component, do the following:
+    \begin{enumerate}
+    \item Calculate pair-wise similarities for all synonyms and
+      identifiers based on Jaccard metric \[\text{sim}(x,y) =
+      \frac{|x\cap y|}{|x\cup y|}\]
+    \item Group synonyms and identifiers based on $\text{sim}(x,y) \ge
+      \delta$ ($\delta=0.4$ gives reasonable grouping)
+    \item Each such synonym/identifier grouping serves as an initial
+      seed for which entities are then merged/split (similar to
+      $k$-means iterations)
+    \end{enumerate}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Next steps}
+  \begin{enumerate}
+  \item Ongoing evaluation of the proposed harmonization strategy
+  \item How best to normalize entities?
+    \begin{itemize}
+    \item Identify preferred synonyms and identifiers
+    \end{itemize}
+  \item Support manual curation and harmonization cycle
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}[fragile]

@@ -1,0 +1,54 @@
+GARD ID	Disease Name	CUI	Type	UMLS Concept
+428	Webster Deming syndrome	C4303859	Disease or Syndrome	Craniofrontonasal dysplasia with Poland anomaly syndrome
+2786	Hygroma cervical	C0919640	Neoplastic Process	Hygroma colli
+3254	Limb reduction defect	C0265547	Congenital Abnormality	Longitudinal deficiency of limb
+3399	Maroteaux Stanescu Cousin syndrome	C4304745	Disease or Syndrome	Lethal recessive chondrodysplasia
+3660	Midline cleft of lower lip	C4518460	Congenital Abnormality	Midline cleft of lower lip
+4114	Organic mood syndrome	C0029232	Mental or Behavioral Dysfunction	Organic mood disorder
+5161	Central pain syndrome	C1536114	Disease or Syndrome	Central pain syndrome
+5264	Trichomalacia	C0406471	Disease or Syndrome	Trichomalacia
+5585	Wisconsin syndrome	C0796201	Disease or Syndrome	Wisconsin syndrome
+6392	Exercise-induced anaphylaxis	C0344183	Disease or Syndrome	Exercise anaphylaxis
+6730	Hypoketonemic hypoglycemia	C0596744	Disease or Syndrome	hypoketonemic hypoglycemia
+6782	Infectious myocarditis	C0729608	Disease or Syndrome	Myocarditis due to infectious agent
+6920	Loin pain hematuria syndrome	C0268712	Disease or Syndrome	Loin pain-hematuria syndrome
+7054	Mondor disease	C0265070	Disease or Syndrome	Thrombophlebitis of breast
+7194	Neurogenic hypertension	C0597048	Disease or Syndrome	Neurogenic hypertension
+7297	Ovarian remnant syndrome	C0271614	Disease or Syndrome	Residual ovary syndrome
+7480	Prurigo nodularis	C0263353	Disease or Syndrome	Prurigo nodularis
+7624	Selenium poisoning	C0274973	Injury or Poisoning	Selenium poisoning
+7644	Sideroblastic anemia acquired	C0272024	Disease or Syndrome	Secondary acquired sideroblastic anemia
+7680	Spinal shock	C0597503	Injury or Poisoning	Spinal shock
+7724	Syringobulbia	C0270771	Congenital Abnormality	Syringobulbia
+7829	Tuberculous uveitis	C1281935	Disease or Syndrome	Tuberculous uveitis
+8358	Shaver's disease	C0311227	Disease or Syndrome	Aluminosis of lung
+8712	Hemoglobinemia	C0235573	Disease or Syndrome	Hemoglobinemia
+10276	Windblown hand	C0431875	Congenital Abnormality	Windblown hand
+10370	Rhabdomyomatous mesenchymal hamartoma	C0406821	Congenital Abnormality	Rhabdomyomatous mesenchymal hamartoma
+10440	Neonatal meningitis	C0456107	Disease or Syndrome	Neonatal meningitis
+10495	Wilson-Mikity syndrome	C0270171	Disease or Syndrome	Wilson-Mikity syndrome
+10549	Mycobacterium Malmoense	C0317767	Bacterium	Mycobacterium malmoense
+10725	Odontogenic myxoma	C0334569	Neoplastic Process	Odontogenic myxoma
+10745	Orbital melanoma	C3898089	Neoplastic Process	Orbital Melanoma
+10904	Pityriasis rotunda	C0343060	Disease or Syndrome	Pityriasis rotunda
+10926	Pulmonary hyalinizing granuloma	C0340160	Disease or Syndrome	Pulmonary hyalinizing granuloma
+10931	Orbital varix	C0339155	Disease or Syndrome	Orbital varix
+10932	Ocular neuromyotonia	C1321330	Finding	Ocular neuromyotonia
+10979	Lymphangiomatosis	C0334102	Disease or Syndrome	Lymphangiomatosis
+11012	Refractory cytopenia with unilineage dysplasia	C2826318	Neoplastic Process	Refractory cytopenia with unilineage dysplasia
+11912	Gliomatosis peritonei	C2938915	Neoplastic Process	Peritoneal gliomatosis
+11924	Carcinoma showing thymus-like differentiation	C1266100	Neoplastic Process	Carcinoma showing thymus-like element
+11968	Lactobezoar	C0341220	Disease or Syndrome	Lactobezoar
+11969	Clostridium septicum infection	C1384676	Disease or Syndrome	Gas gangrene caused by clostridium septicum
+11976	Cystic adventitial disease	C1306656	Disease or Syndrome	Cystic adventitial disease
+12263	Proliferative verrucous leukoplakia	C3697776	Neoplastic Process	Proliferative verrucous oral leukoplakia
+12321	Double outlet right atrium	C0344795	Disease or Syndrome	Double outlet right atrium
+12654	Baylisascaris infection 	C0162626	Disease or Syndrome	Ascaridida Infections
+12856	Trigeminal trophic syndrome	C1274928	Disease or Syndrome	Trigeminal trophic syndrome
+12980	Monoclonal mast cell activation syndrome	C4267893	Disease or Syndrome	Monoclonal mast cell activation syndrome
+13023	Alezzandrini syndrome	C1274653	Disease or Syndrome	Alezzandrini syndrome
+13027	Bier spots	C0406529	Disease or Syndrome	Biers spots
+13028	Dissociative seizures	C0349245	Mental or Behavioral Dysfunction	Dissociative convulsions
+13142	Acute flaccid myelitis	C4290000	Disease or Syndrome	Acute Flaccid Myelitis
+13238	Extracardiac Rhabdomyoma	C1707985	Neoplastic Process	Extracardiac Rhabdomyoma
+13254	Skeletal-extraskeletal angiomatosis	C4324614	Congenital Abnormality	Skeletal-extraskeletal angiomatosis
