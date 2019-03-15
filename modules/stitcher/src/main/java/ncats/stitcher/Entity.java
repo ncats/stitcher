@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static ncats.stitcher.StitchKey.*;
+
 public class Entity extends CNode {
     static final Logger logger = Logger.getLogger(Entity.class.getName());
     
@@ -488,6 +490,11 @@ public class Entity extends CNode {
     }
 
     public double similarity (Entity other, StitchKey... keys) {
+        Map<StitchKey, Object> values = keys (other);
+        if (values.containsKey(R_exactMatch)
+            || values.containsKey(R_equivalentClass))
+            return 1.;
+        
         if (keys == null || keys.length == 0) {
             keys = KEYS;
         }

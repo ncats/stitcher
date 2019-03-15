@@ -1,0 +1,33 @@
+match p=(n:`rancho-disease-drug_2018-12-18_13-30.txt`:Drug)-[*1..3]-(m:`GARD_v1`) return p skip 150 limit 50
+
+match p=(n)-[e*1..3]-(m:`GARD_v1`) where any(x in e where x.value='has_phenotype') return p limit 50
+
+match(n:`rancho-disease-drug_2018-12-18_13-30.txt`:Drug)-[*1..3]-(m:`GARD_v1`) with n,m match (m)-[e*1..2]-(d) where any(x in e where x.value='has_phenotype') return n.N_Name,m.N_Name,[x in e|x.gene],d.N_Name,labels(m) limit 100
+
+match p=(n:`GARD_v1`)-[e*0..2]-(m:`GHR_v1`) return p skip 100 limit 50
+
+
+match(n:`ordo.owl.gz`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match(n)-[:N_Name|:I_CODE*1..2]-(a:`HPO.owl.gz`) return count(distinct n) as `Orphanet`,count(distinct a) as `HPO`
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true and not (n)-[:N_Name|:I_CODE]-() return count(distinct n)
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with distinct labels(n) as t, count(n) as cnt unwind  t as Label return Label,sum(cnt) as Count order by Count desc
+
+match(n:`ordo.owl.gz`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match(n)-[:N_Name|:I_CODE*1]-(a:`DOID.owl.gz`) where not exists(a.status) return count(distinct n) as `Orphanet`,count(distinct a) as `DO`
+
+match(n:`ordo.owl.gz`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match(n)-[:N_Name|:I_CODE*1]-(a:`OMIM.ttl.gz`:T047) return count(distinct n) as `Orphanet`,count(distinct a) as `OMIM`
+
+match(n:`MONDO.owl.gz`)-[]-(m:DATA) where not exists(n.status) and exists(m.label) return count(n)
+
+match(n:`ordo.owl.gz`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `Orphanet`,count(distinct a) as `MONDO`
+
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `GARD`,count(distinct a) as `MONDO`
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`MEDLINEPLUS.ttl.gz`) return count(distinct n) as `GARD`,count(distinct a) as `MEDLINE`
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`MESH.ttl.gz`:T047) return count(distinct n) as `GARD`,count(distinct a) as `MESH`
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`OMIM.ttl.gz`:T047) return count(distinct n) as `GARD`,count(distinct a) as `OMIM`
+
+match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`DOID.owl.gz`) where not exists(a.status) return count(distinct n) as `GARD`,count(distinct a) as `DO`
