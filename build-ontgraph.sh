@@ -1,15 +1,16 @@
 #!/bin/sh
 
-version="v2"
-owl="BrendaTissue.owl.gz \
-   DOID.owl.gz \
+version="v3"
+# make sure MONDO is last in disease ontologies
+owl="DOID.owl.gz \
    HPO.owl.gz \
    MEDLINEPLUS.ttl.gz \
    MESH.ttl.gz \
-   MONDO.owl.gz \
    OMIM.ttl.gz \
-   UBERON.owl.gz \
    ordo.owl.gz \
+   MONDO.owl.gz \
+   BrendaTissue.owl.gz \
+   UBERON.owl.gz \
    GO.owl.gz \
    ogg.owl.gz \
    ogms.owl \
