@@ -661,17 +661,17 @@ if __name__ == "__main__":
     # findOrphans: Some resource entries were supposed to be stitched,
     # but are orphaned
     # approvedStitches: Report on all the approved stitches from API
+    # ranchoShouldBeApproved: A list of all drugs with UNIIs, G-SRS, and Rancho names
+    # that should have a condition with an "Approved" Highest Phase in RCAP, but don't
 
-    # tests = [nmeClashes,
-    #          nmeClashes2,
-    #          PMEClashes,
-    #          activemoietyClashes,
-    #          uniiClashes,
-    #          findOrphans,
-    #          approvedStitches,
-    #          ranchoShouldBeApproved]
-
-    tests = [ranchoShouldBeApproved]
+    tests = [nmeClashes,
+             nmeClashes2,
+             PMEClashes,
+             activemoietyClashes,
+             uniiClashes,
+             findOrphans,
+             approvedStitches,
+             ranchoShouldBeApproved]
 
     headers = {"nmeClashes": ["UNII -- UNII PT",
                               "Stitch",
