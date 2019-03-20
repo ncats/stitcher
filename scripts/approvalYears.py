@@ -250,14 +250,18 @@ def apprDateRegression(prods):
 if __name__=="__main__":
 
     maindir = getMainDir()
+
     drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
     print syscall
+
     if not os.path.exists(drugsAtfdafile):
         os.system(syscall)
+
     uniifile = maindir+"/temp/UNIIs-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+uniifile + " " + getUNIIZipURL()
     print syscall
+
     if not os.path.exists(uniifile):
         os.system(syscall)
     obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
@@ -265,25 +269,31 @@ if __name__=="__main__":
     print syscall
     if not os.path.exists(obfile):
         os.system(syscall)
-    appYrsfile = maindir+"/temp/approvalYears.txt"
+
+    appYrsfile = maindir+"/data/_archive/approvalYears.txt"
     if not os.path.exists(appYrsfile):
         raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
+
     gsrsDumpfile = maindir+'/data/dump-public-2018-07-19.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
+
     fdaNMEfile = maindir+'/data/FDA-NMEs-2018-08-07.txt'
-    if not os.path.exists(gsrsDumpfile):
+    if not os.path.exists(fdaNMEfile):
         raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
         
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
     fp = zfp.open(names[-1], 'r')
     line = fp.readline()
+
     if line[:-2] != "Name\tType\tUNII\tDisplay Name":
         raise ValueError('Problem reading UNII file:'+line)
+
     line = fp.readline()
     uniiPT = dict()
     uniiALL = dict()
+
     while line != "":
         sline = line[:-2].split("\t")
         if len(sline) < 4:
@@ -332,11 +342,13 @@ if __name__=="__main__":
     missingUNIIsfile = maindir+"/temp/missingUNIIs-"+getTimeStamp()+".txt"
     fp = open(missingUNIIsfile, 'w')
     m2 = []
+
     for key in missing.keys():
         m2.append([len(missing[key]), key, missing[key][0]])
     m2.sort()
     m2.reverse()
     fp.write("Number of products\tIngredient\tExample NDA\n")
+
     for item in m2:
         fp.write(str(item[0])+"\t"+item[1]+"\t"+item[2]+"\n")
     fp.close()
@@ -352,6 +364,7 @@ if __name__=="__main__":
     sl['2'] = 'Over-the-counter'
     sl['3'] = 'Discontinued'
     sl['4'] = 'None (Tentative Approval)'
+
     #MarketingStatusID	ApplNo	ProductNo
     for entry in markt['table']:
         key = entry[1]+"/"+entry[2]
@@ -365,11 +378,13 @@ if __name__=="__main__":
     fp = zfp.open('Applications.txt', 'r')
     appInfo = readTabFP(fp)
     fp.close()
+
     #ApplNo	ApplType	ApplPublicNotes	SponsorName
     #0          1               2               3
     apps = dict()
     for entry in appInfo['table']:
         apps[entry[0]] = entry
+
     for key in prods.keys():
         if apps.has_key(key[0:6]):
             prods[key].append(apps[key[0:6]][1])
@@ -385,11 +400,13 @@ if __name__=="__main__":
     #ApplNo	SubmissionClassCodeID	SubmissionType	SubmissionNo	SubmissionStatus	SubmissionStatusDate	SubmissionsPublicNotes	ReviewPriority
     #0          1                       2               3               4                       5                       6                       7
     subm = dict()
+
     for entry in submDates['table']:
         if not subm.has_key(entry[0]):
             subm[entry[0]] = entry[5][0:10]
         elif subm[entry[0]] > entry[5][0:10]:
             subm[entry[0]] = entry[5][0:10]
+
     for key in prods.keys():
         if subm.has_key(key[0:6]):
             prods[key].append(subm[key[0:6]])
@@ -397,6 +414,7 @@ if __name__=="__main__":
         else:
             prods[key].append('')
             prods[key].append('')
+
     zfp.close()
 
     # read in Orange Book products
@@ -404,6 +422,7 @@ if __name__=="__main__":
     fp = zfp.open('products.txt', 'r')
     obprods = readTabFP(fp, True, '~')
     fp.close()
+
     #Ingredient~DF;Route~Trade_Name~Applicant~Strength~Appl_Type~Appl_No~Product_No~TE_Code~Approval_Date~RLD~RS~Type~Applicant_Full_Name
     #0          1        2          3         4        5         6       7          8       9             10  11 12   13
     sponsors = dict()
@@ -413,6 +432,7 @@ if __name__=="__main__":
     sl['RX'] = 'Prescription'
     sl['OTC'] = 'Over-the-counter'
     sl['DISCN'] = 'Discontinued'
+
     for entry in obprods['table']:
         appl = entry[6]+'/'+entry[7]
         # other product info is updated
@@ -425,6 +445,7 @@ if __name__=="__main__":
             status = 'Discontinued FR'
             entry[4] = entry[4][:entry[4].find(" **")]
         sponsors[entry[3].strip()] = entry[13]
+
         # verify ingredients are mapped to this product
         for ingred in parseIngred(entry[0], uniiPT, uniiALL, missing):
             if appl not in prods:
@@ -435,7 +456,8 @@ if __name__=="__main__":
                 #raise ValueError('Ingredient from Orange Book not found in products:'+ingred)
             if appl not in UNII2prods[ingred]:
                 UNII2prods[ingred].append(appl)
-                #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred)      
+                #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred) 
+
         if prods.has_key(appl):
             # I've verified manually that these differences are not important
             #stop = -1
@@ -477,6 +499,7 @@ if __name__=="__main__":
     #0          1               2               3       4               5               6               7       8
     fdaNMEs = readTabFile(fdaNMEfile)
     fdaNMEdates = dict()
+
     for entry in fdaNMEs['table']:
         unii = entry[3]
         year = entry[0]
@@ -524,6 +547,7 @@ if __name__=="__main__":
     # use predicted apprv startDate from previous approvalYears file
     appYrs = readTabFile(appYrsfile)
     appPredDate = dict()
+
     for entry in appYrs['table']:
         unii = entry[0]
         ts = time.strptime(entry[5], "%m/%d/%Y")
@@ -532,6 +556,7 @@ if __name__=="__main__":
         appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
         if method == 'PREDICTED':
             appPredDate[appl] = date
+
     for prod in prods.keys():
         if prod[0:6] in appPredDate:
             pred = appPredDate[prod[0:6]]
@@ -578,14 +603,18 @@ if __name__=="__main__":
                     for item in activeMoiety[key]:
                         if item == unii:
                             unii = key
+
             for otherunii in activeMoiety[unii]:
                 if UNII2prods.has_key(otherunii):
                     for prod in UNII2prods[otherunii]:
                         entry2 = prods[prod]
+
                         if entry2[-2] != '' and entry2[-2] < early[-2]:
                             early = entry2
+
             if date == early[-2] or date > early[-2]:
                 match = 0 # startDate is the same or earlier
+
             if date < early[-2]:
                 for otherunii in activeMoiety[unii]:
                     if UNII2prods.has_key(otherunii):
@@ -598,18 +627,23 @@ if __name__=="__main__":
                             match = 1 # appl exists and wasn't mapped to this unii
             if match > 1:
                 print date, unii, method, appl
+
                 print activeMoiety[unii]
+
                 for otherunii in activeMoiety[unii]:
                     if UNII2prods.has_key(otherunii):
                         for prod in UNII2prods[otherunii]:
                             print otherunii, prod, prods[prod]
+
                 for prod in prods.keys():
                     if prod[0:6] == appl:
                         print prod, prods[prod]
+
                 for otherunii in UNII2prods.keys():
                     for key in UNII2prods[otherunii]:
                         if key[0:6] == appl:
                             print appl, otherunii
+
                 print early
                 raise ValueError('Tyler had other info here:'+appl)
 
@@ -619,21 +653,26 @@ if __name__=="__main__":
     #header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
     header = "UNII\tApproval_Year\tDate\tDate_Method\tApp_Type\tApp_No\tSponsor\tProduct\tUrl\tactive\tComment\n"
     fp.write(header)
+
     #outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
     #fperr = open(outfile2, 'w')
     #fperr.write(header)
     for unii in activeMoiety.keys():
         early = [getTimeStamp(), '']
         earlyDate = getTimeStamp()
+
         for otherunii in activeMoiety[unii]:
             if UNII2prods.has_key(otherunii):
                 for prod in UNII2prods[otherunii]:
                     entry = prods[prod]
+
                     if entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
                         if early[-1] == '' or (entry[-2] != '' and not entry[-2] > early[-2]):
                             early = entry
+
                     elif early[-1] == '':
                         early = entry
+
                     if entry[-2] != '' and entry[-2] < earlyDate:
                         earlyDate = entry[-2]
                             
@@ -648,22 +687,27 @@ if __name__=="__main__":
             appurl = ''
             active = "true"
             outfp = fp
+
             if len(early[0]) > 6 and early[0][6] == '/' or early[-1].find('https://www.accessdata.fda.gov/') > -1:
                 appno = early[0][0:6]
+
                 if method == "PREDICTED":
                     year = "[Approval Date Uncertain] "+year
+
                 appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
             else:
                 #outfp = fperr
                 active = "false"
                 if method.find('OB NME Appendix 1950-') > -1:
                     appno = early[0][0:6]
+
                 for otherunii in activeMoiety[unii]:
                     if UNII2prods.has_key(otherunii):
                         for prod in UNII2prods[otherunii]:
                             entry = prods[prod]
                             if entry[0] == early[0]:
                                 unii = otherunii
+
             #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
             #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
             #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
@@ -678,15 +722,21 @@ if __name__=="__main__":
             if not prod2UNIIs.has_key(prod):
                 prod2UNIIs[prod] = []
             prod2UNIIs[prod].append(unii)
+
     UNII2pt = dict()
+
     for key in resolverCache.keys():
         UNII2pt[resolverCache[key]] = key
+
     for key in uniiPT.keys():
         UNII2pt[uniiPT[key]] = key
+
     productsfile = maindir+"/temp/products-"+getTimeStamp()+".txt"
     fp = open(productsfile, 'w')
+
     header = 'NDA\tProduct\tForm;Route\tStrength\tStatus\tAppl Type\tSponsor\tDate\tDate Ref\tUNIIs\tIngredients\n'
     fp.write(header)
+    
     for prod in prods.keys():
         uniis = []
         if prod2UNIIs.has_key(prod): # ingreds that don't have uniis
