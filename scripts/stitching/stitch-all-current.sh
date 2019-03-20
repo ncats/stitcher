@@ -66,7 +66,7 @@ echo 'IIG:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 #cp -r $db NOSTITCH$db
 
 # now the stitching...
-sbt stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
+sbt -mem 16000 stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 echo $(date) >> $log
