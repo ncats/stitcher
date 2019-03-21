@@ -437,11 +437,14 @@ public class Util {
                 int len = Array.getLength(val);
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
-                    v = type == String.class ? v.toString() : type.cast(v);
-                    if (unique.remove(v))
-                        Array.set(merged, count++, v);
+                    if (v != null) {
+                        v = type == String.class ? v.toString() : type.cast(v);
+                        if (unique.remove(v))
+                            Array.set(merged, count++, v);
+                    }
                 }
-            } else {
+            }
+            else {
                 val = type == String.class ? val.toString() : type.cast(val);
                 if (unique.remove(val)) {
                     Array.set(merged, count++, val);

@@ -612,7 +612,8 @@ public class GARDEntityFactory extends EntityRegistry {
                         && target._hasAnyLabels(sources)
                         && !source._hasAnyLabels(types)
                         && !target._hasAnyLabels(types)) {
-                        score = calcScore (sv);
+                        score = (int)(source.similarity(target, N_Name, I_CODE)
+                                      * calcScore (sv) + 0.5);
                     }
                     return score;
                 }
