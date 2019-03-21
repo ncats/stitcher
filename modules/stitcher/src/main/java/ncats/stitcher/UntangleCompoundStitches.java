@@ -315,11 +315,11 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
         Set<Entity> roots = new HashSet<>();
         Set<Entity> unsure = new HashSet<>();
         traverse ((traversal, triple) -> {
-                Entity source = ef.entity(triple.source(T_ActiveMoiety));
-                Entity target = ef.entity(triple.target(T_ActiveMoiety));
+                Entity source = ef.entity(triple.source(R_activeMoiety));
+                Entity target = ef.entity(triple.target(R_activeMoiety));
                 
-                Entity[] out = source.outNeighbors(T_ActiveMoiety);
-                Entity[] in = target.inNeighbors(T_ActiveMoiety);
+                Entity[] out = source.outNeighbors(R_activeMoiety);
+                Entity[] in = target.inNeighbors(R_activeMoiety);
 
                 boolean root = isRoot (target);
                 logger.info(" ("+out.length+") "+source.getId()
@@ -347,7 +347,7 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
                 }
                 
                 return true;
-            }, T_ActiveMoiety);
+            }, R_activeMoiety);
         dump ("##### active moiety stitching");
 
         logger.info("########### STITCHING TRIPLES #############");
@@ -528,7 +528,7 @@ public class UntangleCompoundStitches extends UntangleCompoundAbstract {
 
         // now resolve entities that point to multiple active moieties
         for (Entity e : unsure) {
-            Entity[] nb = e.outNeighbors(T_ActiveMoiety);
+            Entity[] nb = e.outNeighbors(R_activeMoiety);
             // just assign to arbitrary or based on rank?
             uf.union(e.getId(), nb[0].getId());
         }

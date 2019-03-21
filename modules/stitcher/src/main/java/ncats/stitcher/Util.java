@@ -387,23 +387,23 @@ public class Util {
                         if (type == null)
                             type = v.getClass();
                         else if (!v.getClass().isAssignableFrom(type))
-		                    type = String.class; // Use String class as a common demoninator here as we are mostly using this for combining primitive types
-		    // Problem was coming 2 PubChem CIDs, one provided as a long from Rancho (ALAFOSFALIN; 71957) and the other as a string from GSRS (XMK47YQG9R; 12757032)
-		      //                        throw new IllegalArgumentException
-		      //     ("Incompatible class; "+v.getClass().getName()
-                      //       +" is not assignable from "+type.getName()+": "+v+"|"+val+":"+Arrays.toString(unique.toArray()));
+                            type = String.class; // Use String class as a common demoninator here as we are mostly using this for combining primitive types
+                    // Problem was coming 2 PubChem CIDs, one provided as a long from Rancho (ALAFOSFALIN; 71957) and the other as a string from GSRS (XMK47YQG9R; 12757032)
+                    //                        throw new IllegalArgumentException
+                    //     ("Incompatible class; "+v.getClass().getName()
+                    //       +" is not assignable from "+type.getName()+": "+v+"|"+val+":"+Arrays.toString(unique.toArray()));
                 }
             }
             else {
                 if (type == null)
                     type = val.getClass();
-		else if (!val.getClass().isAssignableFrom(type))
-		    type = String.class;
+                else if (!val.getClass().isAssignableFrom(type))
+                    type = String.class;
             }
         }
 
-	Set unique = new HashSet();
-	for (Object val : values) {
+        Set unique = new HashSet();
+        for (Object val : values) {
             if (val == null)
                 ;
             else if (val.getClass().isArray()) {
@@ -411,39 +411,48 @@ public class Util {
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(val, i);
                     if (v != null)
-                        unique.add(type == String.class ? v.toString() : type.cast(v));
+                        unique.add(type == String.class
+                                   ? v.toString() : type.cast(v));
                     else {
                         v = null;
                     }
                 }
             }
             else {
-	      unique.add(type == String.class ? val.toString() : type.cast(val));
-            }
-    }
-
-    Object merged = Array.newInstance(type, unique.size());
-    int count = 0;
-    for (Object val : values) {
-        if (val == null)
-            ;
-        else if (val.getClass().isArray()) {
-            int len = Array.getLength(val);
-            for (int i = 0; i < len; ++i) {
-                Object v = Array.get(val, i);
-                v = type == String.class ? v.toString() : type.cast(v);
-                if (unique.remove(v))
-		            Array.set(merged, count++, v);
-            }
-        } else {
-            val = type == String.class ? val.toString() : type.cast(val);
-            if (unique.remove(val)) {
-                Array.set(merged, count++, val);
+                unique.add(type == String.class
+                           ? val.toString() : type.cast(val));
             }
         }
-    }
-    return merged;
-	//return unique.toArray(empty);
+
+        // this happens when all values are null
+        if (type == null)
+            return null;
+
+        Object merged = Array.newInstance(type, unique.size());
+        int count = 0;
+        for (Object val : values) {
+            if (val == null)
+                ;
+            else if (val.getClass().isArray()) {
+                int len = Array.getLength(val);
+                for (int i = 0; i < len; ++i) {
+                    Object v = Array.get(val, i);
+                    if (v != null) {
+                        v = type == String.class ? v.toString() : type.cast(v);
+                        if (unique.remove(v))
+                            Array.set(merged, count++, v);
+                    }
+                }
+            }
+            else {
+                val = type == String.class ? val.toString() : type.cast(val);
+                if (unique.remove(val)) {
+                    Array.set(merged, count++, val);
+                }
+            }
+        }
+        return merged;
+        //return unique.toArray(empty);
     }
 
     static public boolean equals (Object u, Object v) {

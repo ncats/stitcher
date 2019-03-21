@@ -1,0 +1,129 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix umls: <http://bioportal.bioontology.org/ontologies/umls/> .
+
+
+<http://purl.bioontology.org/ontology/OMIM/>
+    a owl:Ontology ;
+    rdfs:comment "RDF Version of the UMLS ontology OMIM; converted with the UMLS2RDF tool (https://github.com/ncbo/umls2rdf), developed by the NCBO project." ;
+    rdfs:label "OMIM" ;
+    owl:imports <http://www.w3.org/2004/02/skos/core> ;
+    owl:versionInfo "2018aa" .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0001> a owl:Class ;
+        skos:prefLabel """HACE1, ARG219TER"""@en ;
+        skos:notation """610876.0001"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226074"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0003> a owl:Class ;
+        skos:prefLabel """HACE1, 20-BP INS, NT2019"""@en ;
+        skos:notation """610876.0003"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226072"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0002> a owl:Class ;
+        skos:prefLabel """HACE1, ARG748TER"""@en ;
+        skos:notation """610876.0002"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226073"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0005> a owl:Class ;
+        skos:prefLabel """HACE1, 2-BP DEL, 1852CA"""@en ;
+        skos:notation """610876.0005"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226070"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0004> a owl:Class ;
+        skos:prefLabel """HACE1, 3-BP DEL, 2490TCT"""@en ;
+        skos:notation """610876.0004"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226071"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0007> a owl:Class ;
+        skos:prefLabel """HACE1, ARG269TER"""@en ;
+        skos:notation """610876.0007"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4225719"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0006> a owl:Class ;
+        skos:prefLabel """HACE1, GLN152TER"""@en ;
+        skos:notation """610876.0006"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226069"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876.0008> a owl:Class ;
+        skos:prefLabel """HACE1, CYS80TER"""@en ;
+        skos:notation """610876.0008"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/allelic_variant_of> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_phenotype> <http://purl.bioontology.org/ontology/OMIM/610876> ;
+        umls:cui """C4226068"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+
+<http://purl.bioontology.org/ontology/OMIM/610876> a owl:Class ;
+        skos:prefLabel """HECT DOMAIN- AND ANKYRIN REPEAT-CONTAINING E3 UBIQUITIN PROTEIN LIGASE 1"""@en ;
+        skos:notation """610876"""^^xsd:string ;
+        skos:altLabel """KIAA1320"""@en , """HACE1"""@en , """SPASTIC PARAPLEGIA AND PSYCHOMOTOR RETARDATION WITH OR WITHOUT SEIZURES"""@en ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0007> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0008> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0006> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0005> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0004> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0003> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0002> ;
+        <http://purl.bioontology.org/ontology/OMIM/phenotype_of> <http://purl.bioontology.org/ontology/OMIM/610876.0001> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0007> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0008> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0006> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0005> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0004> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0003> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0002> ;
+        <http://purl.bioontology.org/ontology/OMIM/has_allelic_variant> <http://purl.bioontology.org/ontology/OMIM/610876.0001> ;
+        <http://purl.bioontology.org/ontology/OMIM/GENESYMBOL> """KIAA1320"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/GENESYMBOL> """HACE1"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/GENESYMBOL> """SPPRS"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/MIMTYPEVALUE> """star"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/MIMTYPEMEANING> """Gene with known sequence"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/MIMTYPE> """1"""^^xsd:string ;
+        <http://purl.bioontology.org/ontology/OMIM/GENELOCUS> """6q21"""^^xsd:string ;
+        umls:cui """C4225215"""^^xsd:string ;
+        umls:cui """C1427259"""^^xsd:string ;
+        umls:tui """T047"""^^xsd:string ;
+        umls:tui """T028"""^^xsd:string ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T047> ;
+        umls:hasSTY <http://purl.bioontology.org/ontology/STY/T028> ;
+ .
+

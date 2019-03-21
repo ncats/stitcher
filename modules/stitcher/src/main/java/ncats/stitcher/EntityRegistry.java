@@ -107,18 +107,20 @@ public class EntityRegistry extends EntityFactory {
         blacklist = new HashMap<>();
     }
 
-    public void addBlacklist (Object... values) {
+    public EntityRegistry addBlacklist (Object... values) {
         for (Object v : values)
             for (StitchKey key : Entity.KEYS)
                 addBlacklist (key, v);
+        return this;
     }
     
-    public void addBlacklist (StitchKey key, Object... values) {
+    public EntityRegistry addBlacklist (StitchKey key, Object... values) {
         Set set = blacklist.get(key);
         if (set == null)
             blacklist.put(key, set = new HashSet ());
         for (Object v : values)
             set.add(v);
+        return this;
     }
 
     public boolean isBlacklist (StitchKey key, Object value) {
@@ -509,7 +511,7 @@ public class EntityRegistry extends EntityFactory {
                 ent = _register (map);
             }
             else {
-                ent = null;
+                //ent = null;
                 logger.info(id+" is already registered!");
             }
             tx.success();
@@ -639,26 +641,17 @@ public class EntityRegistry extends EntityFactory {
     protected Object normalize (StitchKey key, Object value) {
         if (value != null) {
             if (value.getClass().isArray()) {
+                if (key.type.isAssignableFrom(String.class)) {
+                    int len = Array.getLength(value);
+                    String[] vals = new String[len];
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(value, i);
+                        vals[i] = v.toString().toUpperCase();
+                    }
+                    value = vals;
+                }
             }
             else {
-                /*
-                switch (key) {
-                case N_Name:
-                case I_UNII:
-                case H_InChIKey:
-                case H_LyChI_L1:
-                case H_LyChI_L2:
-                case H_LyChI_L3:
-                case H_LyChI_L4:
-                case H_LyChI_L5:
-                case H_SHA1:
-                case H_SHA256:
-                case H_MD5:
-                    value = value.toString().toUpperCase();
-                    break;
-                }
-                */
-                
                 if (key.type.isAssignableFrom(Number.class)) {
                     try {
                         value = Long.parseLong(value.toString());
@@ -701,10 +694,16 @@ public class EntityRegistry extends EntityFactory {
                         else
                             ent._addLabel(Label.label(val.toString()));
                     }
-                    else {
+                    else if (m.getKey() == R_exactMatch
+                             || m.getKey() == R_equivalentClass
+                             || m.getKey() == R_subClassOf) {
+                        // don't normalize
                         ent._add(m.getKey(),
-                                 new StitchValue (me.getKey(),
-                                                  normalize (m.getKey(), val)));
+                                 new StitchValue (me.getKey(), val));
+                    }
+                    else {
+                        ent._add(m.getKey(), new StitchValue
+                                 (me.getKey(), normalize (m.getKey(), val)));
                     }
                     
                     Set<String> props = stitchMappers.get(m.getKey());
@@ -933,13 +932,12 @@ public class EntityRegistry extends EntityFactory {
         return source = getDataSourceFactory().register(file);
     }
 
-    public DataSource register (String key, String name, File file) throws IOException {
-        logger.warning("I'm EntityRegistry");
+    public DataSource register (String key, String name, File file)
+        throws IOException {
         return source = getDataSourceFactory().register(key, name, file);
     }
 
     public DataSource register (String name, File file) throws IOException {
-        logger.warning("I'm EntityRegistry");
         return source = getDataSourceFactory().register(name, file);
     }
 
