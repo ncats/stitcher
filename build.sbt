@@ -50,7 +50,10 @@ lazy val commonDependencies = Seq(
   "org.freehep" % "freehep-graphicsio" % "2.4",
   "org.freehep" % "freehep-graphicsio-svg" % "2.4",
   "org.freehep" % "freehep-graphics2d" % "2.4",
-  "com.github.fge" % "json-patch" % "1.9"
+  "com.github.fge" % "json-patch" % "1.9",
+  "org.apache.jena" % "apache-jena-libs" % "3.9.0",
+  "mysql" % "mysql-connector-java" % "5.1.31",
+  "com.microsoft.sqlserver" % "mssql-jdbc" % "7.2.0.jre8"
 )
 
 lazy val root = (project in file("."))
@@ -65,7 +68,7 @@ lazy val buildinfo = (project in file("modules/build"))
   .settings(commonSettings: _*)
   .settings(
   name := "stitcher-buildinfo",
-    sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
+    sourceGenerators in Compile += sourceManaged in Compile map { dir =>
       val file = dir / "BuildInfo.java"
       IO.write(file, """
 package ncats.stitcher;
@@ -84,10 +87,10 @@ public class BuildInfo {
 lazy val stitcher = (project in file("modules/stitcher"))
   .settings(commonSettings: _*)
   .settings(name := "stitcher-core",
-    unmanagedBase <<= baseDirectory { base => base / "../../lib" },
-    cleanFiles <<= baseDirectory {
+    unmanagedBase := baseDirectory { base => base / "../../lib" }.value,
+    cleanFiles := baseDirectory {
       base => ((base / "../../") ** "_ix*.db").get ++ (base / "target").get
-    },
+    }.value,
     libraryDependencies ++= commonDependencies,
     libraryDependencies += "com.typesafe" % "config" % "1.2.0",
     javacOptions ++= javaBuildOptions

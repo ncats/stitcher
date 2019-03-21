@@ -1,0 +1,473 @@
+164: Sclerocornea, Syndactyly, ambiguous genitalia
+202: Maxillary double lip
+228: Resistance to LH (luteinizing hormone)
+263: Narrow oral fissure short stature cone shaped epiphyses
+286: Imaizumi Kuroki syndrome
+297: Lockwood Feingold syndrome
+389: Wegmann Jones Smith syndrome
+397: Herrmann Opitz arthrogryposis syndrome
+428: Webster Deming syndrome
+483: Acro coxo mesomelic dysplasia
+679: Angiomatosis, leptomeningeal capillary venous
+728: Anterior pituitary insufficiency, familial
+801: Idiopathic double athetosis
+1125: Carpal deformity micrognathia microstomia
+1160: Cataract-glaucoma
+1302: Chondrodysplasia punctata, humero-metacarpal type
+1489: Congenital ichthyosis, microcephalus, quadriplegia
+1497: Congenital myxovirus
+1631: Cushing syndrome, familial
+1863: Gastric duplication cysts
+2101: Emery-Dreifuss muscular dystrophy, dominant type
+2218: Facial asymmetry temporal seizures
+2305: Fetal left ventricular aneurysm
+2455: Genetic reflex epilepsy
+2468: Giant ganglionic hyperplasia
+2487: Glaucoma, hereditary adult type 1A
+2488: Glaucoma, hereditary juvenile type 1B
+2489: Glaucoma, primary infantile type 3A
+2573: Growth retardation alopecia pseudoanodontia optic 
+2574: Growth retardation hydrocephaly lung hypoplasia
+2628: Hemeralopia, congenital essential
+2629: Hemeralopia, familial
+2631: Hemifacial atrophy agenesis of the caudate nucleus
+2648: Hennekam Van der Horst syndrome
+2660: Hereditary myopathy with intranuclear filamentous 
+2663: Hereditary resistance to anti-vitamin K
+2669: Herpes virus antenatal infection
+2670: Herpetic embryopathy
+2685: Hillig syndrome
+2686: Hing Torack Dowston syndrome
+2691: Hip luxation
+2702: Hirschsprung microcephaly cleft palate
+2703: Hirschsprung nail hypoplasia dysmorphism
+2710: Hm syndrome
+2717: Holmes Borden syndrome
+2722: Holoprosencephaly caudal dysgenesis
+2725: Holoprosencephaly ectrodactyly cleft lip palate
+2735: Hoon Hall syndrome
+2737: Horn Kolb syndrome
+2742: Houlston Ironton Temple syndrome
+2749: Humeroradioulnar synostosis
+2753: Hunter Macpherson syndrome
+2755: Hunter Mcdonald syndrome
+2759: Hurst Hallam Hockey syndrome
+2762: Hyalinosis systemic short stature
+2772: Hydrocephalus craniosynostosis bifid nose
+2774: Hydrocephalus growth retardation skeletal anomalies
+2776: Hydrocephalus skeletal anomalies
+2777: Hydrocephaly corpus callosum agenesis diaphragmatic hernia
+2782: Hydrops ectrodactyly syndactyly
+2784: Hydrops fetalis anemia immune disorder absent thumb
+2786: Hygroma cervical
+2800: Hypercalcinuria macular coloboma
+2811: Hypergonadotropic ovarian failure, familial or sporadic
+2821: Hyperinsulinism, diffuse
+2822: Hyperinsulinism, focal
+2854: Hypertensive hypokalemia familial
+2868: Hypertrophic hemangiectasia
+2883: Hypodermyasis
+2886: Hypodontia of incisors and premolars
+2890: Hypogonadism cardiomyopathy
+2895: Hypogonadism primary partial alopecia
+2899: Hypogonadotropic hypogonadism without anosmia, X-linked
+2921: Hypoplasia hepatic ductular
+2924: Hypoplastic thumbs hydranencephaly
+2927: Hyposmia nasal hypoplasia hypogonadism
+2940: Hypotonic sclerotic muscular dystrophy
+2961: Ichthyosis, erythrokeratolysis hemalis
+2986: Immunodeficiency, microcephaly with normal intelligence
+3000: Infantile recurrent chronic multifocal osteomyolitis
+3019: Intracranial aneurysms multiple congenital anomaly
+3021: Intrathoracic kidney vertebral fusion
+3022: Intrauterine growth retardation - mandibular malar hypoplasia
+3023: Intrauterine infections
+3029: Ischiadic hypoplasia renal dysfunction immunodeficiency
+3036: Isthmian coarctation
+3050: Johnson Hall Krous syndrome
+3082: Short stature, cranial hyperostosis, hepatomegaly and diabetes
+3101: Keratosis palmoplantaris adenocarcinoma of the colon
+3162: Lactate dehydrogenase deficiency type C
+3167: Lagophthalmia cleft lip palate
+3197: Lateral body wall defect
+3214: Leg absence deformity cataract
+3219: Leiomyomatosis of esophagus, cataract and hematuria
+3234: Leukomelanoderma mental redardation hypotrichosis
+3254: Limb reduction defect
+3299: Lower mesodermal defects sequence
+3308: Lumbar malsegmentation short stature
+3389: Marginal glioneuronal heterotopia
+3393: Markel Vikkula Mulliken syndrome
+3399: Maroteaux Stanescu Cousin syndrome
+3402: Marsden Nyhan Sakati syndrome
+3410: Mastroiacovo De Rosa Satta syndrome
+3411: Mastroiacovo Gambi Segni syndrome
+3417: Matsoukas Liarikos Giannika syndrome
+3419: Maumenee syndrome
+3423: McCallum Macadam Johnston syndrome
+3425: McDowall syndrome
+3426: McGillivray syndrome
+3456: Meinecke syndrome
+3497: Mental retardation macrocephaly coarse facies hypotonia
+3515: Mental retardation short stature microcephaly eye
+3556: Mesomelic dysplasia skin dimples
+3576: Methylcobalamin deficiency, cbl E complementation type
+3580: Methylmalonic aciduria microcephaly cataract
+3611: Microcephaly chorioretinopathy recessive form
+3617: Microcephaly hypergonadotropic hypogonadism short stature
+3660: Midline cleft of lower lip
+3676: Mirror polydactyly segmentation and limbs defects
+3689: Miura syndrome
+3792: Motor sensory neuropathy type 1 aplasia cutis congenita
+3833: Multiple joint dislocations metaphyseal dysplasia
+3878: Myoglobinuria dominant form
+3888: Myopathy mitochondrial cataract
+3939: Nephronophthisis familial adult spastic quadriparesis
+3942: Nephropathy familial with hyperuricemia
+3978: Neuropathy sensory spastic paraplegia
+3982: Neutropenia monocytopenia deafness
+4014: Nova syndrome
+4043: Oculodentodigital dysplasia dominant
+4087: Opthalmic icthyosis
+4089: Opthalmomandibulomelic dysplasia
+4090: Opthalmoplegia myalgia tubular aggregates
+4093: Opthalmoplegia progressive external scoliosis
+4101: Optic atrophy opthalmoplegia ptosis deafness myopia
+4114: Organic mood syndrome
+4163: Osteosclerosis abnormalities of nervous system and meninges
+4174: Otosclerosis, familial
+4179: Ovarian insufficiency due to FSH resistance
+4181: Overgrowth radial ray defect arthrogryposis
+4336: Phosphomannoisomerase deficiency
+4366: Pilo dento ungular dysplasia microcephaly
+4379: Plasmalogens synthesis deficiency isolated
+4415: Polydactyly postaxial dental and vertebral
+4418: Polydactyly syndrome middle ray duplication
+4420: Polymicrogyria turricephaly hypogenitalism
+4432: Polysyndactyly trigonocephaly agenesis of corpus callosum
+4449: Portal hypertension due to infrahepatic block
+4453: Positive rheumatoid factor polyarthritis
+4458: Posterior valve urethra
+4472: Precocious epileptic encephalopathy
+4473: Precocious myoclonic encephalopathy
+4474: Precocious puberty, gonadotropin-dependent
+4487: Primary tubular proximal acidosis
+4495: Progeria variant syndrome Ruvalcaba type
+4501: Progressive black carbon hyperpigmentation of infancy
+4505: Progressive kinking of the hair, acquired
+4518: Prosencephaly cerebellar dysgenesis
+4522: Protein R deficiency
+4547: Pseudohermaphrodism anorectal anomalies
+4555: Pseudomarfanism
+4556: Pseudomongolism
+4559: Pseudopapilledema blepharophimosis hand anomalies
+4566: Pterigium Colli
+4576: Ptosis strabismus diastasis
+4587: Pulmonary artery familial dilatation
+4589: Pulmonary branches stenosis
+4592: Pulmonary hypoplasia familial primary
+4603: Punctate acrokeratoderma freckle like pigmentation
+4622: Pyruvate kinase deficiency, muscle type
+4629: Radio-digito-facial dysplasia
+4646: Reductional transverse limb defects
+4649: Reginato Shiapachasse syndrome
+4651: Renal adysplasia dominant type
+4654: Renal agenesis meningomyelocele mullerian defect
+4655: Renal caliceal diverticuli deafness
+4657: Renal dysplasia diffuse autosomal recessive
+4671: Renal tubular acidosis, distal, type 4
+4673: Renoanogenital syndrome
+4676: Multiple respiratory chain enzyme deficiencies
+4681: Retinal telangiectasia hypogammaglobulinemia
+4682: Retinis pigmentosa deafness hypogenitalism
+4686: Retinopathy anemia CNS anomalies
+4687: Retinopathy aplastic anemia neurological abnormalities
+4696: Reynolds Neri Hermann syndrome
+4708: Richieri-Costa Colletto Otto syndrome
+4717: Richieri Costa Orquizas syndrome
+4720: Right atrium familial dilatation
+4735: Rodini Richieri Costa syndrome
+4773: Scoliosis with unilateral unsegmented bar
+4789: Seizures benign familial neonatal recessive form
+4790: Seizures mental retardation hair dysplasia
+4793: Semmekrot Haraldsson Weemaes syndrome
+4798: Sensory neuropathy type 1
+4804: Sequeiros Sack syndrome
+4819: Shith Filkins syndrome
+4821: Short broad great toe macrocranium
+4826: Short limb dwarf edema iris coloboma
+4828: Short limbs abnormal face congenital heart disease
+4829: Short limbs subluxed knees cleft palate
+4836: Short ribs craniosynostosis polysyndactyly
+4839: Short stature contractures hypotonia
+4840: Short stature cranial hyperostosis hepatomegaly
+4842: Short stature dysmorphic face pelvic scapula dysplasia
+4849: Short stature microcephaly seizures deafness
+4850: Short stature monodactylous ectrodactyly cleft palate
+4851: Short stature prognathism short femoral necks
+4852: Short stature Robin sequence cleft mandible hand anomalies clubfoot
+4853: Short stature talipes natal teeth
+4854: Short stature valvular heart disease
+4859: Shoulder and thorax deformity congenital heart disease
+4871: Silvery hair syndrome
+4888: Skeletal dysplasia orofacial anomalies
+4890: Skeleto cardiac syndrome with thrombocytopenia
+4906: Sosby syndrome
+4909: Spastic angina with healthy coronary artery
+4943: Spinal dysostosis type Anhalt
+4948: Spine rigid cardiomyopathy
+4961: Spinocerebellar degenerescence book type
+4965: Split hand split foot malformation autosomal recessive
+5001: Stampe sorensen syndrome
+5010: Sterility due to immotile flagella
+5013: Sternal cyst vascular anomalies
+5014: Sternal malformation vascular dysplasia associatio
+5033: Familial stomach cancer
+5055: Succinic acidemia lactic acidosis congenital
+5069: Palmoplantar keratoderma of Sybert
+5072: Symphalangism brachydactyly craniosynostosis
+5074: Symphalangism distal
+5076: Symphalangism short stature accessory testis
+5078: Syncamptodactyly scoliosis
+5101: Syringomas natal teeth oligodontia
+5102: Syringomelia hyperkeratosis
+5161: Central pain syndrome
+5179: Thoracic celosomia
+5190: Thrombocytopenia cerebellar hypoplasia short stature
+5198: Thumb absent short stature immune deficiency
+5211: Tibiae bowed radial anomalies osteopenia fracture
+5213: Tibial aplasia ectrodactyly hydrocephalus
+5214: Tibial hemimelia cleft lip palate
+5236: Tracheoesophageal fistula symphalangism
+5237: Tracheophageal fistula hypospadias
+5242: Transverse limb deficiency hemangioma
+5253: Tricho odonto onycho dermal syndrome
+5254: Tricho odonto onychodysplasia syndactyly dominant type
+5255: Tricho onychic dysplasia
+5256: Tricho onycho hypohidrotic dysplasia
+5257: Tricho retino dento digital syndrome
+5264: Trichomalacia
+5282: Trigonomacrocephaly tibial defect polydactyly
+5283: Trihydroxycholestanoylcoa oxidase isolated deficiency
+5286: Triopia
+5371: Trochlear dysplasia
+5378: Tsukahara Azuno Kajii syndrome
+5416: Uniparental disomy of  6
+5448: Van Allen Myhre syndrome
+5457: Van Regemorter Pierquin Vamos syndrome
+5476: Ventriculo-arterial discordance, isolated
+5477: Ventruto Digirolamo Festa syndrome
+5492: Viljoen Winship syndrome
+5498: Vitamin A embryopathy
+5543: Weaver Johnson syndrome
+5553: Weleber Hecht Bigley syndrome
+5567: Wiedemann Opitz syndrome
+5570: Wilkes Stevenson syndrome
+5574: Willems De vries syndrome
+5585: Wisconsin syndrome
+5631: Xeroderma talipes enamel defects
+6392: Exercise-induced anaphylaxis
+6590: Hemophagocytic reticulosis
+6597: Hepadnavirus infection
+6634: Hereditary peripheral nervous disorder
+6640: Hereditary type 1 neuropathy
+6641: Hereditary type 2 neuropathy
+6654: Herpesvirus simiae B virus
+6684: Hyper-reninism
+6717: Hypertrophic branchial myopathy
+6730: Hypoketonemic hypoglycemia
+6782: Infectious myocarditis
+6786: Intercellular cholesterol esterification disease
+6896: Leukomalacia
+6920: Loin pain hematuria syndrome
+6938: Lymphocytes absent
+7030: Metastatic insulinoma
+7036: Microcephaly with chorioretinopathy, autosomal dominant form
+7054: Mondor disease
+7143: Myoclonus epilepsy partial seizure
+7145: Myofibrillar lysis
+7189: Neuroendocrine carcinoma of the cervix
+7194: Neurogenic hypertension
+7196: Neuroma biliary tract
+7198: Neuronal interstitial dysplasia
+7222: Nonsyndromic hereditary sensorineural hearing loss
+7266: Oral pharyngeal disorders
+7297: Ovarian remnant syndrome
+7346: Pediatric T-cell leukemia
+7361: Perilymphatic fistula
+7362: Perimyositis
+7386: Philadelphia-negative chronic myeloid leukemia
+7409: Pneumocystic carinii pneumonia
+7434: Post-infectious myocarditis
+7480: Prurigo nodularis
+7487: Pseudomonas stutzeri infections
+7507: Hereditary orotic aciduria without megaloblastic anaemia
+7624: Selenium poisoning
+7644: Sideroblastic anemia acquired
+7648: Simian B virus infection
+7675: Spinal bulbar motor neuropathy
+7680: Spinal shock
+7719: Synovial cancer
+7724: Syringobulbia
+7767: Thymoma, childhood
+7829: Tuberculous uveitis
+7857: Virus associated hemophagocytic syndrome
+8168: Pontoneocerebellar Hypoplasia
+8220: Lymphoma, large-cell
+8267: Morel's ear
+8325: Trisomy 11 mosaicism
+8358: Shaver's disease
+8374: Labrador lung
+8379: Arachindonic acid, absence of
+8388: Hydroxycarboxylic aciduria
+8395: Leukodystrophy, pseudometachromatic
+8655: Familial interstitial fibrosis
+8677: Y chromosome pericentric inversion
+8685: Stachybotrys chartarum
+8687: Non-A-E hepatitis
+8712: Hemoglobinemia
+8741: Unilateral absence of a pulmonary artery
+8746: Sjogren's syndrome, juvenile, secondary to autoimmune disease
+9137: Ophthalmoplegic Muscular dystrophy
+9222: Asternia with Cardiac, Diaphragmatic, and Abdominal defects
+9311: Breast cancer, childhood
+9320: Colorectal cancer, childhood
+9321: Esophageal cancer, childhood
+9329: Stomach cancer, childhood
+9332: Hodgkin lymphoma, childhood
+9333: Hodgkin lymphoma, during pregnancy
+9340: Kidney cancer, childhood
+9341: Laryngeal cancer, childhood
+9343: Non-small cell lung cancer, childhood
+9344: Small cell lung cancer, adult
+9345: Small cell lung cancer,  childhood
+9346: Non-Hodgkin lymphoma, childhood
+9347: Non-Hodgkin lymphoma, during pregnancy
+9353: Nasal cavity cancer, childhood
+9354: Paranasal sinus cancer, adult
+9355: Paranasal sinus cancer, childhood
+9357: Nasopharyngeal cancer, childhood
+9359: Oropharyngeal cancer, childhood
+9361: Childhood ovarian cancer
+9365: Parathyroid cancer, childhood
+9367: Penile cancer, childhood
+9375: Rectal cancer, childhood
+9377: Salivary gland cancer, adult
+9378: Salivary gland cancer, childhood
+9380: Soft tissue sarcoma childhood
+9382: Skin cancer, non melanoma, childhood
+9386: Small intestine cancer, childhood
+9387: Testicular cancer, childhood
+9388: Thyroid cancer, childhood
+9392: Carcinoma of unknown primary site, childhood
+9416: Post-Streptococcal Neurologic Disorders
+9422: Melanocytic lesions of CNS
+9432: Hemolytic uremic syndrome, atypical, childhood
+9460: Ovarian insufficiency, familial
+9478: Supraglottic laryngeal cancer
+9542: Herpes simiae (B virus)
+9544: Leucocyte adhesion defect
+9549: Nasal polyposis, familial
+9552: Polyomavirus allograft nephropathy
+9720: Orbital lymphangioma
+9785: Streptococcal Group B invasive disease
+9786: Group B strep disease in newborns
+9801: Non-dystrophic myotonic disorders
+10269: Pancreatitis, pediatric
+10276: Windblown hand
+10292: Ocular colobomas, ichthyosis, brain malformations and endocrine abnormalities
+10293: Spastic paraplegia and distal muscle wasting caused by neuropathy target esterase gene mutation
+10305: Mitochondrial disease with severe hypotonia, lactic acidaemia and hyperammonemia
+10347: Bizzare parosteal osteochondromatous proliferation
+10370: Rhabdomyomatous mesenchymal hamartoma
+10410: Primary malignant melanoma of the conjunctiva
+10440: Neonatal meningitis
+10495: Wilson-Mikity syndrome
+10527: Levy-Yeboa syndrome
+10549: Mycobacterium Malmoense
+10555: Trabecular myopathy
+10575: PROSTAGLANDIN-ENDOPEROXIDE SYNTHASE DEFICIENCY
+10596: Androgen insensitivity syndrome, mild
+10721: Kingella infections
+10725: Odontogenic myxoma
+10745: Orbital melanoma
+10807: Infantile scoliosis
+10822: Spontaneous coronary artery dissection
+10825: Tufted hair folliculitis
+10832: Chromosome 1p duplication
+10833: Chromosome 19q deletion
+10834: Chromosome 19p duplication
+10835: Chromosome 19p deletion
+10836: Chromosome 2p deletion
+10843: Chromosome 6p deletion
+10844: Chromosome 9q deletion
+10845: Chromosome 11p duplication
+10847: Chromosome 12q deletion
+10853: Chromosome 16p deletion
+10854: Chromosome 16q deletion
+10856: Chromosome 20q duplication
+10857: Chromosome 20q deletion
+10858: Chromosome 21q duplication
+10862: Chromosome 22q duplication
+10869: Mosaic trisomy 13
+10888: Diffuse dermal angiomatosis
+10904: Pityriasis rotunda
+10908: Congenital extrahepatic portosystemic shunt
+10918: Idiopathic spinal cord herniation
+10920: Localized hypertrophic neuropathy
+10926: Pulmonary hyalinizing granuloma
+10931: Orbital varix
+10932: Ocular neuromyotonia
+10952: Bow hunter's stroke
+10967: Polyarticular onset juvenile idiopathic arthritis
+10971: Autosomal recessive optic atrophy, hearing loss, and peripheral neuropathy
+10978: Chromosome Xp deletion
+10979: Lymphangiomatosis
+10982: Isochromosome Yp
+10990: Chromosome 15q25.2 microdeletion
+11002: Chromosome Xq deletion
+11012: Refractory cytopenia with unilineage dysplasia
+11891: Propriospinal myoclonus
+11912: Gliomatosis peritonei
+11917: Autoimmune autonomic ganglionopathy
+11921: Pediatric hypertension
+11924: Carcinoma showing thymus-like differentiation
+11928: Juvenile-onset small-fiber polyneuropathy
+11968: Lactobezoar
+11969: Clostridium septicum infection
+11976: Cystic adventitial disease
+11978: Sclerosing mucoepidermoid carcinoma with eosinophilia
+12035: Airway-centered interstitial fibrosis
+12047: Extracranial arteriovenous malformation
+12063: Autoimmune gastrointestinal dysmotility
+12075: Nevus mucinosis
+12113: Trochleitis
+12130: Eosinophilic mastitis
+12263: Proliferative verrucous leukoplakia
+12321: Double outlet right atrium
+12392: Cutaneous-skeletal hypophosphatemia syndrome 
+12407: Adverse events of 5-alpha-reductase inhibitors
+12654: Baylisascaris infection 
+12706: Painful legs and moving toes syndrome
+12856: Trigeminal trophic syndrome
+12908: Duarte Galactosemia
+12974: Lipedematous Scalp
+12980: Monoclonal mast cell activation syndrome
+12996: SCN1A-related seizure disorders
+13013: Elizabethkingia anophelis infection
+13023: Alezzandrini syndrome
+13027: Bier spots
+13028: Dissociative seizures
+13104: Fibro-adipose vascular anomaly
+13142: Acute flaccid myelitis
+13238: Extracardiac Rhabdomyoma
+13254: Skeletal-extraskeletal angiomatosis
+13277: HaNDL syndrome
+13322: Condrodisplasia punctata rizomélica
+13355: SCN2A related disorders
+13402: Papillary glioneuronal tumors
+13455: Jackhammer esophagus
+13487: Corneal neuropathic disease
+13497: Short-lasting unilateral neuralgiform headache attacks with cranial autonomic symptoms
+13514: PHIP-Related disorder
+13541: Gait ataxia with late onset polyneuropathy syndrome

@@ -30,8 +30,8 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             return u != null && Util.delta(u, v) == null;
         }
 
-        Entity[] out = e.outNeighbors(T_ActiveMoiety);
-        Entity[] in = e.inNeighbors(T_ActiveMoiety);
+        Entity[] out = e.outNeighbors(R_activeMoiety);
+        Entity[] in = e.inNeighbors(R_activeMoiety);
         
         boolean root = false;
         if (in.length > 0 && out.length == 0) {
@@ -133,8 +133,8 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             
             int moieties = 0;
             for (Entity e : entities) {
-                Entity[] in = e.inNeighbors(T_ActiveMoiety);
-                Entity[] out = e.outNeighbors(T_ActiveMoiety);
+                Entity[] in = e.inNeighbors(R_activeMoiety);
+                Entity[] out = e.outNeighbors(R_activeMoiety);
                 
                 if (in.length > 0 && out.length == 0) {
                     root = e;

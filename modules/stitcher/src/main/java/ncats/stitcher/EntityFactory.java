@@ -41,7 +41,7 @@ import ncats.stitcher.graph.UnionFind;
 
 // NOTE: methods and variables that begin with underscore "_" generally assume that a graph database transaction is already open!
 
-public class EntityFactory implements Props {
+public class EntityFactory implements Props, AutoCloseable {
     static final Logger logger = Logger.getLogger
         (EntityFactory.class.getName());
 
@@ -114,29 +114,54 @@ public class EntityFactory implements Props {
         }
     }
 
-    static class ConnectedComponents implements Iterator<Entity[]> {
+    static class StronglyConnectedComponents implements Iterator<Component> {
         int current;
         long[][] components;
         long[] singletons;
         final GraphDatabaseService gdb;
-        
-        ConnectedComponents (GraphDatabaseService gdb) {
+
+        StronglyConnectedComponents (GraphDatabaseService gdb,
+                                     final Predication predication) {
             try (Transaction tx = gdb.beginTx()) {
                 UnionFind eqv = new UnionFind ();
                 List<Long> singletons = new ArrayList<Long>();
-
+                
                 gdb.findNodes(AuxNodeType.ENTITY).stream().forEach(node -> {
-                        int edges = 0;
-                        for (Relationship rel
-                                 : node.getRelationships(Direction.BOTH,
-                                                         Entity.KEYS)) {
-                            eqv.union(rel.getStartNode().getId(),
-                                      rel.getEndNode().getId());
-                            ++edges;
-                        }
-                        
-                        if (edges == 0) {
+                        Map<Node, Map<StitchKey, Object>> sv =
+                            stitchValues (node);
+                        if (sv.isEmpty()) {
                             singletons.add(node.getId());
+                        }
+                        else {
+                            Entity n = Entity._getEntity(node);
+                            List<Node> bestNodes = new ArrayList<>();
+                            int bestScore = 0;
+                            for (Map.Entry<Node, Map<StitchKey, Object>>
+                                     me : sv.entrySet()) {
+                                Entity m = Entity._getEntity(me.getKey());
+                                // we should properly make sure directionality
+                                // is correct here
+                                int score = predication.score
+                                    (n, me.getValue(), m);
+                                if (score == 0) {
+                                }
+                                else if (score > bestScore) {
+                                    bestScore = score;
+                                    bestNodes.clear();
+                                    bestNodes.add(me.getKey());
+                                }
+                                else if (score == bestScore) {
+                                    bestNodes.add(me.getKey());
+                                }
+                            }
+                            
+                            if (!bestNodes.isEmpty()) {
+                                for (Node bn : bestNodes)
+                                    eqv.union(node.getId(), bn.getId());
+                            }
+                            else {
+                                singletons.add(node.getId());
+                            }
                         }
                     });
                 
@@ -147,6 +172,47 @@ public class EntityFactory implements Props {
                 tx.success();
             }
             this.gdb = gdb;
+        }
+
+        Map<Node, Map<StitchKey, Object>> stitchValues (Node node) {
+            Map<Node, Map<StitchKey, List>> edges = new HashMap<>();
+            for (Relationship rel : node.getRelationships(Entity.KEYS)) {
+                StitchKey type =  StitchKey.valueOf(rel.getType().name());
+                Node start = rel.getStartNode();
+                Node end = rel.getEndNode();
+                
+                Node n = start.equals(node) ? end : start;
+                Map<StitchKey, List> values = edges.get(n);
+                if (values == null) {
+                    values = new EnumMap (StitchKey.class);
+                    edges.put(n, values);
+                }
+                
+                List lv = values.get(type);
+                if (lv == null) {
+                    values.put(type, lv = new ArrayList ());
+                }
+                Object v = rel.getProperty(VALUE);
+                if (v != null) lv.add(v);
+            }
+
+            Map<Node, Map<StitchKey, Object>> sv = new HashMap<>();
+            for (Map.Entry<Node, Map<StitchKey, List>> me : edges.entrySet()) {
+                Map<StitchKey, Object> values = new TreeMap<>();
+                for (Map.Entry<StitchKey, List> le: me.getValue().entrySet()) {
+                    List lv = le.getValue();
+                    if (!lv.isEmpty()) {
+                        if (lv.size() == 1)
+                            values.put(le.getKey(), lv.get(0));
+                        else
+                            values.put(le.getKey(), lv.toArray(new Object[0]));
+                    }
+                }
+                
+                if (!values.isEmpty())
+                    sv.put(me.getKey(), values);
+            }
+            return sv;
         }
 
         public long[][] components () {
@@ -164,32 +230,18 @@ public class EntityFactory implements Props {
             }
             return next;
         }
-        
-        public Entity[] next () {
-            Entity[] comp;
+
+        public Component next () {
+            long[] comp;
             if (current < components.length) {
-                long[] cc = components[current];
-                
-                comp = new Entity[cc.length];
-                try (Transaction tx = gdb.beginTx()) {
-                    for (int i = 0; i < cc.length; ++i) {
-                        comp[i] = new Entity (gdb.getNodeById(cc[i]));
-                    }
-                    tx.success();
-                }
+                comp = components[current];
             }
             else {
-                comp = new Entity[1];
-                try (Transaction tx = gdb.beginTx()) {
-                    comp[0] = new Entity
-                        (gdb.getNodeById
-                         (singletons[current-components.length]));
-                    tx.success();
-                }
+                comp = new long[1];
+                comp[0] = singletons[current-components.length];
             }
             ++current;
-            
-            return comp;
+            return new ComponentImpl (gdb, comp);
         }
         
         public void remove () {
@@ -464,8 +516,13 @@ public class EntityFactory implements Props {
         }
 
         public Component _filter (StitchKey key, Object value) {
-            return new ComponentImpl
-                (gdb, EntityFactory.nodes(gdb, key.name(), value));
+            long[] nodes = EntityFactory.nodes(gdb, key.name(), value);
+            Set<Long> subset = new TreeSet<>();
+            // restrict to be subset of this component
+            for (int i = 0; i < nodes.length; ++i)
+                if (this.nodes.contains(nodes[i]))
+                    subset.add(nodes[i]);
+            return new ComponentImpl (gdb, Util.toArray(subset));
         }
         
         public Iterator<Entity> iterator () {
@@ -509,13 +566,15 @@ public class EntityFactory implements Props {
                     for (Relationship rel :
                              n.getRelationships(Direction.BOTH, key)) {
                         if (!seen.contains(rel.getId())) {
-                            //Node xn = rel.getOtherNode(n);
-                            Object val = rel.getProperty(VALUE, null);
-                            if (val != null) {
-                                Integer c = stats.get(val);
-                                stats.put(val, c == null ? 1 : (c+1));
+                            Node xn = rel.getOtherNode(n);
+                            if (nodes.contains(xn.getId())) {
+                                Object val = rel.getProperty(VALUE, null);
+                                if (val != null) {
+                                    Integer c = stats.get(val);
+                                    stats.put(val, c == null ? 1 : (c+1));
+                                }
+                                seen.add(rel.getId());
                             }
-                            seen.add(rel.getId());
                         }
                     }
                 }
@@ -849,6 +908,7 @@ public class EntityFactory implements Props {
                 tx.success();
             }
             id = Util.sha1(nodes).substring(0, 9);
+            this.gdb = gdb;
         }
 
         void update (Node[] nodes, StitchKey key) {
@@ -1204,6 +1264,14 @@ public class EntityFactory implements Props {
                 return true;
         return false;
     }
+
+    public Component getComponent (long[] nodes) {
+        return new ComponentImpl (gdb, nodes);
+    }
+
+    public Component getComponent (Long... nodes) {
+        return new ComponentImpl (gdb, nodes);
+    }
     
     /*
      * return the top k stitched values for a given stitch key
@@ -1327,8 +1395,8 @@ public class EntityFactory implements Props {
         return count;
     }
 
-    public Iterator<Entity[]> connectedComponents () {
-        return new ConnectedComponents (gdb);
+    public Iterator<Component> connectedComponents (Predication predication) {
+        return new StronglyConnectedComponents (gdb, predication);
     }
 
     public Collection<Component> components () {
@@ -1604,6 +1672,54 @@ public class EntityFactory implements Props {
             });
     }
 
+    public int stitchCount (StitchKey key, Object value) {
+        return stitchCount (key.name(), value);
+    }
+    
+    public int stitchCount (StitchKey key, Object value, Label... labels) {
+        return stitchCount (key.name(), value, labels);
+    }
+    
+    public int stitchCount (String key, Object value) {
+        return stitchCount (gdb, key, value, AuxNodeType.ENTITY);
+    }
+
+    public int stitchCount (String key, Object value, Label... labels) {
+        return stitchCount (gdb, key, value, labels);
+    }
+
+    public static int stitchCount (GraphDatabaseService gdb,
+                                   String key, Object value,
+                                   Label... labels) {
+        try (Transaction tx = gdb.beginTx();
+             IndexHits<Relationship> hits = gdb.index()
+             .forRelationships(Entity.relationshipIndexName())
+             .get(key, value)) {
+            int size = 0;
+            if (labels == null || labels.length == 0) {
+                size = hits.size();
+            }
+            else {
+                for (Relationship rel : hits) {
+                    Node n = rel.getStartNode();
+                    Node m = rel.getEndNode();
+                    int nl = 0, ml = 0;
+                    for (Label l : labels) {
+                        if (n.hasLabel(l)) ++nl;
+                        if (m.hasLabel(l)) ++ml;
+                        if (nl > 0 && ml > 0)
+                            break;
+                    }
+                    
+                    if (nl > 0 && ml > 0)
+                        ++size;
+                }
+            }
+            tx.success();
+            return size;
+        }
+    }
+    
     public static Iterator<Entity> find (GraphDatabaseService gdb,
                                          String key, Object value) {
         return find (gdb, key, value, Stitchable.ANY);
@@ -1790,19 +1906,19 @@ public class EntityFactory implements Props {
             return iter;
         }
     }
+    
     public void entities (DataSource source, Consumer<Entity> consumer) {
         entities(source.getName(), consumer);
     }
+    
     public void entities (String label, Consumer<Entity> consumer) {
         Objects.requireNonNull(consumer);
         try (Transaction tx = gdb.beginTx();
              ResourceIterator<Node> iter = gdb.findNodes(Label.label(label))) {
-
-                  while(iter.hasNext()) {
-                      consumer.accept(Entity.getEntity(iter.next()));
-                  }
+            while(iter.hasNext()) {
+                consumer.accept(Entity.getEntity(iter.next()));
+            }
             tx.success();
-
         }
     }
 
@@ -1831,26 +1947,32 @@ public class EntityFactory implements Props {
         for (String l : labels) {
             query.append(":`"+l+"`");
         }
-        query.append(") return n");
+        query.append(") return n skip {skip} limit {top}");
 
-        // Chunk call to func by batches of 1000 nodes to avoid out of memory issues
-        int count = 0;
-        List<Long> nodes = new ArrayList();
-        try (Transaction tx = gdb.beginTx();
-             Result result = gdb.execute(query.toString())) {
-            while (result.hasNext()) {
-                Map<String, Object> row = result.next();
-                nodes.add(((Node) row.get("n")).getId());
+        // Chunk call to func by batches of 1000 nodes to avoid out of
+        // memory issues
+        int count = 0, top = 100, skip = 0;
+        Map<String, Object> params = new HashMap<>();
+        params.put("top", top);
+        do {
+            params.put("skip", skip);
+            try (Transaction tx = gdb.beginTx();
+                 Result result = gdb.execute(query.toString(), params)) {
+                count = 0;
+                while (result.hasNext()) {
+                    Map<String, Object> row = result.next();
+                    Entity e = Entity._getEntity((Node)row.get("n"));
+                    func.accept(e);
+                    ++count;
+                }
+                result.close();
+                tx.success();
             }
-            result.close();
-            tx.success();
+            skip += count;
         }
-        for (int i=0; i<nodes.size(); i=i+1000) {
-            long[] list = Arrays.stream(nodes.subList(i, Math.min(nodes.size(),i+1000)).toArray(new Long[0])).mapToLong(Long::longValue).toArray();
-            count = count + maps(func, list);
-        }
+        while (count == top);
         
-        return count;
+        return skip+count;
     }
 
     public int maps (Consumer<Entity> func, long[] ids) {
@@ -2007,6 +2129,10 @@ public class EntityFactory implements Props {
     
     public void shutdown () {
         graphDb.shutdown();
+    }
+
+    public void close () throws Exception {
+        shutdown ();
     }
 
     public void execute (Runnable r) {
