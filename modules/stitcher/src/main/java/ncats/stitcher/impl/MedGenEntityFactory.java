@@ -31,7 +31,7 @@ public class MedGenEntityFactory extends EntityRegistry {
         implements Iterator<Map<String, Object>> {
         final String[] header;
         final LineTokenizer tokenizer;
-        Map<String, String> row = new TreeMap<>();
+        Map<String, String> row = new LinkedHashMap<>();
         Map<String, Object> current;
         
         MedGenReader (File file) throws IOException {
@@ -84,7 +84,7 @@ public class MedGenEntityFactory extends EntityRegistry {
                     if (suppress ()) {
                     }
                     else if (rec.isEmpty()
-                        || row.get("CUI").equals(rec.get("CUI"))) {
+                             || row.get("CUI").equals(rec.get("CUI"))) {
                         updateRecord (rec);
                     }
                     else {
@@ -96,6 +96,21 @@ public class MedGenEntityFactory extends EntityRegistry {
             return rec.isEmpty() ? null : rec;
         }
 
+        public Map<String, Object> nextIfMatched (Map<String, Object> t,
+                                                  Map<String, Object> r) {
+            while (hasNext()
+                   && (t == null || (((String)t.get("CUI"))
+                                     .compareTo((String)r.get("CUI")) < 0))) {
+                t = next ();
+            }
+            
+            if (r.get("CUI").equals(t.get("CUI"))) {
+                r.putAll(t);
+            }
+
+            return t;
+        }
+        
         protected abstract boolean suppress ();
         protected abstract Map<String, Object>
             updateRecord (Map<String, Object> rec);
@@ -120,6 +135,27 @@ public class MedGenEntityFactory extends EntityRegistry {
             }
             return rec;
         }        
+    }
+
+    static class DefReader extends MedGenReader {
+        DefReader (File file) throws IOException {
+            super (file);
+        }
+        
+        protected boolean suppress () {
+            return "Y".equals(row.get("SUPPRESS"));
+        }
+        
+        protected Map<String, Object> updateRecord (Map<String, Object> rec) {
+            for (Map.Entry<String, String> me : row.entrySet()) {
+                String key = me.getKey();
+                if ("source".equals(key)) {
+                    key = "SOURCE_DEF";
+                }
+                rec.put(key, me.getValue());
+            }
+            return rec;
+        }
     }
     
     static class ConsoReader extends MedGenReader {
@@ -146,6 +182,11 @@ public class MedGenEntityFactory extends EntityRegistry {
             String code = row.get("SDUI");
             if ("MSH".equals(sab)) code = "MESH:"+code;
             else if ("NCI".equals(sab)) code = "NCI:"+row.get("CODE");
+            else if ("OMIM".equals(sab)) {
+                code = row.get("CODE");
+                if (!code.startsWith("MTH"))
+                    code = sab+":"+code;
+            }
             else if ("SNOMEDCT_US".equals(sab))
                 code = sab+":"+row.get("CODE");
             else if ("ORDO".equals(sab)) {
@@ -185,7 +226,44 @@ public class MedGenEntityFactory extends EntityRegistry {
             return rec;
         }
     }
-    
+
+    static class RelReader extends MedGenReader {
+        RelReader (File file) throws IOException {
+            super (file);
+        }
+
+        @Override
+        protected Map<String, Object> getNext () {
+            Map<String, Object> r = null;
+            if (tokenizer.hasNext()) {
+                String[] toks = tokenizer.next();
+                
+                row.clear();
+                for (int i = 0; i < toks.length; ++i) {
+                    if (header[i] != null) {
+                        String val = toks[i];
+                        if (val != null && val.length() > 32766)
+                            val = val.substring(0, 32766);
+                        row.put(header[i], val);
+                    }
+                }
+                
+                r = new LinkedHashMap<>();
+                for (Map.Entry<String, String> me : row.entrySet())
+                    if (me.getValue() != null)
+                        r.put(me.getKey(), me.getValue());
+            }
+            return r;
+        }
+
+        protected boolean suppress () {
+            return "Y".equals(row.get("SUPPRESS"));
+        }
+
+        protected Map<String, Object> updateRecord (Map<String, Object> rec) {
+            return rec;
+        }
+    }
 
     public MedGenEntityFactory (GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -211,22 +289,7 @@ public class MedGenEntityFactory extends EntityRegistry {
             ;
     }
 
-    public DataSource register (File dir, int version) throws IOException {
-        if (!dir.isDirectory()) {
-            throw new IllegalArgumentException
-                ("Not a directory; please download the content of MedGen "
-                 +"here ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/!");
-        }
-        
-        DataSource ds = getDataSourceFactory().register("MEDGEN_v"+version);
-        Integer size = (Integer)ds.get(INSTANCES);
-        if (size != null && size > 0) {
-            logger.info(ds.getName()+" ("+size
-                        +") has already been registered!");
-            return ds;
-        }
-        setDataSource (ds);
-        
+    protected int registerEntities (File dir) throws IOException {
         File file = new File (dir, "MGCONSO.RRF.gz");
         if (!file.exists())
             throw new IllegalArgumentException
@@ -238,22 +301,22 @@ public class MedGenEntityFactory extends EntityRegistry {
             throw new IllegalArgumentException
                 ("Folder "+dir+" doesn't have file MGSTY.RRF.gz!");
         StyReader sty = new StyReader (file);
+
+        file = new File (dir, "MGDEF.RRF.gz");
+        if (!file.exists())
+            throw new IllegalArgumentException
+                ("Folder "+dir+" doesn't have file MGDEF.RRF.gz!");
+        DefReader def = new DefReader (file);
         
         ObjectMapper mapper = new ObjectMapper ();
-        Map<String, Object> t = null;
+        Map<String, Object> t = null, d = null;
         int count = 0;
         while (conso.hasNext()) {
             Map<String, Object> r = conso.next();
-            while (sty.hasNext()
-                   && (t == null || (((String)t.get("CUI"))
-                                     .compareTo((String)r.get("CUI")) < 0))) {
-                t = sty.next();
-            }
             
-            if (r.get("CUI").equals(t.get("CUI"))) {
-                r.putAll(t);
-            }
-
+            t = sty.nextIfMatched(t, r);
+            d = def.nextIfMatched(d, r);
+            
             if (!r.containsKey("NAME")) {
                 Object syn = r.get("SYNONYMS");
                 if (syn.getClass().isArray())
@@ -273,6 +336,106 @@ public class MedGenEntityFactory extends EntityRegistry {
                 logger.log(Level.SEVERE, ">>> "+mapper.valueToTree(r), ex);
                 break;
             }
+            //if (count > 1000) break;
+        }
+        return count;
+    }
+
+    protected int registerRelationships (File dir) throws IOException {
+        File file = new File (dir, "MGREL.RRF.gz");
+        if (!file.exists())
+            throw new IllegalArgumentException
+                ("Folder "+dir+" doesn't have file MGREL.RRF.gz!");
+        RelReader reader = new RelReader (file);
+        int count = 0;
+        ObjectMapper mapper = new ObjectMapper ();
+        while (reader.hasNext()) {
+            Map<String, Object> r = reader.next();
+            String cui1 = (String)r.get("CUI1");
+            String cui2 = (String)r.get("CUI2");
+            if (!cui1.equals(cui2)) {
+                String rel = (String) r.get("REL");
+                String rela = (String) r.get("RELA");
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui1);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui2);
+                for (Entity s : sources) {
+                    for (Entity t : targets) {
+                        try {
+                            s.stitch(t, R_rel, rela != null ? rela : rel, r);
+                        }
+                        catch (Exception ex) {
+                            logger.log(Level.SEVERE,
+                                       "Can't create relationship between "
+                                       +cui1+" and "+cui2+"\n>>> "
+                                       +mapper.valueToTree(r), ex);
+                            return count;
+                        }
+                    }
+                }
+                
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    protected int registerOMIMRelationships (File dir) throws IOException {
+        File file = new File (dir, "MedGen_HPO_OMIM_Mapping.txt.gz");
+        if (!file.exists())
+            throw new IllegalArgumentException
+                ("Folder "+dir
+                 +" doesn't have file MedGen_HPO_OMIM_Mapping.txt.gz!");
+        RelReader reader = new RelReader (file);
+        int count = 0;
+        while (reader.hasNext()) {
+            Map<String, Object> r = reader.next();
+            String src = (String) r.get("OMIM_CUI");
+            String tar = (String) r.get("HPO_CUI");
+            String rel = (String) r.get("relationship");
+            if (rel != null && !src.equals(tar)) {
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+src);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+tar);
+                for (Entity s : sources) {
+                    for (Entity t : targets) {
+                        s.stitch(t, R_rel, rel, r);
+                    }
+                }
+                ++count;
+            }
+        }
+        return count;
+    }
+    
+    List<Entity> getEntities (StitchKey key, Object value) {
+        Iterator<Entity> iter = find (key.name(), value);
+        List<Entity> entities = new ArrayList<>();
+        while (iter.hasNext())
+            entities.add(iter.next());
+        return entities;
+    }
+    
+    public DataSource register (File dir, int version) throws IOException {
+        if (!dir.isDirectory()) {
+            throw new IllegalArgumentException
+                ("Not a directory; please download the content of MedGen "
+                 +"here ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/!");
+        }
+        
+        DataSource ds = getDataSourceFactory().register("MEDGEN_v"+version);
+        Integer size = (Integer)ds.get(INSTANCES);
+        if (size != null && size > 0) {
+            logger.info(ds.getName()+" ("+size
+                        +") has already been registered!");
+            return ds;
+        }
+        setDataSource (ds);
+
+        int count = registerEntities (dir);
+        if (count > 0) {
+            int nrels = registerRelationships (dir);
+            logger.info("#### "+nrels+" relationships registered!");
+            nrels = registerOMIMRelationships (dir);
+            logger.info("#### "+nrels+" OMIM relationships registered!");
         }
         ds.set(INSTANCES, count);
         updateMeta (ds);
