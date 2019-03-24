@@ -41,3 +41,5 @@ match(n:`OMIM.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz
 match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`HPO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `MONDO`,count(distinct a) as `HPO`
 
 match(n:`OMIM.ttl.gz`:T047) where none(x in labels(n) where x='T028') return count(n)
+
+MATCH (n:`Designated`)-[e*1..2]-(m:`human_phenotype`)-[]-(d:DATA) unwind e as g with distinct g.gene as g,count(n) as cnt unwind g as Gene return Gene,sum(cnt) as Count order by Count desc
