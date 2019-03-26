@@ -356,19 +356,25 @@ public class MedGenEntityFactory extends EntityRegistry {
             if (!cui1.equals(cui2)) {
                 String rel = (String) r.get("REL");
                 String rela = (String) r.get("RELA");
-                List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui1);
-                List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui2);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui1);
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui2);
                 for (Entity s : sources) {
                     for (Entity t : targets) {
-                        try {
-                            s.stitch(t, R_rel, rela != null ? rela : rel, r);
-                        }
-                        catch (Exception ex) {
-                            logger.log(Level.SEVERE,
-                                       "Can't create relationship between "
-                                       +cui1+" and "+cui2+"\n>>> "
-                                       +mapper.valueToTree(r), ex);
-                            return count;
+                        if (!s.equals(t)) {
+                            try {
+                                if ("isa".equals(rela))
+                                    s.stitch(t, R_subClassOf, r);
+                                else
+                                    s.stitch(t, R_rel,
+                                             rela != null ? rela : rel, r);
+                            }
+                            catch (Exception ex) {
+                                logger.log(Level.SEVERE,
+                                           "Can't create relationship between "
+                                           +cui1+" and "+cui2+"\n>>> "
+                                           +mapper.valueToTree(r), ex);
+                                return count;
+                            }
                         }
                     }
                 }
@@ -393,17 +399,69 @@ public class MedGenEntityFactory extends EntityRegistry {
             String tar = (String) r.get("HPO_CUI");
             String rel = (String) r.get("relationship");
             if (rel != null && !src.equals(tar)) {
-                List<Entity> sources = getEntities (I_CODE, "UMLS:"+src);
-                List<Entity> targets = getEntities (I_CODE, "UMLS:"+tar);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+src);
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+tar);
                 for (Entity s : sources) {
                     for (Entity t : targets) {
-                        s.stitch(t, R_rel, rel, r);
+                        if (!s.equals(t))
+                            s.stitch(t, R_rel, rel, r);
                     }
                 }
                 ++count;
             }
         }
         return count;
+    }
+
+    protected int registerOMIMGeneMedGen (File dir) throws IOException {
+        File file = new File (dir, "mim2gene_medgen");
+        if (!file.exists()) {
+            logger.warning("No OMIM gene mapping to MedGen file found: "+file);
+            return 0;
+        }
+
+        try (InputStream is = new FileInputStream (file)) {
+            LineTokenizer tokenizer = new LineTokenizer ('\t');
+            tokenizer.setInputStream(is);
+            if (!tokenizer.hasNext()) {
+                logger.warning("Empty file: "+file);
+                return 0;
+            }
+            
+            //#MIM number     GeneID  type    Source  MedGenCUI       Comment
+            String[] header = tokenizer.next();
+            header[0] = header[0].substring(1);
+            
+            Map<String, Object> row = new LinkedHashMap<>();
+            int count = 0;
+            while (tokenizer.hasNext()) {
+                String[] toks = tokenizer.next();
+                if (!"-".equals(toks[1]) && toks[4].startsWith("C")) {
+                    row.clear();
+                    for (int i = 0; i < header.length; ++i)
+                        row.put(header[i], toks[i].trim());
+                    //logger.info(">> "+row);
+                    
+                    String gid = "GENE:"+ toks[1];
+                    List<Entity> omim = getEntities (I_CODE, "OMIM:"+toks[0]);
+                    List<Entity> gene = getEntities (I_CODE, gid);
+                    List<Entity> cui = getEntities (I_CODE, "UMLS:"+toks[4]);
+                    for (Entity a : omim) {
+                        for (Entity b : cui) {
+                            if (!a.equals(b)) {
+                                for (Entity c : gene) {
+                                    a.stitch(c, I_GENE, gid);
+                                    b.stitch(c, I_GENE, gid);
+                                }
+                                a.stitch(b, I_GENE, gid, row);
+                            }
+                        }
+                    }
+                    ++count;
+                }
+            }
+            return count;
+        }
     }
     
     List<Entity> getEntities (StitchKey key, Object value) {
@@ -436,6 +494,9 @@ public class MedGenEntityFactory extends EntityRegistry {
             logger.info("#### "+nrels+" relationships registered!");
             nrels = registerOMIMRelationships (dir);
             logger.info("#### "+nrels+" OMIM relationships registered!");
+            nrels = registerOMIMGeneMedGen (dir);
+            logger.info("#### "+nrels
+                        +" OMIM-GENE-MEDGE relationships registered!");
         }
         ds.set(INSTANCES, count);
         updateMeta (ds);
@@ -452,6 +513,7 @@ public class MedGenEntityFactory extends EntityRegistry {
         
         try (MedGenEntityFactory medgen = new MedGenEntityFactory (argv[0])) {
             medgen.register(new File (argv[1]), 1);
+            //medgen.registerOMIMGeneMedGen(new File (argv[1]));
         }
     }
 }
