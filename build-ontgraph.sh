@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v3"
+version="v5"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
