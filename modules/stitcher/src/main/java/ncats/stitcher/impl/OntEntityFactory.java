@@ -201,6 +201,8 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_CODE, "RQ")
             .add(I_CODE, "cui")
             .add(I_GENE, "GENESYMBOL")
+            .add(I_GENE, "OGG_0000000004")
+            .add(I_PMID, "OGG_0000000030")
             .add(I_CAS, "CAS")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "inSubset")
@@ -576,6 +578,52 @@ public class OntEntityFactory extends EntityRegistry {
                     useful.add(x);
                 }
             }
+            
+            String comment = (String) data.get("comment");
+            if (comment != null) {
+                if (comment.startsWith("Category=gene")) {
+                    // human protein
+                    Set<String> genes = new TreeSet<> ();
+                    obj = data.get("hasExactSynonym");
+                    if (obj != null) {
+                        Object[] values = Util.toArray(obj);
+                        for (Object v : values) {
+                            String s = v.toString();
+                            if (s.indexOf(' ') > 0) {
+                            }
+                            else {
+                                genes.add(s);
+                            }
+                        }
+                    }
+                    
+                    obj = data.get("hasRelatedSynonym");
+                    if (obj != null) {
+                        Object[] values = Util.toArray(obj);
+                        for (Object v : values) {
+                            String s = v.toString();
+                            if (s.indexOf(' ') > 0) {
+                            }
+                            else {
+                                genes.add(s);
+                            }
+                        }
+                    }
+                    
+                    if (!genes.isEmpty()) {
+                        //logger.info("** GENES: "+genes);
+                        if (genes.size() == 1) {
+                            data.put("GENESYMBOL", genes.iterator().next());
+                        }
+                        else {
+                            data.put("GENESYMBOL",
+                                     genes.toArray(new String[0]));
+                        }
+                    }
+                }
+                else if (comment.startsWith("Category=organism-gene")) {
+                }
+            }
         }
         else if (ontology.props.get("title") != null
                  && ((String)ontology.props.get("title"))
@@ -606,7 +654,29 @@ public class OntEntityFactory extends EntityRegistry {
                 else
                     useful.add(x);
             }
-        }        
+            
+            obj = data.get("OGG_0000000006");
+            if (obj != null)
+                useful.add("GENE:"+obj);
+            obj = data.get("OGG_0000000030");
+            if (obj != null) {
+                // pmid
+                List<Long> pmids = new ArrayList<>();
+                for (String tok : obj.toString().split("\\s")) {
+                    try {
+                        long pmid = Long.parseLong(tok);
+                        pmids.add(pmid);
+                    }
+                    catch (NumberFormatException ex) {
+                    }
+                }
+                
+                if (!pmids.isEmpty()) {
+                    // override
+                    data.put("OGG_0000000030", pmids.toArray(new Long[0]));
+                }
+            }
+        }
         else if ("MEDLINEPLUS".equals(ontology.props.get("label"))) {
             obj = data.remove("notation");
             if (obj != null)
