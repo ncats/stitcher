@@ -1,6 +1,14 @@
 #!/bin/sh
 
 version="v3"
+out="ncatskg-$version.db"
+cache="cache=hash.db"
+orphclass="orphanet_classifications"
+medgen="medgen"
+
+###########################
+##### DON'T MESS BELOW
+###########################
 # make sure MONDO is last in disease ontologies
 owl="DOID.owl.gz \
    HPO.owl.gz \
@@ -19,9 +27,6 @@ owl="DOID.owl.gz \
 owl_path="owl"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
-
-out="ncatskg-$version.db"
-cache="cache=hash.db"
 
 #load GARD
 gard_credentials=
@@ -50,3 +55,13 @@ sbt stitcher/"runMain ncats.stitcher.impl.FDAOrphanDesignationEntityFactory $out
 
 #load hpo annotations
 sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt"
+
+#load additional orphanet relationships if available
+if test -d $orphclass; then
+    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetClassificationEntityFactory $out $orphclass"
+fi
+
+#load MedGen if available
+if test -d $medgen; then
+    sbt stitcher/"runMain ncats.stitcher.impl.MedGenEntityFactory $out $medgen"
+fi
