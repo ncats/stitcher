@@ -356,19 +356,25 @@ public class MedGenEntityFactory extends EntityRegistry {
             if (!cui1.equals(cui2)) {
                 String rel = (String) r.get("REL");
                 String rela = (String) r.get("RELA");
-                List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui1);
-                List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui2);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui1);
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui2);
                 for (Entity s : sources) {
                     for (Entity t : targets) {
-                        try {
-                            s.stitch(t, R_rel, rela != null ? rela : rel, r);
-                        }
-                        catch (Exception ex) {
-                            logger.log(Level.SEVERE,
-                                       "Can't create relationship between "
-                                       +cui1+" and "+cui2+"\n>>> "
-                                       +mapper.valueToTree(r), ex);
-                            return count;
+                        if (!s.equals(t)) {
+                            try {
+                                if ("isa".equals(rela))
+                                    s.stitch(t, R_subClassOf, r);
+                                else
+                                    s.stitch(t, R_rel,
+                                             rela != null ? rela : rel, r);
+                            }
+                            catch (Exception ex) {
+                                logger.log(Level.SEVERE,
+                                           "Can't create relationship between "
+                                           +cui1+" and "+cui2+"\n>>> "
+                                           +mapper.valueToTree(r), ex);
+                                return count;
+                            }
                         }
                     }
                 }
@@ -393,11 +399,12 @@ public class MedGenEntityFactory extends EntityRegistry {
             String tar = (String) r.get("HPO_CUI");
             String rel = (String) r.get("relationship");
             if (rel != null && !src.equals(tar)) {
-                List<Entity> sources = getEntities (I_CODE, "UMLS:"+src);
-                List<Entity> targets = getEntities (I_CODE, "UMLS:"+tar);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+src);
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+tar);
                 for (Entity s : sources) {
                     for (Entity t : targets) {
-                        s.stitch(t, R_rel, rel, r);
+                        if (!s.equals(t))
+                            s.stitch(t, R_rel, rel, r);
                     }
                 }
                 ++count;
