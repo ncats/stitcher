@@ -257,6 +257,13 @@ public class Stitch extends Entity {
         for (Map.Entry<Node, DataSource> me : members.entrySet()) {
             Map m = new TreeMap ();
             m.put("id", me.getKey().getId());
+            long parent = 0;
+            try (Transaction tx = gdb.beginTx()) {
+                for (Relationship rel: me.getKey().getRelationships(Direction.BOTH, AuxRelType.PAYLOAD))
+                    parent = rel.getOtherNode(me.getKey()).getId();
+                tx.success();
+            }
+            m.put("parent", parent);
             m.put("srcid", getField ("IdField", me.getKey()));
             m.put("name", getField ("NameField", me.getKey()));
             m.put("datasource", me.getValue().getName());

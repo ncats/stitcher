@@ -18,11 +18,13 @@ public class EventCalculator extends StitchCalculator {
     static EventParser[] DEFAULT_EVENT_PARSERS = {
             new GSRSEventParser(),
             new DrugsAtFDAEventParser (),
+            new OTCMonographParser (),
+            new FDAanimalDrugsParser (),
+            new FDAexcipientParser(),
             new ClinicalTrialsEventParser(),
             new RanchoEventParser(),
             new NPCEventParser (),
             new PharmManuEventParser (),
-            //!! No longer loading this source: new DrugBankEventParser (),
             new DrugBankXmlEventParser (),
             new DailyMedRxEventParser (),
             new DailyMedOtcEventParser (),
@@ -35,16 +37,20 @@ public class EventCalculator extends StitchCalculator {
     public static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd");
     public static final SimpleDateFormat SDF2 = new SimpleDateFormat ("MM/dd/yyyy");
 
+    public static String highestPhase = "highestPhase";
+    public static String USapproved = "USapproved"; // boolean of whether active ingredient of currently approved product in US
+    public static String initiallyMarketedUS = "initiallyMarketedUS"; // year of initial marketing in the US
+    public static String initiallyMarketed = "initiallyMarketed"; // year of initial marketing, anywhere
+    public static String initiallyMarketedJurisdiction = "initiallyMarketedJurisdiction"; // where it was initially marketed
+
     final DataSourceFactory dsf;
 
     private List<EventParser> eventParsers = Arrays.asList(DEFAULT_EVENT_PARSERS);
 
-    // adapted from https://prsinfo.clinicaltrials.gov/definitions.html
-    public static Set<String> CLINICAL_PHASES = Arrays.asList(
+    /** adapted from https://prsinfo.clinicaltrials.gov/definitions.html */
+    public static List<String> CLINICAL_PHASES = Arrays.asList(
             "Not Applicable", "Early Phase 1", "Phase 1", "Phase 1/Phase 2",
-            "Phase 2", "Phase 2/Phase 3", "Phase 3", "Phase 4")
-            .stream()
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+            "Phase 2", "Phase 2/Phase 3", "Phase 3", "Phase 4");
 
     public EventCalculator(EntityFactory ef) {
         this.ef = ef;
@@ -73,14 +79,14 @@ public class EventCalculator extends StitchCalculator {
         HashMap<String, Integer> eventIndexes = new HashMap<>(); 
         for (Event e : events) {
             Map<String, Object> props = new HashMap<>();
-            String ei = e.source + "|" + e.id;
+            String ei = e.id.toString();
             if (eventIndexes.containsKey(ei)) {
-                props.put(ID, e.id + ":" + eventIndexes.get(ei));
                 eventIndexes.put(ei, eventIndexes.get(ei)+1);
+                e.id = e.id + ":" + eventIndexes.get(ei);
             } else {
-                props.put(ID, e.id);
                 eventIndexes.put(ei, 1);
             }
+            props.put(ID, e.id);
             if (e.source == null) // TODO e.source is coming in as null in some cases
                 e.source = "*!";
             props.put(SOURCE, e.source);
@@ -109,11 +115,52 @@ public class EventCalculator extends StitchCalculator {
             stitch.addIfAbsent(AuxRelType.EVENT.name(), props, data);
         }
 
+        /** Development status: highest development phase attained
+         * US Approved OTC
+         * US Approved Rx
+         * US Withdrawn / previously marketed [withdrawn]
+         * US Unapproved, Currently Marketed
+         * Marketed Outside US
+         * Previously Marketed Outside US [withdrawn]
+         * Investigational - Phase III, Phase II, Phase I, Clinical
+         * Other
+         */
+        Event highestStatus = new Event("fake", stitch.getId(), Event.EventKind.Other);
+        for (Event e: events) {
+            if (e.kind != null) {
+                if (highestStatus == null || e.kind.ordinal() < highestStatus.kind.ordinal())
+                    highestStatus = e;
+            }
+        }
+
+        /** Highest Phase - distinguish clinical phases, using highest CLINICAL_PHASES*/
+        if (highestStatus.kind == Event.EventKind.Clinical) {
+            for (int i=CLINICAL_PHASES.size()-2; i>-1; i--)
+                for (Event e: events) {
+                    if (e.kind == highestStatus.kind &&
+                            CLINICAL_PHASES.indexOf(e.comment) > CLINICAL_PHASES.indexOf(highestStatus.comment))
+                        highestStatus = e;
+                }
+//            if (highestStatus.comment != null) {
+//                //System.out.println("Highest Phase: " + highestStatus.comment);
+//                stitch.set(highestPhase, highestStatus.comment);
+//            } else {
+//                stitch.set(highestPhase, highestStatus.kind.name());
+//            }
+        }
+//        else {
+//            //System.out.println("Highest Status: " + highestStatus.kind);
+//            stitch.set(highestPhase, highestStatus.kind.name());
+//        }
+        stitch.set(highestPhase, highestStatus == null ? "null" : highestStatus.id);
+
         // Calculate Initial Approval
+        /** US Approval Year */
+        /** Initial Approval Year */
         Event initUSAppr = null;
         Event initAppr = null;
         for (Event e: events) {
-            if (e.startDate != null && "US".equals(e.jurisdiction) && e.kind.isApproved()) {
+            if (e.startDate != null && "US".equals(e.jurisdiction) && e.kind.wasMarketed()) {
                 if (initAppr == null || e.startDate.before(initAppr.startDate)) {
                     initAppr = e;
                 }
@@ -121,32 +168,45 @@ public class EventCalculator extends StitchCalculator {
                     initUSAppr = e;
                 }
             }
-            if (e.startDate != null && (e.kind.isApproved() || e.kind == Event.EventKind.Marketed)) {
+            if (e.startDate != null && e.kind.wasMarketed()) {
                 if (initAppr == null || e.startDate.before(initAppr.startDate)) {
                     initAppr = e;
                 }
             }
         }
+        stitch.set(initiallyMarketed, initAppr == null ? "null" : initAppr.id);
+        stitch.set(initiallyMarketedUS, initUSAppr == null ? "null" : initUSAppr.id);
 
-        if (initUSAppr != null) {
-            cal.setTime(initUSAppr.startDate);
-            stitch.set("approved", Boolean.TRUE);
-            stitch.set("approvedYear", cal.get(Calendar.YEAR));
-            if (initAppr != initUSAppr)
-                System.out.println("Initial US marketing: "+cal.get(Calendar.YEAR));
-            cal.setTime(initAppr.startDate);
-            // TODO watch out for null jurisdictions
-            System.out.println("Initially marketed: " + cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
-            if ("1900".equals(cal.get(Calendar.YEAR))) {
-                System.out.println("whoops");
-            }
-        } else if (initAppr != null) {
-            cal.setTime(initAppr.startDate);
-            System.out.println("Initially marketed: "+cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
-            stitch.set("approved", Boolean.FALSE);
-        } else {
-            stitch.set("approved", Boolean.FALSE);
+        Event approved = null;
+        for (Event e: events) {
+            if ("US".equals(e.jurisdiction) && e.kind.isApproved())
+                approved = e;
         }
+        stitch.set(USapproved, approved == null ? "null" : approved.id);
+
+//        if (initUSAppr != null && initAppr != initUSAppr) {
+//                cal.setTime(initUSAppr.startDate);
+//                //System.out.println("Initial US marketing: " + cal.get(Calendar.YEAR));
+//                stitch.set(initiallyMarketedUS, cal.get(Calendar.YEAR));
+//        } else {
+//            if (stitch.get(initiallyMarketedUS) != null)
+//                stitch.removeProperty(initiallyMarketedUS);
+//        }
+//
+//        if (initAppr != null) {
+//            cal.setTime(initAppr.startDate);
+//            //System.out.println("Initially marketed: "+cal.get(Calendar.YEAR) + " (" + initAppr.jurisdiction + ")");
+//            if (initAppr.jurisdiction != null && initAppr.jurisdiction.indexOf("|") == -1)
+//                stitch.set(initiallyMarketedJurisdiction, initAppr.jurisdiction);
+//            else if (stitch.get(initiallyMarketedJurisdiction) != null)
+//                stitch.removeProperty(initiallyMarketedJurisdiction);
+//            stitch.set(initiallyMarketed, cal.get(Calendar.YEAR));
+//        } else {
+//            if (stitch.get(initiallyMarketed) != null)
+//                stitch.removeProperty(initiallyMarketed);
+//            if (stitch.get(initiallyMarketedJurisdiction) != null)
+//                stitch.removeProperty(initiallyMarketedJurisdiction);
+//        }
 
         stitch.addLabel(labels.getLabelNames());
     }
@@ -231,8 +291,8 @@ public class EventCalculator extends StitchCalculator {
         }
         for (EventParser ep : eventParsers) {
             for (Event e: ep.events.values()) {
-                logger.info(ep.name + ": kind=" + e.kind
-                        + " startDate=" + e.startDate);
+                //logger.info(ep.name + ": kind=" + e.kind
+                //        + " startDate=" + e.startDate);
                 events.add(e);
             }
             ep.reset();
@@ -244,20 +304,37 @@ public class EventCalculator extends StitchCalculator {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             System.err.println("Usage: "+EventCalculator.class.getName()
-                               +" DB VERSION");
+                               +" DB VERSION [Stitch IDs]");
             System.exit(1);
         }
 
         EntityFactory ef = new EntityFactory (GraphDb.getInstance(argv[0]));
         EventCalculator ac = new EventCalculator(ef);
         int count;
-        if ("1".equals(argv[1]) || "2".equals(argv[1])) {
-            int version = Integer.parseInt(argv[1]);
-            count = ac.recalculate(version);
+        int ver = Integer.parseInt(argv[1]);
+        if (ver < 3) {
+            count = ac.recalculate(ver);
         } else {
-            long[] nodes = new long[argv.length - 1];
-            for (int i = 1; i < argv.length; i++)
-                nodes[i - 1] = Long.parseLong(argv[i]);
+            List<Long> nodeList = new ArrayList();
+            for (int i=1; i<argv.length; i++) {
+                String id = argv[i];
+                Entity e = null;
+                try {
+                    long n = Long.parseLong(id);
+                    e = ef.entity(n);
+                    if (!e.is(AuxNodeType.SGROUP))
+                        e = null;
+                }
+                catch (Exception ex) {
+                    e = ef.entity(ver, id);
+                }
+                if (e != null) {
+                    nodeList.add(e.getId());
+                }
+            }
+            long[] nodes = new long[nodeList.size()];
+            for (int i=0; i<nodeList.size(); i++)
+                nodes[i] = nodeList.get(i);
             count = ac.recalculateNodes(nodes);
         }
         logger.info(count+" stitches recalculated!");

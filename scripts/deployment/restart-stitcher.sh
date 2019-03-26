@@ -31,6 +31,12 @@ rm -rf ./stitcher.ix/data.db
 rm -rf latest
 
 if [ ! -e stitcher.ix ]; then
+	if [ ! -e files-for-stitcher.ix ]; then
+		echo "Could not find neither 'stitcher.ix' nor 'files-for-stitcher.ix'."
+		echo "Aborting."
+		exit 1	
+	fi
+	
     mkdir stitcher.ix
     cp files-for-stitcher.ix/* stitcher.ix
 fi

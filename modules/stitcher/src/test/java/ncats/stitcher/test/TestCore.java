@@ -13,7 +13,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import ncats.stitcher.*;
 import ncats.stitcher.impl.*;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 import static org.junit.Assert.assertTrue;
 
 public class TestCore extends EntityRegistry {

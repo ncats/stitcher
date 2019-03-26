@@ -50,30 +50,44 @@ public class Event implements Cloneable{
         return e;
     }
 
+    /** Development status: highest development phase attained
+     * US Approved OTC
+     * US Approved Rx
+     * US Withdrawn / previously marketed [withdrawn]
+     * US Unapproved, Currently Marketed
+     * Marketed Outside US
+     * Previously Marketed Outside US [withdrawn]
+     * Investigational - Phase III, Phase II, Phase I, Clinical
+     * Other
+     */
     public enum EventKind {
-        Publication,
-        Filing,
-        Designation,
-        Clinical,
-        ApprovalRx {
-            @Override
-            public boolean isApproved() {
-                return true;
-            }
-        },
-        Marketed {
-            @Override
-            public boolean wasMarketed(){
-                return true;
-            }
-        },
-        ApprovalOTC {
+        USApprovalOTC {
             @Override
             public boolean isApproved(){
                 return true;
             }
         },
-        Withdrawn {
+        USApprovalRx {
+            @Override
+            public boolean isApproved() {
+                return true;
+            }
+        },
+        USApprovalAllergenic {
+            @Override
+            public boolean wasMarketed(){
+                return true;
+            }
+        },
+        USWithdrawn,
+        USPreviouslyMarketed {
+            @Override
+            public boolean wasMarketed(){
+                return true;
+            }
+        },
+        USUnapproved,
+        Marketed {
             @Override
             public boolean wasMarketed(){
                 return true;
@@ -85,16 +99,23 @@ public class Event implements Cloneable{
                 return true;
             }
         },
+        Withdrawn,
+        USAnimalDrug,
+        Clinical,
+        Excipient,
+        Designation,
+        Publication,
+        Filing,
         Other
         ;
 
         public boolean isApproved(){
             return false;
-        }
+        } // used to determined if this is FDA-approved in US
 
         public boolean wasMarketed(){
             return isApproved();
-        }
+        } // used to find initial marketing date
     }
 
     public Event(String source, Object id, EventKind kind, Date startDate) {

@@ -1720,6 +1720,17 @@ public class EntityFactory implements Props, AutoCloseable {
         }
     }
     
+    public List<String> testUntangle (UntangleAbstract untangler) {
+        List<String> newStitches = new ArrayList();
+        untangler.untangle(this, (root, member) -> {
+            String comp = "root:"+root.toString()+" members:";
+            for (long l: member)
+                comp = comp + l + ",";
+            newStitches.add(comp);
+        });
+        return newStitches;
+    }
+
     public static Iterator<Entity> find (GraphDatabaseService gdb,
                                          String key, Object value) {
         return find (gdb, key, value, Stitchable.ANY);
@@ -2009,6 +2020,33 @@ public class EntityFactory implements Props, AutoCloseable {
             entities[i] = _entity (ids[i]);
         return entities;
     }   
+
+    public Entity entity (Integer ver, String id) {
+        Entity[] entities = filter("id", "'"+id+"'", "stitch_v"+ver);
+        if (entities.length > 0) {
+            int index = 0;
+            if (entities.length > 1) {
+                play.Logger.warn(id + " yields " + entities.length
+                        + " matches!");
+                int highestrank = 0; // make which stitchnode is returned to be more deterministic
+                for (int i = 0; i < entities.length; i++) {
+                    Entity ent = entities[i];
+                    Map props = ent.properties();
+                    int rank = 0;
+                    if (props.containsKey("rank"))
+                        rank = (Integer) props.get("rank");
+                    if (rank > highestrank) {
+                        highestrank = rank;
+                        index = i;
+                    } else if (rank == highestrank && ent.getId() < entities[index].getId()) {
+                        index = i;
+                    }
+                }
+            }
+            return entities[index];
+        }
+        return null;
+    }
 
     public Entity entity (long id) {
         try (Transaction tx = gdb.beginTx()) {
