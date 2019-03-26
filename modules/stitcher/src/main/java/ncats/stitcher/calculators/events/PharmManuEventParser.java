@@ -40,7 +40,7 @@ public class PharmManuEventParser extends EventParser {
                                 node.get("Country").asText();
                         /* removed on 2018-08-30 as there are some bogus entries
                         if (event.jurisdiction.equals("US"))
-                            event.kind = Event.EventKind.ApprovalRx;
+                            event.kind = Event.EventKind.USApprovalRx;
                         */
                     }
                     if (node.has("Product")) {

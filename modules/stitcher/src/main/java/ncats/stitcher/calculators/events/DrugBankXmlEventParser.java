@@ -81,7 +81,7 @@ public class DrugBankXmlEventParser extends EventParser {
     Map<String, String> eventElems = new HashMap();
     {
         eventElems.put("ema-product-code", "approvalAppId");
-        eventElems.put("ndc-product-code", "approvalAppId");
+        eventElems.put("ndc-product-code", "comment");
         eventElems.put("ema-ma-number", "approvalAppId");
         eventElems.put("fda-application-number", "approvalAppId");
         eventElems.put("country", "jurisdiction");
@@ -138,6 +138,7 @@ public class DrugBankXmlEventParser extends EventParser {
                 }
 
         ev.URL = "https://www.drugbank.ca/drugs/"+id;
+
         // handle apprCheck, generic, otc info
         if (vals.containsKey("endDate"))
             ev.kind = Event.EventKind.Discontinued;
@@ -145,15 +146,34 @@ public class DrugBankXmlEventParser extends EventParser {
                 equalsIgnoreCase("false"))
             ev.kind = Event.EventKind.Marketed;
         else if (ev.jurisdiction.equals("US")) {
-            if (vals.containsKey("otc") && vals.get("otc").
-                    equalsIgnoreCase("true")) {
-                //ev.kind = Event.EventKind.ApprovalOTC; TODO Find out if this can be trusted
-                ev.kind = Event.EventKind.Marketed;
-            } else if (vals.containsKey("apprCheck") && vals.get("apprCheck").
-                    equalsIgnoreCase("true")) {
-                //ev.kind = Event.EventKind.ApprovalRx; TODO Find out if this can be trusted
-                ev.kind = Event.EventKind.Marketed;
-            }
+            ev = null;
+//            if (vals.containsKey("otc") && vals.get("otc").
+//                    equalsIgnoreCase("true")) {
+//                /** It doesnt appear that DrugBank can be trusted for approval status
+//                 * DrugBank gets its product info via FDA NDC and NOT from drugs@FDA
+//                 * For example, a product can assert that it follows the monograph, but still list active ingredients
+//                 * that aren't listed - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?id=58407
+//                 * Adenosine should not be considered an approved OTC drug based on that label, for example*/
+//                //ev.kind = Event.EventKind.USApprovalOTC;
+//                ev.kind = Event.EventKind.USUnapproved;
+//            } else if (vals.containsKey("apprCheck") && vals.get("apprCheck").
+//                    equalsIgnoreCase("true")) {
+//                /** It doesnt appear that DrugBank doesn't handle subtleties in products like allergenic extracts either
+//                 * NDC 36987-1775 BLA102192*/
+//                ev.kind = Event.EventKind.USUnapproved;
+//                String contentStr = ev.approvalAppId;
+//                if (!ev.source.equals("FDA NDC")) // FDA NDC is the ONLY US source for DrugBank - this will never happen
+//                    ev.kind = Event.EventKind.USApprovalRx;
+//                if (contentStr == null)
+//                    ev.kind = Event.EventKind.USUnapproved;
+//                else if (contentStr.startsWith("NDA") ||
+//                        contentStr.startsWith("ANDA") ||
+//                        contentStr.startsWith("BA") ||
+//                        contentStr.startsWith("BN") ||
+//                        contentStr.startsWith("BLA")) {
+//                    ev.kind = Event.EventKind.USApprovalRx;
+//                }
+//            }
         }
 
 //        if (!id.isEmpty())
@@ -172,7 +192,7 @@ public class DrugBankXmlEventParser extends EventParser {
 //
 //                case "over-the-counter":
 //                    if ("true".equalsIgnoreCase(n.getTextContent()))
-//                        ev.kind = Event.EventKind.ApprovalOTC;
+//                        ev.kind = Event.EventKind.USApprovalOTC;
 //                    break;
 //
 //                case "country":

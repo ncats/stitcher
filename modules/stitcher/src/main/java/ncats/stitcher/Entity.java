@@ -423,7 +423,7 @@ public class Entity extends CNode {
         return _neighbors (Entity.KEYS);
     }
 
-    protected Entity[] _neighbors (Direction dir, StitchKey... keys) {
+    protected Entity[] _neighbors (Direction dir, RelationshipType... keys) {
         Set<Entity> neighbors = new TreeSet<Entity>();
         for (Relationship rel : _node.getRelationships(dir, keys)) {
             Node n = rel.getOtherNode(_node);
@@ -437,6 +437,32 @@ public class Entity extends CNode {
             Entity[] nb = _neighbors (Direction.BOTH, keys);
             tx.success();
             return nb;
+        }
+    }
+
+    public Entity[] neighbors (RelationshipType... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            Entity[] nb = _neighbors (Direction.BOTH, keys);
+            tx.success();
+            return nb;
+        }
+    }
+
+    public Stitch getStitch(int ver) {
+        try (Transaction tx = gdb.beginTx()) {
+            Stitch s = null;
+            for (Relationship rel : _node.getRelationships(Direction.BOTH, AuxRelType.PAYLOAD)) {
+                if (datasource().getKey().equals(rel.getProperty(SOURCE))) {
+                    Node n = rel.getOtherNode(_node);
+                    for (Relationship sr: n.getRelationships(Direction.BOTH, AuxRelType.STITCH)) {
+                        Node sn = sr.getOtherNode(n);
+                        if (sn.hasLabel(Label.label("stitch_v"+ver)))
+                            s = Stitch.getStitch(sn);
+                    }
+                }
+            }
+            tx.success();
+            return s;
         }
     }
 
@@ -1219,11 +1245,17 @@ public class Entity extends CNode {
     }
 
     public Entity _update (StitchKey key, Object oldVal, Object newVal) {
-        if (!_node.hasProperty(key.name())) 
+        if (oldVal != null && !_node.hasProperty(key.name()))
             throw new IllegalArgumentException
                 ("Entity doesn't have "+key+" property");
         
-        Object value = _node.getProperty(key.name());
+        Object value = null;
+        try { // if this is an entirely new value, then an exception will be thrown
+              // org.neo4j.graphdb.NotFoundException: NODE[...] has no property with propertyKey="...".
+              // at org.neo4j.kernel.impl.core.NodeProxy.getProperty(NodeProxy.java:470)
+            value = _node.getProperty(key.name());
+        } catch (NotFoundException nfe) {}
+
         if (newVal == null) {
             // remove from value all elements in oldVal
             Object delta = Util.delta(value, oldVal);

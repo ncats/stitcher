@@ -4,8 +4,8 @@ import java.util.*;
 import java.lang.reflect.Array;
 
 import javax.inject.Inject;
-import play.libs.Json;
 import play.Logger;
+import play.libs.Json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -64,6 +64,8 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                       && !n.hasProperty("Year")) {*/
                     ObjectNode obj = mapper.createObjectNode();
                     setJson (obj, n);
+                    //obj.put("relationship", rel.getType().name());
+                    //obj.put("id", n.getId());
                     node.add(obj);
                     //}
                 }
@@ -96,10 +98,15 @@ public class DefaultJsonCodec implements JsonCodec, Props {
     
     JsonNode toJson (Node _node) {
         ObjectNode node = mapper.createObjectNode();
-        
-        for (Map.Entry<String, Object> me :
-                 _node.getAllProperties().entrySet()) {
-            Util.setJson(node, me.getKey(), me.getValue());
+
+        // TODO top level of object should only have programmatic properties
+        // this code block put source fields as top level object field
+        // which could create a potential namespace collision, so avoid this loop for DATA objects
+        if (!_node.hasLabel(AuxNodeType.DATA)) {
+            for (Map.Entry<String, Object> me :
+                    _node.getAllProperties().entrySet()) {
+                Util.setJson(node, me.getKey(), me.getValue());
+            }
         }
         node.put("id", _node.getId());  
 
@@ -126,18 +133,19 @@ public class DefaultJsonCodec implements JsonCodec, Props {
         Node parent = null;
         
         ObjectNode stitches = null;
+        Long stitchParent = null;
         Set<ObjectNode> members = new TreeSet<>((a,b) -> {
                 long x = a.get("node").asLong(), y = b.get("node").asLong();
                 if (x < y) return -1;
                 if (x > y) return 1;
                 return 0;
             });
-        
+
         if (_node.hasLabel(AuxNodeType.SGROUP)) {
             stitches = mapper.createObjectNode();
             stitches.put("hash", (String) _node.getProperty(ID, null));
             stitches.put("size", (Integer)_node.getProperty(RANK, 0));
-            stitches.put("parent", (Long)_node.getProperty(PARENT, null));
+            stitchParent = (Long)_node.getProperty(PARENT, null);
             node.put("sgroup", stitches);
         }
 
@@ -157,7 +165,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             }
             else if (rel.isType(AuxRelType.STITCH)) {
                 ObjectNode member = mapper.createObjectNode();
-                member.put("node", n.getId());
+                //member.put("dataNode", n.getId());
                 member.put(SOURCE, (String)rel.getProperty(SOURCE));
                                 
                 for (Map.Entry<String, Object> me
@@ -183,6 +191,10 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                     (AuxRelType.PAYLOAD, Direction.OUTGOING);
                 if (payrel != null) {
                     Node sn = payrel.getOtherNode(n);
+                    member.put("node", sn.getId());
+                    member.put("payloadNode", n.getId());
+                    if (stitchParent == n.getId())
+                        stitchParent = sn.getId();
                     
                     String src = (String) sn.getProperty(SOURCE, null);
                     ds = es.getDataSourceFactory().getDataSourceByKey(src);
@@ -239,6 +251,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                                 on.put(SOURCE, ds2.getName());
                             else
                                 on.put(SOURCE, "source not available");
+                            on.put("node", py.getId());
                             data.add(on);
                         }
                     }
@@ -250,8 +263,24 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 members.add(member);
             }
             else if (rel.isType(AuxRelType.PAYLOAD)) {
+                // Stitch relationships are NOT made to entities, but to payload (data) nodes of that entity
+                // include any found stitch relationships back into the neighbors list of an entity
+                for (Relationship rel2 : n.getRelationships(Direction.BOTH)) {
+                    if (rel2.isType(AuxRelType.STITCH)) {
+                        ObjectNode nb = mapper.createObjectNode();
+                        nb.put("node", rel2.getOtherNode(n).getId());
+                        if (null != rel2.getType())
+                            nb.put("reltype", rel2.getType().name());
+                        for (Map.Entry<String, Object> me :
+                                rel2.getAllProperties().entrySet()) {
+                            nb.put(me.getKey(), mapper.valueToTree(me.getValue()));
+                        }
+                        neighbors.add(nb);
+                    }
+                }
                 ObjectNode on = Util.toJsonNode(rel);
                 Util.toJsonNode(on, n);
+                on.put("node", n.getId());
                 payloads.add(on);
             }
             else if (rel.isType(AuxRelType.EVENT)) {
@@ -259,12 +288,12 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 Util.toJsonNode(on, n);
                 events.add(on);
             }
-            else if (n.hasLabel(AuxNodeType.COMPONENT)) {
-                // should do something here..
-            }
+            //else if (n.hasLabel(AuxNodeType.COMPONENT)) {
+            //    // TODO should do something here..
+            //}
             else {
                 ObjectNode nb = mapper.createObjectNode();
-                nb.put("id", n.getId());
+                nb.put("node", n.getId());
                 if (null != rel.getType())
                     nb.put("reltype", rel.getType().name());
                 for (Map.Entry<String, Object> me :
@@ -275,8 +304,10 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             }
         }
 
-        if (!members.isEmpty())
+        if (!members.isEmpty()) {
+            stitches.put("parent", stitchParent);
             stitches.put("members", mapper.valueToTree(members));
+        }
 
         if (!properties.isEmpty()) {
             for (Map.Entry<String, Object> me : properties.entrySet()) {
@@ -363,9 +394,14 @@ public class DefaultJsonCodec implements JsonCodec, Props {
         else {
             if (parent != null) {
                 node.put("parent", parent.getId());
+            }
+
+            // Note: this block was redundant with start of method _node.getAllProperties() call
+            // only call if this is a DATA node
+            if (_node.hasLabel(AuxNodeType.DATA)) {
                 array = mapper.createArrayNode();
                 for (Map.Entry<String, Object> me :
-                         _node.getAllProperties().entrySet()) {
+                        _node.getAllProperties().entrySet()) {
                     ObjectNode n = mapper.createObjectNode();
                     n.put("key", me.getKey());
                     n.put("value", mapper.valueToTree(me.getValue()));
@@ -373,7 +409,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 }
                 node.put("properties", array);
             }
-                    
+
             if (_node.hasProperty(OLDVAL))
                 node.put("oldval",
                          mapper.valueToTree(_node.getProperty(OLDVAL)));
