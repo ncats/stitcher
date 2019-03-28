@@ -35,13 +35,28 @@ public class GARDEntityFactory extends EntityRegistry {
     static final String GARD_JDBC =
         "jdbc:sqlserver://ncatswnsqldvv02.nih.gov;databaseName=ORDRGARD_DEV;";
 
+    static class EqvNode {
+        EqvNode parent;
+        Entity entity;
+        Set<Long> nodes = new TreeSet<>();
+        List<EqvNode> children = new ArrayList<>();
+        EqvNode (Entity entity) {
+            this.entity = entity;
+        }
+        public void add (EqvNode n) {
+            n.parent = this;
+            children.add(n);
+        }
+    }
+    
     class UntangleComponent {
         final public Component comp;
         final public Map<StitchKey, Map<Object, Set<Long>>> values =
             new LinkedHashMap<>();
         final public PrintStream ps;
         final StitchKey[] stitches;
-
+        final Map<Entity, EqvNode> nodes = new HashMap<>();
+        
         UntangleComponent (Component comp, StitchKey... stitches) {
             this (null, comp, stitches);
         }
@@ -50,6 +65,10 @@ public class GARDEntityFactory extends EntityRegistry {
                            Component comp, StitchKey... stitches) {
             if (stitches == null || stitches.length == 0)
                 throw new IllegalArgumentException ("keys must not be empty!");
+
+            this.comp = comp;
+            this.ps = ps == null ? System.out : ps;
+            this.stitches = stitches;
             
             List keys = new ArrayList ();            
             for (StitchKey key : stitches) {
@@ -66,9 +85,37 @@ public class GARDEntityFactory extends EntityRegistry {
                     }
                 }
             }
-            this.comp = comp;
-            this.ps = ps == null ? System.out : ps;
-            this.stitches = stitches;
+
+            for (Entity e : comp.entities()) {
+                Entity[] parents = e.outNeighbors(R_subClassOf);
+                if (parents.length > 0) {
+                    for (Entity p : parents) {
+                        EqvNode eqv = nodes.get(p);
+                        if (eqv == null) {
+                            nodes.put(p, eqv = new EqvNode (p));
+                        }
+                        eqv.add(new EqvNode (e));
+                    }
+                }
+                else {
+                    nodes.put(e, new EqvNode (e));
+                }
+            }
+
+            for (EqvNode n : nodes.values()) {
+                if (n.parent == null && !n.children.isEmpty())
+                    dumpNode (n);
+            }
+        }
+
+        public void dumpNode (EqvNode n) {
+            for (EqvNode p = n.parent; p != null; p = p.parent) {
+                ps.print(".");
+            }
+            
+            ps.println("["+n.entity.getId()+"]");
+            for (EqvNode c : n.children)
+                dumpNode (c);
         }
 
         public void mergeStitches () {
@@ -166,7 +213,7 @@ public class GARDEntityFactory extends EntityRegistry {
                 Entity e = entity (id);
                 
                 double maxscore = 0.;
-                int maxc = -1;
+                BitSet maxc = new BitSet ();
                 for (int c = bs.nextSetBit(0); c >= 0; c = bs.nextSetBit(c+1)) {
                     if (!comps.containsKey(c)) {
                         Set<Long> s = new TreeSet<> ();
@@ -178,7 +225,6 @@ public class GARDEntityFactory extends EntityRegistry {
                         comps.put(c, s);
                     }
 
-                    double score = 0.;
                     for (Long oid : comps.get(c)) {
                         if (!id.equals(oid)) {
                             Entity f = entity (oid);
@@ -186,49 +232,25 @@ public class GARDEntityFactory extends EntityRegistry {
                             ps.println
                                 ("......"+String.format("%1$.3f", sim)+" "
                                  +oid+" {"+c+"}");
-                            score += sim;
+                            if (sim < maxscore) {
+                            }
+                            else if (sim > maxscore) {
+                                maxscore = sim;
+                                maxc.clear();
+                                maxc.set(c);
+                            }
+                            else {
+                                maxc.set(c);
+                            }
                         }
                     }
-                            
-                    if (score < maxscore) {
-                    }
-                    else if (score > maxscore) {
-                        maxscore = score;
-                        maxc = c;
-                    }
-                    else {
-                        //
-                    }
                 }
 
-                if (maxc >= 0) {
+                if (!maxc.isEmpty()) {
                     ps.println("~~~ maxscore="+String.format("%1$.3f", maxscore)
-                               +" in component "+maxc);
-                    for (int c = bs.nextSetBit(0); c >= 0;
-                         c = bs.nextSetBit(c+1)) {
-                        if (c != maxc)
-                            comps.get(c).remove(id);
-                    }
-                    comps.get(maxc).add(id);
+                               +" in component(s) "+maxc);
                 }
             }
-
-            ncomps = 0;
-            Set<Long> unique = new HashSet<>();
-            for (Map.Entry<Integer, Set<Long>> me : comps.entrySet()) {
-                Set<Long> set = me.getValue();
-                ps.println(String.format("%1$3d: %2$d ", me.getKey(),
-                                         set.size())+set);
-                if (!set.isEmpty())
-                    ++ncomps;
-                for (Long id : set) {
-                    if (unique.contains(id))
-                        ps.println(id+" is not uniquely assigned to a component!");
-                    unique.add(id);
-                }
-            }
-            ps.println("*** "+unique.size()+" elements spanning "+ncomps+
-                       " components!");
         } // mergeStitches ()
 
         public void mergeEntities () {
@@ -291,6 +313,7 @@ public class GARDEntityFactory extends EntityRegistry {
             Map<String, Object> data = new TreeMap<>();
             data.put("gard_id", format (id));
             data.put("id", id);
+            data.put("uri", "http://purl.obolibrary.org/obo/"+format(id,'_'));
             identifiers (data);
             categories (data);
             resources (data);
@@ -414,7 +437,11 @@ public class GARDEntityFactory extends EntityRegistry {
     } // GARD
 
     static String format (long id) {
-        return String.format("GARD:%1$07d", id);
+        return format (id, ':');
+    }
+    
+    static String format (long id, char sep) {
+        return String.format("GARD"+sep+"%1$07d", id);
     }
 
     static class UMLS {
@@ -566,6 +593,12 @@ public class GARDEntityFactory extends EntityRegistry {
                     score += ((String)value).length();
                 }
                 break;
+
+            case R_subClassOf: // ?
+                break;
+                
+            case R_rel: // do something here?
+                break;
             }
         }
         return score;
@@ -581,12 +614,17 @@ public class GARDEntityFactory extends EntityRegistry {
             Label.label("MESH.ttl.gz"),
             Label.label("MONDO.owl.gz"),
             Label.label("OMIM.ttl.gz"),
-            Label.label("ordo.owl.gz")
+            Label.label("ordo.owl.gz"),
+            Label.label("MEDGEN_v1")
         };
 
         final Label[] types = {
             Label.label("T028"), // gngm - gene or genome
             Label.label("T033"), // finding
+            Label.label("T037"), // Injury or Poisoning
+            Label.label("T052"), // Activity
+            Label.label("T068"), // Human-caused Phenomenon or Process
+            Label.label("T072"), // Physical Object
             Label.label("T116"), // Amino Acid, Peptide, or Protein
             Label.label("T123"), // Biologically Active Substance
             Label.label("T129"), // Immunologic Factor

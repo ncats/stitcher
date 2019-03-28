@@ -135,14 +135,16 @@ public class EntityFactory implements Props, AutoCloseable {
                         else {
                             Entity n = Entity._getEntity(node);
                             List<Node> bestNodes = new ArrayList<>();
+                            List<Node> eqvnodes = new ArrayList<>();
                             int bestScore = 0;
                             for (Map.Entry<Node, Map<StitchKey, Object>>
                                      me : sv.entrySet()) {
+                                Map<StitchKey, Object> stitches = me.getValue();
                                 Entity m = Entity._getEntity(me.getKey());
                                 // we should properly make sure directionality
                                 // is correct here
-                                int score = predication.score
-                                    (n, me.getValue(), m);
+                                int score = predication
+                                    .score(n, stitches, m);
                                 if (score == 0) {
                                 }
                                 else if (score > bestScore) {
@@ -153,11 +155,20 @@ public class EntityFactory implements Props, AutoCloseable {
                                 else if (score == bestScore) {
                                     bestNodes.add(me.getKey());
                                 }
+
+                                if (stitches.containsKey
+                                    (StitchKey.R_equivalentClass)
+                                    || stitches.containsKey
+                                    (StitchKey.R_exactMatch))
+                                    eqvnodes.add(me.getKey());
                             }
                             
-                            if (!bestNodes.isEmpty()) {
+                            if (!bestNodes.isEmpty() || !eqvnodes.isEmpty()) {
                                 for (Node bn : bestNodes)
                                     eqv.union(node.getId(), bn.getId());
+
+                                for (Node eqn : eqvnodes)
+                                    eqv.union(node.getId(), eqn.getId());
                             }
                             else {
                                 singletons.add(node.getId());
