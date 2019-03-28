@@ -55,24 +55,18 @@ public class HPOEntityFactory extends EntityRegistry {
             else {
                 // diseaseId gene-symbol gene-id(entrez)HPO-ID HPO-term-name
                 List<Entity> diseases = getEntities (I_CODE, toks[0]);
-                List<Entity> genes = getEntities (I_GENE, toks[1]);
+                //List<Entity> genes = getEntities (I_GENE, toks[1]);
                 List<Entity> phenotypes = getEntities (I_CODE, toks[3]);
                 logger.info(toks[0]+"="+diseases.size()+" "
-                            +toks[1]+"="+genes.size()+" "
                             +toks[3]+"="+phenotypes.size());
-                attr.put("gene", toks[1]);
+                attr.clear();
+                for (int i = 0; i < header.length; ++i)
+                    attr.put(header[i], toks[i]);
                 for (Entity p : phenotypes) {
                     for (Entity d : diseases) {
                         if (!p.equals(d)) {
                             d.stitch(p, R_rel, "has_phenotype", attr);
                             d.addLabel(source.getName());
-                        }
-                    }
-                    
-                    for (Entity g : genes) {
-                        if (!p.equals(g)) {
-                            g.stitch(p, R_rel, "has_phenotype", attr);
-                            g.addLabel(source.getName());
                         }
                     }
                     p.addLabel(source.getName());

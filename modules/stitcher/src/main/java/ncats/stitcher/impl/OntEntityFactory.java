@@ -79,7 +79,7 @@ public class OntEntityFactory extends EntityRegistry {
 
     static class OntologyResource {
         final public Resource resource;
-        final public String uri;
+        public String uri;
         final public String type;
         final public Map<String, Object> props = new TreeMap<>();
         final public Map<String, Object> links = new TreeMap<>();
@@ -110,7 +110,8 @@ public class OntEntityFactory extends EntityRegistry {
                     }
                 }
             }
-            this.uri = res.getURI();
+            
+            this.uri = getURI (res);
             this.type = t;
             this.resource = res;
         }
@@ -220,7 +221,19 @@ public class OntEntityFactory extends EntityRegistry {
     
     static String getResourceValue (Resource r) {
         String v = r.getLocalName();
-        return v != null ? v : r.getURI();
+        return v != null ? v : getURI (r);
+    }
+
+    static String getURI (Resource r) {
+        String uri = r.getURI();
+        // map http://purl.bioontology.org/ontology/MESH/D014406
+        // to http://purl.obolibrary.org/obo/MESH_D014406
+        // so as to match MONDO reference
+        if (uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
+            String[] toks = uri.split("/");
+            uri = "http://purl.obolibrary.org/obo/MESH_"+toks[toks.length-1];
+        }
+        return uri;
     }
 
     protected String transform (String value) {
@@ -293,7 +306,7 @@ public class OntEntityFactory extends EntityRegistry {
                 for (int i = 0; i < len; ++i) {
                     Object v = Array.get(value, i);
                     if (v instanceof Resource) {
-                        others.add(((Resource)v).getURI());
+                        others.add(getURI ((Resource)v));
                     }
                     else {
                         String s = v.toString();
@@ -306,7 +319,7 @@ public class OntEntityFactory extends EntityRegistry {
                 }
             }
             else if (value instanceof Resource) {
-                others.add(((Resource)value).getURI());
+                others.add(getURI ((Resource)value));
             }
             else {
                 String v = value.toString();
@@ -808,7 +821,7 @@ public class OntEntityFactory extends EntityRegistry {
 
     boolean _stitch (Entity ent, String name, Resource res) {
         boolean stitched = false;
-        String uri = res.getURI();
+        String uri = getURI (res);
         if (uri != null) {
             for (Iterator<Entity> iter = find (Props.URI, uri);
                  iter.hasNext();) {
@@ -934,7 +947,7 @@ public class OntEntityFactory extends EntityRegistry {
                 }
             }
             else if (or.isClass()) {
-                if (or.uri != null) {
+                if (or.uri != null) {                    
                     OntologyResource old = resources.put(res, or);
                     if (old != null) {
                         logger.warning
@@ -957,14 +970,15 @@ public class OntEntityFactory extends EntityRegistry {
                         String[] vals = new String[len];
                         for (int i = 0; i < len; ++i) {
                             Resource r = (Resource) Array.get(value, i);
-                            vals[i] = r.getURI();
+                            vals[i] = getURI (r);
                         }
                         ds.set(me.getKey(), vals);
                     }
                     else {
                         Resource r = (Resource) me.getValue();
-                        if (res.getURI() != null)
-                            ds.set(me.getKey(), r.getURI());
+                        String uri = getURI (r);
+                        if (uri != null)
+                            ds.set(me.getKey(), uri);
                     }
                 }
                 logger.info(">>>>>>> Ontology <<<<<<<<\n"+or);
@@ -1046,7 +1060,7 @@ public class OntEntityFactory extends EntityRegistry {
                 RDFNode obj = stm.getObject();
                 System.out.print("-- "+prop.getLocalName()+": ");
                 if (obj.isResource()) {
-                    System.out.print(obj.asResource().getURI());
+                    System.out.print(getURI (obj.asResource()));
                 }
                 else if (obj.isLiteral()) {
                     System.out.print(obj.asLiteral().getValue());

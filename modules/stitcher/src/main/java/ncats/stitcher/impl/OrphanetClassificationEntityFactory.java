@@ -98,9 +98,12 @@ public class OrphanetClassificationEntityFactory extends EntityRegistry {
                 if (d.parent != null) {
                     Entity p = instrument (d.parent);
                     if (p != null) {
-                        d.entity.stitch
-                            (p, R_subClassOf,
-                             source != null ? source.getName() : null);
+                        Map<String, Object> r = new LinkedHashMap<>();
+                        if (source != null)
+                            r.put(SOURCE, source.getName());
+                        
+                        d.entity.stitch(p, R_subClassOf,
+                                        "ORPHA:"+d.parent.orphaNumber, r);
                         //System.out.println(d.entity.getId()+" -> "+p.getId());
                     }
                 }
