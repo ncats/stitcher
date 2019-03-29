@@ -415,32 +415,19 @@ public class Entity extends CNode {
         }
     }
     
-    public Entity[] neighbors () {
-        return neighbors (Entity.KEYS);
-    }
-
-    public Entity[] _neighbors () {
-        return _neighbors (Entity.KEYS);
-    }
-
     protected Entity[] _neighbors (Direction dir, RelationshipType... keys) {
         Set<Entity> neighbors = new TreeSet<Entity>();
         for (Relationship rel : _node.getRelationships(dir, keys)) {
             Node n = rel.getOtherNode(_node);
             neighbors.add(_getEntity (n));
         }
-        return neighbors.toArray(new Entity[0]);        
-    }
-    
-    public Entity[] neighbors (StitchKey... keys) {
-        try (Transaction tx = gdb.beginTx()) {
-            Entity[] nb = _neighbors (Direction.BOTH, keys);
-            tx.success();
-            return nb;
-        }
+        return neighbors.toArray(new Entity[0]);
     }
 
     public Entity[] neighbors (RelationshipType... keys) {
+        if (keys == null || keys.length == 0)
+            keys = Entity.KEYS;
+
         try (Transaction tx = gdb.beginTx()) {
             Entity[] nb = _neighbors (Direction.BOTH, keys);
             tx.success();
@@ -448,13 +435,15 @@ public class Entity extends CNode {
         }
     }
 
-    public Stitch getStitch(int ver) {
+    public Stitch getStitch (int ver) {
         try (Transaction tx = gdb.beginTx()) {
             Stitch s = null;
-            for (Relationship rel : _node.getRelationships(Direction.BOTH, AuxRelType.PAYLOAD)) {
+            for (Relationship rel : _node.getRelationships
+                     (Direction.BOTH, AuxRelType.PAYLOAD)) {
                 if (datasource().getKey().equals(rel.getProperty(SOURCE))) {
                     Node n = rel.getOtherNode(_node);
-                    for (Relationship sr: n.getRelationships(Direction.BOTH, AuxRelType.STITCH)) {
+                    for (Relationship sr: n.getRelationships
+                             (Direction.BOTH, AuxRelType.STITCH)) {
                         Node sn = sr.getOtherNode(n);
                         if (sn.hasLabel(Label.label("stitch_v"+ver)))
                             s = Stitch.getStitch(sn);

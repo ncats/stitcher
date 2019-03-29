@@ -114,76 +114,73 @@ public class EntityFactory implements Props, AutoCloseable {
         }
     }
 
-    static class StronglyConnectedComponents implements Iterator<Component> {
-        int current;
-        long[][] components;
-        long[] singletons;
-        final GraphDatabaseService gdb;
+    static class EquivalenceClass {
+        final List<Long> singletons = new ArrayList<>();
+        final UnionFind eqv = new UnionFind ();
+        final Predication predication;
+        final Map<Integer, Integer> hist = new TreeMap<>();
+        final int minscore;
 
-        StronglyConnectedComponents (GraphDatabaseService gdb,
-                                     final Predication predication) {
-            try (Transaction tx = gdb.beginTx()) {
-                UnionFind eqv = new UnionFind ();
-                List<Long> singletons = new ArrayList<Long>();
-                
-                gdb.findNodes(AuxNodeType.ENTITY).stream().forEach(node -> {
-                        Map<Node, Map<StitchKey, Object>> sv =
-                            stitchValues (node);
-                        if (sv.isEmpty()) {
-                            singletons.add(node.getId());
-                        }
-                        else {
-                            Entity n = Entity._getEntity(node);
-                            List<Node> bestNodes = new ArrayList<>();
-                            List<Node> eqvnodes = new ArrayList<>();
-                            int bestScore = 0;
-                            for (Map.Entry<Node, Map<StitchKey, Object>>
-                                     me : sv.entrySet()) {
-                                Map<StitchKey, Object> stitches = me.getValue();
-                                Entity m = Entity._getEntity(me.getKey());
-                                // we should properly make sure directionality
-                                // is correct here
-                                int score = predication
-                                    .score(n, stitches, m);
-                                if (score == 0) {
-                                }
-                                else if (score > bestScore) {
-                                    bestScore = score;
-                                    bestNodes.clear();
-                                    bestNodes.add(me.getKey());
-                                }
-                                else if (score == bestScore) {
-                                    bestNodes.add(me.getKey());
-                                }
-
-                                if (stitches.containsKey
-                                    (StitchKey.R_equivalentClass)
-                                    || stitches.containsKey
-                                    (StitchKey.R_exactMatch))
-                                    eqvnodes.add(me.getKey());
-                            }
-                            
-                            if (!bestNodes.isEmpty() || !eqvnodes.isEmpty()) {
-                                for (Node bn : bestNodes)
-                                    eqv.union(node.getId(), bn.getId());
-
-                                for (Node eqn : eqvnodes)
-                                    eqv.union(node.getId(), eqn.getId());
-                            }
-                            else {
-                                singletons.add(node.getId());
-                            }
-                        }
-                    });
-                
-                this.singletons = new long[singletons.size()];
-                for (int i = 0; i < this.singletons.length; ++i)
-                    this.singletons[i] = singletons.get(i);
-                components = eqv.components();
-                tx.success();
-            }
-            this.gdb = gdb;
+        EquivalenceClass (Predication predication) {
+            this (1, predication);
         }
+        
+        EquivalenceClass (int minscore, Predication predication) {
+            if (predication == null)
+                predication = (s, sv, t) -> 1;
+            this.minscore = minscore;
+            this.predication = predication;
+        }
+
+        public void add (Node node) {
+            Map<Node, Map<StitchKey, Object>> sv = stitchValues (node);
+            if (sv.isEmpty()) {
+                singletons.add(node.getId());
+            }
+            else {
+                Entity n = Entity._getEntity(node);
+                List<Node> bestNodes = new ArrayList<>();
+                List<Node> eqvnodes = new ArrayList<>();
+                int bestScore = 0;
+                for (Map.Entry<Node, Map<StitchKey, Object>>
+                         me : sv.entrySet()) {
+                    Map<StitchKey, Object> stitches = me.getValue();
+                    Entity m = Entity._getEntity(me.getKey());
+                    
+                    // we should properly make sure directionality
+                    // is correct here
+                    int score = predication.score(n, stitches, m);
+                    Integer c = hist.get(score);
+                    hist.put(score, c==null ? 1:c+1);
+                    
+                    if (score < minscore) {
+                    }
+                    else if (score > bestScore) {
+                        bestScore = score;
+                        bestNodes.clear();
+                        bestNodes.add(me.getKey());
+                    }
+                    else if (score == bestScore) {
+                        bestNodes.add(me.getKey());
+                    }
+
+                    if (stitches.containsKey(StitchKey.R_equivalentClass)
+                        || stitches.containsKey(StitchKey.R_exactMatch))
+                        eqvnodes.add(me.getKey());
+                }
+                
+                if (!bestNodes.isEmpty() || !eqvnodes.isEmpty()) {
+                    for (Node bn : bestNodes)
+                        eqv.union(node.getId(), bn.getId());
+
+                    for (Node eqn : eqvnodes)
+                        eqv.union(node.getId(), eqn.getId());
+                }
+                else {
+                    singletons.add(node.getId());
+                }
+            }            
+        } // add ()
 
         Map<Node, Map<StitchKey, Object>> stitchValues (Node node) {
             Map<Node, Map<StitchKey, List>> edges = new HashMap<>();
@@ -224,6 +221,51 @@ public class EntityFactory implements Props, AutoCloseable {
                     sv.put(me.getKey(), values);
             }
             return sv;
+        }
+        
+        public long[] singletons () { return Util.toArray(singletons); }
+        public long[][] components () { return eqv.components(); }
+
+        public void dumpScoreHist () {
+            try (PrintStream ps = new PrintStream
+                 (new FileOutputStream ("strong_cc.hist"))) {
+                for (Map.Entry<Integer, Integer> me : hist.entrySet()) {
+                    ps.println(me.getKey()+" "+me.getValue());
+                }
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    } // EquivalenceClass
+    
+    static class StronglyConnectedComponents implements Iterator<Component> {
+        int current;
+        long[][] components;
+        long[] singletons;
+        final GraphDatabaseService gdb;
+
+        StronglyConnectedComponents (final GraphDatabaseService gdb,
+                                     final Predication predication) {
+            this (gdb, predication, 1);
+        }
+        
+        StronglyConnectedComponents (final GraphDatabaseService gdb,
+                                     final Predication predication,
+                                     final int minscore) {
+            EquivalenceClass eqv = new EquivalenceClass (minscore, predication);
+            try (Transaction tx = gdb.beginTx()) {
+                gdb.findNodes(AuxNodeType.ENTITY).stream().forEach(node -> {
+                        eqv.add(node);
+                    });
+                
+                tx.success();
+            }
+            eqv.dumpScoreHist();
+            
+            this.singletons = eqv.singletons();
+            this.components = eqv.components();
+            this.gdb = gdb;
         }
 
         public long[][] components () {
@@ -1407,7 +1449,12 @@ public class EntityFactory implements Props, AutoCloseable {
     }
 
     public Iterator<Component> connectedComponents (Predication predication) {
-        return new StronglyConnectedComponents (gdb, predication);
+        return connectedComponents (1, predication);
+    }
+    
+    public Iterator<Component> connectedComponents (int minscore,
+                                                    Predication predication) {
+        return new StronglyConnectedComponents (gdb, predication, minscore);
     }
 
     public Collection<Component> components () {

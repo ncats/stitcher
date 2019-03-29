@@ -456,6 +456,121 @@ public class GARDEntityFactory extends EntityRegistry {
             json = mapper.readTree(con.getInputStream());
         }
     }
+
+    class GARDJson {
+        final ObjectMapper mapper = new ObjectMapper ();
+        final Set<Long> seen = new HashSet<>();
+
+        GARDJson () {
+        }
+
+        public void dump (Label... nblabels) {
+            dump (System.out, nblabels);
+        }
+        
+        public void dump (PrintStream ps, Label... nblabels) {
+            seen.clear();
+
+            ps.print("[");
+            int top = 100, count = 0;
+            Set<Entity> related = new LinkedHashSet<>();
+            do {
+                Entity[] entities = entities (count, top, "GARD_v1");
+                for (Entity e : entities) {
+                    ObjectNode obj = serialize (related, e, nblabels);
+                    ps.println(obj+",");
+                }
+                
+                count += entities.length;
+                if (/*true ||*/ entities.length < top)
+                    break;
+            }
+            while (true);
+            logger.info(count+" GARD entities!");
+
+            for (Entity e : related) {
+                expand (ps, e);
+            }
+            ps.println("]");
+        }
+        
+        JsonNode labels (Entity e) {
+            Set<String> labels = new TreeSet<>(e.labels());
+            labels.remove("ENTITY");
+            labels.remove("COMPONENT");
+            return mapper.valueToTree(labels);
+        }
+
+        ObjectNode serialize (Set<Entity> neighbors,
+                              Entity e, Label...nblabels) {
+            Map<String, Object> data = e.payload();
+            ObjectNode obj = mapper.createObjectNode();
+            obj.put("_id", e.getId());
+            obj.put("_labels", labels(e));
+            
+            for (Map.Entry<String, Object> me : data.entrySet()) {
+                obj.put(me.getKey(), mapper.valueToTree(me.getValue()));
+            }
+            
+            Entity[] nb = e.neighbors(new StitchKey[]{N_Name, I_CODE});
+            ArrayNode related = mapper.createArrayNode();
+            for (Entity n : nb) {
+                if (n.hasAnyLabels(nblabels)) {
+                    ObjectNode ne = mapper.createObjectNode();
+                    ne.put("_id", n.getId());
+                    ne.put("_labels", labels(n));
+                    related.add(ne);
+                    neighbors.add(n);
+                }
+            }
+            obj.put("_related", related);
+
+            nb = e.outNeighbors(R_subClassOf);
+            if (nb.length > 0) {
+                ArrayNode parents = mapper.createArrayNode();
+                for (Entity n : nb) {
+                    ObjectNode ne = mapper.createObjectNode();
+                    ne.put("_id", n.getId());
+                    ne.put("_labels", labels (n));
+                    parents.add(ne);
+                }
+                obj.put("_parents", parents);
+            }
+
+            return obj;
+        }
+
+        void expand (PrintStream ps, Entity e) {
+            if (seen.contains(e.getId()))
+                return;
+
+            Map<String, Object> data = e.payload();
+            ObjectNode obj = mapper.createObjectNode();
+            obj.put("_id", e.getId());
+            obj.put("_labels", labels(e));
+            
+            for (Map.Entry<String, Object> me : data.entrySet()) {
+                obj.put(me.getKey(), mapper.valueToTree(me.getValue()));
+            }
+            
+            Entity[] nb = e.outNeighbors(R_subClassOf);
+            if (nb.length > 0) {
+                ArrayNode parents = mapper.createArrayNode();
+                for (Entity n : nb) {
+                    //ObjectNode ne = mapper.createObjectNode();
+                    //ne.put("_id", n.getId());
+                    //ne.put("_labels", labels (n));
+                    parents.add(n.getId());
+                }
+                obj.put("_parents", parents);
+            }
+            ps.println((seen.isEmpty() ? "":",")+obj);
+            
+            seen.add(e.getId());
+            for (Entity n : nb)
+                expand (ps, n);
+        }
+    }
     
     public GARDEntityFactory (GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -593,6 +708,10 @@ public class GARDEntityFactory extends EntityRegistry {
                     score += ((String)value).length();
                 }
                 break;
+                
+            case I_GENE:
+                score += 5;
+                break;
 
             case R_subClassOf: // ?
                 break;
@@ -640,25 +759,22 @@ public class GARDEntityFactory extends EntityRegistry {
             Label.label("T048"), // Mental or Behavioral Dysfunction
         };
 
-        Predication rule1 = new Predication () {
-                public int score
-                    (Entity source, Map<StitchKey, Object> sv, Entity target) {
-                    int score = 0;
-                    if (!"deprecated".equals(source._get(STATUS))
-                        && !"deprecated".equals(target._get(STATUS))
-                        && source._hasAnyLabels(sources)
-                        && target._hasAnyLabels(sources)
-                        && !source._hasAnyLabels(types)
-                        && !target._hasAnyLabels(types)) {
-                        score = (int)(source.similarity(target, N_Name, I_CODE)
-                                      * calcScore (sv) + 0.5);
-                    }
-                    return score;
-                }
-            };
+        Predication rule1 = (source, sv, target) -> {
+            int score = 0;
+            if (!"deprecated".equals(source._get(STATUS))
+                && !"deprecated".equals(target._get(STATUS))
+                && source._hasAnyLabels(sources)
+                && target._hasAnyLabels(sources)
+                && !source._hasAnyLabels(types)
+                && !target._hasAnyLabels(types)) {
+                score = (int)(source.similarity(target, N_Name, I_CODE)
+                              * calcScore (sv) + 0.5);
+            }
+            return score;
+        };
 
         logger.info("######### generating strongly connected components...");
-        for (Iterator<Component> it = connectedComponents(rule1);
+        for (Iterator<Component> it = connectedComponents (2, rule1);
              it.hasNext();) {
             Component comp = it.next();
             System.out.println("--");
@@ -830,6 +946,15 @@ public class GARDEntityFactory extends EntityRegistry {
         return keys.size();
     }
 
+    public void dumpJsonGARD (Label... nblabels) {
+        try (PrintStream ps = new PrintStream
+             (new FileOutputStream ("gard-matched.json"))) {
+            new GARDJson().dump(ps, nblabels);
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
     
     public static class Register {
         public static void main (String[] argv) throws Exception {
@@ -880,7 +1005,9 @@ public class GARDEntityFactory extends EntityRegistry {
         
         try (GARDEntityFactory gef = new GARDEntityFactory (argv[0])) {
             //gef.checkGARD(1);
-            gef.showComponents();
+            //gef.showComponents();
+            gef.dumpJsonGARD(Label.label("MONDO.owl.gz"),
+                             Label.label("ordo.owl.gz"));
         }
     }
 }
