@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import java.util.concurrent.Callable;
 import java.lang.reflect.Array;
 
-import java.sql.*;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 
