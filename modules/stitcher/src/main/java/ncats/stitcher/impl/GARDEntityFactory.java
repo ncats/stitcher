@@ -1005,9 +1005,11 @@ public class GARDEntityFactory extends EntityRegistry {
         
         try (GARDEntityFactory gef = new GARDEntityFactory (argv[0])) {
             //gef.checkGARD(1);
-            //gef.showComponents();
+            gef.showComponents();
+            /*
             gef.dumpJsonGARD(Label.label("MONDO.owl.gz"),
                              Label.label("ordo.owl.gz"));
+            */
         }
     }
 }

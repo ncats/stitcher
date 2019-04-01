@@ -43,3 +43,10 @@ match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.statu
 match(n:`OMIM.ttl.gz`:T047) where none(x in labels(n) where x='T028') return count(n)
 
 MATCH (n:`Designated`)-[e*1..2]-(m:`human_phenotype`)-[]-(d:DATA) unwind e as g with distinct g.gene as g,count(n) as cnt unwind g as Gene return Gene,sum(cnt) as Count order by Count desc
+
+match(n)-[]-(d:DATA) where d.id='MONDO:0019035' with n,d match(n)-[:R_subClassOf*1..9]->(m)-[]-(a:DATA) return n,d,m,a
+
+match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() return count(n)
+
+# all leaf nodes descendants of rare disease
+match(n)-[]-(d:DATA) where  exists(d.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() with n match(n)-[:R_subClassOf*1..9]->(m) where 'MONDO:0021200' in m.I_CODE return count(distinct n)
