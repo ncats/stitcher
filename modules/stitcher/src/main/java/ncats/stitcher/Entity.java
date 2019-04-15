@@ -507,8 +507,17 @@ public class Entity extends CNode {
     public double similarity (Entity other, StitchKey... keys) {
         Map<StitchKey, Object> values = keys (other);
         if (values.containsKey(R_exactMatch)
-            || values.containsKey(R_equivalentClass))
+            || values.containsKey(R_equivalentClass)) {
+            if (keys != null && keys.length > 0) {
+                // make sure it's connected by at least one of
+                //  the specified keys
+                for (StitchKey sk : keys)
+                    if (values.containsKey(sk))
+                        return 1.;
+                return 0.; // no dice
+            }
             return 1.;
+        }
         
         if (keys == null || keys.length == 0) {
             keys = KEYS;

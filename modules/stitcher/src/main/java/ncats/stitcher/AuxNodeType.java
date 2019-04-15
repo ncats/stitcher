@@ -14,5 +14,6 @@ public enum AuxNodeType implements Label {
     DATA,
     ENTITY,
     DATASOURCE,
-    BLACKLIST
+    BLACKLIST,
+    TRANSIENT
 }

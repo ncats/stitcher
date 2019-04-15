@@ -39,6 +39,11 @@ import org.neo4j.index.lucene.TimelineIndex;
 
 import ncats.stitcher.graph.UnionFind;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 // NOTE: methods and variables that begin with underscore "_" generally assume that a graph database transaction is already open!
 
 public class EntityFactory implements Props, AutoCloseable {
@@ -152,8 +157,14 @@ public class EntityFactory implements Props, AutoCloseable {
                     int score = predication.score(n, stitches, m);
                     Integer c = hist.get(score);
                     hist.put(score, c==null ? 1:c+1);
-                    
-                    if (score < minscore) {
+
+                    if ((stitches.containsKey(StitchKey.R_equivalentClass)
+                         || stitches.containsKey(StitchKey.R_exactMatch))
+                        && score > 0) {
+                        eqvnodes.add(me.getKey());
+                    }
+                    else if (score < minscore
+                             || stitches.containsKey(StitchKey.R_subClassOf)) {
                     }
                     else if (score > bestScore) {
                         bestScore = score;
@@ -163,18 +174,15 @@ public class EntityFactory implements Props, AutoCloseable {
                     else if (score == bestScore) {
                         bestNodes.add(me.getKey());
                     }
-
-                    if (stitches.containsKey(StitchKey.R_equivalentClass)
-                        || stitches.containsKey(StitchKey.R_exactMatch))
-                        eqvnodes.add(me.getKey());
                 }
-                
-                if (!bestNodes.isEmpty() || !eqvnodes.isEmpty()) {
-                    for (Node bn : bestNodes)
-                        eqv.union(node.getId(), bn.getId());
 
+                if (!eqvnodes.isEmpty()) {
                     for (Node eqn : eqvnodes)
                         eqv.union(node.getId(), eqn.getId());
+                }
+                else if (!bestNodes.isEmpty()) {
+                    for (Node bn : bestNodes)
+                        eqv.union(node.getId(), bn.getId());
                 }
                 else {
                     singletons.add(node.getId());
@@ -596,6 +604,30 @@ public class EntityFactory implements Props, AutoCloseable {
             return false;
         }
 
+        /*
+         * potential function for this component
+         */
+        public Double potential (StitchKey... keys) {
+            if (keys == null || keys.length == 0)
+                keys = Entity.KEYS;
+
+            double score = 0.0;
+            // this assumes the component is a clique
+            for (int i = 0; i < entities.length; ++i) {
+                for (int j = i+1; j < entities.length; ++j) {
+                    double s = entities[i].similarity(entities[j], keys);
+                    score += s;
+                }
+            }
+
+            if (entities.length > 1) {
+                score /= entities.length*(entities.length-1);
+            }
+            else score = 0.;
+            
+            return score;
+        }
+        
         @Override
         public long[] nodes (StitchKey key, Object value) {
             Set<Long> nodes = new TreeSet<>();
@@ -880,6 +912,67 @@ public class EntityFactory implements Props, AutoCloseable {
             return getClass().getName()+"{id="+id+",size="
                 +nodes.size()+",nodes="+nodes+"}";
         }
+
+        public JsonNode toJson () {
+            ObjectMapper mapper = new ObjectMapper ();
+            ObjectNode comp = mapper.createObjectNode();            
+            try (Transaction tx = gdb.beginTx()) {
+                comp.put("id", id);
+                comp.put("size", nodes.size());
+                ObjectNode stitches = mapper.createObjectNode();
+                for (StitchKey key : Entity.KEYS) {
+                    Map<Object, Integer> sv = values (key);
+                    if (!sv.isEmpty()) {
+                        ArrayNode svkey = mapper.createArrayNode();
+                        for (Map.Entry<Object, Integer> me : sv.entrySet()) {
+                            ObjectNode sk = mapper.createObjectNode();
+                            sk.put("value", mapper.valueToTree(me.getKey()));
+                            sk.put("count", me.getValue());
+                            sk.put("total",
+                                   stitchCount (gdb, key.name(), me.getKey()));
+                            svkey.add(sk);
+                        }
+                        stitches.put(key.name(), svkey);
+                    }
+                }
+                comp.put("stitches", stitches);
+
+                ArrayNode nodes = mapper.createArrayNode();
+                Set<Relationship> relationships = new LinkedHashSet<>();
+                for (Long id : this.nodes) {
+                    ObjectNode n = mapper.createObjectNode();
+                    Node node = gdb.getNodeById(id);
+                    n.put("id", id);
+                    ArrayNode labels = mapper.createArrayNode();
+                    for (Label l : node.getLabels())
+                        labels.add(l.name());
+                    n.put("labels", labels);
+                    n.put("properties", Util.toJsonNode(node));
+                    
+                    for (Relationship rel : node.getRelationships()) {
+                        Node xn = rel.getOtherNode(node);
+                        if (this.nodes.contains(xn.getId()))
+                            relationships.add(rel);
+                    }
+                    nodes.add(n);
+                }
+                comp.put("nodes", nodes);
+
+                ArrayNode rels = mapper.createArrayNode();
+                for (Relationship rel : relationships) {
+                    ObjectNode rn = mapper.createObjectNode();
+                    rn.put("id", rel.getId());
+                    rn.put("source", rel.getStartNode().getId());
+                    rn.put("target", rel.getEndNode().getId());
+                    rn.put("type", rel.getType().name());
+                    rn.put("properties", Util.toJsonNode(rel));
+                    rels.add(rn);
+                }
+                comp.put("relationships", rels);
+                tx.success();
+            }
+            return comp;
+        }
     } // ComponentImpl
 
     static class ComponentLazy extends ComponentImpl {
@@ -926,7 +1019,7 @@ public class EntityFactory implements Props, AutoCloseable {
             init ();
             return super.iterator();
         }
-        @Override public Double score () {
+        @Override public Double potential (StitchKey... keys) {
             return rank.doubleValue();
         }
     }
@@ -1037,7 +1130,7 @@ public class EntityFactory implements Props, AutoCloseable {
         }
 
         @Override
-        public Double score () {
+        public Double potential (StitchKey... keys) {
             int priority = 1;
             for (StitchKey sk: values.keySet())
                 if (priority < sk.priority)
@@ -1196,7 +1289,7 @@ public class EntityFactory implements Props, AutoCloseable {
                 dfs (nodes, edges, xn, key, value); 
         }
     }
-    
+
     public GraphDb getGraphDb () { return graphDb; }
     public CacheFactory getCache () { return graphDb.getCache(); }
     public void setCache (CacheFactory cache) {

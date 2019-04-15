@@ -19,5 +19,7 @@ public class DefaultComponent implements Component {
     public Component and (Component c) { return comp.and(c); }
     public Component add (Component c) { return comp.add(c); }
     public Stream<Entity> stream () { return comp.stream(); }
-    public Double score () { return comp.score(); }
+    public Double potential (StitchKey... keys) {
+        return comp.potential(keys);
+    }
 }

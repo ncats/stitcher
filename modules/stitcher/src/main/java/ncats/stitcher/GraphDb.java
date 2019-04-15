@@ -182,17 +182,10 @@ public class GraphDb extends TransactionEventHandler.Adapter
         return getInstance (dir, null);
     }
 
-
-
-
-    public static synchronized GraphDb getInstance(File dir, CacheFactory cache) throws IOException {
-
-        return INSTANCES.computeIfAbsent(dir, Uncheck.throwingFunction(f-> new GraphDb(f, cache)));
-//        GraphDb gdb = INSTANCES.get(dir);
-//        if (gdb == null) {
-//            INSTANCES.put(dir, gdb = new GraphDb (dir, cache));
-//        }
-//        return gdb;
+    public static synchronized GraphDb getInstance
+        (File dir, CacheFactory cache) throws IOException {
+        return INSTANCES.computeIfAbsent
+            (dir, Uncheck.throwingFunction(f-> new GraphDb(f, cache)));
     }
 
     public static GraphDb getInstance (GraphDatabaseService gdb) {

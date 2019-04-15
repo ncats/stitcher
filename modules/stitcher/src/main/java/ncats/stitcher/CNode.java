@@ -128,8 +128,16 @@ public class CNode implements Props, Comparable<CNode> {
         }
     }
     
-    public void _addLabel (Label label) {
-        _node.addLabel(label);
+    public void _addLabel (Label... labels) {
+        for (Label l : labels)
+            _node.addLabel(l);
+    }
+
+    public void addLabel (Label... labels) {
+        try (Transaction tx = gdb.beginTx()) {
+            _addLabel (labels);
+            tx.success();
+        }
     }
 
     public Set<String> _labels () {

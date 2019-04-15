@@ -194,22 +194,39 @@ public class OntEntityFactory extends EntityRegistry {
             .add(N_Name, "hasExactSynonym")
             .add(N_Name, "hasRelatedSynonym")
             .add(N_Name, "IAO_0000118") // alternative term
+            .add(N_Name, "P90") // synonym
+            .add(N_Name, "P107") // display name
+            .add(N_Name, "P108") // preferred name
             .add(I_CODE, "hasDbXref")
             .add(I_CODE, "id")
             .add(I_CODE, "notation")
             .add(I_CODE, "hasAlternativeId")
+            // Contains a Concept Unique Identifier for those concepts that
+            //  appear in NCI Metathesaurus but not in the NLM UMLS
+            .add(I_CODE, "P208")
+            .add(I_CODE, "P215") // KEGG
+            .add(I_CODE, "P332") // MGI
+            .add(I_CODE, "P368") // CHEBI
+            .add(I_CODE, "P369") // HGNC
+            .add(I_CODE, "P387") // GO
             .add(I_CODE, "SY")
             .add(I_CODE, "RQ")
             .add(I_CODE, "cui")
+            .add(I_UNII, "P319")
             .add(I_GENE, "GENESYMBOL")
             .add(I_GENE, "OGG_0000000004")
+            .add(I_GENE, "P321")
             .add(I_PMID, "OGG_0000000030")
+            .add(I_PMID, "P171")
             .add(I_CAS, "CAS")
+            .add(I_CAS, "P210")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "inSubset")
             .add(T_Keyword, "type")
             .add(T_Keyword, "hasOBONamespace")
             .add(T_Keyword, "hasSTY")
+            .add(T_Keyword, "P106") // nci thesaurus
+            .add(T_Keyword, "P386") // source name
             ;
     }
 
@@ -229,7 +246,8 @@ public class OntEntityFactory extends EntityRegistry {
         // map http://purl.bioontology.org/ontology/MESH/D014406
         // to http://purl.obolibrary.org/obo/MESH_D014406
         // so as to match MONDO reference
-        if (uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
+        if (uri != null
+            && uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
             String[] toks = uri.split("/");
             uri = "http://purl.obolibrary.org/obo/MESH_"+toks[toks.length-1];
         }
@@ -239,6 +257,12 @@ public class OntEntityFactory extends EntityRegistry {
     protected String transform (String value) {
         if (value.startsWith("UMLS_CUI")) {
             value = value.replaceAll("_CUI", "");
+        }
+        else if (value.startsWith("UniProtKB:")) {
+            int pos = value.indexOf('-');
+            if (pos > 0)
+                // UniProtKB:P52198-1 => UniProtKB:P52198
+                value = value.substring(0, pos);
         }
         return value;
     }
@@ -352,6 +376,28 @@ public class OntEntityFactory extends EntityRegistry {
         }
         
         if (ontology == null) {
+        }
+        else if (ontology.resource != null
+                 && ontology.resource.getLocalName().equals("Thesaurus.owl")) {
+            // NCI Thesaurus
+            obj = data.get("NHC0");
+            if (obj != null)
+                xrefs.add("NCIT:"+obj);
+            obj = data.get("P100");
+            if (obj != null)
+                xrefs.add("OMIM:"+obj);
+            obj = data.get("P175");
+            if (obj != null)
+                xrefs.add("NSC:"+obj);
+            obj = data.get("P207");
+            if (obj != null)
+                xrefs.add("UMLS:"+obj);
+            obj = data.remove("P321");
+            if (obj != null)
+                xrefs.add("GENE:"+obj);
+            obj = data.get("P93");
+            if (obj != null)
+                xrefs.add("UNIPROTKB:"+obj);
         }
         else if (ontology.links.containsKey("versionIRI")
                  && ontology.links.get("versionIRI")
@@ -810,6 +856,11 @@ public class OntEntityFactory extends EntityRegistry {
         }
 
         Entity ent = register (sigh (data));
+        if (or.props.isEmpty() && or.axioms.isEmpty()) {
+            // transient entity
+            ent.addLabel(AuxNodeType.TRANSIENT);
+        }
+        
         Object deprecated = data.get("deprecated");
         if (deprecated != null
             && "true".equalsIgnoreCase(deprecated.toString())) {
