@@ -378,7 +378,7 @@ public class OntEntityFactory extends EntityRegistry {
         if (ontology == null) {
         }
         else if (ontology.resource != null
-                 && ontology.resource.getLocalName().equals("Thesaurus.owl")) {
+                 && "Thesaurus.owl".equals(ontology.resource.getLocalName())) {
             // NCI Thesaurus
             obj = data.get("NHC0");
             if (obj != null)
