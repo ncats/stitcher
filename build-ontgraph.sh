@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v5"
+version="v7"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -16,6 +16,7 @@ owl="DOID.owl.gz \
    MESH.ttl.gz \
    OMIM.ttl.gz \
    ordo.owl.gz \
+   Thesaurus.owl.gz \
    MONDO.owl.gz \
    BrendaTissue.owl.gz \
    UBERON.owl.gz \

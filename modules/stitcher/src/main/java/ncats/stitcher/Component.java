@@ -12,6 +12,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * A (connected) component is a set of linked nodes within a graph
  */
@@ -211,8 +213,14 @@ public interface Component extends Iterable<Entity> {
     default Stream<Entity> stream () {
         return Stream.of(entities ());
     }
+    
     /*
-     * return the score for this component
+     * return the potential for this component; smaller is better
      */
-    default Double score () { return null; }
+    default Double potential (StitchKey... keys) { return null; }
+
+    default JsonNode toJson () {
+        throw new UnsupportedOperationException
+            ("toJson() is not supported for this implementation");
+    }
 }

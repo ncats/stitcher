@@ -106,6 +106,16 @@ public class GARDEntityFactory extends EntityRegistry {
                 if (n.parent == null && !n.children.isEmpty())
                     dumpNode (n);
             }
+
+            try (FileOutputStream fos =
+                 new FileOutputStream ("C"+comp.getId()+".json")) {
+                ObjectMapper mapper = new ObjectMapper ();
+                mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(fos, comp.toJson());
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
         public void dumpNode (EqvNode n) {
@@ -128,13 +138,39 @@ public class GARDEntityFactory extends EntityRegistry {
                 ps.println(".. ["+me.getKey()+"]");
                 for (Map.Entry<Object, Set<Long>> ve
                          : me.getValue().entrySet()) {
-                    Component c = getComponent
-                        (ve.getValue().toArray(new Long[0]));
+                    Set<Long> clique = ve.getValue();
+                    Component c = getComponent (clique.toArray(new Long[0]));
                     Map<Object, Integer> stats = c.stats(me.getKey());
                     ps.println("....\""+ve.getKey()+"\"="
                                +stats.get(ve.getKey())+"/"
                                +stitchCount (me.getKey(), ve.getKey())
-                               +" "+c.getId()+" ("+c.size()+") "+c.nodeSet());
+                               +" "+String.format("%1$.3f",
+                                                  c.potential(N_Name, I_CODE))
+                               +" ("+c.size()+") "+c.nodeSet());
+                    for (Long id : clique) {
+                        long[] nb = neighbors (id, stitches);
+                        int nbest = 0;
+                        Entity best = null;
+                        Entity e = entity (id);
+                        for (int i = 0; i < nb.length; ++i) {
+                            if (nb[i] != id) {
+                                Entity ne = entity (nb[i]);
+                                int nv = calcScore (e.keys(ne));
+                                if (nv > nbest
+                                    || (nv == nbest
+                                        && clique.contains(nb[i]))) {
+                                    nbest = nv;
+                                    best = ne;
+                                }
+                            }
+                        }
+                        
+                        if (best != null) {
+                            ps.println("     "+nbest
+                                       +" "+id+" -> "+best.getId()
+                                       +" "+clique.contains(best.getId()));
+                        }
+                    }
                     
                     int q = keys.size();
                     uf.union(q, q);
@@ -457,25 +493,27 @@ public class GARDEntityFactory extends EntityRegistry {
         }
     }
 
-    class GARDJson {
+    class JsonExport {
         final ObjectMapper mapper = new ObjectMapper ();
         final Set<Long> seen = new HashSet<>();
+        final String refLabel;
 
-        GARDJson () {
+        JsonExport (String label) {
+            refLabel = label;
         }
 
-        public void dump (Label... nblabels) {
-            dump (System.out, nblabels);
+        public void export (Label... nblabels) {
+            export (System.out, nblabels);
         }
         
-        public void dump (PrintStream ps, Label... nblabels) {
+        public void export (PrintStream ps, Label... nblabels) {
             seen.clear();
 
             ps.print("[");
             int top = 100, count = 0;
             Set<Entity> related = new LinkedHashSet<>();
             do {
-                Entity[] entities = entities (count, top, "GARD_v1");
+                Entity[] entities = entities (count, top, refLabel);
                 for (Entity e : entities) {
                     ObjectNode obj = serialize (related, e, nblabels);
                     ps.println(obj+",");
@@ -486,7 +524,7 @@ public class GARDEntityFactory extends EntityRegistry {
                     break;
             }
             while (true);
-            logger.info(count+" GARD entities!");
+            logger.info(count+" entities for \""+refLabel+"\"!");
 
             for (Entity e : related) {
                 expand (ps, e);
@@ -501,13 +539,17 @@ public class GARDEntityFactory extends EntityRegistry {
             return mapper.valueToTree(labels);
         }
 
+        ObjectNode createJsonNode (Entity e) {
+            ObjectNode obj = mapper.createObjectNode();
+            obj.put("@id", e.getId());
+            obj.put("@labels", labels(e));
+            return obj;
+        }
+
         ObjectNode serialize (Set<Entity> neighbors,
                               Entity e, Label...nblabels) {
             Map<String, Object> data = e.payload();
-            ObjectNode obj = mapper.createObjectNode();
-            obj.put("_id", e.getId());
-            obj.put("_labels", labels(e));
-            
+            ObjectNode obj = createJsonNode (e);
             for (Map.Entry<String, Object> me : data.entrySet()) {
                 obj.put(me.getKey(), mapper.valueToTree(me.getValue()));
             }
@@ -516,25 +558,21 @@ public class GARDEntityFactory extends EntityRegistry {
             ArrayNode related = mapper.createArrayNode();
             for (Entity n : nb) {
                 if (n.hasAnyLabels(nblabels)) {
-                    ObjectNode ne = mapper.createObjectNode();
-                    ne.put("_id", n.getId());
-                    ne.put("_labels", labels(n));
+                    ObjectNode ne = createJsonNode (n);
                     related.add(ne);
                     neighbors.add(n);
                 }
             }
-            obj.put("_related", related);
+            obj.put("@related", related);
 
             nb = e.outNeighbors(R_subClassOf);
             if (nb.length > 0) {
                 ArrayNode parents = mapper.createArrayNode();
                 for (Entity n : nb) {
-                    ObjectNode ne = mapper.createObjectNode();
-                    ne.put("_id", n.getId());
-                    ne.put("_labels", labels (n));
+                    ObjectNode ne = createJsonNode (n);
                     parents.add(ne);
                 }
-                obj.put("_parents", parents);
+                obj.put("@parents", parents);
             }
 
             return obj;
@@ -545,9 +583,7 @@ public class GARDEntityFactory extends EntityRegistry {
                 return;
 
             Map<String, Object> data = e.payload();
-            ObjectNode obj = mapper.createObjectNode();
-            obj.put("_id", e.getId());
-            obj.put("_labels", labels(e));
+            ObjectNode obj = createJsonNode (e);
             
             for (Map.Entry<String, Object> me : data.entrySet()) {
                 obj.put(me.getKey(), mapper.valueToTree(me.getValue()));
@@ -557,12 +593,10 @@ public class GARDEntityFactory extends EntityRegistry {
             if (nb.length > 0) {
                 ArrayNode parents = mapper.createArrayNode();
                 for (Entity n : nb) {
-                    //ObjectNode ne = mapper.createObjectNode();
-                    //ne.put("_id", n.getId());
-                    //ne.put("_labels", labels (n));
+                    //ObjectNode ne = createJsonNode (n);
                     parents.add(n.getId());
                 }
-                obj.put("_parents", parents);
+                obj.put("@parents", parents);
             }
             ps.println((seen.isEmpty() ? "":",")+obj);
             
@@ -691,26 +725,30 @@ public class GARDEntityFactory extends EntityRegistry {
             switch (key) {
             case I_CODE:
                 if (value.getClass().isArray()) {
-                    score += 10*Array.getLength(value);
+                    score += Array.getLength(value);
                 }
                 else {
-                    score += 10;
+                    score += 1;
                 }
                 break;
                 
             case N_Name:
                 if (value.getClass().isArray()) {
                     int len = Array.getLength(value);
+                    /*
                     for (int i = 0; i < len; ++i)
                         score += ((String)Array.get(value, i)).length();
+                    */
+                    score += len;
                 }
                 else {
-                    score += ((String)value).length();
+                    //score += ((String)value).length();
+                    ++score;
                 }
                 break;
                 
             case I_GENE:
-                score += 5;
+                //score += 5;
                 break;
 
             case R_subClassOf: // ?
@@ -731,7 +769,7 @@ public class GARDEntityFactory extends EntityRegistry {
             Label.label("MESH.ttl.gz"),
             Label.label("MEDLINEPLUS.ttl.gz"),
             Label.label("MESH.ttl.gz"),
-            Label.label("MONDO.owl.gz"),
+            //Label.label("MONDO.owl.gz"),
             Label.label("OMIM.ttl.gz"),
             Label.label("ordo.owl.gz"),
             Label.label("MEDGEN_v1")
@@ -767,8 +805,11 @@ public class GARDEntityFactory extends EntityRegistry {
                 && target._hasAnyLabels(sources)
                 && !source._hasAnyLabels(types)
                 && !target._hasAnyLabels(types)) {
+                /*
                 score = (int)(source.similarity(target, N_Name, I_CODE)
-                              * calcScore (sv) + 0.5);
+                              * 100.0 + 0.5);
+                              */
+                score = calcScore (sv);
             }
             return score;
         };
@@ -779,112 +820,11 @@ public class GARDEntityFactory extends EntityRegistry {
             Component comp = it.next();
             System.out.println("--");
             System.out.println("++ component "+comp.size()+": "+comp.nodeSet());
-            //dump (System.out, comp);
             UntangleComponent uc = new UntangleComponent (comp, N_Name, I_CODE);
             uc.mergeStitches();
             uc.mergeEntities();
             System.out.println();
         }
-    }
-
-    void dump (OutputStream os, Component comp) {
-        PrintStream ps = new PrintStream (os);
-        ps.println("## "+comp.labels());
-
-        /*
-        Entity[] entities = comp.entities();
-        final Map<String, Double> simmat = new HashMap<>();
-        for (int i = 0; i < entities.length; ++i) {
-            for (int j = i+1; j < entities.length; ++j) {
-                String key = "["
-                    +(entities[i].getId() < entities[j].getId()
-                      ? entities[i].getId()+","+entities[j].getId()
-                      : entities[j].getId()+","+entities[i].getId())
-                    +"]";
-                simmat.put(key, entities[i].similarity(entities[j]));
-            }
-        }
-        List<String> pairs = new ArrayList<>(simmat.keySet());
-        Collections.sort(pairs, (a,b) -> {
-                double s0 = simmat.get(a);
-                double s1 = simmat.get(b);
-                if (s1 > s0) return 1;
-                if (s1 < s0) return -1;
-                return a.compareTo(b);
-            });
-        for (String k : pairs) {
-            ps.println(".. "+String.format("%1$.3f", simmat.get(k))+" "+k);
-        }
-        */
-        
-        Map<Object, Component> values = new LinkedHashMap<>();
-        List keys = new ArrayList ();
-        UnionFind uf = new UnionFind ();
-        for (StitchKey key : Entity.KEYS) {
-            final Map<Object, Integer> stats = comp.stats(key);
-            if (!stats.isEmpty()) {
-                ps.println(".. ["+key+"]");
-                List order = new ArrayList (stats.keySet());
-                Collections.sort(order, (a,b) -> stats.get(b) - stats.get(a));
-                for (Object k : order) {
-                    Component c = comp.filter(key, k);
-                    ps.println("....\""+k+"\"="+stats.get(k)+"/"
-                               +stitchCount (key, k)
-                               +" "+c.getId()+" ("+c.size()+") "+c.nodeSet());
-                    switch (key) {
-                    case I_CODE:
-                    case N_Name:
-                        {   int q = keys.size();
-                            for (Map.Entry<Object, Component> me
-                                     : values.entrySet()) {
-                                double sim = c.similarity(me.getValue());
-                                if (sim > 0.) {
-                                    ps.println
-                                        ("     "+String.format("%1$.3f", sim)
-                                         +" \""+me.getKey()+"\"");
-                                    if (sim >= .4) { 
-                                        int p = keys.indexOf(me.getKey());
-                                        
-                                        if (p < 0) {
-                                            logger.warning
-                                                ("BOGUS KEY: "+me.getKey());
-                                        }
-                                        else {
-                                            uf.union(p, q);
-                                        }
-                                    }
-                                }
-                            }
-
-                            keys.add(k);
-                            values.put(k, c);
-                        }
-                    }
-                }
-                ps.println();
-            }
-        }
-        
-        long[][] ccs = uf.components();
-        ps.println("**** "+ccs.length+" component(s)!");
-        Map<Long, BitSet> hc = new TreeMap<>();
-        for (int n = 0; n < ccs.length; ++n) {
-            long[] c = ccs[n];
-            ps.println("### component "+n+" ("+c.length+")");
-            for (int i = 0; i < c.length; ++i) {
-                Object k = keys.get((int)c[i]);
-                Component kc = values.get(k);
-                ps.println("......"+k+" "+kc.nodeSet());
-            
-                for (Long id : kc.nodeSet()) {
-                    BitSet bs = hc.get(id);
-                    if (bs == null)
-                        hc.put(id, bs = new BitSet (ccs.length));
-                    bs.set(n);
-                }
-            }
-        }
-        ps.println("*** "+hc);
     }
 
     JsonNode resolveUMLS (String name) throws Exception {
@@ -946,10 +886,9 @@ public class GARDEntityFactory extends EntityRegistry {
         return keys.size();
     }
 
-    public void dumpJsonGARD (Label... nblabels) {
-        try (PrintStream ps = new PrintStream
-             (new FileOutputStream ("gard-matched.json"))) {
-            new GARDJson().dump(ps, nblabels);
+    public void exportJson (File file, String ref, Label... nblabels) {
+        try (PrintStream ps = new PrintStream(new FileOutputStream (file))) {
+            new JsonExport(ref).export(ps, nblabels);
         }
         catch (IOException ex) {
             ex.printStackTrace();
@@ -1007,8 +946,9 @@ public class GARDEntityFactory extends EntityRegistry {
             //gef.checkGARD(1);
             gef.showComponents();
             /*
-            gef.dumpJsonGARD(Label.label("MONDO.owl.gz"),
-                             Label.label("ordo.owl.gz"));
+            gef.exportJson(new File ("gard-export.json"),
+                           "GARD_v1", Label.label("MONDO.owl.gz"),
+                           Label.label("ordo.owl.gz"));
             */
         }
     }
