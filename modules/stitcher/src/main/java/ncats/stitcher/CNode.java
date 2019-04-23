@@ -162,6 +162,21 @@ public class CNode implements Props, Comparable<CNode> {
                 return true;
         return false;
     }
+
+    public boolean _hasAllLabels (Label... labels) {
+        for (Label l : labels)
+            if (!_node.hasLabel(l))
+                return false;
+        return true;
+    }
+
+    public boolean hasAllLabels (Label... labels) {
+        try (Transaction tx = _node.getGraphDatabase().beginTx()) {
+            boolean all = _hasAllLabels (labels);
+            tx.success();
+            return all;
+        }
+    }
     
     public boolean _hasAnyLabels (String... labels) {
         for (String s : labels)
