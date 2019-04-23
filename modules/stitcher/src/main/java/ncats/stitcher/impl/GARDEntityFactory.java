@@ -48,6 +48,29 @@ public class GARDEntityFactory extends EntityRegistry {
             children.add(n);
         }
     }
+
+    static class SimEdge implements Comparable<SimEdge> {
+        final Object node1, node2;
+        final double sim;
+
+        SimEdge (Object n1, Object n2, double sim) {
+            node1 = n1;
+            node2 = n2;
+            this.sim = sim;
+        }
+
+        public int compareTo (SimEdge se) {
+            double d = se.sim - sim;
+            if (d > 0.) return 1;
+            if (d < 0.) return -1;
+            return 0;
+        }
+
+        public String toString () {
+            return String.format("%1$.3f", sim)+" \""
+                +node1+"\"...\""+node2+"\"";
+        }
+    }
     
     class UntangleComponent {
         final public Component comp;
@@ -56,6 +79,7 @@ public class GARDEntityFactory extends EntityRegistry {
         final public PrintStream ps;
         final StitchKey[] stitches;
         final Map<Entity, EqvNode> nodes = new HashMap<>();
+        final List<SimEdge> edges = new ArrayList<>();
         
         UntangleComponent (Component comp, StitchKey... stitches) {
             this (null, comp, stitches);
@@ -181,6 +205,9 @@ public class GARDEntityFactory extends EntityRegistry {
                             ps.println
                                 ("     "+String.format("%1$.3f", sim)
                                  +" \""+keys.get(qe.getKey())+"\"");
+                            SimEdge se = new SimEdge
+                                (ve.getKey(), keys.get(qe.getKey()), sim);
+                            edges.add(se);
                             if (sim > 0.4) {
                                 uf.union(qe.getKey(), q);
                             }
@@ -191,6 +218,12 @@ public class GARDEntityFactory extends EntityRegistry {
                     keys.add(ve.getKey());
                 }
                 ps.println();
+            }
+
+            ps.println("**** similarity "+edges.size()+" values!");
+            Collections.sort(edges);
+            for (SimEdge se : edges) {
+                ps.println("..."+se);
             }
 
             long[][] ccs = uf.components();
@@ -762,20 +795,24 @@ public class GARDEntityFactory extends EntityRegistry {
     }
 
     public void showComponents () {
-        final Label[] sources = {
-            Label.label("GHR_v1"),
-            Label.label("DOID.owl.gz"),
-            Label.label("GARD_v1"),
-            Label.label("MESH.ttl.gz"),
-            Label.label("MEDLINEPLUS.ttl.gz"),
-            Label.label("MESH.ttl.gz"),
+        Label T047 = Label.label("T047");
+        final Label[][] LABELS = {
+            {Label.label("GHR_v1")},
+            {Label.label("DOID.owl.gz")},
+            {Label.label("GARD_v1")},
+            {Label.label("MESH.ttl.gz"), T047},
+            {Label.label("MEDLINEPLUS.ttl.gz"), T047},
+            {Label.label("MESH.ttl.gz"), T047},
             //Label.label("MONDO.owl.gz"),
-            Label.label("OMIM.ttl.gz"),
-            Label.label("ordo.owl.gz"),
-            Label.label("MEDGEN_v1")
+            {Label.label("OMIM.ttl.gz"), T047},
+            {Label.label("ordo.owl.gz")},
+            {Label.label("HPO.owl.gz")},
+            {Label.label("Thesaurus.owl.gz"),
+             Label.label("Disease or Syndrome")},
+            {Label.label("MEDGEN_v1"), T047}
         };
 
-        final Label[] types = {
+        final Label[] NOT_TYPES = {
             Label.label("T028"), // gngm - gene or genome
             Label.label("T033"), // finding
             Label.label("T037"), // Injury or Poisoning
@@ -801,15 +838,24 @@ public class GARDEntityFactory extends EntityRegistry {
             int score = 0;
             if (!"deprecated".equals(source._get(STATUS))
                 && !"deprecated".equals(target._get(STATUS))
-                && source._hasAnyLabels(sources)
-                && target._hasAnyLabels(sources)
-                && !source._hasAnyLabels(types)
-                && !target._hasAnyLabels(types)) {
+                && !source._hasAnyLabels(NOT_TYPES)
+                && !target._hasAnyLabels(NOT_TYPES)) {
+                int src = 0, tar = 0;
+                for (Label[] labels : LABELS) {
+                    if (source._hasAllLabels(labels))
+                        ++src;
+                    if (target._hasAllLabels(labels))
+                        ++tar;
+                    if (src > 0 && tar > 0) {
+                        score = calcScore (sv);                        
+                        break;
+                    }
+                }
                 /*
                 score = (int)(source.similarity(target, N_Name, I_CODE)
                               * 100.0 + 0.5);
                               */
-                score = calcScore (sv);
+
             }
             return score;
         };

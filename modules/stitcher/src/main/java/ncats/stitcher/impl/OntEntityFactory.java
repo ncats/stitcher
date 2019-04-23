@@ -381,8 +381,10 @@ public class OntEntityFactory extends EntityRegistry {
                  && "Thesaurus.owl".equals(ontology.resource.getLocalName())) {
             // NCI Thesaurus
             obj = data.get("NHC0");
-            if (obj != null)
+            if (obj != null) {
                 xrefs.add("NCIT:"+obj);
+                xrefs.add("NCI:"+obj);
+            }
             obj = data.get("P100");
             if (obj != null)
                 xrefs.add("OMIM:"+obj);
@@ -392,7 +394,7 @@ public class OntEntityFactory extends EntityRegistry {
             obj = data.get("P207");
             if (obj != null)
                 xrefs.add("UMLS:"+obj);
-            obj = data.remove("P321");
+            obj = data.get("P321");
             if (obj != null)
                 xrefs.add("GENE:"+obj);
             obj = data.get("P93");
