@@ -5,6 +5,7 @@ out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
 medgen="medgen"
+ppi="ppi"
 
 ###########################
 ##### DON'T MESS BELOW
@@ -65,4 +66,11 @@ fi
 #load MedGen if available
 if test -d $medgen; then
     sbt stitcher/"runMain ncats.stitcher.impl.MedGenEntityFactory $out $medgen"
+fi
+
+#load PPI if available
+if test -d $ppi; then
+    for f in $ppi/*.txt.gz; do
+        sbt stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $f"
+    done
 fi
