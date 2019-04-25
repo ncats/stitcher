@@ -64,7 +64,6 @@ public enum StitchKey implements RelationshipType {
     R_equivalentClass,
     R_exactMatch,
     R_closeMatch,
-    R_activeMoiety(5, true), // active moiety relationship (directed)
     R_axiom,
 
     /*
@@ -72,6 +71,12 @@ public enum StitchKey implements RelationshipType {
      * https://www.nlm.nih.gov/research/umls/knowledge_sources/metathesaurus/release/abbreviations.html
      */
     R_rel,
+
+    /*
+     * Biology relationships
+     */
+    R_activeMoiety(5, true), // active moiety relationship (directed)
+    R_pip, // Protein-protein interaction; directionality prey -> bait if known
     
     /*
      * Tag
