@@ -78,7 +78,7 @@ public class PPIEntityFactory extends EntityRegistry {
                     for (Entity b : intactb) {
                         // toks[13] interaction id
                         if (!a.equals(b))
-                            a.stitch(b, R_pip, toks[13], attr);
+                            a.stitch(b, R_ppi, toks[13], attr);
                     }
                 }
 

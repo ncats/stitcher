@@ -72,7 +72,8 @@ public class OntEntityFactory extends EntityRegistry {
         "has_form",
         "quantified_form_of",
         "doseformgroup_of",
-        "IAO_0100001" // term_replaced_by
+        "IAO_0100001", // term_replaced_by
+        "SIB"
     };
     static final Set<String> RELATIONS =
         new TreeSet<>(Arrays.asList(_RELATIONS));
@@ -777,6 +778,11 @@ public class OntEntityFactory extends EntityRegistry {
             obj = data.remove("notation");
             if (obj != null)
                 data.put("notation", map (obj, a -> "VANDF:"+a));
+        }
+        else if ("ICD10CM".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null)
+                data.put("notation", map (obj, a -> "ICD10CM:"+a));
         }
         
         if (!useful.isEmpty() || !others.isEmpty()) {

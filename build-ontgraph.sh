@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v7"
+version="v8"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -16,9 +16,11 @@ owl="DOID.owl.gz \
    MEDLINEPLUS.ttl.gz \
    MESH.ttl.gz \
    OMIM.ttl.gz \
+   ICD10CM.ttl.gz \
    ordo.owl.gz \
    Thesaurus.owl.gz \
    MONDO.owl.gz \
+   VANDF.ttl.gz \
    BrendaTissue.owl.gz \
    UBERON.owl.gz \
    GO.owl.gz \
