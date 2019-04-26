@@ -76,7 +76,7 @@ public enum StitchKey implements RelationshipType {
      * Biology relationships
      */
     R_activeMoiety(5, true), // active moiety relationship (directed)
-    R_pip, // Protein-protein interaction; directionality prey -> bait if known
+    R_ppi, // Protein-protein interaction; directionality prey -> bait if known
     
     /*
      * Tag
