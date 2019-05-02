@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 
 import akka.actor.ActorSystem;
 import akka.stream.Materializer;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import ncats.stitcher.Props;
 import ncats.stitcher.tools.CompoundStitcher;
 import play.*;
@@ -430,33 +432,120 @@ public class Api extends Controller {
         return updateEvents (ver, id);
     }
 
-    Object editProperty(Object value, String newVal, String oldVal) throws Exception {
-        if (value.getClass().isArray()) {
-            boolean found = false;
-            ArrayList<String> vals = new ArrayList();
-            for (int i = 0; i < Array.getLength(value); ++i) {
-                String v = Array.get(value, i).toString();
-                if (v.equals(oldVal)) { // remove or replace
-                    found = true;
-                    if (newVal != null) // replace
-                        vals.add(newVal);
-                } else {
-                    vals.add(v);
-                }
-            }
-            if (oldVal == null) // add
-                vals.add(newVal);
-            else if (!found) {
-                throw new Exception("Value to be replaced not found! "+oldVal+": "+newVal);
-            }
-            value = vals.toArray(new String[0]);
-        } else {
-            if (oldVal == null) {
-                throw new Exception("Can't add new value to property - property value already exists: "+value.toString());
-            }
-            value = newVal;
+    private Object editProperty(Object value, ArrayList<String> newVal, ArrayList<String> oldVal) throws Exception {
+
+        if (!value.getClass().isArray()) {
+            String[] value2 = new String[1];
+            value2[0] = value.toString();
+            value = value2;
         }
+
+        ArrayList<String> vals = new ArrayList();
+        int found = 0;
+        for (int i = 0; i < Array.getLength(value); ++i) {
+            String v = Array.get(value, i).toString();
+            if (oldVal.contains(v)) // remove or replace
+                found++;
+            else if (newVal.contains(v))
+                throw new Exception ("New value already exists here! "+v+":"+newVal.toString());
+            else vals.add(v);
+        }
+        if (found != oldVal.size())
+            throw new Exception("Value to be replaced not found! "+oldVal+": "+vals);
+        for (Iterator<String> i = newVal.iterator(); i.hasNext(); ) {
+            vals.add(i.next());
+        }
+        if (vals.size() == 0)
+            return null;
+        if (vals.size() == 1)
+            return vals.get(0);
+        else
+            return vals.toArray(new String[0]);
+
+//        if (value.getClass().isArray()) {
+//            boolean found = false;
+//            ArrayList<String> vals = new ArrayList();
+//            for (int i = 0; i < Array.getLength(value); ++i) {
+//                String v = Array.get(value, i).toString();
+//                if (v.equals(oldVal)) { // remove or replace
+//                    found = true;
+//                    if (newVal.size() != 0) // replace
+//                        vals.add(newVal);
+//                } else {
+//                    vals.add(v);
+//                }
+//            }
+//            if (oldVal.size() == 0) // add
+//                vals.add(newVal);
+//            else if (!found) {
+//                throw new Exception("Value to be replaced not found! "+oldVal+": "+newVal);
+//            }
+//            value = vals.toArray(new String[0]);
+//        } else {
+//            if (oldVal.size() == 0) {
+//                throw new Exception("Can't add new value to property - property value already exists: "+value.toString());
+//            }
+//            value = newVal;
+//        }
+//        return value;
+    }
+
+    private String parseUpdatePropertyJson(String jsonPath, JsonNode oldV, JsonNode newV) throws Exception {
+        if (oldV instanceof ObjectNode) {
+            return oldV.findValue("key").asText();
+        } else if (newV instanceof ObjectNode) {
+            return newV.findValue("key").asText();
+        }
+
+        if (jsonPath.contains("$.properties")) {
+            // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+            //e.g. {key: 'Synonyms', value: '[LABOTEST-BB LT00441005, 2-((hydroxyimino)dodecyl)-4-methylphenol]'}
+            // newV or oldV contains both updateProperty and a value in this case --- split them out
+            System.err.println(jsonPath + "!" + oldV.toString() + "!" + newV.toString());
+            throw new Exception("Can't parse update property name properly");
+        } else if (jsonPath.indexOf("' && @['value']") > -1) {
+            return jsonPath.substring(29, jsonPath.indexOf("' && @['value']"));
+        } else if (jsonPath.indexOf("' )]['value']") > -1) {
+            return jsonPath.substring(29, jsonPath.indexOf("' )]['value']"));
+        } else {
+            Logger.warn("Not sure, but proceeding to try and parse this unexpected jsonPath: "+jsonPath);
+            return jsonPath.substring(29, jsonPath.indexOf("'"));
+        }
+    }
+
+    private ArrayList<String> parseValueJson(JsonNode node) throws Exception {
+        ArrayList<String> value = new ArrayList<>();
+
+        // parse object into key and value
+        if (node instanceof ObjectNode) {
+            //updateProperty = node.findValue("key").asText();
+            node = node.findValue("value");
+        }
+
+        if (node == null || node.isNull() || node.isMissingNode())
+            node = null; // do nothing
+        else if (node instanceof TextNode) {
+            value.add(node.asText());
+        } else if (node instanceof ArrayNode) {
+            ArrayNode anode = (ArrayNode)node;
+            for (int i=0; i<anode.size(); i++)
+                if (anode.get(i) instanceof TextNode)
+                    value.add(anode.get(i).asText());
+                else throw new Exception("Error parsing value json ..."+node.toString());
+        } else throw new Exception("Error parsing value json ..."+node.toString());
+
         return value;
+    }
+
+    // parse string into json, if needed
+    private JsonNode parseTextAsObject(JsonNode node) {
+        if (node instanceof TextNode &&
+                (node.asText().startsWith("{") || node.asText().startsWith("["))) {
+            try {
+                node = mapper.readTree(node.asText());
+            } catch (Exception ex) {}
+        }
+        return node;
     }
 
     @Transactional
@@ -486,21 +575,17 @@ public class Api extends Controller {
                 long rootId = node.get("sgroup").get("parent").asLong();
                 Entity root = es.getEntity(rootId);
                 ArrayList<Long> nodes = new ArrayList();
-                //long[] nodes = new long[node.get("sgroup").get("size").asInt()];
-                int index = 0;
                 for (JsonNode entry: node.get("sgroup").get("members")) {
                     Long nodeId = entry.get("node").asLong();
                     nodes.add(nodeId);
-                    Entity item = es.getEntity(nodeId);
-                    if (item.datasource().getName().equals(update.get("nodeSource").asText()) &&
+                    //Entity item = es.getEntity(nodeId);
+                    if (entry.get("source").asText().equals(update.get("nodeSource").asText()) && //item.datasource().getName().equals(update.get("nodeSource").asText()) &&
                         entry.get("id").asText().equals(update.get("nodeId").asText())) {
-                        if (Long.valueOf(update.get("node").asText()) != nodeId) {
-                            Logger.warn("node ID has changed since original curation! "+item.name()+" "+update.get("node").asText());
-                            update.set("nodeId", entry.get("id"));
+                        if (update.get("node").asLong() != nodeId) {
+                            Logger.warn("node ID has changed since original curation! "+entry.get("node").asText()+" "+update.get("node").asText());
                         }
                         updateNode = es.getEntity(nodeId);
                     }
-                    index++;
                 }
 
                 if (updateNode != null) {
@@ -517,69 +602,104 @@ public class Api extends Controller {
 
                         String response = "nothing happened; payload would have been updated";
 
-                        String oldVal = update.at("/oldValue").textValue();
-                        //String newVal = update.at("/value").textValue();
-                        //if (newVal != null && newVal.contains("\"")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
-                        //    String[] yo = newVal.split("\"");
-                        //    newVal = yo[3].trim();
-                        //}
-                        JsonNode newV = update.at("/value");
-                        String newVal;
-                        String updateProperty = update.get("jsonPath").asText();
-                        if (updateProperty.contains("$.properties")) { // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
-                            // do this below
-                        } else if (updateProperty.indexOf("' && @['value']") > -1) {
-                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("' && @['value']"));
-                        } else if (updateProperty.indexOf("' )]['value']") > -1) {
-                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("' )]['value']"));
-                        } else {
-                            Logger.warn("Not sure, but proceeding to try and parse this unexpected jsonPath: "+updateProperty);
-                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("'"));
-                        }
+                        //!!! TODO
+                        //String oldVal = update.at("/oldValue").textValue();
+                        //String newVal = "";
+                        String jsonPath = update.get("jsonPath").asText();
+                        JsonNode oldV = parseTextAsObject(update.at("/oldValue"));
+                        ArrayList<String> oldVal = parseValueJson(oldV);
+                        JsonNode newV = parseTextAsObject(update.at("/value"));
+                        ArrayList<String> newVal = parseValueJson(newV);
+                        String updateProperty = parseUpdatePropertyJson(jsonPath, oldV, newV);
 
-                        if (!newV.isNull() && !newV.isMissingNode()) {
-                            if (newV.isObject()) {
-                                updateProperty = newV.fieldNames().next();
-                                newVal = newV.get(updateProperty).textValue();
-                            } else {
-                                try {
-                                    updateProperty = mapper.readTree(newV.textValue()).fieldNames().next();
-                                    newVal = mapper.readTree(newV.textValue()).get(updateProperty).textValue();
-                                } catch (Exception ex) {
-                                    newVal = newV.textValue();
-                                }
-                            }
-                        } else {
-                            newVal = null;
-                        }
+//                        String updateProperty = update.get("jsonPath").asText();
+//                        if (updateProperty.contains("$.properties")) {
+//                            // "value":"{"   CompoundUNII":"7PG89G35Q7" }"
+//                            //e.g. {key: 'Synonyms', value: '[LABOTEST-BB LT00441005, 2-((hydroxyimino)dodecyl)-4-methylphenol]'}
+//                            // newV or oldV contains both updateProperty and a value in this case --- split them out
+//                            try {
+//                                System.err.println(oldV.getClass());
+//                                System.err.println(oldV.has("key"));
+//                                System.err.println(newV.getClass());
+//                                System.err.println(newV.has("key"));
+//                                if (newV == null) { // oldV is not null
+//                                    if (oldV.getClass() != ObjectNode.class)
+//                                        throw new Exception("Can't parse update property name from old value");
+//                                    updateProperty = oldV.findValue("key").asText();
+//                                    oldV = oldV.findValue("value");
+//                                } else if (oldV == null) { // newV is not null
+//                                    if (newV.getClass() != ObjectNode.class)
+//                                        throw new Exception("Can't parse update property name from new value");
+//                                    updateProperty = newV.findValue("key").asText();
+//                                    newV = newV.findValue("value");
+//                                } else {
+//                                    throw new Exception("Can't parse update property name properly");
+//                                }
+//                                System.err.println(updateProperty + "!" + oldV.toString() + "!" + newV.toString());
+//                            } catch (Exception ex) {
+//                                ex.printStackTrace();
+//                                throw new Exception("Can't parse update property name from value");
+//                            }
+//                        } else if (updateProperty.indexOf("' && @['value']") > -1) {
+//                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("' && @['value']"));
+//                        } else if (updateProperty.indexOf("' )]['value']") > -1) {
+//                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("' )]['value']"));
+//                        } else {
+//                            Logger.warn("Not sure, but proceeding to try and parse this unexpected jsonPath: "+updateProperty);
+//                            updateProperty = updateProperty.substring(29, updateProperty.indexOf("'"));
+//                        }
 
-
+//                        if (!newV.isNull() && !newV.isMissingNode()) {
+//                            if (newV.isObject()) {
+//                                updateProperty = newV.fieldNames().next();
+//                                newVal = newV.get(updateProperty).textValue();
+//                            } else {
+//                                try {
+//                                    updateProperty = mapper.readTree(newV.textValue()).fieldNames().next();
+//                                    newVal = mapper.readTree(newV.textValue()).get(updateProperty).textValue();
+//                                } catch (Exception ex) {
+//                                    newVal = newV.textValue();
+//                                }
+//                            }
+//                        } else {
+//                            newVal = null;
+//                        }
+//
+//
                         String operation = update.has("operation") ? update.get("operation").asText() : null;
-                        if ("replace".equals(operation) && (oldVal == null || newVal == null)) {
+                        if ("replace".equals(operation) && (oldVal.size() == 0 || newVal.size() == 0)) {
                             throw new Exception("Can't replace if old or new value is null");
-                        } else if ("remove".equals(operation) && newVal != null) {
+                        } else if ("remove".equals(operation) && newVal.size() != 0) {
                             //throw new Exception("New value must be null if removing"); // TODO maybe fix this in Tongan's side
-                            newVal = null;
+                            newV = null;
                         } else if (("replace".equals(operation) || "remove".equals(operation)) &&
                                 !updateNode.payload().containsKey(updateProperty)) {
                             throw new Exception("Payload does not contain property: "+updateProperty);
-                        } else if ("add".equals(operation) && oldVal != null) {
+                        } else if ("add".equals(operation) && oldVal.size() != 0) {
                             throw new Exception("Old value must be null if adding anew");
                         }
 
                         // create new payload object
+                        Object oldValO = null;
+                        Object newValO = null;
                         DefaultPayload payload = new DefaultPayload (updateNode.datasource());
                         payload.setId(updateNode.payload().get("id"));
                         for (Map.Entry<String, Object> me: updateNode.payload().entrySet()) {
                             Object value = me.getValue();
                             if (me.getKey().equals(updateProperty)) {
-                                value = editProperty(me.getValue(), newVal, oldVal);
+                                oldValO = value;
+                                newValO = editProperty(me.getValue(), newVal, oldVal);
+                                value = newValO;
                             }
                             if (value != null)
                                 payload.put(me.getKey(), value);
                         }
                         if ("add".equals(operation) && !updateNode.payload().containsKey(updateProperty)) {
-                            payload.put(updateProperty, newVal);
+                            if (newVal.size() == 1)
+                                newValO = newVal.get(0);
+                            else
+                                newValO = newVal.toArray(new String[0]);
+                            payload.put(updateProperty, newValO);
                         }
 
                         // add the curation itself to the payload
@@ -587,13 +707,16 @@ public class Api extends Controller {
                         updateStr = updateStr.substring(0, updateStr.length()-1) +
                                 ",\"_ver\":\""+ver+"\",\"_stitch\":\""+id+"\",\"_uri\":\""+request().uri()+
                                 "\",\"_timestamp\":"+new Date().getTime()+"}";
+                        ArrayList<String> updateVal = new ArrayList<>();
+                        ArrayList<String> emptyVal = new ArrayList<>();
+                        updateVal.add(updateStr);
                         Object value = updateNode.payload("_CURATION");
                         if (value == null) {
                             String[] upSA = new String[1];
                             upSA[0] = updateStr;
                             payload.put("_CURATION", upSA);
                         } else {
-                            payload.put("_CURATION", editProperty(value, updateStr, null));
+                            payload.put("_CURATION", editProperty(value, updateVal, emptyVal));
                         }
 
                         // see if it's a stitchkey
@@ -631,7 +754,7 @@ public class Api extends Controller {
                             List<Stitch> sL = new ArrayList();
                             sL.add(updateNode.getStitch(ver));
 
-                            updateNode.update(sk, oldVal, newVal);
+                            updateNode.update(sk, oldValO, newValO);
                             for (Entity e : updateNode.neighbors(sk, newVal)) {
                                 Stitch s = e.getStitch(ver);
                                 if (s != null && !sL.contains(s)) {
@@ -651,7 +774,7 @@ public class Api extends Controller {
                             List<String> nSL = cs.testStitch(ver, comp);
                             if (test) {
                                 // undo stitchkey update if just testing
-                                updateNode.update(sk, newVal, oldVal);
+                                updateNode.update(sk, newValO, oldValO);
                                 response = "updating payload and stitchkey, does not affect stitching.";
                                 if (nSL.size() != sL.size()) {
                                     response = "updating payload and stitchkey causes restitching of node.";
