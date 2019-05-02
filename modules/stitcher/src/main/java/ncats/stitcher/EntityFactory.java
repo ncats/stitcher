@@ -919,6 +919,7 @@ public class EntityFactory implements Props, AutoCloseable {
             try (Transaction tx = gdb.beginTx()) {
                 comp.put("id", id);
                 comp.put("size", nodes.size());
+                comp.put("node_ids", mapper.valueToTree(nodes));
                 ObjectNode stitches = mapper.createObjectNode();
                 for (StitchKey key : Entity.KEYS) {
                     Map<Object, Integer> sv = values (key);

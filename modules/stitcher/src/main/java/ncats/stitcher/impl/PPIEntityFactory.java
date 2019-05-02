@@ -13,6 +13,8 @@ import org.neo4j.graphdb.Transaction;
 import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
+// GeneRIF interactions
+// ftp://ftp.ncbi.nlm.nih.gov/gene/GeneRIF/interactions.gz
 public class PPIEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(PPIEntityFactory.class.getName());
@@ -29,6 +31,17 @@ public class PPIEntityFactory extends EntityRegistry {
         super (dir);
     }
 
+    @Override
+    protected void init () {
+        super.init();
+        setIdField ("id");
+        add(I_GENE, "gene_id_2")
+            .add(I_GENE, "interactant_id_7")
+            //.add(I_PMID, "pubmed_id_list_14")
+            .add(T_Keyword, "generif_text_16")
+            ;
+    }
+    
     List<Entity> getEntities (String value) {
         if (value.startsWith("entrez gene")) {
             int pos = value.indexOf(':');
@@ -60,34 +73,48 @@ public class PPIEntityFactory extends EntityRegistry {
 
         String[] header = null;
         int count = 0, lines = 0;
-        Map<String, Object> attr = new HashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
         for (; tokenizer.hasNext(); ++lines) {
             String[] toks = tokenizer.next();
             if (header == null) {
                 header = toks;
             }
             else {
-                attr.clear();
-                for (int i = 0; i < header.length; ++i)
-                    attr.put(header[i], toks[i]);
-                attr.put("source", source.getName());
+                data.clear();
+                for (int i = 0; i < header.length; ++i) {
+                    Object value = "-".equals(toks[i]) ? null : toks[i];
+                    if (header[i].equals("pubmed_id_list")) {
+                        List<Long> pmids = new ArrayList<>();
+                        for (String t : toks[i].split(",")) {
+                            try {
+                                pmids.add(Long.parseLong(t));
+                            }
+                            catch (NumberFormatException ex) {
+                            }
+                        }
+                        value = !pmids.isEmpty() ?
+                            pmids.toArray(new Long[0]) : null;
+                    }
+                    data.put(header[i]+"_"+(i+1), value);
+                }
+                data.put("source", source.getName());
+                
+                String src = (String) data.get("interaction_id_type_18");
+                String id = (String) data.get("interaction_id_17");
+                if (src != null && id != null) {
+                    id = src.toUpperCase()+":"+id;
+                    data.put("id", id);
 
-                List<Entity> intacta = getEntities (toks[0]);
-                List<Entity> intactb = getEntities (toks[1]);
-                for (Entity a : intacta) {
-                    for (Entity b : intactb) {
-                        // toks[13] interaction id
-                        if (!a.equals(b))
-                            a.stitch(b, R_ppi, toks[13], attr);
+                    // only consider human for now
+                    if ("9606".equals(data.get("#tax_id_1"))
+                        && "9606".equals(data.get("tax_id_6"))) {
+                        Entity e = register (data);
+                        logger.info("++++++++ "+count+"/"+lines+" "+id
+                                    +" => "+e.getId()+" ++++++++");
+                        ++count;
                     }
                 }
-
-                if (!intacta.isEmpty() && !intactb.isEmpty()) {
-                    logger.info("++++++++ "+count+"/"+lines+" "+toks[0]
-                                +" ("+intacta.size()
-                                +") <-> "+toks[1]+" ("+intactb.size()+")");
-                    ++count;
-                }
+                
                 ++lines;
             }
         }
@@ -113,7 +140,7 @@ public class PPIEntityFactory extends EntityRegistry {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             logger.info("Usage: "+PPIEntityFactory.class.getName()
-                        +" DBDIR MINTAB_FILES...");
+                        +" DBDIR FILE");
             System.exit(1);
         }
         

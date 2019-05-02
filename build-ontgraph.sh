@@ -5,7 +5,7 @@ out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
 medgen="medgen"
-ppi="ppi"
+ppi="ppi/interactions.gz"
 
 ###########################
 ##### DON'T MESS BELOW
@@ -72,7 +72,5 @@ fi
 
 #load PPI if available
 if test -d $ppi; then
-    for f in $ppi/*.txt.gz; do
-        sbt stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $f"
-    done
+    sbt stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $ppi"
 fi
