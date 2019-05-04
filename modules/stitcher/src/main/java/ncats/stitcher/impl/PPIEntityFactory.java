@@ -13,8 +13,9 @@ import org.neo4j.graphdb.Transaction;
 import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
-// GeneRIF interactions
-// ftp://ftp.ncbi.nlm.nih.gov/gene/GeneRIF/interactions.gz
+/*
+ * load PPI from mitab file format
+ */
 public class PPIEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(PPIEntityFactory.class.getName());
@@ -34,11 +35,11 @@ public class PPIEntityFactory extends EntityRegistry {
     @Override
     protected void init () {
         super.init();
-        setIdField ("id");
-        add(I_GENE, "gene_id_2")
-            .add(I_GENE, "interactant_id_7")
-            //.add(I_PMID, "pubmed_id_list_14")
-            .add(T_Keyword, "generif_text_16")
+        setIdField ("_id");
+        add(I_GENE, "_interactors_A")
+            .add(I_GENE, "_interactors_B")
+            .add(I_PMID, "_pmids")
+            .add(T_Keyword, "Interaction Types")
             ;
     }
     
@@ -66,6 +67,101 @@ public class PPIEntityFactory extends EntityRegistry {
         
         return entities;
     }
+
+    static String[] parseGenes (String text) {
+        List<String> genes = new ArrayList<>();
+        for (String s : text.split("\\|")) {
+            if (s.startsWith("entrez gene")) {
+                int pos = s.indexOf(':');
+                if (pos > 0) {
+                    int end = s.indexOf('(', pos);
+                    String gene = end < 0
+                        ? s.substring(pos+1) : s.substring(pos+1, end);
+                    try {
+                        int id = Integer.parseInt(gene);
+                        genes.add("GENE:"+id);
+                    }
+                    catch (NumberFormatException ex) {
+                        genes.add(gene);
+                    }
+                }
+            }
+        }
+        return genes.toArray(new String[0]);
+    }
+
+    protected void parse (Map<String, Object> data,
+                          String[] header, String[] toks) {
+        data.clear();
+        for (int i = 0; i < header.length; ++i) {
+            Object value = "-".equals(toks[i]) ? null : toks[i];
+            if (value != null) {
+                switch (header[i]) {
+                case "Interaction Identifiers":
+                    data.put("_id", toks[i].toUpperCase());
+                    break;
+                            
+                case "Publication Identifiers":
+                    { List<Long> pmids = new ArrayList<>();
+                        for (String t : toks[i].split("\\|")) {
+                            if (t.startsWith("pubmed:")) {
+                                try {
+                                    long id = Long.parseLong(t.substring(7));
+                                    pmids.add(id);
+                                }
+                                catch (NumberFormatException ex) {
+                                }
+                            }
+                        }
+                        
+                        if (!pmids.isEmpty()) {
+                            data.put("_pmids",
+                                     pmids.toArray(new Long[0]));
+                        }
+                    }
+                    break;
+                    
+                case "ID Interactor A":
+                    { String[] genes = parseGenes (toks[i]);
+                        if (genes.length > 0)
+                            data.put("_interactors_A", genes);
+                    }
+                    break;
+                    
+                case "ID Interactor B":
+                    { String[] genes = parseGenes (toks[i]);
+                        if (genes.length > 0)
+                            data.put("_interactors_B", genes);
+                    }
+                    break;
+                    
+                case "Alt IDs Interactor A":
+                case "Aliases Interactor A":
+                    { String[] genes = parseGenes (toks[i]);
+                        if (genes.length > 0) {
+                            data.put
+                                ("_interactors_A",
+                                 Util.merge(data.get("_interactors_A"), genes));
+                        }
+                    }
+                    break;
+                    
+                case "Alt IDs Interactor B":
+                case "Aliases Interactor B":
+                    { String[] genes = parseGenes (toks[i]);
+                        if (genes.length > 0) {
+                            data.put
+                                ("_interactors_B",
+                                 Util.merge(data.get("_interactors_B"), genes));
+                        }
+                    }
+                    break;
+                }
+            }
+            data.put(header[i], value);
+        }
+        data.put("_source", source.getName());
+    }
     
     protected int register (InputStream is) throws IOException {
         LineTokenizer tokenizer = new LineTokenizer ();
@@ -77,44 +173,20 @@ public class PPIEntityFactory extends EntityRegistry {
         for (; tokenizer.hasNext(); ++lines) {
             String[] toks = tokenizer.next();
             if (header == null) {
+                if (toks[0].charAt(0) == '#')
+                    toks[0] = toks[0].substring(1);
                 header = toks;
             }
             else {
-                data.clear();
-                for (int i = 0; i < header.length; ++i) {
-                    Object value = "-".equals(toks[i]) ? null : toks[i];
-                    if (header[i].equals("pubmed_id_list")) {
-                        List<Long> pmids = new ArrayList<>();
-                        for (String t : toks[i].split(",")) {
-                            try {
-                                pmids.add(Long.parseLong(t));
-                            }
-                            catch (NumberFormatException ex) {
-                            }
-                        }
-                        value = !pmids.isEmpty() ?
-                            pmids.toArray(new Long[0]) : null;
-                    }
-                    data.put(header[i]+"_"+(i+1), value);
+                parse (data, header, toks);
+                String taxa = (String) data.get("Taxid Interactor A");
+                String taxb = (String) data.get("Taxid Interactor B");
+                if ("taxid:9606".equals(taxa) && taxa.equals(taxb)) {
+                    Entity e = register (data);
+                    logger.info("++++++ "+data.get("_id")+" "
+                                +count+"/"+lines+" => "+e.getId());
+                    ++count;
                 }
-                data.put("source", source.getName());
-                
-                String src = (String) data.get("interaction_id_type_18");
-                String id = (String) data.get("interaction_id_17");
-                if (src != null && id != null) {
-                    id = src.toUpperCase()+":"+id;
-                    data.put("id", id);
-
-                    // only consider human for now
-                    if ("9606".equals(data.get("#tax_id_1"))
-                        && "9606".equals(data.get("tax_id_6"))) {
-                        Entity e = register (data);
-                        logger.info("++++++++ "+count+"/"+lines+" "+id
-                                    +" => "+e.getId()+" ++++++++");
-                        ++count;
-                    }
-                }
-                
                 ++lines;
             }
         }
