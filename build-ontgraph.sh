@@ -1,11 +1,11 @@
 #!/bin/sh
 
-version="v8"
+version="v9"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
 medgen="medgen"
-ppi="ppi/interactions.gz"
+ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 
 ###########################
 ##### DON'T MESS BELOW
