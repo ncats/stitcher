@@ -472,14 +472,14 @@ public class MedGenEntityFactory extends EntityRegistry {
         return entities;
     }
     
-    public DataSource register (File dir, int version) throws IOException {
+    public DataSource register (File dir) throws IOException {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException
                 ("Not a directory; please download the content of MedGen "
                  +"here ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/!");
         }
         
-        DataSource ds = getDataSourceFactory().register("MEDGEN_v"+version);
+        DataSource ds = getDataSourceFactory().register("MEDGEN");
         Integer size = (Integer)ds.get(INSTANCES);
         if (size != null && size > 0) {
             logger.info(ds.getName()+" ("+size
@@ -512,7 +512,7 @@ public class MedGenEntityFactory extends EntityRegistry {
         }
         
         try (MedGenEntityFactory medgen = new MedGenEntityFactory (argv[0])) {
-            medgen.register(new File (argv[1]), 1);
+            medgen.register(new File (argv[1]));
             //medgen.registerOMIMGeneMedGen(new File (argv[1]));
         }
     }

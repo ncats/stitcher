@@ -446,6 +446,21 @@ public class EntityRegistry extends EntityFactory {
         }
     }
 
+    protected Label getSourceLabel () {
+        String name = source.getName();
+        StringBuilder label = new StringBuilder ();
+        for (int pos = 0, p; (p = name.indexOf('.', pos)) > 0;) {
+            label.append(name.substring(pos, p));
+            if (p < name.length() && Character.isDigit(name.charAt(p+1))) {
+                // this is a decimal (e.g., version number), so replace with _
+                label.append('_');
+                pos = p+1;
+            }
+            else break;
+        }
+        return Label.label(label.toString().toUpperCase());
+    }
+
     public Entity _attach (final Map<String, Object> map) {
         Entity ent = null;
         int cnt = 0;
@@ -462,7 +477,7 @@ public class EntityRegistry extends EntityFactory {
                             new DefaultPayload (source, id);
                         payload.putAll(map);
                         e._add(payload);
-                        e._addLabel(source.getName());
+                        e._addLabel(getSourceLabel ());
                         if (ent == null)
                             ent = e;
                         logger.info
@@ -886,8 +901,7 @@ public class EntityRegistry extends EntityFactory {
                 ("Can't create entity without a data source!");
         }
         
-        Node node = gdb.createNode(AuxNodeType.ENTITY,
-                                   Label.label(source.getName()));
+        Node node = gdb.createNode(AuxNodeType.ENTITY, getSourceLabel ());
         node.setProperty(SOURCE, source.getKey());
         return node;
     }
