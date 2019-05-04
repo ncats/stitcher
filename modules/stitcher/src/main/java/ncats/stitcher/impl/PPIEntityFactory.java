@@ -35,10 +35,11 @@ public class PPIEntityFactory extends EntityRegistry {
     @Override
     protected void init () {
         super.init();
-        setIdField ("_id");
+        setIdField ("Interaction Identifiers");
         add(I_GENE, "_interactors_A")
             .add(I_GENE, "_interactors_B")
             .add(I_PMID, "_pmids")
+            .add(I_CODE, "Interaction Identifiers")
             .add(T_Keyword, "Interaction Types")
             ;
     }
@@ -97,10 +98,6 @@ public class PPIEntityFactory extends EntityRegistry {
             Object value = "-".equals(toks[i]) ? null : toks[i];
             if (value != null) {
                 switch (header[i]) {
-                case "Interaction Identifiers":
-                    data.put("_id", toks[i].toUpperCase());
-                    break;
-                            
                 case "Publication Identifiers":
                     { List<Long> pmids = new ArrayList<>();
                         for (String t : toks[i].split("\\|")) {
@@ -183,7 +180,8 @@ public class PPIEntityFactory extends EntityRegistry {
                 String taxb = (String) data.get("Taxid Interactor B");
                 if ("taxid:9606".equals(taxa) && taxa.equals(taxb)) {
                     Entity e = register (data);
-                    logger.info("++++++ "+data.get("_id")+" "
+                    logger.info("++++++ "
+                                +data.get("Interaction Identifiers")+" "
                                 +count+"/"+lines+" => "+e.getId());
                     ++count;
                 }
