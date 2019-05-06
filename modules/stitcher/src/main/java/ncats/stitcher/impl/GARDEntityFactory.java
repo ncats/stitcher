@@ -663,9 +663,8 @@ public class GARDEntityFactory extends EntityRegistry {
             ;
     }
         
-    public DataSource register (Connection con, int version)
-        throws Exception {
-        DataSource ds = getDataSourceFactory().register("GARD_v"+version);
+    public DataSource register (Connection con) throws Exception {
+        DataSource ds = getDataSourceFactory().register("GARD");
         
         Statement stm = con.createStatement();        
         Integer size = (Integer)ds.get(INSTANCES);
@@ -803,7 +802,8 @@ public class GARDEntityFactory extends EntityRegistry {
             {Label.label("MESH.ttl.gz"), T047},
             {Label.label("MEDLINEPLUS.ttl.gz"), T047},
             {Label.label("MESH.ttl.gz"), T047},
-            //Label.label("MONDO.owl.gz"),
+            {Label.label("ICD10CM.ttl.gz"), T047},
+            {Label.label("MONDO.owl.gz")},
             {Label.label("OMIM.ttl.gz"), T047},
             {Label.label("ordo.owl.gz")},
             {Label.label("HPO.owl.gz")},
@@ -945,12 +945,10 @@ public class GARDEntityFactory extends EntityRegistry {
         public static void main (String[] argv) throws Exception {
             if (argv.length < 1) {
                 logger.info("Usage: "+Register.class.getName()
-                            +" DBDIR [user=USERNAME] [password=PASSWORD]"
-                            +" [version=1,2,..]");
+                            +" DBDIR [user=USERNAME] [password=PASSWORD]");
                 System.exit(1);
             }
 
-            int version = 1;
             String user = null, password = null;
             for (int i = 1; i < argv.length; ++i) {
                 if (argv[i].startsWith("user=")) {
@@ -958,9 +956,6 @@ public class GARDEntityFactory extends EntityRegistry {
                 }
                 else if (argv[i].startsWith("password=")) {
                     password = argv[i].substring(9);
-                }
-                else if (argv[i].startsWith("version=")) {
-                    version = Integer.parseInt(argv[i].substring(8));
                 }
             }
 
@@ -976,7 +971,7 @@ public class GARDEntityFactory extends EntityRegistry {
             
             try (GARDEntityFactory gef = new GARDEntityFactory (argv[0]);
                  Connection con = DriverManager.getConnection(jdbcUrl)) {
-                gef.register(con, version);
+                gef.register(con);
             }
         }
     }
