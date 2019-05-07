@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v9"
+version="v10"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -42,6 +42,9 @@ sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory\$Register $out $gard
 #load GHR
 sbt stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
 
+#load NORD
+sbt stitcher/"runMain ncats.stitcher.impl.NORDEntityFactory $out"
+
 # load ontologies
 #sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
 for f in $owl_files; do
@@ -71,6 +74,6 @@ if test -d $medgen; then
 fi
 
 #load PPI if available
-if test -d $ppi; then
+if test -f $ppi; then
     sbt stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $ppi"
 fi

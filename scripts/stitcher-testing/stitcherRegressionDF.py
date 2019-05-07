@@ -11,29 +11,47 @@ import argparse
 import pandas as pd
 import base64
 from tqdm import tqdm
+import re
 
 # check that the python version is correct (need 2)
 if sys.version_info[0] > 2:
     raise "Must be using Python 2! Aborting."
 
+#get a default directory with data files for this script
+def getScriptsDataDir():
+    curr = os.getcwd()
+    sdata = re.sub("/stitcher.*$", 
+                   "/stitcher/scripts/data",
+                   curr)
+
+    if not os.path.exists(sdata):
+        raise ValueError('Could not identify dir with script files!')
+    
+    return sdata
+
+sdata = getScriptsDataDir()
+
 # check for arguments
 args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
 args_p.add_argument('addr',
                     help="""a full Stitcher address OR
-                            a shorthand: 'prod', 'dev', 'test' or 'local'""")
+                            a shorthand: 'prod', 'dev', 'test', 'local' [on 8080] or a port number""")
 args_p.add_argument('--unii',
                     nargs="?",
-                    default="../../temp/UNIIs-2018-09-07/UNII Names 31Aug2018.txt",
+                    default=os.path.join(sdata,
+                                         "UNII Names 31Aug2018.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--appyears",
                     nargs="?",
-                    default="../../data/approvalYears.txt",
+                    default=os.path.join(sdata,
+                                         "approvalYears.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--fdanme",
                     nargs="?",
-                    default="../../data/FDA-NMEs-2018-08-07.txt",
+                    default=os.path.join(sdata,
+                                         "FDA-NMEs-2018-08-07.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument('--maxsubs',
@@ -42,11 +60,17 @@ args_p.add_argument('--maxsubs',
                     default=100000,
                     help="maximum number of substances to evaluate")
 
+args_p.add_argument('--outdir',
+                    nargs="?",
+                    default="./test-results",
+                    help="where to save the results")
+
 site_arg = args_p.parse_args().addr
 unii_path = args_p.parse_args().unii
 appyears_path = args_p.parse_args().appyears
 fdanme_path = args_p.parse_args().fdanme
 max_subs = args_p.parse_args().maxsubs
+outdir = args_p.parse_args().outdir
 
 switcher = {
     "prod": "https://stitcher.ncats.io/",
@@ -55,10 +79,21 @@ switcher = {
     "local": "http://localhost:8080/"
     }
 
+#script can ingest a port number
+ports_patt = "^[0-9]{4}$"
+
 if site_arg in switcher:
     site = switcher[site_arg]
+elif re.search(ports_patt, str(site_arg)):
+    site = "http://localhost:%s/" % site_arg
 else:
     site = site_arg
+
+print "Querying stitcher instance at %s..." % site
+
+#create output directory if missing
+if not os.path.exists(outdir):
+    os.mkdir(outdir)
 
 date = time.strftime("%Y-%m-%d", time.gmtime())
 
@@ -73,7 +108,6 @@ opener.addheaders = [
     ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
                     'Windows NT 5.2; .NET CLR 1.1.4322)'))
 ]
-
 
 def requestJson(uri):
     try:
@@ -119,7 +153,7 @@ def approvedStitches(approved, stitch):
               "Rank"]
     '''
 
-    if stitch['approved']:
+    if stitch['USapproved']:
         apprYear = "not given"
 
         if 'approvedYear' in stitch:
@@ -447,65 +481,6 @@ def extendPaths(paths, edges):
     return npaths
 
 
-def probeUniiClash():
-    uri = site + 'api/stitches/latest/ZY81Z83H0X'
-    obj = requestJson(uri)
-    stitch = []
-    stitch.append(obj['sgroup']['parent'])
-    for member in obj['sgroup']['members']:
-        if member['node'] not in stitch:
-            stitch.append(member['node'])
-
-    edges = []
-    sp = dict()
-    nodes = []
-    for item in stitch:
-        uri = site + 'api/node/' + str(item)
-        obj = requestJson(uri)
-        sp[item] = obj['parent']
-        nodes.append(sp[item])
-        edges.append([item, sp[item], 'parent', 'parent'])
-
-    edges, nodesrc = getEdges(nodes, edges)
-
-    uri = site + 'api/stitches/latest/1222096'
-    obj = requestJson(uri)
-    ostitch = []
-    ostitch.append(obj['sgroup']['parent'])
-    for member in obj['sgroup']['members']:
-        if member['node'] not in ostitch:
-            ostitch.append(member['node'])
-
-    nodes = []
-    for item in ostitch:
-        uri = site + 'api/node/' + str(item)
-        obj = requestJson(uri)
-        sp[item] = obj['parent']
-        nodes.append(sp[item])
-        edges.append([sp[item], item, 'rparent', 'rparent'])
-
-    edges, nodesrc = getEdges(nodes, edges, nodesrc)
-
-    print stitch
-    print ostitch
-    print nodesrc
-    print edges
-
-    paths = getPathsFromStitch(stitch)
-    match = []
-    round = 0
-    while len(match) == 0:
-        for p in paths:
-            if p[-1] == ostitch[-1]:
-                match.append(list(p))
-        if len(match) == 0:
-            round = round + 1
-            paths = extendPaths(paths, edges)
-            if len(paths) == 0 or round > 10:
-                match = ["impossible"]
-    print match
-
-
 def get_uniis(unii_path):
     uniis = pd.read_csv(unii_path,
                         sep="\t")
@@ -730,10 +705,11 @@ if __name__ == "__main__":
                 if len(v) > 3
             }
 
-    xl_writer = pd.ExcelWriter("".join([date,
-                                        "_regression_",
-                                        site_arg,
-                                        ".xlsx"]))
+    xl_writer = pd.ExcelWriter(os.path.join(outdir
+                                            ,"".join([date,
+                                                "_regression_",
+                                                site_arg,
+                                                ".xlsx"])))
 
     for test_index in range(len(tests)):
         test_name = tests[test_index].__name__

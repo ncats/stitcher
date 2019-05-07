@@ -460,7 +460,7 @@ public class EntityRegistry extends EntityFactory {
         }
         if (label.length() == 0)
             label.append(name);
-        
+
         return Label.label(label.toString().toUpperCase());
     }
 

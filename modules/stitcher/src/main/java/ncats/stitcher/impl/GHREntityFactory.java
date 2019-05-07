@@ -72,8 +72,8 @@ public class GHREntityFactory extends EntityRegistry {
             ;
     }
     
-    public DataSource register (InputStream is, int version) throws Exception {
-        DataSource ds = getDataSourceFactory().register("GHR_v"+version);
+    public DataSource register (InputStream is) throws Exception {
+        DataSource ds = getDataSourceFactory().register("GHR");
         setDataSource (ds);
         
         XMLEventReader events =
@@ -192,10 +192,6 @@ public class GHREntityFactory extends EntityRegistry {
         return ds;
     }
 
-    public DataSource register (URL url, int version) throws Exception {
-        return register (url.openStream(), version);
-    }
-    
     public static void main (String[] argv) throws Exception {
         if (argv.length < 1) {
             logger.info("Usage: "+GHREntityFactory.class.getName()
@@ -218,8 +214,8 @@ public class GHREntityFactory extends EntityRegistry {
         }
         logger.info("Registering "+xml+"...");
         try (GHREntityFactory ghr = new GHREntityFactory (argv[0])) {
-            DataSource ds = ghr.register(xml, 1);
-            
+            DataSource ds = ghr.register(xml.openStream());
+            ds.set("url", xml.toString());
         }
     }
 }
