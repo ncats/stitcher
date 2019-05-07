@@ -79,7 +79,7 @@ public class Partition {
         final double[][] Pw;
         final double[][][] P;
 
-        final int N, M, K;
+        final int N, M, K, maxiter;
         /*
          * N - number of documents
          * M - number of words (i.e., dictionary size)
@@ -92,6 +92,7 @@ public class Partition {
             this.K = K;
             this.N = N;
             this.M = M;
+            this.maxiter = 10*K;
         }
 
         protected void init () {
@@ -154,7 +155,7 @@ public class Partition {
         }
 
         protected boolean converged (int niter) {
-            return niter > 50;
+            return niter > maxiter;
         }
 
         // return true if word j is in document i; false otherwise
@@ -220,34 +221,63 @@ public class Partition {
             return d;
         }
 
-        public void aspects () {
+        public void aspects (OutputStream os) {
             EM ();
-            if (reversed) {
-                for (int j = 0; j < M; ++j) {
-                    System.out.print(String.format("%1$40d", nodes[j].id));
-                    for (int k = 0; k < K; ++k) {
-                        System.out.print
-                            ("\t"+String.format("%1$.3f", Pw[k][j]));
+            
+            PrintStream ps = new PrintStream (os);
+            Map<Integer, Set> partitions = new TreeMap<>();
+            for (int j = 0; j < M; ++j) {
+                Object val;
+                if (reversed) {
+                    ps.print(String.format("%1$40d", nodes[j].id));
+                    val = nodes[j].id;
+                }
+                else {
+                    ps.print(String.format("%1$40s", values[j].value));
+                    val = values[j].value;
+                }
+                
+                BitSet set = new BitSet (K);
+                double max = 0.; 
+                for (int k = 0; k < K; ++k) {
+                    ps.print("\t"+String.format("%1$.3f", Pw[k][j]));
+                    if (Pw[k][j] < max) {
                     }
-                    System.out.println();
+                    else if (Pw[k][j] > max) {
+                        max = Pw[k][j];
+                        set.clear();
+                        set.set(k);
+                    }
+                    else if (max > 0.) {
+                        set.set(k);
+                    }
+                }
+                ps.println();
+                
+                if (set.cardinality() > 1) {
+                    logger.warning(val+": "+set);
+                }
+                else {
+                    int k = set.nextSetBit(0);
+                    Set mem = partitions.get(k);
+                    if (mem == null)
+                        partitions.put(k, mem = new LinkedHashSet ());
+                    mem.add(val);
                 }
             }
-            else {
-                for (int j = 0; j < M; ++j) {
-                    System.out.print(String.format("%1$40s", values[j].value));
-                    for (int k = 0; k < K; ++k) {
-                        System.out.print
-                            ("\t"+String.format("%1$.3f", Pw[k][j]));
-                    }
-                    System.out.println();
-                }
+            
+            for (Map.Entry<Integer, Set> me : partitions.entrySet()) {
+                ps.println("++++ K="+me.getKey());
+                for (Object v : me.getValue())
+                    ps.println(v);
+                ps.println();
             }
         }
     }
 
     Map<String, SV> values = new TreeMap<>();
     Map<Long, NV> nodes = new TreeMap<>();
-    
+
     public Partition (File file) throws IOException {
         ObjectMapper mapper = new ObjectMapper ();
         try (InputStream is = new FileInputStream (file)) {
@@ -329,34 +359,49 @@ public class Partition {
             }
             
             logger.info("loading "+json.get("id").asText()+"..."+values.size());
-
             Set<SV> svs = new TreeSet<>(values.values());
             for (SV sv : svs) {
                 System.out.println(sv);
             }
-
-            logger.info("------- synonym partitions -------");
-            StitchPLSA plsa =
-                new StitchPLSA (5, this.nodes.values().toArray(new NV[0]),
-                                this.values.values().toArray(new SV[0]));
-            plsa.aspects();
-
-            logger.info("------- node partitions ---------");
-            plsa = new StitchPLSA (5, this.values.values().toArray(new SV[0]),
-                                   this.nodes.values().toArray(new NV[0]));
-            plsa.aspects();
         }
+    }
+    
+    public void plsa (int K) throws Exception {
+        plsa (K, System.out);
+    }
+    
+    public void plsa (int K, OutputStream os) throws Exception {
+        logger.info("------- VALUE partitions -------");
+        StitchPLSA plsa =
+            new StitchPLSA (K, nodes.values().toArray(new NV[0]),
+                            values.values().toArray(new SV[0]));
+        plsa.aspects(os);
+        
+        logger.info("------- NODE partitions ---------");
+        plsa = new StitchPLSA (K, values.values().toArray(new SV[0]),
+                               nodes.values().toArray(new NV[0]));
+        plsa.aspects(os);
     }
 
     public static void main (String[] argv) throws Exception {
         if (argv.length == 0) {
-            System.err.println("Usage: ncats.stitcher.Partition FILES...");
+            System.err.println
+                ("Usage: ncats.stitcher.Partition [K=5] [FILES...");
             System.exit(1);
         }
 
-        for (String f : argv) {
-            File file = new File (f);
-            new Partition (file);
+        int K = 5, i = 0;
+        try {
+            K = Integer.parseInt(argv[i]);
+            ++i;
+        }
+        catch (NumberFormatException ex) {
+        }
+        
+        for (; i < argv.length; ++i) {
+            File file = new File (argv[i]);
+            Partition part = new Partition (file);
+            part.plsa(K);
         }
     }
 }

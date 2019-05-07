@@ -458,6 +458,9 @@ public class EntityRegistry extends EntityFactory {
             }
             else break;
         }
+        if (label.length() == 0)
+            label.append(name);
+        
         return Label.label(label.toString().toUpperCase());
     }
 
