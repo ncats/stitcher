@@ -559,10 +559,66 @@ public class Entity extends CNode {
         }
 
         double sim = 0.0;
-        if (a+b > 0) {
+        if (a + b > 0) {
             sim = (double)ov/(a+b-ov);
         }
         return sim;
+    }
+
+    protected double strucsim (Node other, StitchKey... keys) {
+       try (Transaction tx = gdb.beginTx()) {
+            if (other.equals(_node))
+                return 1.;
+
+            if (keys == null || keys.length == 0)
+                keys = Entity.KEYS;
+            
+            Set<Long> U = new TreeSet<>();
+            U.add(_node.getId());
+            for (Relationship rel : _node.getRelationships(keys)) {
+                Node u = rel.getOtherNode(_node);
+                U.add(u.getId());
+            }
+
+            Set<Long> V = new TreeSet<>();
+            V.add(other.getId());
+            int ov = U.contains(other.getId()) ? 1 : 0;
+            for (Relationship rel : other.getRelationships(keys)) {
+                Node v = rel.getOtherNode(other);
+                if (!V.contains(v.getId())) {
+                    if (U.contains(v.getId()))
+                        ++ov;
+                    V.add(v.getId());
+                }
+            }
+            tx.success();
+            
+            return ov / Math.sqrt(U.size()*V.size());
+        }
+    }
+    
+    /*
+     * structural similarity
+     */
+    public double strucSimilarity (Entity other, StitchKey... keys) {
+        return strucsim (other._node, keys);
+    }
+
+    /*
+     * return neighbors that have structural similarity >= sim
+     */
+    public Entity[] strucNeighbors (double sim, StitchKey... keys) {
+        List<Entity> neighbors = new ArrayList<>();
+        try (Transaction tx = gdb.beginTx()) {
+            for (Relationship rel : _node.getRelationships(keys)) {
+                Node n = rel.getOtherNode(_node);
+                double s = strucsim (n);
+                if (s >= sim)
+                    neighbors.add(Entity.getEntity(n));
+            }
+            tx.success();
+        }
+        return neighbors.toArray(new Entity[0]);
     }
     
     public boolean contains (StitchKey key, Object value) {

@@ -2112,8 +2112,6 @@ public class EntityFactory implements Props, AutoCloseable {
         }
         query.append(") return n skip {skip} limit {top}");
 
-        // Chunk call to func by batches of 1000 nodes to avoid out of
-        // memory issues
         int count = 0, top = 100, skip = 0;
         Map<String, Object> params = new HashMap<>();
         params.put("top", top);
