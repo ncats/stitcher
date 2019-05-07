@@ -71,6 +71,6 @@ if test -d $medgen; then
 fi
 
 #load PPI if available
-if test -d $ppi; then
+if test -f $ppi; then
     sbt stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $ppi"
 fi
