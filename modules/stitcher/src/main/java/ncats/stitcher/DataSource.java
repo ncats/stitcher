@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.concurrent.Callable;
 
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 
@@ -100,6 +101,23 @@ public class DataSource extends CNode {
                     return (String)_node.getProperty(NAME);
                 }
             });
+    }
+
+    public Label getLabel () {
+        String name = getName ();
+        StringBuilder label = new StringBuilder ();
+        for (int pos = 0, p; (p = name.indexOf('.', pos)) > 0;) {
+            label.append(name.substring(pos, p));
+            if (p < name.length() && Character.isDigit(name.charAt(p+1))) {
+                // this is a decimal (e.g., version number), so replace with _
+                label.append('_');
+                pos = p+1;
+            }
+            else break;
+        }
+        if (label.length() == 0)
+            label.append(name);
+        return Label.label("S_"+label.toString().toUpperCase());
     }
 
     public void setName (String name) {

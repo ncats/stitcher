@@ -38,7 +38,7 @@ public class PPIEntityFactory extends EntityRegistry {
         setIdField ("Interaction Identifiers");
         add(I_GENE, "_interactors_A")
             .add(I_GENE, "_interactors_B")
-            .add(I_PMID, "_pmids")
+            //.add(I_PMID, "_pmids")
             .add(I_CODE, "Interaction Identifiers")
             .add(T_Keyword, "Interaction Types")
             ;

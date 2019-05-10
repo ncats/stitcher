@@ -52,6 +52,7 @@ public class EntityFactory implements Props, AutoCloseable {
 
     static final double CLIQUE_WEIGHT = 0.7;
     static final int CLIQUE_MINSIZE = 2;
+    static final String TEXT_INDEXER = "lucene";
 
     static class DefaultGraphMetrics implements GraphMetrics {
         int entityCount;
@@ -1250,6 +1251,7 @@ public class EntityFactory implements Props, AutoCloseable {
     protected final GraphDatabaseService gdb;
     protected final TimelineIndex<Node> timeline;
     protected final DataSourceFactory dsf;
+    protected TextIndexer indexer;
     
     public EntityFactory (String dir) throws IOException {
         this (GraphDb.getInstance(dir));
@@ -1272,6 +1274,12 @@ public class EntityFactory implements Props, AutoCloseable {
             this.timeline = new LuceneTimeline
                 (gdb, gdb.index().forNodes(CNode.NODE_TIMELINE));
             tx.success();
+        }
+        try {
+            indexer = graphDb.getTextIndexer(TEXT_INDEXER);
+        }
+        catch (Exception ex) {
+            logger.warning("TextIndexer is not available: "+ex.getMessage());
         }
         this.graphDb = graphDb;
         this.dsf = new DataSourceFactory (graphDb);
@@ -1300,7 +1308,6 @@ public class EntityFactory implements Props, AutoCloseable {
         graphDb.setCache(CacheFactory.getInstance(cache));
     }
     public DataSourceFactory getDataSourceFactory () { return dsf; }
-    
     public long getLastUpdated () { return graphDb.getLastUpdated(); }
     
     public GraphMetrics calcGraphMetrics() {
@@ -2208,6 +2215,28 @@ public class EntityFactory implements Props, AutoCloseable {
 
     public Entity _entity (long id) {
         return Entity._getEntity(gdb.getNodeById(id));  
+    }
+
+    public Entity[] search (String query, int max) {
+        return search (query, 0, max);
+    }
+    
+    public Entity[] search (String query, int skip, int top) {
+        List<Entity> results = new ArrayList<>();
+        try (Transaction tx = gdb.beginTx()) {
+            List<Node> nodes = indexer.search(query, skip, top);
+            for (Node u : nodes) {
+                Relationship rel = u.getSingleRelationship
+                    (AuxRelType.PAYLOAD, Direction.OUTGOING);
+                Entity e = Entity._getEntity(rel.getOtherNode(u));
+                results.add(e);
+            }
+            tx.success();
+        }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, "Search \""+query+"\" failed!", ex);
+        }
+        return results.toArray(new Entity[0]);
     }
 
     static void dfs (Set<Long> nodes, Node n, StitchValue sv) {

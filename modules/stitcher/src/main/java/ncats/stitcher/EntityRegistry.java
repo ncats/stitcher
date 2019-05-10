@@ -446,24 +446,6 @@ public class EntityRegistry extends EntityFactory {
         }
     }
 
-    protected Label getSourceLabel () {
-        String name = source.getName();
-        StringBuilder label = new StringBuilder ();
-        for (int pos = 0, p; (p = name.indexOf('.', pos)) > 0;) {
-            label.append(name.substring(pos, p));
-            if (p < name.length() && Character.isDigit(name.charAt(p+1))) {
-                // this is a decimal (e.g., version number), so replace with _
-                label.append('_');
-                pos = p+1;
-            }
-            else break;
-        }
-        if (label.length() == 0)
-            label.append(name);
-
-        return Label.label(label.toString().toUpperCase());
-    }
-
     public Entity _attach (final Map<String, Object> map) {
         Entity ent = null;
         int cnt = 0;
@@ -480,7 +462,7 @@ public class EntityRegistry extends EntityFactory {
                             new DefaultPayload (source, id);
                         payload.putAll(map);
                         e._add(payload);
-                        e._addLabel(getSourceLabel ());
+                        e._addLabel(source.getLabel());
                         if (ent == null)
                             ent = e;
                         logger.info
@@ -548,12 +530,11 @@ public class EntityRegistry extends EntityFactory {
             ent = Entity._getEntity(_createNode ());
             String id = null;
             if (idField != null && map.containsKey(idField)) {
-                Object o =map.get(idField);
+                Object o = map.get(idField);
                 //do null value check incase it's missing!
-                if(o !=null){
-                    id = map.get(idField).toString();
+                if (o !=null){
+                    id = o.toString();
                 }
-
             }
             
             DefaultPayload payload = new DefaultPayload (getDataSource (), id);
@@ -568,8 +549,11 @@ public class EntityRegistry extends EntityFactory {
                             lychify (ent, mol);
                     }
                     else {
-                        if ("NA".equals(value.toString()))
-                            value = "Not Available"; // Withdrawn file uses NA as not available, but this is a valid smiles
+                        if ("NA".equals(value.toString())) {
+                            // Withdrawn file uses NA as not available,
+                            // but this is a valid smiles
+                            value = "Not Available";
+                        }
                         try {
                             MolHandler mh = new MolHandler (value.toString());
                             Molecule mol = mh.getMolecule();
@@ -904,7 +888,7 @@ public class EntityRegistry extends EntityFactory {
                 ("Can't create entity without a data source!");
         }
         
-        Node node = gdb.createNode(AuxNodeType.ENTITY, getSourceLabel ());
+        Node node = gdb.createNode(AuxNodeType.ENTITY, source.getLabel());
         node.setProperty(SOURCE, source.getKey());
         return node;
     }
@@ -949,7 +933,7 @@ public class EntityRegistry extends EntityFactory {
     
     public DataSourceFactory getDataSourceFactory () { return dsf; }
     public EntityRegistry setDataSource (DataSource source) {
-        this.source = source;
+        this.source = source;        
         return this;
     }
     public DataSource getDataSource () { return source; }

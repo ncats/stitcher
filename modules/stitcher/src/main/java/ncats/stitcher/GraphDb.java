@@ -42,6 +42,8 @@ public class GraphDb extends TransactionEventHandler.Adapter
     protected final AtomicLong lastUpdated = new AtomicLong ();
     
     protected final File indexDir;
+    protected final Map<File, TextIndexer> indexers
+        = new ConcurrentHashMap<>();
     
     protected GraphDb (File dir) throws IOException {
         this (dir, null);
@@ -62,8 +64,13 @@ public class GraphDb extends TransactionEventHandler.Adapter
     }
     
     protected GraphDb (File dir, CacheFactory cache) throws IOException {
+        GraphDatabaseSettings.BoltConnector bolt =
+            GraphDatabaseSettings.boltConnector( "0" );
         gdb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dir)
             .setConfig(GraphDatabaseSettings.dump_configuration, "true")
+            .setConfig(bolt.type, "BOLT" )
+            .setConfig(bolt.enabled, "true" )
+            .setConfig(bolt.address, "localhost:7687" )
             .newGraphDatabase();
 
         /*
@@ -112,6 +119,15 @@ public class GraphDb extends TransactionEventHandler.Adapter
     
     public File getPath () { return dir; }
     public void shutdown () {
+        for (TextIndexer indexer : indexers.values()) {
+            try {
+                indexer.close();
+            }
+            catch (Exception ex) {
+                logger.log(Level.SEVERE, "Can't close TextIndexer", ex);
+            }
+        }
+        gdb.unregisterTransactionEventHandler(this);
         gdb.shutdown();
         if (localCache)
             cache.shutdown();
@@ -134,6 +150,24 @@ public class GraphDb extends TransactionEventHandler.Adapter
             tx.success();
         }
         return cnode;
+    }
+
+    public TextIndexer getTextIndexer (String name) throws Exception {
+        return getTextIndexer (name, true);
+    }
+    
+    public TextIndexer getTextIndexer (String name, boolean createIfAbsent)
+        throws Exception {
+        File dir = new File (indexDir, name);
+        TextIndexer indexer = indexers.get(dir);
+        if (indexer == null) {
+            if (!dir.exists() && !createIfAbsent)
+                throw new IllegalArgumentException
+                    ("TextIndexer \""+name+"\" doesn't exist!");
+            indexer = new TextIndexer (gdb, dir);
+            indexers.put(dir, indexer);
+        }
+        return indexer;
     }
 
     /*

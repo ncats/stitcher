@@ -68,6 +68,7 @@ public class Api extends Controller {
             ObjectNode node = mapper.createObjectNode();
             node.put("key", ds.getKey());
             node.put("name", ds.getName());
+            node.put("label", ds.getLabel().name());
             URI uri = ds.toURI();
             node.put("source", uri == null ?
                     null :
@@ -145,6 +146,25 @@ public class Api extends Controller {
             ex.printStackTrace();
         }
         return notFound ("Unknown node "+id);
+    }
+
+    public Result search (String q, int skip, int top) {
+        try {
+            Entity[] matches = es.getEntityFactory().search(q, skip, top);
+            ObjectNode json = mapper.createObjectNode();
+            json.put("query", q);
+            json.put("skip", skip);
+            json.put("top", top);
+            json.put("count", matches.length);
+            ArrayNode results = mapper.createArrayNode();
+            for (Entity e : matches)
+                results.add(jsonCodec.encode(e));
+            json.put("contents", results);
+            return ok (json);
+        }
+        catch (Exception ex) {
+            return internalServerError (ex.getMessage());
+        }
     }
 
     @Transactional
