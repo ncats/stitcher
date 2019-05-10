@@ -65,6 +65,7 @@ public class GHREntityFactory extends EntityRegistry {
     protected void init () {
         super.init();
         setNameField ("name");
+        setIdField ("name");
         add (N_Name, "name")
             .add(N_Name, "synonyms")
             .add(I_GENE, "genes")

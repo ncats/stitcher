@@ -129,6 +129,8 @@ public class DefaultJsonCodec implements JsonCodec, Props {
         node.put("labels", array);
 
         ArrayNode neighbors = mapper.createArrayNode();
+        ArrayNode parents = mapper.createArrayNode();
+        ArrayNode children = mapper.createArrayNode();
         List<Relationship> snapshots = new ArrayList<Relationship>();
         Node parent = null;
         
@@ -291,6 +293,14 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             //else if (n.hasLabel(AuxNodeType.COMPONENT)) {
             //    // TODO should do something here..
             //}
+            else if (rel.isType(StitchKey.R_subClassOf)) {
+                if (_node.equals(rel.getStartNode())) {
+                    parents.add(n.getId());
+                }
+                else { //
+                    children.add(n.getId());
+                }
+            }
             else {
                 ObjectNode nb = mapper.createObjectNode();
                 nb.put("node", n.getId());
@@ -338,6 +348,12 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             
         if (neighbors.size() > 0)
             node.put("neighbors", neighbors);
+
+        if (parents.size() > 0)
+            node.put("parents", parents);
+
+        if (children.size() > 0)
+            node.put("children", children);
             
         if (!payloads.isEmpty()) {
             ArrayNode ary = mapper.createArrayNode();
