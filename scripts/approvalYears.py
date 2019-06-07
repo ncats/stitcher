@@ -23,7 +23,8 @@ def getTimeStamp():
     return time.strftime("%Y-%m-%d", ts)
 
 def getOBZipURL():
-    zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM163762.zip"
+    zipurl = "https://www.fda.gov/media/76860/download"
+    #zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM163762.zip"
     return zipurl
 
 def getUNIIZipURL():
@@ -31,7 +32,8 @@ def getUNIIZipURL():
     return zipurl
 
 def getDrugsFDAZipURL():
-    zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM527389.zip"
+    zipurl = "https://www.fda.gov/media/89850/download"
+    #zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM527389.zip"
     #page = urllib2.urlopen('https://www.fda.gov/Drugs/InformationOnDrugs/ucm079750.htm').read()
     #i = page.find('Drugs@FDA Download File')
     #j = page.rfind('href="/downloads/Drugs/InformationOnDrugs/', 0, i)
@@ -270,7 +272,7 @@ if __name__=="__main__":
     if not os.path.exists(obfile):
         os.system(syscall)
 
-    appYrsfile = maindir+"/data/_archive/approvalYears.txt"
+    appYrsfile = maindir+"/data/approvalYears-2019-03-20.txt"
     if not os.path.exists(appYrsfile):
         raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
 
@@ -550,10 +552,16 @@ if __name__=="__main__":
 
     for entry in appYrs['table']:
         unii = entry[0]
-        ts = time.strptime(entry[5], "%m/%d/%Y")
-        date = time.strftime("%Y-%m-%d", ts)
-        method = entry[6]
-        appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
+        ts = time.strptime(entry[2], "%m/%d/%Y")
+        date = '%04d-%02d-%02d' % (ts.tm_year, ts.tm_mon, ts.tm_mday)
+        #date = time.strftime("%Y-%m-%d", ts) # 1897 ValueError: year out of range
+        method = entry[3]
+        appl = '%06s' % (entry[5])
+        try:
+            appl = int(entry[10][0:6])
+        except:
+            appl = "NAN"
+        #appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
         if method == 'PREDICTED':
             appPredDate[appl] = date
 
@@ -591,10 +599,16 @@ if __name__=="__main__":
     appYrs = readTabFile(appYrsfile)
     for entry in appYrs['table']:
         unii = entry[0]
-        ts = time.strptime(entry[5], "%m/%d/%Y")
-        date = time.strftime("%Y-%m-%d", ts)
-        method = entry[6]
-        appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
+        ts = time.strptime(entry[2], "%m/%d/%Y")
+        date = '%04d-%02d-%02d' % (ts.tm_year, ts.tm_mon, ts.tm_mday)
+        #date = time.strftime("%Y-%m-%d", ts) # 1897 ValueError: year out of range
+        method = entry[3]
+        appl = '%06s' % (entry[5])
+        try:
+            appl = int(entry[10][0:6])
+        except:
+            appl = "NAN"
+        #appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
         match = 5
         if method == 'PREDICTED':
             early = [getTimeStamp(), 'Not available']
@@ -612,21 +626,21 @@ if __name__=="__main__":
                         if entry2[-2] != '' and entry2[-2] < early[-2]:
                             early = entry2
 
-            if date == early[-2] or date > early[-2]:
+            if date[0:4] == early[-2][0:4] or date > early[-2]:
                 match = 0 # startDate is the same or earlier
 
             if date < early[-2]:
                 for otherunii in activeMoiety[unii]:
                     if UNII2prods.has_key(otherunii):
                         for prod in UNII2prods[otherunii]:
-                            if prod[0:6] == appl:
+                            if match > 4 and prod[0:6] == '%06d' % (appl):
                                 match = 4 # appl is in list and startDate doesn't work
                 if match == 5:
                     for prod in prods.keys():
-                        if prod[0:6] == appl:
+                        if prod[0:6] == '%06d' % (appl):
                             match = 1 # appl exists and wasn't mapped to this unii
-            if match > 1:
-                print date, unii, method, appl
+            if match > 4:
+                print match, date, unii, method, appl
 
                 print activeMoiety[unii]
 
