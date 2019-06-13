@@ -30,6 +30,8 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
 import org.apache.lucene.search.vectorhighlight.FieldQuery;
 
+import org.apache.commons.text.StringTokenizer;
+
 public class TextIndexer extends TransactionEventHandler.Adapter
     implements AutoCloseable {
     static final Logger logger = Logger.getLogger(TextIndexer.class.getName());
@@ -159,12 +161,35 @@ public class TextIndexer extends TransactionEventHandler.Adapter
     public List<Node> search (String query, int max) throws Exception {
         return search (query, 0, max);
     }
-    
+
+    public String rewriteQuery (String text) {
+        StringTokenizer tokenizer = new StringTokenizer (text);
+        tokenizer.setQuoteChar('"');
+        
+        StringBuilder q = new StringBuilder ();
+        while (tokenizer.hasNext()) {
+            String tok = tokenizer.next();
+            if (q.length() > 0)
+                q.append(" ");
+            char ch = tok.charAt(0);
+            if (ch == '+' || ch == '-')
+                q.append(tok); // as-is
+            else if (ch == '~')
+                q.append(tok.substring(1)); // optional token
+            else if (tok.indexOf(' ') > 0)
+                q.append("+\""+tok+"\"");
+            else
+                q.append("+"+tok);
+        }
+        logger.info("** REWRITE: "+q);
+        return q.toString();
+    }
+        
     public List<Node> search (String query, int skip, int top)
         throws Exception {
         QueryParser parser = new QueryParser
             (FIELD_TEXT, indexWriter.getAnalyzer());
-        return search (parser.parse(query), skip, top);
+        return search (parser.parse(rewriteQuery (query)), skip, top);
     }
     
     public List<Node> search (Query query, int skip, int top)

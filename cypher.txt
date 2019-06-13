@@ -50,3 +50,96 @@ match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.statu
 
 # all leaf nodes descendants of rare disease
 match(n)-[]-(d:DATA) where  exists(d.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() with n match(n)-[:R_subClassOf*1..9]->(m) where 'MONDO:0021200' in m.I_CODE return count(distinct n)
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `ORDO`, count(distinct a) as `NORD`
+
+match p=(n:`S_MEDGEN`:T047)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `MEDGEN`, count(distinct a) as `NORD`
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `ORDO`, count(distinct a) as `MEDGEN`
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `ORDO`, count(distinct a) as `NCI`
+
+match(n:`S_GHR`)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `GHR`, count(distinct a) as `NCI`
+
+match(n:`S_GHR`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:`T047`) return count(distinct n) as `GHR`, count(distinct a) as `MEDGEN`
+
+match(n:`S_GHR`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `GHR`, count(distinct a) as `NORD`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `NORD`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `MEDGEN`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `NCI`
+
+
+
+match(n:`MESH.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MEDLINEPLUS.ttl.gz`:T047) return count(distinct n) as `MESH`,count(distinct a) as `MEDLINE`
+
+match(n:`MESH.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `MESH`,count(distinct a) as `MONDO`
+
+match(n:`OMIM.ttl.gz`:T047) with n match(n)-[:N_Name|:I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `OMIM`,count(distinct a) as `MONDO`
+
+match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`HPO.owl.gz`)-[]-(b:DATA) where exists(b.label) and not exists(a.status) return count(distinct n) as `MONDO`,count(distinct a) as `HPO`
+
+match(n:`OMIM.ttl.gz`:T047) where none(x in labels(n) where x='T028') return count(n)
+
+MATCH (n:`Designated`)-[e*1..2]-(m:`human_phenotype`)-[]-(d:DATA) unwind e as g with distinct g.gene as g,count(n) as cnt unwind g as Gene return Gene,sum(cnt) as Count order by Count desc
+
+match(n)-[]-(d:DATA) where d.id='MONDO:0019035' with n,d match(n)-[:R_subClassOf*1..9]->(m)-[]-(a:DATA) return n,d,m,a
+
+match(n:`MONDO.owl.gz`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() return count(n)
+
+# all leaf nodes descendants of rare disease
+match(n)-[]-(d:DATA) where  exists(d.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() with n match(n)-[:R_subClassOf*1..9]->(m) where 'MONDO:0021200' in m.I_CODE return count(distinct n)
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `ORDO`, count(distinct a) as `NORD`
+
+match p=(n:`S_MEDGEN`:T047)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `MEDGEN`, count(distinct a) as `NORD`
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `ORDO`, count(distinct a) as `MEDGEN`
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `ORDO`, count(distinct a) as `NCI`
+
+match(n:`S_GHR`)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `GHR`, count(distinct a) as `NCI`
+
+match(n:`S_GHR`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:`T047`) return count(distinct n) as `GHR`, count(distinct a) as `MEDGEN`
+
+match(n:`S_GHR`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `GHR`, count(distinct a) as `NORD`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `NORD`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `MEDGEN`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `NCI`
+
+match(n:`S_OMIM`:T047)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) where not exists(n.status) return count(distinct n) as `OMIM`, count(distinct a) as `MEDGEN`
+
+match(n:`S_OMIM`:T047)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) where not exists(n.status) return count(distinct n) as `OMIM`, count(distinct a) as `NORD`
+
+match(n:`S_MESH`:T047)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `MESH`, count(distinct a) as `NORD`
+
+match(n:`S_MESH`:T047)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `MESH`, count(distinct a) as `MEDGEN`
+
+match(n:`S_MESH`:T047)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `MESH`, count(distinct a) as `NCI`
+
+match(n:`S_MEDLINEPLUS`)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `MEDLINE`, count(distinct a) as `NCI`
+
+match(n:`S_MEDLINEPLUS`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `MEDLINE`, count(distinct a) as `MEDGEN`
+
+match(n:`S_MEDLINEPLUS`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `MEDLINE`, count(distinct a) as `NORD`
+
+match(n:`S_MONDO`)-[]-(d:DATA) where not exists(n.status) and exists(d.label) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `MONDO`, count(distinct a) as `NORD`
+
+match(n:`S_MONDO`)-[]-(d:DATA) where not exists(n.status) and exists(d.label) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `MONDO`, count(distinct a) as `MEDGEN`
+
+match(n:`S_MONDO`)-[]-(d:DATA) where not exists(n.status) and exists(d.label) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `MONDO`, count(distinct a) as `NCI`
+
+match(n:`S_HPO`)-[:N_Name|:I_CODE*1]-(a:`S_THESAURUS`:`Disease or Syndrome`) return count(distinct n) as `HPO`, count(distinct a) as `NCI`
+
+match(n:`S_HPO`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `HPO`, count(distinct a) as `MEDGEN`
+
+match(n:`S_HPO`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `HPO`, count(distinct a) as `NORD`
+
+match(n:`S_THESAURUS`:`Disease or Syndrome`)-[:N_Name|:I_CODE*1]-(a:`S_NORD`) return count(distinct n) as `NCI`, count(distinct a) as `NORD`
+
+match(n:`S_THESAURUS`:`Disease or Syndrome`)-[:N_Name|:I_CODE*1]-(a:`S_MEDGEN`:T047) return count(distinct n) as `NCI`, count(distinct a) as `MEDGEN`
