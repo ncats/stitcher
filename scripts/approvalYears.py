@@ -23,7 +23,8 @@ def getTimeStamp():
     return time.strftime("%Y-%m-%d", ts)
 
 def getOBZipURL():
-    zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM163762.zip"
+    #zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM163762.zip"
+    zipurl = "https://www.fda.gov/media/76860/download"
     return zipurl
 
 def getUNIIZipURL():
@@ -31,7 +32,8 @@ def getUNIIZipURL():
     return zipurl
 
 def getDrugsFDAZipURL():
-    zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM527389.zip"
+    #zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM527389.zip"
+    zipurl = "https://www.fda.gov/media/89850/download"
     #page = urllib2.urlopen('https://www.fda.gov/Drugs/InformationOnDrugs/ucm079750.htm').read()
     #i = page.find('Drugs@FDA Download File')
     #j = page.rfind('href="/downloads/Drugs/InformationOnDrugs/', 0, i)
@@ -51,7 +53,7 @@ def getMainDir():
 
     if not os.path.exists(curr+"/temp"):
         os.mkdir(curr+"/temp")
-    
+
     return curr
 
 def resolveName(name): # returns empty string if resolver can't do anything with this name
@@ -149,7 +151,7 @@ def readTabFile(filename, header = True, delim = '\t'):
     data = readTabFP(fp, header, delim)
     fp.close()
     return data
-    
+
 def readTabFP(fp, header = True, delim = '\t'):
     data = dict()
     line = fp.readline()
@@ -175,7 +177,7 @@ def readTabFP(fp, header = True, delim = '\t'):
     for i in range(len(data['table'])):
         while len(data['table'][i]) < elems:
             data['table'][i].append('')
-            
+
     return data
 
 def apprDateRegression(prods):
@@ -227,7 +229,7 @@ def apprDateRegression(prods):
         plt.xlim(-window,applimit+window)
         fig.tight_layout()
         plt.savefig(figt+'.png')
-        
+
     for prod in prods.keys():
         date = prods[prod][-2]
         source = prods[prod][-1]
@@ -244,7 +246,7 @@ def apprDateRegression(prods):
                         prods[prod][-1] = 'PREDICTED'
                 elif date == '':
                     prods[prod][-2] = pred
-                    prods[prod][-1] = 'PREDICTED'    
+                    prods[prod][-1] = 'PREDICTED'
     return prods
 
 if __name__=="__main__":
@@ -270,7 +272,7 @@ if __name__=="__main__":
     if not os.path.exists(obfile):
         os.system(syscall)
 
-    appYrsfile = maindir+"/data/_archive/approvalYears.txt"
+    appYrsfile = maindir+"/scripts/data/approvalYears.txt"
     if not os.path.exists(appYrsfile):
         raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
 
@@ -281,7 +283,7 @@ if __name__=="__main__":
     fdaNMEfile = maindir+'/data/FDA-NMEs-2018-08-07.txt'
     if not os.path.exists(fdaNMEfile):
         raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
-        
+
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
     fp = zfp.open(names[-1], 'r')
@@ -304,7 +306,7 @@ if __name__=="__main__":
         uniiALL[sline[0]] = sline[2]
         line = fp.readline()
     print "UNIIs in memory:", len(uniiPT), len(uniiALL)
-    
+
     zfp = zipfile.ZipFile(drugsAtfdafile, 'r')
     fp = zfp.open('Products.txt', 'r')
     #ApplNo\tProductNo\tForm\tStrength\tReferenceDrug\tDrugName\tActiveIngredient\tReferenceStandard
@@ -392,7 +394,7 @@ if __name__=="__main__":
         else:
             prods[key].append('')
             prods[key].append('')
-    
+
     # read in submission dates
     fp = zfp.open('Submissions.txt', 'r')
     submDates = readTabFP(fp)
@@ -456,7 +458,7 @@ if __name__=="__main__":
                 #raise ValueError('Ingredient from Orange Book not found in products:'+ingred)
             if appl not in UNII2prods[ingred]:
                 UNII2prods[ingred].append(appl)
-                #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred) 
+                #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred)
 
         if prods.has_key(appl):
             # I've verified manually that these differences are not important
@@ -490,7 +492,7 @@ if __name__=="__main__":
         else:
             print appl
             print entry
-            raise ValueError('Product in Orange Book not found in products:'+appl)        
+            raise ValueError('Product in Orange Book not found in products:'+appl)
 
     #prods has format: key="NDA/prodno" : [0:NDA/prodno, 1:Prod name, 2:Form;Doseage, 3:Strength, 4:Availability (Prescription; Over-the-counter; Discontinued), 5:Appl type (NDA), 6:Sponsor, 7:Marketing startDate, 8: Marketing startDate ref]
 
@@ -538,8 +540,8 @@ if __name__=="__main__":
             elif nmeDate[0] < date: # we should go back and curate these!
                 #print "different dates:",startDate, nmeDate, prods[prod]
                 prods[prod][-2] = nmeDate[0]
-                prods[prod][-1] = nmeDate[1]                
-    
+                prods[prod][-1] = nmeDate[1]
+
     # TOO MUCH TROUBLE
     # fix 1982-01-01 OrangeBook dates with regression
     #prods = apprDateRegression(prods)
@@ -566,7 +568,7 @@ if __name__=="__main__":
                 prods[prod][-2] = pred
                 prods[prod][-1] = 'PREDICTED'
                 #print prods[prod]
-    
+
     # get active moieties from tyler's dump file
     activeMoiety = dict()
     with gzip.open( gsrsDumpfile, 'rb') as fp:
