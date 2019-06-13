@@ -2,7 +2,9 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{xcolor}
-  
+%\usepackage{tabularx}
+\usepackage{rotating}
+
 \hypersetup{colorlinks,linkcolor=,urlcolor=blue}
 
 %%\usepackage{blkarray}
@@ -25,7 +27,7 @@
   harmonization across ontologies} 
 \author{Dac-Trung Nguyen\and Qian Zhu\\[1em] \emph{NCATS Informatics}}
 %\date{{\Large$\pi\!$}, 2019}
-\date{April 12, 2019}
+\date{May 15, 2019}
 
 \begin{document}
 
@@ -73,9 +75,9 @@
     \item No username/password required
     \item Use \texttt{disease.ncats.io:7687} as the \textbf{Host}
     \end{itemize}
-  \item 1,368,353 entities spanning diseases, genes, proteins, drugs,
+  \item 1,636,132 entities spanning diseases, genes, proteins, drugs,
     phenotypes, tissues, FDA orphan designations.
-  \item 125,360,984 relationships that span ontological (e.g.,
+  \item 131,608,737 relationships that span ontological (e.g.,
     \texttt{subclassOf}), phenotypic (e.g.,
     \texttt{manifestation\_of}), disease association (e.g.,
     \texttt{is\_associated\_disease\_of}), etc.
@@ -92,27 +94,27 @@
     \tiny
     \begin{tabular}{rl}\toprule
       Data Source & Entities\\ \midrule
-      \texttt{GARD\_v1}&6763\\
-      \texttt{BrendaTissue.owl.gz}&5902\\
-      \texttt{GHR\_v1}&1287\\
-      \texttt{DOID.owl.gz}&12694\\
-      \texttt{HPO.owl.gz}&17387\\
-      \texttt{MEDLINEPLUS.ttl.gz}&2238\\
-      \texttt{MESH.ttl.gz}&275329\\
-      \texttt{MONDO.owl.gz}&110363\\
-      \texttt{OMIM.ttl.gz}&102715\\
-      \texttt{UBERON.owl.gz}&15909\\
-      \texttt{ordo.owl.gz}&13871\\
-      \texttt{GO.owl.gz}&49290\\
-      \texttt{ogg.owl.gz}&69688\\
-      \texttt{pr.owl.gz}&315937\\
-      \texttt{ogms.owl}&91\\
-      \texttt{pato.owl.gz}&2730\\
-      \texttt{chebi.xrdf.gz}&130403\\
+      \texttt{GARD}&6763\\
+      \texttt{BRENDATISSUE}&5902\\
+      \texttt{GHR}&1287\\
+      \texttt{DOID}&12694\\
+      \texttt{HPO}&17387\\
+      \texttt{MEDLINEPLUS}&2238\\
+      \texttt{MESH}&275329\\
+      \texttt{MONDO}&110363\\
+      \texttt{OMIM}&102715\\
+      \texttt{UBERON}&15909\\
+      \texttt{ORDO}&13871\\
+      \texttt{GO}&49290\\
+      \texttt{OGG}&69688\\
+      \texttt{PR}&315937\\
+      \texttt{OGMS}&91\\
+      \texttt{PATO}&2730\\
+      \texttt{CHEBI}&130403\\
       \texttt{FDAOrphanGARD\_20190216.txt}&6074\\
-      \texttt{rancho-disease-drug\_2018-12-18\_13-30.txt}&19817\\
-      \texttt{HPO\_annotation\_100918.txt}&164448\\
-      \texttt{MEDGEN\_v1} &216700\\ \bottomrule
+      \texttt{RANCHO-DISEASE-DRUG\_2018-12-18\_13-30}&19817\\
+      \texttt{HPO\_ANNOTATION\_100918}&164448\\
+      \texttt{MEDGEN} &216700\\ \bottomrule
     \end{tabular}
   \end{center}
 \end{frame}
@@ -202,27 +204,32 @@
       MONDO &
       \href{http://monarchinitiative.org/}{\texttt{http://monarchinitiative.org/}}\\
       HPO & \href{https://hpo.jax.org}{\texttt{https://hpo.jax.org}}\\
+      NORD & \href{https://rarediseases.org}{\texttt{https://rarediseases.org}}\\
+      MEDGEN & \href{https://www.ncbi.nlm.nih.gov/medgen/}{\texttt{https://www.ncbi.nlm.nih.gov/medgen/}}\\
+      NCI & \href{https://ncit.nci.nih.gov/}{\texttt{https://ncit.nci.nih.gov/}}\\
     \end{tabular}
   \end{center}
-  (MEDGEN was recently added but is not part of this analysis.)
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Disease overlap matrix}
   \begin{block}{Direct match by synonyms or identifiers}
-    \begin{center}
-      \tiny
-      \begin{tabular}{rccccccccc}\toprule
-        & GARD & Orphanet & GHR & DO & OMIM & MeSH & MEDLINE+&MONDO & HPO\\ \midrule
-        GARD & \textbf{6,504}&4,377&837&2,760&3,597&4,017&257&5,796&715\\
-        Orphanet &4,299&\textbf{9,290}&616&3,301&4,427&3,613&280&8,973&858\\
-        GHR &829&616&\textbf{1,287}&620&556&876&99&1,125&143\\
-        DO &2,506&3,554&617&\textbf{8,699}&3,473&3,295&722&8,679&1,502\\
-        OMIM &4,850&7,313&883&5,842&\textbf{12,883}&8,505&664&11,374&2,491\\
-        MeSH &3,889&3,330&836&3,140&5,871&\textbf{8,892}&653&7,882&1,153\\
-        MEDLINE+ &310&414&99&966&495&743&\textbf{2,238}&662&440\\
-        MONDO &6,573&11,856&1,245&10,776&8,696&8,555&645&\textbf{21,826}&2,385\\
-        HPO &730&868&143&1,510&1,458&1,382&379&2,237&\textbf{13,725}\\ \bottomrule
+    \begin{center}\tiny
+      \begin{tabular}{rcccccc}\toprule
+        & GARD & Orphanet & GHR & DO & OMIM & MeSH\\ \midrule
+        GARD & \textbf{6,504}&4,377&837&2,760&3,597&4,017\\
+        Orphanet &4,299&\textbf{9,290}&616&3,301&4,427&3,613\\
+        GHR &829&616&\textbf{1,287}&620&556&876\\
+        DO &2,506&3,554&617&\textbf{8,699}&3,473&3,295\\
+        OMIM &4,850&7,313&883&5,842&\textbf{12,883}&8,505\\
+        MeSH &3,889&3,330&836&3,140&5,871&\textbf{8,892}\\
+        MEDLINE+ &310&414&99&966&495&743\\
+        MONDO &6,573&11,856&1,245&10,776&8,696&8,555\\
+        HPO &730&868&143&1,510&1,458&1,382\\
+        NORD & 1,049 & 617 &364 &741 &703 &937 \\
+        MEDGEN &4,896 &7,753 &989 &6,796 &7,147 &9,400 \\
+        NCI & 1,465 &1,435 &501 &2,319 &1,633 &2,430 \\ \bottomrule
       \end{tabular}
     \end{center}
     The matrix is asymmetric due to $1-n$ and/or $m-1$ mappings; e.g.,
@@ -230,6 +237,27 @@
     Orphanet. These numbers improve as we extend the
     matching indirectly to two-, three-, four-neighbor.
   \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Disease overlap matrix (cont'd)}
+  \begin{center}\tiny
+    \begin{tabular}{rcccccc}\toprule
+      & MEDLINE+&MONDO & HPO & NORD & MEDGEN & NCI\\ \midrule
+      GARD & 257&5,796&715&1,153&4,075 & 1,410\\
+      Orphanet &280&8,973&858 & 642& 5,952& 1,439\\
+      GHR &99 &1,125 &143 &365 &879 &490\\
+      DO &722 &8,679 &1,502 &810 &4,417 &2,108\\
+      OMIM &664 &11,374 &2,491 &1,053 &9,010 &2,657\\
+      MeSH &653 &7,882 &1,153 &1,003 &7,357 &2,074\\
+      MEDLINE+ &\textbf{2,238} &662 &440 &202 &801 &765\\
+      MONDO &645 &\textbf{21,826} &2,385 &1,633 &11,672 &3,377\\
+      HPO &379 &2,237 &\textbf{13,725} &277 &2,160 &1,072\\
+      NORD &190 &1,163 &249 &\textbf{1,251} &938 &622\\
+      MEDGEN &668 &13,221 &2,934 &1,361&\textbf{37,546} &3,632 \\
+      NCI &593 &3,329 &1,092 &703 &3,450&\textbf{5,323}\\ \bottomrule
+    \end{tabular}
+  \end{center}
 \end{frame}
 
 \begin{frame}
@@ -302,14 +330,14 @@ match(n:DATASOURCE) return n.name,n.instances
   \begin{block}{OMIM disease count}
     \small
 \begin{verbatim}
-match(n:`OMIM.ttl.gz`:T047) return count(n)
+match(n:`S_OMIM`:T047) return count(n)
 \end{verbatim}
   \end{block}
   
   \begin{block}{GARD disease category breakdown}
     \small
 \begin{verbatim}
-match(n:`GARD_v1`)-[]-(m:DATA) where m.is_rare=true 
+match(n:`S_GARD`)-[]-(m:DATA) where m.is_rare=true 
 with distinct labels(n) as t, count(n) as cnt 
 unwind  t as Category
 return Category,sum(cnt) as Count order by Count desc
@@ -322,11 +350,11 @@ return Category,sum(cnt) as Count order by Count desc
   \begin{block}{Orphanet and MONDO}
     \small
 \begin{verbatim}
-match(n:`ordo.owl.gz`)-[]-(m:DATA) 
+match(n:`S_ORDO`)-[]-(m:DATA) 
 where not exists(m.symbol) 
 and not exists(m.reason_for_obsolescence) 
 with n match(n)-[:N_Name|
-   :I_CODE*1]-(a:`MONDO.owl.gz`)-[]-(b:DATA) 
+   :I_CODE*1]-(a:`S_MONDO`)-[]-(b:DATA) 
 where exists(b.label) and not exists(a.status) 
 return count(distinct n) as `Orphanet`,
     count(distinct a) as `MONDO`
