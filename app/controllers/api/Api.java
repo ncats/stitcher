@@ -150,14 +150,17 @@ public class Api extends Controller {
 
     public Result search (String q, int skip, int top) {
         try {
-            Entity[] matches = es.getEntityFactory().search(q, skip, top);
+            Map<String, Object> result = new HashMap<>();
+            int total = es.getEntityFactory().search(result, q, skip, top);
             ObjectNode json = mapper.createObjectNode();
             json.put("query", q);
             json.put("skip", skip);
             json.put("top", top);
-            json.put("count", matches.length);
+            json.put("count", (Integer)result.get("count"));
+            json.put("total", total);
+            Entity[] entities = (Entity[])result.get("entities");
             ArrayNode results = mapper.createArrayNode();
-            for (Entity e : matches)
+            for (Entity e : entities)
                 results.add(jsonCodec.encode(e));
             json.put("contents", results);
             return ok (json);

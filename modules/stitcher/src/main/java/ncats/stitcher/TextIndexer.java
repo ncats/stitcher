@@ -3,6 +3,7 @@ package ncats.stitcher;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -30,11 +31,70 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
 import org.apache.lucene.search.vectorhighlight.FieldQuery;
 
-import org.apache.commons.text.StringTokenizer;
 
 public class TextIndexer extends TransactionEventHandler.Adapter
     implements AutoCloseable {
     static final Logger logger = Logger.getLogger(TextIndexer.class.getName());
+    
+    static final Pattern SLOP = Pattern.compile("~([\\d+])$");
+    static final Pattern QUOTE =
+        Pattern.compile("([\\+~-])?\"([^\"]+)\"(~[\\d+])?");
+    static Pattern TOKEN = Pattern.compile("\\s*([^\\s]+|$)\\s*");
+
+    public static class QueryTokenizer {
+        public final List<String> tokens = new ArrayList<>();
+        public QueryTokenizer (String text) {
+            List<int[]> matches = new ArrayList<>();
+            Matcher m = QUOTE.matcher(text);
+            while (m.find()) {
+                int[] r = new int[]{m.start(), m.end()};
+                matches.add(r);
+            }
+            
+            m = TOKEN.matcher(text);
+            while (m.find()) {
+                int s = m.start();
+                int e = m.end();
+                boolean valid = true;
+                for (int[] r : matches) {
+                    if ((s >= r[0] && s < r[1])
+                        || (e > r[0] && e < r[1])) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid && s < e)
+                    matches.add(new int[]{s,e});
+            }
+
+            Collections.sort(matches, (a, b) -> a[0] - b[0]);
+            for (int[] r : matches) {
+                tokens.add(text.substring(r[0], r[1]).trim());
+            }
+        }
+        
+        public List<String> tokens () { return tokens; }
+    }
+
+    public static class SearchResult {
+        public final List<Node> nodes = new ArrayList<>();
+        public final int skip;
+        public final int top;
+        public final int total;
+
+        SearchResult () {
+            this (0, 0, 0);
+        }
+        
+        SearchResult (int skip, int top, int total) {
+            this.skip = skip;
+            this.top = top;
+            this.total = total;
+        }
+        public int size () { return nodes.size();  }
+    }
+
+    public static final SearchResult EMPTY_RESULT = new SearchResult ();
 
     static final Label DATA = Label.label("DATA");
     public static final String FIELD_TEXT = "text";
@@ -158,17 +218,10 @@ public class TextIndexer extends TransactionEventHandler.Adapter
     public void afterRollback(TransactionData data, Object state) {
     }
 
-    public List<Node> search (String query, int max) throws Exception {
-        return search (query, 0, max);
-    }
-
-    public String rewriteQuery (String text) {
-        StringTokenizer tokenizer = new StringTokenizer (text);
-        tokenizer.setQuoteChar('"');
-        
+    public static String queryRewrite (String query) {
+        QueryTokenizer tokenizer = new QueryTokenizer (query);
         StringBuilder q = new StringBuilder ();
-        while (tokenizer.hasNext()) {
-            String tok = tokenizer.next();
+        for (String tok : tokenizer.tokens()) {
             if (q.length() > 0)
                 q.append(" ");
             char ch = tok.charAt(0);
@@ -176,28 +229,43 @@ public class TextIndexer extends TransactionEventHandler.Adapter
                 q.append(tok); // as-is
             else if (ch == '~')
                 q.append(tok.substring(1)); // optional token
-            else if (tok.indexOf(' ') > 0)
-                q.append("+\""+tok+"\"");
+            else if (ch == '"') {
+                int slop = 0;
+                Matcher m = SLOP.matcher(tok);
+                if (m.find()) {
+                    slop = Integer.parseInt(tok.substring(m.start()+1));
+                    tok = tok.substring(0, m.start());
+                }
+                
+                q.append("+"+tok);
+                if (slop > 0)
+                    q.append("~"+slop);
+            }
             else
                 q.append("+"+tok);
+            //Logger.debug("TOKEN: <<"+tok+">>");
         }
         logger.info("** REWRITE: "+q);
         return q.toString();
     }
-        
-    public List<Node> search (String query, int skip, int top)
+
+    public SearchResult search (String query, int max) throws Exception {
+        return search (query, 0, max);
+    }
+    
+    public SearchResult search (String query, int skip, int top)
         throws Exception {
         QueryParser parser = new QueryParser
             (FIELD_TEXT, indexWriter.getAnalyzer());
-        return search (parser.parse(rewriteQuery (query)), skip, top);
+        return search (parser.parse(queryRewrite (query)), skip, top);
     }
     
-    public List<Node> search (Query query, int skip, int top)
+    public SearchResult search (Query query, int skip, int top)
         throws Exception {
-        List<Node> results = new ArrayList<>();
         try (IndexReader reader = DirectoryReader.open(indexWriter)) {
             IndexSearcher searcher = new IndexSearcher (reader);
             TopDocs hits = searcher.search(query, top+skip);
+            SearchResult result = new SearchResult (skip, top, hits.totalHits);
             int size = Math.min(skip+top, hits.totalHits);
             for (int i = skip; i < size; ++i) {
                 Document doc = searcher.doc(hits.scoreDocs[i].doc);
@@ -209,7 +277,7 @@ public class TextIndexer extends TransactionEventHandler.Adapter
                             long id = Long.parseLong(did.substring(pos+1));
                             Node n = gdb.getNodeById(id);
                             if (n != null && n.hasLabel(DATA))
-                                results.add(n);
+                                result.nodes.add(n);
                         }
                         catch (NumberFormatException ex) {
                             logger.log(Level.SEVERE, "Bogus id field: "+did,ex);
@@ -217,7 +285,7 @@ public class TextIndexer extends TransactionEventHandler.Adapter
                     }
                 }
             }
+            return result;
         }
-        return results;
     }
 }
