@@ -2218,27 +2218,35 @@ public class EntityFactory implements Props, AutoCloseable {
     }
 
     public Entity[] search (String query, int max) {
-        return search (query, 0, max);
+        Map<String, Object> result = new HashMap<>();
+        search (result, query, 0, max);
+        return (Entity[])result.get("entities");
     }
     
-    public Entity[] search (String query, int skip, int top) {
-        List<Entity> results = new ArrayList<>();
+    public int search (Map<String, Object> out,
+                       String query, int skip, int top) {
+        int total = 0;
         try (Transaction tx = gdb.beginTx()) {
-            List<Node> nodes = indexer.search(query, skip, top);
-            for (Node u : nodes) {
+            TextIndexer.SearchResult result = indexer.search(query, skip, top);
+            List<Entity> results = new ArrayList<>();
+            for (Node u : result.nodes) {
                 Relationship rel = u.getSingleRelationship
                     (AuxRelType.PAYLOAD, Direction.OUTGOING);
                 Entity e = Entity._getEntity(rel.getOtherNode(u));
                 results.add(e);
             }
+            total = result.total;
+            out.put("total", total);
+            out.put("entities", results.toArray(new Entity[0]));
+            out.put("count", results.size());
             tx.success();
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Search \""+query+"\" failed!", ex);
         }
-        return results.toArray(new Entity[0]);
+        return total;
     }
-
+    
     static void dfs (Set<Long> nodes, Node n, StitchValue sv) {
         nodes.add(n.getId());
         for (Relationship rel :
