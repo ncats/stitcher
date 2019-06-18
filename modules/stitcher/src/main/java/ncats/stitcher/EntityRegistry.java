@@ -382,9 +382,9 @@ public class EntityRegistry extends EntityFactory {
                 
                 ref.ds = dsf.getDataSourceByName(name);
                 if (ref.ds == null) {
-                    logger.warning("Can't locate data source \""+
+                    logger.log(Level.SEVERE, "Can't locate data source \""+
                                    name+"\"");
-                    continue;
+                    throw new Exception("Can't locate data source");
                 }
                 
                 ref.id = cf.getString("id");
@@ -457,7 +457,7 @@ public class EntityRegistry extends EntityFactory {
                 Iterator<Entity> iter = find (ref.key, rid);
                 while (iter.hasNext()) {
                     Entity e = iter.next();
-                    if (e._is(ref.ds.getName())) {
+                    if (e._is(ref.ds.getLabel())) {
                         DefaultPayload payload =
                             new DefaultPayload (source, id);
                         payload.putAll(map);
