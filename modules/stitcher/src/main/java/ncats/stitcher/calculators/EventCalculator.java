@@ -312,7 +312,7 @@ public class EventCalculator extends StitchCalculator {
         EventCalculator ac = new EventCalculator(ef);
         int count;
         int ver = Integer.parseInt(argv[1]);
-        if (ver < 3) {
+        if (ver < 3 && argv.length < 3) {
             count = ac.recalculate(ver);
         } else {
             List<Long> nodeList = new ArrayList();
