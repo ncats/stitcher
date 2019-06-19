@@ -8,7 +8,7 @@ import java.util.logging.Level;
 public class ClinicalTrialsEventParser extends EventParser {
 
     public ClinicalTrialsEventParser() {
-        super ("ClinicalTrials, December 2017");
+        super ("NCT_REPORT.txt.gz");
     }
 
     boolean earlyEvent(Event event, String status) {

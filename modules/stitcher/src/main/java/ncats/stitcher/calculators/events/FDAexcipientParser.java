@@ -7,7 +7,7 @@ import java.util.logging.Level;
 
 public class FDAexcipientParser extends EventParser {
     public FDAexcipientParser() {
-        super ("FDA Excipients, December 2018");
+        super ("FDAexcipients.txt");
     }
 
     public void produceEvents(Map<String, Object> payload) {
