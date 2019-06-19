@@ -234,48 +234,6 @@ public class EventCalculator extends StitchCalculator {
     }
 
 
-    static class DrugBankEventParser extends EventParser {
-        public DrugBankEventParser() {
-            super ("drugbank-full-annotated.sdf");
-        }
-            
-        public void produceEvents(Map<String, Object> payload) {
-            Event event = null;
-            Object id = payload.get("DATABASE_ID");
-            if (id != null && id.getClass().isArray()
-                && Array.getLength(id) == 1)
-                id = Array.get(id, 0);
-            
-            Object content = payload.get("DRUG_GROUPS");
-            if (content != null) {
-                if (content.getClass().isArray()) {
-                    StringBuilder approved = new StringBuilder ();
-                    for (int i = 0; i < Array.getLength(content); ++i) {
-                        String s = (String) Array.get(content, i);
-                        if (s.toLowerCase().indexOf("approved") >= 0) {
-                            if (approved.length() > 0)
-                                approved.append("; ");
-                            approved.append(s);
-                        }
-                    }
-
-                    if (approved.length() > 0) {
-                        event = new Event(name, id, Event.EventKind.Marketed);
-                        event.comment = approved.toString();
-                    }
-                }
-                else if (((String)content)
-                         .toLowerCase().indexOf("approved") >= 0) {
-                    event = new Event(name, id, Event.EventKind.Marketed);
-                    event.comment = (String)content;
-                }
-            }
-            if (event != null) events.put(String.valueOf(System.identityHashCode(event)), event);
-            return;
-        }
-    }
-
-
     List<Event> getEvents (Stitch stitch) {
         List<Event> events = new ArrayList<>();
 

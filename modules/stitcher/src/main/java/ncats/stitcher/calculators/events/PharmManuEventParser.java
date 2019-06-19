@@ -12,7 +12,7 @@ public class PharmManuEventParser extends EventParser {
     final Base64.Decoder decoder = Base64.getDecoder();
 
     public PharmManuEventParser() {
-        super ("PharmManuEncycl3rdEd.json");
+        super ("Pharmaceutical Manufacturing Encyclopedia (Third Edition)");
     }
 
     public void produceEvents(Map<String, Object> payload) {
