@@ -113,7 +113,7 @@ public class MakeABigDump {
         }
 
         String[] main7 = {neoDB, ncgc, ncgcFile};
-        NCGCLoader.main(main7);
+        ncats.stitcher.impl.NCGCLoader.main(main7);
 
     }
 

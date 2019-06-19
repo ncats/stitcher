@@ -16,7 +16,7 @@ import java.util.logging.Level;
 public class DrugBankXmlEventParser extends EventParser {
     protected String id;
     public DrugBankXmlEventParser() {
-        super ("drugbank_all_full_database.xml.zip");
+        super ("DrugBank, December 2018");
     }
 
     public void produceEvents(Map<String, Object> payload) {

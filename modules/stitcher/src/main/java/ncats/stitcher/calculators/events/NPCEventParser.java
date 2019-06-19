@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class NPCEventParser extends EventParser {
     public NPCEventParser() {
-        super ("npc-dump-1.2-04-25-2012_annot.sdf.gz");
+        super ("NCATS Pharmaceutical Collection, April 2012");
     }
 
     public void produceEvents(Map<String, Object> payload) {
