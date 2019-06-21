@@ -221,8 +221,8 @@ public class GinasLoader extends MoleculeEntityFactory {
         GinasLoader gl = null;
         try {
             gl = new GinasLoader(argv[0]);
-            DataSource ds = gl.getDataSourceFactory().register(file);
-            ds.setName(argv[1]);
+            DataSource ds = gl.getDataSourceFactory().register(argv[1], file);
+            //ds.setName(argv[1]);
             gl.setDataSource(ds);
         } catch (IOException e) {
             e.printStackTrace();

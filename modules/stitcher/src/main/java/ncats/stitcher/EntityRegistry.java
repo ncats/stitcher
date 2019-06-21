@@ -76,6 +76,7 @@ public class EntityRegistry extends EntityFactory {
     protected String idField; // id field
     protected String nameField; // preferred name field
     protected String strucField;
+    protected String parserField; // EventParser for this datasource
     
     protected EnumMap<StitchKey, Set<String>> stitches;
     protected Map<String, StitchKeyMapper> mappers; // TODO this is deprecated + should be removed
@@ -407,29 +408,31 @@ public class EntityRegistry extends EntityFactory {
 
         Config source = conf.getConfig("source");
         DataSource ds;
-        
         String data = source.getString("data");
         if (data.startsWith("http")) {
-            ds = register (new URL (data));
-        }
-        else if (data.startsWith("file")) {
-            ds = register (new File (new URI (data)));
-        }
-        else {
-            File file = new File (base, data);
-            if (!file.exists()) {
-                // now let's try current
-                file = new File (data);
-                if (!file.exists())
-                    throw new IllegalArgumentException
-                        ("Can't find data: \""+data+"\"");
+            ds = register(new URL(data));
+        } else {
+            File file;
+            if (data.startsWith("file")) {
+                file = new File (new URI (data));
+            } else {
+                file = new File (base, data);
+                if (!file.exists()) {
+                    // now let's try current
+                    file = new File (data);
+                    if (!file.exists())
+                        throw new IllegalArgumentException
+                                ("Can't find data: \""+data+"\"");
+                }
             }
-            ds = register (file);
+            if (source.hasPath("name")) {
+                String name = source.getString("name");
+                ds = register (name, file);
+            } else {
+                ds = register(file);
+            }
         }
-        
-        if (ds != null && source.hasPath("name"))
-            ds.setName(source.getString("name"));
-        
+
         return ds;
     }
 
@@ -925,6 +928,8 @@ public class EntityRegistry extends EntityFactory {
             ds.set("NameField", nameField);
         if (strucField != null)
             ds.set("StrucField", strucField);
+        if (parserField != null)
+            ds.set("ParseField", parserField);
     }
     
     public void updateDataSourceMetadata () {
@@ -938,6 +943,7 @@ public class EntityRegistry extends EntityFactory {
     }
     public DataSource getDataSource () { return source; }
 
+    @Deprecated
     public DataSource register (File file) throws IOException {
         return source = getDataSourceFactory().register(file);
     }

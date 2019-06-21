@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 public class FDAanimalDrugsParser extends EventParser {
     public FDAanimalDrugsParser() {
-        super ("FDAanimalDrugs.txt");
+        super ("FDA NADA and ANADAs, December 2018");
     }
 
     public void produceEvents(Map<String, Object> payload) {

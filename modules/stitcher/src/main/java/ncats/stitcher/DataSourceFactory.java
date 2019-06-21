@@ -99,6 +99,7 @@ public class DataSourceFactory implements Props {
         }
     }
 
+    @Deprecated
     public DataSource register (File file) throws IOException {
         return register (file.getName(), file);
     }

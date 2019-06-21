@@ -120,9 +120,10 @@ public class DataSource extends CNode {
         return Label.label("S_"+label.toString().toUpperCase());
     }
 
-    public void setName (String name) {
-        set (NAME, name, true);
-    }
+    //@Deprecated //!!!! This doesn't add the new name to the correct datasource name index Index<Node> index = gdb.index().forNodes(DataSource.nodeIndexName());
+    //public void setName (String name) {
+    //    set (NAME, name, true);
+    //}
 
     public String toString () {
         return getName ();
