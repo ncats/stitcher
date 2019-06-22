@@ -6,17 +6,19 @@ import urllib
 import urllib2
 import json
 import time
+import ssl
+import pandas
 
 cookies = cookielib.CookieJar()
 
+gcontext = ssl._create_unverified_context() #ssl.SSLContext()  # Only for gangstars
 opener = urllib2.build_opener(
     urllib2.HTTPRedirectHandler(),
     urllib2.HTTPHandler(debuglevel=0),
-    urllib2.HTTPSHandler(debuglevel=0),
+    urllib2.HTTPSHandler(debuglevel=0, context=gcontext),
     urllib2.HTTPCookieProcessor(cookies))
 opener.addheaders = [
-    ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
-                    'Windows NT 5.2; .NET CLR 1.1.4322)'))
+    ('User-agent', ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'))
 ]
 
 site = 'https://animaldrugsatfda.fda.gov/'
@@ -36,8 +38,6 @@ oldnadasjson = directory+"NADAs.json"
 newnadasjson = "NADAs.json"
 faradProds = directory+"faradProds.txt"
 faradtxt = directory+"farad.txt"
-sec6txt = directory+"Section6VoluntaryWithdrawal.txt"
-sec12txt = directory+"Section12byApplicationNumber.txt"
 
 def requestJson(uri):
     try:
@@ -46,7 +46,20 @@ def requestJson(uri):
         handle.close()
         obj = json.loads(response)
         return obj
-    except:
+    except Exception, err:
+        print Exception, err
+        sys.stderr.write("failed: "+uri+"\n")
+        sys.stderr.flush()
+        time.sleep(5)
+
+def requestHtml(uri):
+    try:
+        handle = opener.open(uri)
+        response = handle.read()
+        handle.close()
+        return response
+    except Exception, err:
+        print Exception, err
         sys.stderr.write("failed: "+uri+"\n")
         sys.stderr.flush()
         time.sleep(5)
@@ -182,8 +195,25 @@ def faradRoutes():
 def scrapeNADAs():
     
     # download all application numbers
-    #https://animaldrugsatfda.fda.gov/adafda/views/#/search
-    #https://animaldrugsatfda.fda.gov/adafda/app/search/public/tradeSponsorExcelByNadaAnada/Section12byApplicationNumber
+    #homePage = requestHtml("https://animaldrugsatfda.fda.gov/adafda/views/#/search")
+    sec12Page = "https://animaldrugsatfda.fda.gov/adafda/app/search/public/tradeSponsorExcelByNadaAnada/Section12byApplicationNumber"
+    sec12File = "Section12byApplicationNumber.xls"
+    syscall = "curl --insecure -o "+sec12File + " " + sec12Page
+    print syscall
+    if not os.path.exists(sec12File):
+        os.system(syscall)
+
+    sec6Page = "https://animaldrugsatfda.fda.gov/adafda/app/search/public/voluntaryWithdrawalExcel/Section6VoluntaryWithdrawal"
+    sec6File = "Section6VoluntaryWithdrawal.xls"
+    syscall = "curl --insecure -o "+sec6File + " " + sec6Page
+    print syscall
+    if not os.path.exists(sec6File):
+        os.system(syscall)
+    sec6txt = "Section6VoluntaryWithdrawal.txt"
+    sec12txt = "Section12byApplicationNumber.txt"
+
+    pandas.read_excel(sec12File, sheet_name=0, index=0).to_csv(path_or_buf=sec12txt, sep='\t', encoding='utf-8', index=False)
+    pandas.read_excel(sec6File, sheet_name=0, index=0).to_csv(path_or_buf=sec6txt, sep='\t', encoding='utf-8', index=False)
 
     files = [sec12txt, sec6txt] #"Section12byApplicationNumber.txt", "Section6VoluntaryWithdrawal.txt"]
     apps = dict()
@@ -244,6 +274,7 @@ def scrapeNADAs():
         for item in obj["applicationNumbers"]:
             app = item["applicationNumber"]
             if app not in apps.keys():
+                print "Oops!"
                 print app
                 print item
                 sys.exit()
