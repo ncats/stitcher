@@ -45,7 +45,8 @@ public class EventCalculator extends StitchCalculator {
 
     final DataSourceFactory dsf;
 
-    private List<EventParser> eventParsers = Arrays.asList(DEFAULT_EVENT_PARSERS);
+//    private List<EventParser> eventParsers = Arrays.asList(DEFAULT_EVENT_PARSERS);
+    private Map<DataSource, EventParser> parsers = new HashMap<>();
 
     /** adapted from https://prsinfo.clinicaltrials.gov/definitions.html */
     public static List<String> CLINICAL_PHASES = Arrays.asList(
@@ -55,10 +56,24 @@ public class EventCalculator extends StitchCalculator {
     public EventCalculator(EntityFactory ef) {
         this.ef = ef;
         this.dsf = ef.getDataSourceFactory();
+        initParsers();
     }
 
-    public void setEventParsers(List<EventParser> parsers){
-        this.eventParsers = new ArrayList<>(Objects.requireNonNull(parsers));
+//    public void setEventParsers(List<EventParser> parsers){
+//        this.eventParsers = new ArrayList<>(Objects.requireNonNull(parsers));
+//    }
+
+    public void initParsers() {
+        try {
+            for (DataSource ds: dsf.datasources()) {
+                if (ds.get(DataSource.EVENTPARSER) != null) {
+                    Object ep = Class.forName(ds.get(DataSource.EVENTPARSER).toString()).newInstance();
+                    parsers.put(ds, (EventParser)ep);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /*
@@ -237,24 +252,35 @@ public class EventCalculator extends StitchCalculator {
     List<Event> getEvents (Stitch stitch) {
         List<Event> events = new ArrayList<>();
 
-        for (EventParser ep : eventParsers) {
-            try {
-                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)) {
-                    ep.produceEvents(payload);
-                }
-            } catch (IllegalArgumentException iae) {
-                logger.warning(ep.name + " not a valid data source");
+        for (DataSource ds: parsers.keySet()) {
+            for (Map<String, Object> payload : stitch.multiplePayloads(ds.getKey())) {
+                parsers.get(ds).produceEvents(payload);
             }
-
         }
-        for (EventParser ep : eventParsers) {
-            for (Event e: ep.events.values()) {
-                //logger.info(ep.name + ": kind=" + e.kind
-                //        + " startDate=" + e.startDate);
+        for (DataSource ds: parsers.keySet()) {
+            for (Event e: parsers.get(ds).events.values())
                 events.add(e);
-            }
-            ep.reset();
+            parsers.get(ds).reset();
         }
+
+//        for (EventParser ep : eventParsers) {
+//            try {
+//                for(Map<String, Object> payload : stitch.multiplePayloads(ep.name)) {
+//                    ep.produceEvents(payload);
+//                }
+//            } catch (IllegalArgumentException iae) {
+//                logger.warning(ep.name + " not a valid data source");
+//            }
+//
+//        }
+//        for (EventParser ep : eventParsers) {
+//            for (Event e: ep.events.values()) {
+//                //logger.info(ep.name + ": kind=" + e.kind
+//                //        + " startDate=" + e.startDate);
+//                events.add(e);
+//            }
+//            ep.reset();
+//        }
 
         return events;
     }

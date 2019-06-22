@@ -36,18 +36,18 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
     }
 
     @Override
-    public DataSource register (File file) throws IOException {
-        return register (file, "\t", -1);
+    public DataSource register (String name, File file) throws IOException {
+        return register (name, file, "\t", -1);
     }
 
-    public DataSource register (File file, String delim) throws IOException {
-        return register (file, delim, -1);
+    public DataSource register (String name, File file, String delim) throws IOException {
+        return register (name, file, delim, -1);
     }
     
-    public DataSource register (File file, String delim, int molcol)
+    public DataSource register (String name, File file, String delim, int molcol)
         throws IOException {
         // TODO: make this cleaner...
-        this.source = getDataSourceFactory().register(file);
+        this.source = getDataSourceFactory().register(name, file);
         
         Integer instances = (Integer) this.source.get(INSTANCES);
         if (instances != null) {

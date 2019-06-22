@@ -75,6 +75,7 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
         setIdField ("drugbank-id");
         setNameField ("name");
         setStrucField ("SMILES");
+        setEventParser(ncats.stitcher.calculators.events.DrugBankXmlEventParser.class.getCanonicalName());
         //add (N_Name, "synonyms");
         add (N_Name, "name");
         //add (I_CAS, "cas-number");
@@ -305,7 +306,7 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
                         mef.register(sourceName, file);
                     }
                     else {
-                        mef.register(file);
+                        mef.register(file.getName(), file);
                     }
                 }
             }

@@ -18,6 +18,10 @@ import org.neo4j.graphdb.index.Index;
 
 public class DataSource extends CNode {
     static final Logger logger = Logger.getLogger(DataSource.class.getName());
+    public static final String IDFIELD = "IdField";
+    public static final String NAMEFIELD = "NameField";
+    public static final String STRUCTFIELD = "StructField";
+    public static final String EVENTPARSER = "EventParser";
 
     public static String nodeIndexName () {
         return DataSource.class.getName()+NODE_INDEX;
