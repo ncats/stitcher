@@ -51,7 +51,7 @@ public class MapEntityFactoryTest {
                 .stitch(1);
 
         EventCalculator ac = new EventCalculator(registry);
-        ac.setEventParsers(Arrays.asList(new WithdrawnEventParser()));
+//        ac.setEventParsers(Arrays.asList(new WithdrawnEventParser()));
         ac.recalculate(1);
 
 

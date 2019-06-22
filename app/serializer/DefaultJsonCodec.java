@@ -201,7 +201,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                     String src = (String) sn.getProperty(SOURCE, null);
                     ds = es.getDataSourceFactory().getDataSourceByKey(src);
                     if (ds != null) {
-                        String field = (String) ds.get("IdField");
+                        String field = (String) ds.get(DataSource.IDFIELD);
                         if (field != null) {
                             Object val = n.getProperty(field, null);
                             if (val != null) {
@@ -211,7 +211,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                             }
                         }
                         
-                        field = (String) ds.get("NameField");
+                        field = (String) ds.get(DataSource.NAMEFIELD);
                         if (field != null) {
                             Object val = n.getProperty(field, null);
                             if (val != null) {

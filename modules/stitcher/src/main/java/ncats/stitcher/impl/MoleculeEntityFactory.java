@@ -246,10 +246,6 @@ public class MoleculeEntityFactory extends EntityRegistry {
         return count;
     }
 
-    public DataSource register (String file) throws IOException {
-        return register (new File (file));
-    }
-
     public int register (DataSource ds) throws IOException {
         Integer instances = (Integer)ds.get(INSTANCES);
         if (instances != null) {
@@ -266,11 +262,9 @@ public class MoleculeEntityFactory extends EntityRegistry {
         }
         return instances;
     }
-    
-    public DataSource register (File file) throws IOException {
-        DataSource ds = super.register(file);
-        register (ds);
-        return ds;
+
+    public DataSource register (String file) throws IOException {
+        return register (file, new File (file));
     }
 
     public DataSource register (String key, String name, File file)

@@ -84,9 +84,10 @@ public class Api extends Controller {
             node.put("count", (Integer)ds.get(ncats.stitcher.Props.INSTANCES));
             node.put("sha1", (String)ds.get(ncats.stitcher.Props.SHA1));
             node.put("size", (Long)ds.get(ncats.stitcher.Props.SIZE));
-            node.put("_idField", (String)ds.get("IdField"));
-            node.put("_NameField", (String)ds.get("NameField"));
-            node.put("_StructField", (String)ds.get("StrucField"));
+            node.put("_idField", (String)ds.get(DataSource.IDFIELD));
+            node.put("_NameField", (String)ds.get(DataSource.NAMEFIELD));
+            node.put("_StructField", (String)ds.get(DataSource.STRUCTFIELD));
+            node.put("_EventParser", (String)ds.get(DataSource.EVENTPARSER));
 
             String[] props = (String[])ds.get(ncats.stitcher.Props.PROPERTIES);
             if (props != null)

@@ -172,7 +172,13 @@ public class EntityRegistry extends EntityFactory {
         return this;
     }
     public String getStrucField () { return strucField; }
-    
+
+    public EntityRegistry setEventParser (String eventParser) {
+        this.parserField = eventParser;
+        return this;
+    }
+    public String getEventParser () { return parserField; }
+
     public void clear () { stitches.clear(); }
     
     public EntityRegistry add (StitchKey key, String property) {
@@ -243,6 +249,10 @@ public class EntityRegistry extends EntityFactory {
         strucField = null;
         if (source.hasPath("structure")) {
             strucField = source.getString("structure");
+        }
+        parserField = null;
+        if (source.hasPath("eventParser")) {
+            parserField = source.getString("eventParser");
         }
 
         if (conf.hasPath("stitches")) {
@@ -429,7 +439,7 @@ public class EntityRegistry extends EntityFactory {
                 String name = source.getString("name");
                 ds = register (name, file);
             } else {
-                ds = register(file);
+                ds = register(file.getName(), file);
             }
         }
 
@@ -923,13 +933,13 @@ public class EntityRegistry extends EntityFactory {
         ds.set(REFERENCES, sk, true);
 
         if (idField != null)
-            ds.set("IdField", idField);
+            ds.set(DataSource.IDFIELD, idField);
         if (nameField != null)
-            ds.set("NameField", nameField);
+            ds.set(DataSource.NAMEFIELD, nameField);
         if (strucField != null)
-            ds.set("StrucField", strucField);
+            ds.set(DataSource.STRUCTFIELD, strucField);
         if (parserField != null)
-            ds.set("ParseField", parserField);
+            ds.set(DataSource.EVENTPARSER, parserField);
     }
     
     public void updateDataSourceMetadata () {
