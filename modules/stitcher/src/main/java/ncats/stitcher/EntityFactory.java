@@ -2213,8 +2213,33 @@ public class EntityFactory implements Props, AutoCloseable {
         }
     }
 
+    /**
+     * get Entity as-is
+     */
+    public Entity _getEntity (long id) {
+        return Entity._getEntity(gdb.getNodeById(id));
+    }
+
+    public Entity getEntity (long id) {
+         try (Transaction tx = gdb.beginTx()) {
+             Entity e = _getEntity (id);
+             tx.success();
+             return e;
+         }
+    }
+
+    /**
+     * get Entity conceptually
+     */
     public Entity _entity (long id) {
-        return Entity._getEntity(gdb.getNodeById(id));  
+        Node n = gdb.getNodeById(id);
+        if (n.hasLabel(AuxNodeType.DATA)) {
+            // this is the payload, so return the corresponding entity
+            Relationship rel = n.getSingleRelationship
+                (AuxRelType.PAYLOAD, Direction.BOTH);
+            n = rel.getOtherNode(n);
+        }
+        return Entity._getEntity(n);
     }
 
     public Entity[] search (String query, int max) {
