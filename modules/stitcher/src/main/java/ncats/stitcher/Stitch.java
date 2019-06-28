@@ -264,8 +264,8 @@ public class Stitch extends Entity {
                 tx.success();
             }
             m.put("parent", parent);
-            m.put("srcid", getField ("IdField", me.getKey()));
-            m.put("name", getField ("NameField", me.getKey()));
+            m.put("srcid", getField (DataSource.IDFIELD, me.getKey()));
+            m.put("name", getField (DataSource.NAMEFIELD, me.getKey()));
             m.put("datasource", me.getValue().getName());
             m.put("properties", getProperties (me.getKey()));
             m.put("stitches", getStitches (me.getKey()));

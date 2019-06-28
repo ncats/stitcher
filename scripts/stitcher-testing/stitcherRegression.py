@@ -366,7 +366,7 @@ if __name__=="__main__":
     testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
 
     # initialize list of NMEs
-    nmeList = open("../data/approvalYears.txt", "r").readlines()
+    nmeList = open("../data/approvalYears-2019-06-18.txt", "r").readlines()
     for entry in nmeList[1:]:
         sline = entry.split('\t')
         if sline[0] not in NMEs:
@@ -379,7 +379,7 @@ if __name__=="__main__":
 
     # initialize UNII preferred terms
     uniis = dict()
-    fp = open('../temp/UNIIs-2018-09-07/UNII Names 31Aug2018.txt', 'r')
+    fp = open('../temp/UNIIs-2019-06-18/UNII NAMES 7Mar2019.txt', 'r')
     line = fp.readline()
     line = fp.readline()
     while line != "":
