@@ -81,7 +81,7 @@ public class WithdrawnEventParser extends EventParser{
     }
 
     public WithdrawnEventParser() {
-        super("combined_withdrawn_shortage_drugs.txt");
+        super("Withdrawn and Shortage Drugs List Feb 2018");
     }
 
     @Override

@@ -76,6 +76,7 @@ public class EntityRegistry extends EntityFactory {
     protected String idField; // id field
     protected String nameField; // preferred name field
     protected String strucField;
+    protected String parserField; // EventParser for this datasource
     
     protected EnumMap<StitchKey, Set<String>> stitches;
     protected Map<String, StitchKeyMapper> mappers; // TODO this is deprecated + should be removed
@@ -171,7 +172,13 @@ public class EntityRegistry extends EntityFactory {
         return this;
     }
     public String getStrucField () { return strucField; }
-    
+
+    public EntityRegistry setEventParser (String eventParser) {
+        this.parserField = eventParser;
+        return this;
+    }
+    public String getEventParser () { return parserField; }
+
     public void clear () { stitches.clear(); }
     
     public EntityRegistry add (StitchKey key, String property) {
@@ -242,6 +249,10 @@ public class EntityRegistry extends EntityFactory {
         strucField = null;
         if (source.hasPath("structure")) {
             strucField = source.getString("structure");
+        }
+        parserField = null;
+        if (source.hasPath("eventParser")) {
+            parserField = source.getString("eventParser");
         }
 
         if (conf.hasPath("stitches")) {
@@ -382,9 +393,9 @@ public class EntityRegistry extends EntityFactory {
                 
                 ref.ds = dsf.getDataSourceByName(name);
                 if (ref.ds == null) {
-                    logger.warning("Can't locate data source \""+
+                    logger.log(Level.SEVERE, "Can't locate data source \""+
                                    name+"\"");
-                    continue;
+                    throw new Exception("Can't locate data source");
                 }
                 
                 ref.id = cf.getString("id");
@@ -407,29 +418,31 @@ public class EntityRegistry extends EntityFactory {
 
         Config source = conf.getConfig("source");
         DataSource ds;
-        
         String data = source.getString("data");
         if (data.startsWith("http")) {
-            ds = register (new URL (data));
-        }
-        else if (data.startsWith("file")) {
-            ds = register (new File (new URI (data)));
-        }
-        else {
-            File file = new File (base, data);
-            if (!file.exists()) {
-                // now let's try current
-                file = new File (data);
-                if (!file.exists())
-                    throw new IllegalArgumentException
-                        ("Can't find data: \""+data+"\"");
+            ds = register(new URL(data));
+        } else {
+            File file;
+            if (data.startsWith("file")) {
+                file = new File (new URI (data));
+            } else {
+                file = new File (base, data);
+                if (!file.exists()) {
+                    // now let's try current
+                    file = new File (data);
+                    if (!file.exists())
+                        throw new IllegalArgumentException
+                                ("Can't find data: \""+data+"\"");
+                }
             }
-            ds = register (file);
+            if (source.hasPath("name")) {
+                String name = source.getString("name");
+                ds = register (name, file);
+            } else {
+                ds = register(file.getName(), file);
+            }
         }
-        
-        if (ds != null && source.hasPath("name"))
-            ds.setName(source.getString("name"));
-        
+
         return ds;
     }
 
@@ -457,7 +470,7 @@ public class EntityRegistry extends EntityFactory {
                 Iterator<Entity> iter = find (ref.key, rid);
                 while (iter.hasNext()) {
                     Entity e = iter.next();
-                    if (e._is(ref.ds.getName())) {
+                    if (e._is(ref.ds.getLabel())) {
                         DefaultPayload payload =
                             new DefaultPayload (source, id);
                         payload.putAll(map);
@@ -920,11 +933,13 @@ public class EntityRegistry extends EntityFactory {
         ds.set(REFERENCES, sk, true);
 
         if (idField != null)
-            ds.set("IdField", idField);
+            ds.set(DataSource.IDFIELD, idField);
         if (nameField != null)
-            ds.set("NameField", nameField);
+            ds.set(DataSource.NAMEFIELD, nameField);
         if (strucField != null)
-            ds.set("StrucField", strucField);
+            ds.set(DataSource.STRUCTFIELD, strucField);
+        if (parserField != null)
+            ds.set(DataSource.EVENTPARSER, parserField);
     }
     
     public void updateDataSourceMetadata () {
@@ -938,6 +953,7 @@ public class EntityRegistry extends EntityFactory {
     }
     public DataSource getDataSource () { return source; }
 
+    @Deprecated
     public DataSource register (File file) throws IOException {
         return source = getDataSourceFactory().register(file);
     }

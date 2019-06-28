@@ -15,8 +15,7 @@ opener = urllib2.build_opener(
     urllib2.HTTPSHandler(debuglevel=0),
     urllib2.HTTPCookieProcessor(cookies))
 opener.addheaders = [
-    ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
-                    'Windows NT 5.2; .NET CLR 1.1.4322)'))
+    ('User-agent', ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'))
 ]
 
 def requestJson(uri):
@@ -681,7 +680,7 @@ def clipTag(lines, i, tag):
     return part
 
 if __name__=="__main__":
-    
+
     #uri = "https://www.gpo.gov/fdsys/bulkdata/CFR/2018/title-21/CFR-2018-title21-vol6.xml"
     #uri = "https://www.govinfo.gov/content/pkg/CFR-2018-title21-vol6/xml/CFR-2018-title21-vol6-part516.xml"
     #uri = "https://www.govinfo.gov/content/pkg/CFR-2018-title21-vol6/xml/CFR-2018-title21-vol6-sec516-1684.xml"
@@ -694,6 +693,7 @@ if __name__=="__main__":
             subparts = part[part.find(":")+1:].split(",")
             part = part[:part.find(":")]
         uri = uristem + part + ".xml"
+        print uri
         handle = opener.open(uri)
         response = handle.read().decode('utf-8')
         handle.close()

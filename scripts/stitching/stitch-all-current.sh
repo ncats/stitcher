@@ -21,7 +21,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
 #echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db data/dump-public-2018-07-19.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, April 2019\" cache=data/hash.db data/dump-public-2019-04-03.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, March 2019\" cache=data/hash.db data/rancho-export_2019-03-06_05-29.json"

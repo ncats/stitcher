@@ -18,8 +18,7 @@ opener = urllib2.build_opener(
     urllib2.HTTPSHandler(debuglevel=0),
     urllib2.HTTPCookieProcessor(cookies))
 opener.addheaders = [
-    ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
-                    'Windows NT 5.2; .NET CLR 1.1.4322)'))
+    ('User-agent', ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'))
 ]
 
 def getMainDir():
@@ -149,12 +148,18 @@ if __name__=="__main__":
                 print ts, iigfile
             elif line.find("Inactive Ingredient Database File") > -1:
                 dbURL = line[line.find('"')+1:]
-                dbURL = uri[:uri.find("/", 8)]+urllib.quote(dbURL[:dbURL.find("\"")])
+                if dbURL[0:3] == "UCM":
+                    dbURL = "http://wayback.archive-it.org/7993/20170112022245/http://www.fda.gov/downloads/Drugs/InformationOnDrugs/"+dbURL+".zip"
+                else:
+                    dbURL = uri[:uri.find("/", 8)]+urllib.quote(dbURL[:dbURL.find("\"")])
                 ts = "null"
                 try:
                     ts = time.strftime("%Y-%m-%d", time.strptime(line[line[:line.find(': ')].rfind('>')+1:line.find(': ')], '%B %Y'))
                 except:
-                    ts = time.strftime("%Y-%m-%d", time.strptime(line[line[:line.find(' Inactive')].rfind('>')+1:line.find(' Inactive')], '%B %Y'))                    
+                    try:
+                        ts = time.strftime("%Y-%m-%d", time.strptime(line[line[:line.find(': Inactive')].rfind('\"')+1:line.find(': Inactive')], '%B %Y'))
+                    except:
+                        ts = time.strftime("%Y-%m-%d", time.strptime(line[line[:line.find(' Inactive')].rfind('>')+1:line.find(' Inactive')], '%B %Y'))
                 iigfile = maindir+"/temp/iig-"+ts+".zip"
                 syscall = "curl --insecure -v -L -o "+iigfile + " " + dbURL
                 print syscall
@@ -192,7 +197,8 @@ if __name__=="__main__":
         rec = sline[shead.index('UNII')]
         if not iig.has_key(rec):
             iig[rec] = []
-        iig[rec].append(entry)
+        if rec != "":
+            iig[rec].append(entry)
         line = fp.readline()
     fp.close()
     zfp.close()
@@ -203,7 +209,7 @@ if __name__=="__main__":
     keys.sort()
     keys.reverse()
     for key in keys:
-        if key != getTimeStamp():
+        if key != getTimeStamp() and os.path.isfile(iigfiles[key]):
             #print key
             zfp = zipfile.ZipFile(iigfiles[key], 'r')
             names = zfp.namelist()
