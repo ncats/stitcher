@@ -249,6 +249,58 @@ def apprDateRegression(prods):
                     prods[prod][-1] = 'PREDICTED'
     return prods
 
+def writeInitApp(outfp, unii, early, earlyDate):
+    date = ''
+    year = ''
+    if len(earlyDate) > 0:
+        date = earlyDate[5:7]+"/"+earlyDate[8:]+"/"+earlyDate[0:4]
+        year = date[-4:]
+    #['072437/001', 'FENOPROFEN CALCIUM', 'CAPSULE;ORAL', 'EQ 200MG BASE', 'Discontinued', 'ANDA', 'PAR PHARM', '1988-08-22', 'Drugs@FDA']
+    method = early[-1]
+    apptype = early[-4]
+    appsponsor = early[-3]
+    product = early[-8]
+    appno = ''
+    appurl = ''
+    active = "true"
+    if early[-5] != "Prescription" and early[-5] != "Over-the-counter":
+        active = "false"
+
+    if early[-1].find('https://www.accessdata.fda.gov/') > -1:
+        appno = early[0][0:6]
+
+        appurl = early[-1]
+        method = "Drugs@FDA"
+    elif len(early[0]) > 6 and early[0][6] == '/':
+        appno = early[0][0:6]
+
+        if method == "PREDICTED":
+            year = "[Approval Date Uncertain] "+year
+
+        appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
+    else:
+        #outfp = fperr
+        active = "false"
+        if method.find('OB NME Appendix 1950-') > -1:
+            appno = early[0][0:6]
+        elif method.find('http') > -1:
+            appurl = method
+            method = "Literature"
+
+        for otherunii in activeMoiety[unii]:
+            if UNII2prods.has_key(otherunii):
+                for prod in UNII2prods[otherunii]:
+                    entry = prods[prod]
+                    if entry[0] == early[0]:
+                        unii = otherunii
+
+    #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
+    #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
+    #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
+    comment = early[0].decode('latin-1').encode('ascii', 'replace')
+    outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
+    outfp.write(outline)
+
 if __name__=="__main__":
 
     maindir = getMainDir()
@@ -660,7 +712,26 @@ if __name__=="__main__":
     #fperr = open(outfile2, 'w')
     #fperr.write(header)
     for unii in activeMoiety.keys():
-        early = [getTimeStamp(), '']
+        # early = [getTimeStamp(), '']
+        # earlyDate = getTimeStamp()
+        #
+        # for otherunii in activeMoiety[unii]:
+        #     if UNII2prods.has_key(otherunii):
+        #         for prod in UNII2prods[otherunii]:
+        #             entry = prods[prod]
+        #
+        #             if entry[-2] < "1938-08-01":
+        #                 writeInitApp(fp, unii, entry, entry[-2])
+        #             elif entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
+        #                 if early[-1] == '' or (entry[-2] != '' and not entry[-2] > early[-2]):
+        #                     early = entry
+        #             elif early[-1] == '':
+        #                 early = entry
+        #
+        #             if entry[-2] != '' and entry[-2] < earlyDate and entry[-2] > "1938-08-01":
+        #                 earlyDate = entry[-2]
+        #
+        early = dict()
         earlyDate = getTimeStamp()
 
         for otherunii in activeMoiety[unii]:
@@ -668,54 +739,65 @@ if __name__=="__main__":
                 for prod in UNII2prods[otherunii]:
                     entry = prods[prod]
 
-                    if entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
-                        if early[-1] == '' or (entry[-2] != '' and not entry[-2] > early[-2]):
-                            early = entry
+                    akey = entry[0][0:6]
+                    if not early.has_key(akey):
+                        early[akey] = entry
+                    else: # merge records
+                        if early[akey][-2] == '' or (entry[-2] != '' and early[akey][-2] > entry[-2]):
+                            early[akey] = entry
 
-                    elif early[-1] == '':
-                        early = entry
+                    #if entry[-2] < "1938-08-01":
+                    #    early[entry[-1]] = entry
+                    #elif entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
+                    #    if not early.has_key(entry[-5]) or (entry[-2] != '' and not entry[-2] > early[entry[-5]][-2]):
+                    #        early[entry[-5]] = entry
+                    #elif not early.has_key(entry[-5]):
+                    #    early[entry[-5]] = entry
 
-                    if entry[-2] != '' and entry[-2] < earlyDate:
+                    if entry[-2] != '' and entry[-2] < earlyDate and entry[-2] > "1938-08-01":
                         earlyDate = entry[-2]
-                            
-        if early[-2] != getTimeStamp():
-            date = earlyDate[5:7]+"/"+earlyDate[8:]+"/"+earlyDate[0:4]
-            year = date[-4:]
-            method = early[-1]
-            apptype = early[-4]
-            appsponsor = early[-3]
-            product = early[-8]
-            appno = ''
-            appurl = ''
-            active = "true"
-            outfp = fp
 
-            if len(early[0]) > 6 and early[0][6] == '/' or early[-1].find('https://www.accessdata.fda.gov/') > -1:
-                appno = early[0][0:6]
-
-                if method == "PREDICTED":
-                    year = "[Approval Date Uncertain] "+year
-
-                appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
-            else:
-                #outfp = fperr
-                active = "false"
-                if method.find('OB NME Appendix 1950-') > -1:
-                    appno = early[0][0:6]
-
-                for otherunii in activeMoiety[unii]:
-                    if UNII2prods.has_key(otherunii):
-                        for prod in UNII2prods[otherunii]:
-                            entry = prods[prod]
-                            if entry[0] == early[0]:
-                                unii = otherunii
-
-            #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
-            #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
-            #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
-            comment = early[0].decode('latin-1').encode('ascii', 'replace')
-            outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
-            outfp.write(outline)
+        for key in early.keys():
+            if early[key][-2] != '' and early[key][-2][0:4] == earlyDate[0:4] and early[key][-2] > earlyDate:
+                early[key][-2] = earlyDate
+            writeInitApp(fp, unii, early[key], early[key][-2])
+            # date = earlyDate[5:7]+"/"+earlyDate[8:]+"/"+earlyDate[0:4]
+            # year = date[-4:]
+            # method = early[-1]
+            # apptype = early[-4]
+            # appsponsor = early[-3]
+            # product = early[-8]
+            # appno = ''
+            # appurl = ''
+            # active = "true"
+            # outfp = fp
+            #
+            # if len(early[0]) > 6 and early[0][6] == '/' or early[-1].find('https://www.accessdata.fda.gov/') > -1:
+            #     appno = early[0][0:6]
+            #
+            #     if method == "PREDICTED":
+            #         year = "[Approval Date Uncertain] "+year
+            #
+            #     appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
+            # else:
+            #     #outfp = fperr
+            #     active = "false"
+            #     if method.find('OB NME Appendix 1950-') > -1:
+            #         appno = early[0][0:6]
+            #
+            #     for otherunii in activeMoiety[unii]:
+            #         if UNII2prods.has_key(otherunii):
+            #             for prod in UNII2prods[otherunii]:
+            #                 entry = prods[prod]
+            #                 if entry[0] == early[0]:
+            #                     unii = otherunii
+            #
+            # #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
+            # #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
+            # #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
+            # comment = early[0].decode('latin-1').encode('ascii', 'replace')
+            # outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
+            # outfp.write(outline)
 
     # write out all products data
     prod2UNIIs = dict()

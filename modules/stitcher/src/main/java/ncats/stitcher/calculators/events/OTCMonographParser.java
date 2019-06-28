@@ -8,7 +8,7 @@ import java.util.logging.Level;
 
 public class OTCMonographParser extends EventParser {
     public OTCMonographParser() {
-        super ("OTC-listings-CFR-FR-summary.txt");
+        super ("OTC Monographs, December 2018");
     }
 
     public void produceEvents(Map<String, Object> payload) {

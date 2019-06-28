@@ -11,6 +11,7 @@ import java.security.DigestInputStream;
 import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 import chemaxon.struc.Molecule;
+import ncats.stitcher.calculators.events.GSRSEventParser;
 
 public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static final Logger logger =
@@ -37,6 +38,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         super.init();
         setIdField ("UNII");
         setNameField ("PreferredName");
+        setEventParser(GSRSEventParser.class.getCanonicalName());
         setUseName (false);
         add (N_Name, "Synonyms");
         add (I_CAS, "CAS");
@@ -219,7 +221,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                         mef.register(sourceName, file);
                     }
                     else {
-                        mef.register(file);
+                        mef.register(file.getName(), file);
                     }
                 }
             }

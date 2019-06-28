@@ -9,6 +9,7 @@ import java.io.IOException;
 import ncats.stitcher.GraphDb;
 import ncats.stitcher.StitchKey;
 import ncats.stitcher.Util;
+import ncats.stitcher.calculators.events.NPCEventParser;
 
 public class NPCEntityFactory extends MoleculeEntityFactory {
     static private final Logger logger =
@@ -28,6 +29,7 @@ public class NPCEntityFactory extends MoleculeEntityFactory {
     protected void init () {
         super.init();
         setIdField ("ID");
+        setEventParser(NPCEventParser.class.getCanonicalName());
         //add (StitchKey.I_CAS, "CAS");
         //add (StitchKey.N_Name, "Synonyms");
         add (StitchKey.I_UNII, "CompoundUNII");
@@ -66,7 +68,7 @@ public class NPCEntityFactory extends MoleculeEntityFactory {
                         mef.register(sourceName, file);
                     }
                     else {
-                        mef.register(file);
+                        mef.register(file.getName(), file);
                     }
                 }
             }
