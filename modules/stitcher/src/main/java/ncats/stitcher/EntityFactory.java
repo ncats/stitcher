@@ -1543,7 +1543,22 @@ public class EntityFactory implements Props, AutoCloseable {
                 ++count;
             }
             logger.info(count+" entities deleted for \""+source+"\"");
-            
+
+            count = 0;
+            for (Iterator<Relationship> it = gdb.getAllRelationships().iterator(); it.hasNext();) {
+                Relationship rel = it.next();
+                if (rel.isType(AuxRelType.PAYLOAD)) {
+                    String s = (String)rel.getProperty(SOURCE);
+                    if (source.equals(s)) {
+                        Entity payload = Entity._getEntity(rel.getStartNode());
+                        rel.delete();
+                        payload._node.delete();
+                        ++count;
+                    }
+                }
+            }
+            logger.info(count+" payloads deleted for \""+source+"\"");
+
             tx.success();
         }
         return count;
