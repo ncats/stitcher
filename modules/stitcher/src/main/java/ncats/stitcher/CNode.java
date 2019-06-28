@@ -634,7 +634,7 @@ public class CNode implements Props, Comparable<CNode> {
                     Node xn = rel.getOtherNode(_node);
                     DataSource ds = dsf.getDataSourceByKey
                         ((String)xn.getProperty(SOURCE, ""));
-                    String field = (String) ds._get("IdField");
+                    String field = (String) ds._get(DataSource.IDFIELD);
                     if (field != null) {
                         Object value = _node.getProperty(field, null);
                         if (value != null) {
@@ -646,7 +646,7 @@ public class CNode implements Props, Comparable<CNode> {
                 }
             }
             else {
-                source = getField ("IdField");
+                source = getField (DataSource.IDFIELD);
             }
             tx.success();
         }

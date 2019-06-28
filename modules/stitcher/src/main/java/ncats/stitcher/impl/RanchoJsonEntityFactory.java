@@ -21,6 +21,7 @@ import static ncats.stitcher.StitchKey.*;
 
 import chemaxon.struc.Molecule;
 import chemaxon.util.MolHandler;
+import ncats.stitcher.calculators.events.RanchoEventParser;
 
 public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
     static final Logger logger =
@@ -48,6 +49,7 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
         super.init();
         setIdField ("CompoundName");
         setNameField ("CompoundName");
+        setEventParser(RanchoEventParser.class.getCanonicalName());
         setUseName (false);
         addBlacklist ("Unknown");
         add (N_Name, "CompoundName");
@@ -177,7 +179,7 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
                         mef.register(sourceName, file);
                     }
                     else {
-                        mef.register(file);
+                        mef.register(file.getName(), file);
                     }
                 }
             }

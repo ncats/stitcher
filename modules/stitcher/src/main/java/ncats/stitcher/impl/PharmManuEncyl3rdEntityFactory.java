@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import ncats.stitcher.calculators.events.PharmManuEventParser;
 
 public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
     static final Logger logger =
@@ -47,6 +48,7 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
         super.init();
         setIdField ("UNII");
         setNameField ("Drug Substance");
+        setEventParser(PharmManuEventParser.class.getCanonicalName());
         add (I_UNII, "UNII");
     }
     
@@ -162,25 +164,6 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
     }
 
     @Override
-    public DataSource register (File file) throws IOException {
-        DataSource ds = super.register(file);
-        Integer instances = (Integer) ds.get(INSTANCES);
-        if (instances != null) {
-            logger.warning("### Data source "+ds.getName()
-                           +" has already been registered with "+instances
-                           +" entities!");
-        }
-        else {
-            instances = register (ds.openStream());
-            if (!props.isEmpty())
-                ds.set(PROPERTIES, props.toArray(new String[0]));
-            ds.set(INSTANCES, instances);
-            updateMeta (ds);
-            logger.info("$$$ "+instances+" entities registered for "+ds);
-        }
-        return ds;
-    }
-
     public DataSource register (String name, File file) throws IOException {
         DataSource ds = super.register(name, file);
         Integer instances = (Integer) ds.get(INSTANCES);
@@ -208,7 +191,7 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
         }
         
         PharmManuEncyl3rdEntityFactory mef = new PharmManuEncyl3rdEntityFactory (argv[0]);
-         String sourceName = null;
+        String sourceName = null;
         try {
             for (int i = 1; i < argv.length; ++i) {
                 int pos = argv[i].indexOf('=');
@@ -232,7 +215,7 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
                         mef.register(sourceName, file);
                     }
                     else {
-                        mef.register(file);
+                        mef.register(argv[i], file);
                     }
                 }
             }

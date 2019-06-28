@@ -15,7 +15,7 @@ public class RanchoEventParser extends EventParser {
     Object id;
 
     public RanchoEventParser() {
-        super ("rancho-export_2018-08-30_20-58.json");
+        super ("Rancho BioSciences, March 2019");
     }
 
     void parseCondition(JsonNode n) {

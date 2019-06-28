@@ -99,28 +99,22 @@ public class DataSourceFactory implements Props {
         }
     }
 
+    @Deprecated
     public DataSource register (File file) throws IOException {
+        return register (file.getName(), file);
+    }
+
+    public DataSource register (String name, File file) throws IOException {
         Util.FileStats stats = Util.stats(file);
         String key = stats.sha1.substring(0,9); // truncated sha1
         try (Transaction tx = gdb.beginTx()) {
-            DataSource ds = _register (key, file.getName());
+            DataSource ds = _register (key, name);
             ds.set(SHA1, stats.sha1);
             ds.set(SIZE, stats.size);
             ds.set(URI, file.getCanonicalFile().toURI().toString());
             tx.success();
             return ds;
         }
-    }
-
-    public DataSource register (String name, File file) throws IOException {
-        logger.warning("I'm DataSourceFactory");
-
-        DataSource ds = register (file);
-        ds.setName(name);
-
-        //System.out.println(ds.getName());
-
-        return ds;
     }
 
     /*

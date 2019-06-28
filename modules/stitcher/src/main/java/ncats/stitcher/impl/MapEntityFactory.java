@@ -42,14 +42,14 @@ public class MapEntityFactory extends EntityRegistry {
         super (graphDb);
     }
     
-    public DataSource register (File file,  String... header)
+    public DataSource register (String name, File file,  String... header)
         throws IOException {
-        return register (file, delimiter, header);
+        return register (name, file, delimiter, header);
     }
 
     @Override
-    public DataSource register (File file) throws IOException {
-        return register (file, delimiter, (String[])null);
+    public DataSource register (String name, File file) throws IOException {
+        return register (name, file, delimiter, (String[])null);
     }
 
     @Override
@@ -61,9 +61,9 @@ public class MapEntityFactory extends EntityRegistry {
         }
     }
     
-    public DataSource register (File file, String delim, String... header)
+    public DataSource register (String name, File file, String delim, String... header)
         throws IOException {
-        DataSource ds = super.register(file);
+        DataSource ds = super.register(name, file);
         Integer instances = (Integer) ds.get(INSTANCES);
         if (instances != null) {
             logger.warning("### Data source "+ds.getName()

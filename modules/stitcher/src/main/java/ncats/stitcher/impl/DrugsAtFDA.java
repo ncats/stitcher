@@ -592,7 +592,7 @@ public class DrugsAtFDA extends MapEntityFactory {
             }
             else {
                 logger.info("***** registering "+argv[i]+" ******");
-                fda.register(new File (argv[i]));
+                fda.register(argv[i], new File (argv[i]));
             }
         }
         fda.shutdown();
