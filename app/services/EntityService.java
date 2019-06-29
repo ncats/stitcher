@@ -92,6 +92,10 @@ public class EntityService {
     }
 
     public Entity getEntity (long id) {
+        return getEntityFactory().getEntity(id);
+    }
+
+    public Entity entity (long id) {
         return getEntityFactory().entity(id);
     }
     

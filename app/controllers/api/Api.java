@@ -1031,7 +1031,7 @@ public class Api extends Controller {
         
         try {
             long id = Long.parseLong(label);
-            Entity e = es.getEntity(id);
+            Entity e = es.entity(id);
             return e != null ? ok (jsonCodec.encode(e))
                 : notFound ("No such entity id "+id);
         }
@@ -1043,6 +1043,12 @@ public class Api extends Controller {
         int t = top != null ? Math.min(top,1000) : 10;
         
         return ok (toJson (s, t, es.entities(label, s, t)));
+    }
+
+    public Result entity (Long id) {
+        Entity e = es.entity(id);
+        return e != null ? ok (jsonCodec.encode(e))
+            : notFound ("No such entity id "+id);
     }
 
     public Result structure (Long id, String format, Integer size) {

@@ -2232,7 +2232,13 @@ public class EntityFactory implements Props, AutoCloseable {
      * get Entity as-is
      */
     public Entity _getEntity (long id) {
-        return Entity._getEntity(gdb.getNodeById(id));
+        try {
+            return Entity._getEntity(gdb.getNodeById(id));
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Unknown entity "+id);
+        }
+        return null;
     }
 
     public Entity getEntity (long id) {
@@ -2247,14 +2253,20 @@ public class EntityFactory implements Props, AutoCloseable {
      * get Entity conceptually
      */
     public Entity _entity (long id) {
-        Node n = gdb.getNodeById(id);
-        if (n.hasLabel(AuxNodeType.DATA)) {
-            // this is the payload, so return the corresponding entity
-            Relationship rel = n.getSingleRelationship
-                (AuxRelType.PAYLOAD, Direction.BOTH);
-            n = rel.getOtherNode(n);
+        try {
+            Node n = gdb.getNodeById(id);
+            if (n.hasLabel(AuxNodeType.DATA)) {
+                // this is the payload, so return the corresponding entity
+                Relationship rel = n.getSingleRelationship
+                    (AuxRelType.PAYLOAD, Direction.BOTH);
+                n = rel.getOtherNode(n);
+            }
+            return Entity._getEntity(n);
         }
-        return Entity._getEntity(n);
+        catch (NotFoundException ex) {
+            logger.warning("Unknown entity "+id);
+        }
+        return null;
     }
 
     public Entity[] search (String query, int max) {
