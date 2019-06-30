@@ -27,14 +27,18 @@ public class RanchoEventParser extends EventParser {
                 event.URL = n.get("HighestPhaseUri").asText();
                 if (event.URL.contains("fda.gov")) {
                     event.jurisdiction = "US";
-                    if (event.URL.contains("Veterinary") || event.URL.contains("Animal"))
-                        event.kind = Event.EventKind.USAnimalDrug;
-                    else
-                        event.kind = Event.EventKind.USApprovalRx;
+                    // While Rancho is manually curated, they shouldn't override annotations directly from FDA
+                    // Such annotations need to be manually reviewed
+//                    if (event.URL.contains("Veterinary") || event.URL.contains("Animal"))
+//                        event.kind = Event.EventKind.USAnimalDrug;
+//                    else
+//                        event.kind = Event.EventKind.USApprovalRx;
                 }
                 else if (event.URL.contains("dailymed.nlm.nih.gov")) {
                     event.jurisdiction = "US";
-                    event.kind = Event.EventKind.USUnapproved; // TODO Update Rancho highest phase to match new nomenclature
+                    // While Rancho is manually curated, they shouldn't override annotations directly from FDA
+                    // Such annotations need to be manually reviewed
+//                    event.kind = Event.EventKind.USUnapproved; // TODO Update Rancho highest phase to match new nomenclature
                 }
             }
             else {
