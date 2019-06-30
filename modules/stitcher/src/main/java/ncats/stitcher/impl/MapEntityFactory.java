@@ -92,6 +92,13 @@ public class MapEntityFactory extends EntityRegistry {
         throws IOException {
         LineTokenizer tokenizer = new LineTokenizer (delim.charAt(0));
         tokenizer.setInputStream(is);
+
+        boolean needIDField = false; // If there are multiple entries for a given ID, subsequent row overwrite previous ones
+        // one hack solution is to not include an id field in the config and use count instead
+        if (this.idField == null) {
+            this.idField = "__Count";
+            needIDField = true;
+        }
         
         int count = 0;
         while (tokenizer.hasNext()) {
@@ -123,6 +130,8 @@ public class MapEntityFactory extends EntityRegistry {
                 }
 
                 if (!row.isEmpty()) {
+                    if (needIDField)
+                        row.put(this.idField, String.valueOf(count));
                     Entity ent = register (row);
                     if (ent != null)
                         ++count;
