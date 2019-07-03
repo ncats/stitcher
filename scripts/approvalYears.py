@@ -332,7 +332,7 @@ if __name__=="__main__":
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
-    fdaNMEfile = maindir+'/data/FDA-NMEs-2018-08-07.txt'
+    fdaNMEfile = maindir+'/scripts/data/FDA-NMEs-2018-08-07.txt'
     if not os.path.exists(fdaNMEfile):
         raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
 

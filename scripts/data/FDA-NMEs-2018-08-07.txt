@@ -50,7 +50,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1942	Paredrine HBr	hydroxyamphetamine HBr	59IG47SZ0E		NDA	0-004	Smith Kline & French	DeHaen 1940-1975 NMEs		
 1942	Privine HCl	naphazoline HCl	MZ1131787D				Ciba	DeHaen 1940-1975 NMEs		
 1942	Sulfasuxidine	succinylsulfathiazole	RSS8647O4S				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
-1941	Sulfadiazine Sodium	sulfadiazine sodium	84CS1P306F	08-11-41	NDA	4-054ÊÊÊÊ 	Lederle	DeHaen 1940-1975 NMEs		
+1941	Sulfadiazine Sodium	sulfadiazine sodium	84CS1P306F	08-11-41	NDA	4-054ï¿½ï¿½ï¿½ï¿½ 	Lederle	DeHaen 1940-1975 NMEs		
 1942	Tyrothricin	tyrothricin	877376V2XW				Merck	DeHaen 1940-1975 NMEs		
 1943	Aralen	chloroquine phosphate	6E17K3343P		NDA	6-002	Winthrop	DeHaen 1940-1975 NMEs		
 1943	Globin Insulin	globin zinc insulin injection					Burroughs Wellcome	DeHaen 1940-1975 NMEs		
@@ -940,7 +940,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1966	Miochol	Acetylcholine Chloride	AF73293C2R	10-10-66	NDA	16-211	Smith Miller & Patch	OB NME Appendix 1950-1993		
 1966	Symmetrel 6	amantadine HCl	M6Q1EO9TD0	10-18-66	NDA	16-020	DuPont (Endo)	OB NME Appendix 1950-1985		
 1966	Levoprome	methotrimeprazine	9G0LAW7ATQ	10-18-66	NDA	15-865	Lederle	OB NME Appendix 1950-1985		
-1965	Omnipen	ampicillin anhydrous	7C782967RD	12-17-65	NDA	60-624ÊÊÊÊ 	Wyeth	DeHaen 1940-1975 NMEs		
+1965	Omnipen	ampicillin anhydrous	7C782967RD	12-17-65	NDA	60-624ï¿½ï¿½ï¿½ï¿½ 	Wyeth	DeHaen 1940-1975 NMEs		
 1966	Serc	betahistine hydrochloride	49K58SMZ7U				Unimed More	DeHaen 1940-1975 NMEs		
 1966	Garamycio	gentamicin sulfate	8X7386QRLV				Schering	DeHaen 1940-1975 NMEs		
 1966	Rondomycin	methacycline HCl	9GJ0N7ZAP0				Pfizer	DeHaen 1940-1975 NMEs		
@@ -961,7 +961,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1967	Vibramycin Hyclate	doxycycline hyclate	19XTS3T51U	12-05-67	NDA	50-007	Pfizer	OB NME Appendix 1950-1993		
 1967	Hydrea	hydroxyurea	X6Q56QN5QC	12-07-67	NDA	16-295	Squibb	OB NME Appendix 1950-1985		
 1967	Alcopara	bephenium hydroxynaphthoate	47RU9546DX				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
-1967	Valisone	betamethasone valerate	9IFA5XM7R2	09-02-67	NDA	16-322ÊÊÊÊ 	Schering	DeHaen 1940-1975 NMEs		
+1967	Valisone	betamethasone valerate	9IFA5XM7R2	09-02-67	NDA	16-322ï¿½ï¿½ï¿½ï¿½ 	Schering	DeHaen 1940-1975 NMEs		
 1965	Maolate	chlorphenesin carbamate	57U5YI11WP	06-14-65	NDA	14-217     	Upjohn	DeHaen 1940-1975 NMEs		
 1967	LMD6	dextran 40	K3R6ZDH4DU				Abbott	DeHaen 1940-1975 NMEs		
 1967	Rheomacrodexll	dextran 40	K3R6ZDH4DU				Pharmacia	DeHaen 1940-1975 NMEs		
@@ -984,9 +984,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1968	Loridine	cephaloridine	LVZ1VC61HB				Lilly	DeHaen 1940-1975 NMEs		
 1968	Dynapen	dicloxacillin sodium	4HZT2V9KX0				Bristol	DeHaen 1940-1975 NMEs		
 1968	Veracillin	dicloxacillin sodium	4HZT2V9KX0				Ayerst	DeHaen 1940-1975 NMEs		
-1968	Sublimaze Citrate	fentanyl citrate	MUN5LYG46H	02-19-68	NDA	16-619ÊÊÊÊ 	McNeil	DeHaen 1940-1975 NMEs		
+1968	Sublimaze Citrate	fentanyl citrate	MUN5LYG46H	02-19-68	NDA	16-619ï¿½ï¿½ï¿½ï¿½ 	McNeil	DeHaen 1940-1975 NMEs		
 1968	Magan	magnesium salicylate	41728CY7UX				Warren-Teed	DeHaen 1940-1975 NMEs		
-1968	Ovral	norgestrel	3J8Q1747Z2	04-16-68	NDA	16-672ÊÊÊÊ 	Wyeth	DeHaen 1940-1975 NMEs		
+1968	Ovral	norgestrel	3J8Q1747Z2	04-16-68	NDA	16-672ï¿½ï¿½ï¿½ï¿½ 	Wyeth	DeHaen 1940-1975 NMEs		
 1969	P-300 Antibacterial	Triclosan	4NM5039Y5X	01-24-69	NDA	16-486	Colgate-Palmolive	OB NME Appendix 1950-1993		
 1969	Quide	piperacetazine	KL6248WNW4	02-03-69	NDA	13-615	"Dow Chemical, USA"	OB NME Appendix 1950-1985		
 1969	Teslac	testolactone	6J9BLA949Q	06-03-69	NDA	16-119	Squibb	OB NME Appendix 1950-1985		
@@ -998,9 +998,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1969	Bilopaque Sodium	Tyropanoate Sodium	XRJ0P5FAYO	10-24-69	NDA	13-731	Sterling	OB NME Appendix 1950-1985		
 1969	HMS	medrysone	D2UFC189XF	11-28-69	NDA	16-624	Allergan	OB NME Appendix 1950-1985		
 1969	Cytostar	cytarabine HCl	33K3DB6591				Upjohn	DeHaen 1940-1975 NMEs		
-1969	Sulfamylon Cream	mafenide acetate	RQ6LP6Z0WY	01-24-69	NDA	16-763ÊÊÊÊ 	Winthrop	DeHaen 1940-1975 NMEs		
+1969	Sulfamylon Cream	mafenide acetate	RQ6LP6Z0WY	01-24-69	NDA	16-763ï¿½ï¿½ï¿½ï¿½ 	Winthrop	DeHaen 1940-1975 NMEs		
 1969	Quilene	pentapiperide methylsulfate	Y8B7PF4062				Warner /Chilcott	DeHaen 1940-1975 NMEs		
-1969	Talwin Tablets	pentazocine HCl	A36BXO4PPX	02-03-69	NDA	16-732ÊÊÊÊ 	Winthrop	DeHaen 1940-1975 NMEs		
+1969	Talwin Tablets	pentazocine HCl	A36BXO4PPX	02-03-69	NDA	16-732ï¿½ï¿½ï¿½ï¿½ 	Winthrop	DeHaen 1940-1975 NMEs		
 1969	Aristospan	triamcinolone hexacetonide	I7GT1U99Y9	07-29-69	NDA	16-466	Lederle	DeHaen 1940-1975 NMEs		
 1970	Urispas	flavoxate hydrochloride	9C05J6089W	01-15-70	NDA	16-769	Smith Kline & French	OB NME Appendix 1950-1985		
 1970	Ketalar	ketamine HCl	O18YUO0I83	02-19-70	NDA	16-812	Parke-Davis	OB NME Appendix 1950-1985		
@@ -2021,7 +2021,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 2009	Kalbitor	Ecallantide	5Q6TZN2HNM	12-01-09	BLA	125-277		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125277		
 2009	Simponi	Golimumab	91X1KLU43E	04-24-09	BLA	125-289		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125289		
 2009	Arzerra	Ofatumumab	M95KG522R0	10-26-09	BLA	125-326		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125326		
-2009	Votrient	Pazopanib	7RN5DR86CK	10-19-09	NDA	22-465ÊÊÊÊ 		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=22ÊÊ 		
+2009	Votrient	Pazopanib	7RN5DR86CK	10-19-09	NDA	22-465ï¿½ï¿½ï¿½ï¿½ 		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=22ï¿½ï¿½ 		
 2009	Stelara	Ustekinumab	FU77B4U5Z0	09-25-09	BLA	125-261		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=125261		
 2010	Ampyra	Dalfampridine	BH3B64OKL9	01-22-10	NDA	22-250		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=22250		
 2010	Victoza	Liraglutide	839I73S42A	01-25-10	NDA	22-341		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=22341		
@@ -2247,7 +2247,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1911	Chloretone	chlorobutanol	HM4YQM8WRC				Parke-Davis	https://catalog.hathitrust.org/Record/100782317		
 1912	Luminal	phenobarbital	YQE403BP4D					https://archive.org/details/newnonofficialre39coun		
 1912	Neosalvarsan	neoarsphenamine	O7K7R0O4BG					https://archive.org/details/newnonofficialre39coun		
-1920		butacaine	Z84S23CGJJ					https://archive.org/details/newnonofficialre39coun		
+1914	Emetin	emetine	U52OG12P96					https://jamanetwork.com/journals/jama/article-abstract/453753
+1920		butacaine	Z84S23CGJJ					https://archive.org/details/newnonofficialre39coun
 1923		butobarbital	OHZ8QAW6YC					https://archive.org/details/newnonofficialre39coun		
 1923		ethyl chloride/ethylene	46U771ERWK					https://archive.org/details/newnonofficialre39coun		
 1923		sulfarsphenamine	B1GGH4ZUZL					https://archive.org/details/newnonofficialre39coun		
