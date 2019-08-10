@@ -213,10 +213,10 @@ public class Api extends Controller {
         return paths (paths, fields);
     }
 
-    public Result tree (long node) {
+    public Result tree (String id) {
         String[] fields = request().queryString().get("field");
         EntityTree tree = es.getEntityFactory()
-            .tree(node, StitchKey.R_subClassOf);
+            .tree(id, StitchKey.R_subClassOf);
         return ok (tree.root.toJson(fields));
     }
 

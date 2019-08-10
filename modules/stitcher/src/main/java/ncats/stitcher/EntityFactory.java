@@ -2249,10 +2249,7 @@ public class EntityFactory implements Props, AutoCloseable {
          }
     }
 
-    /**
-     * get Entity conceptually
-     */
-    public Entity _entity (long id) {
+    Node _getEntityNode (long id) {
         try {
             Node n = gdb.getNodeById(id);
             if (n.hasLabel(AuxNodeType.DATA)) {
@@ -2261,12 +2258,20 @@ public class EntityFactory implements Props, AutoCloseable {
                     (AuxRelType.PAYLOAD, Direction.BOTH);
                 n = rel.getOtherNode(n);
             }
-            return Entity._getEntity(n);
+            return n;
         }
         catch (NotFoundException ex) {
             logger.warning("Unknown entity "+id);
         }
         return null;
+    }
+    
+    /**
+     * get Entity conceptually
+     */
+    public Entity _entity (long id) {
+        Node n = _getEntityNode (id);
+        return n != null ? Entity._getEntity(n) : null;
     }
 
     public Entity[] search (String query, int max) {
@@ -2274,7 +2279,7 @@ public class EntityFactory implements Props, AutoCloseable {
         search (result, query, 0, max);
         return (Entity[])result.get("entities");
     }
-    
+
     public int search (Map<String, Object> out,
                        String query, int skip, int top) {
         int total = 0;
@@ -2432,17 +2437,22 @@ public class EntityFactory implements Props, AutoCloseable {
     /*
      * return paths starting at the specified node
      */
-    List<Node[]> paths (long id, Direction dir, StitchKey... keys) {
+    List<Node[]> paths (Node node, Direction dir, StitchKey... keys) {
         List<Node[]> paths = new ArrayList<>();
+        traversal (node, new LinkedList<Node>(), paths,
+                   new HashSet<Node>(), dir, keys);
+        return paths;
+    }
+    
+    List<Node[]> paths (long id, Direction dir, StitchKey... keys) {
         try {
-            Node node = gdb.getNodeById(id);
-            traversal (node, new LinkedList<Node>(), paths,
-                       new HashSet<Node>(), dir, keys);
+            Node node = _getEntityNode (id);
+            return paths (node, dir, keys);
         }
         catch (NotFoundException ex) {
             logger.warning("Node not found: "+id);
         }
-        return paths;
+        return Collections.emptyList();
     }
     
     public List<Entity[]> _parents (long id, StitchKey... keys) {
@@ -2473,9 +2483,51 @@ public class EntityFactory implements Props, AutoCloseable {
      * return a tree based containing the specified node by traversing
      * the directed stitch key provided
      */
-    public EntityTree _tree (long id, StitchKey... keys) {
-        List<Node[]> parents = paths (id, Direction.OUTGOING, keys);
+    public EntityTree _tree (String name, StitchKey... keys) {
         EntityTree tree = null;
+        try {
+            long id = Long.parseLong(name);
+            tree = _tree (_getEntityNode (id), keys);
+        }
+        catch (NumberFormatException ex) {
+            try {
+                TextIndexer.SearchResult result = indexer.search(name, 0, 5);
+                if (result.total > 1) {
+                    logger.warning("** "+name+" resolves to "+result.total
+                                   +" nodes!");
+                }
+                
+                Node node = null;
+                for (Node n : result.nodes) {
+                    // find a property that matches the name
+                    Map<String, Object> props = n.getAllProperties();
+                    for (Map.Entry<String, Object> p : props.entrySet()) {
+                        if (p.getValue().equals(name)) {
+                            return _tree (_getEntityNode (n.getId()), keys);
+                        }
+                    }
+                    
+                    if (node == null)
+                        node = n;
+                }
+                
+                // no definitive match
+                if (node != null)
+                    tree = _tree (_getEntityNode (node.getId()), keys);
+            }
+            catch (Exception exx) {
+                logger.log(Level.SEVERE, "Can't execute search for "+name, exx);
+            }
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Node not found: "+name);
+        }
+        return tree;
+    }
+    
+    EntityTree _tree (Node node, StitchKey... keys) {
+        EntityTree tree = null;
+        List<Node[]> parents = paths (node, Direction.OUTGOING, keys);
         for (Node[] p : parents) {
             if (tree == null)
                 tree = new EntityTree (p);
@@ -2484,7 +2536,7 @@ public class EntityFactory implements Props, AutoCloseable {
             }
         }
         
-        List<Node[]> children = paths (id, Direction.INCOMING, keys);
+        List<Node[]> children = paths (node, Direction.INCOMING, keys);
         for (Node[] p : children) {
             for (int i = 0, j = p.length-1; i < j; ++i, --j) {
                 Node t = p[i];
@@ -2501,7 +2553,7 @@ public class EntityFactory implements Props, AutoCloseable {
         return tree;
     }
 
-    public EntityTree tree (long id, StitchKey... keys) {
+    public EntityTree tree (String id, StitchKey... keys) {
         try (Transaction tx = gdb.beginTx()) {
             EntityTree tree = _tree (id, keys);
             tx.success();
