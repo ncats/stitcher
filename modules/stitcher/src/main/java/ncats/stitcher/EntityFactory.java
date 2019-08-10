@@ -7,12 +7,12 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.lang.reflect.Array;
 import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import java.util.function.BiPredicate;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.Function;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -2403,7 +2403,112 @@ public class EntityFactory implements Props, AutoCloseable {
             return iter;
         }
     }
+
+    protected void traversal (Node node, LinkedList<Node> path,
+                              List<Node[]> paths, Set<Node> seen,
+                              Direction dir, StitchKey... keys) {
+        path.push(node);
+        for (Relationship rel : node.getRelationships(dir, keys)) {
+            Node xn = rel.getOtherNode(node);
+            if (path.indexOf(xn) < 0)
+                traversal (xn, path, paths, seen, dir, keys);
+        }
+        
+        if (!seen.contains(path.peek())) {
+            paths.add(path.toArray(new Node[0]));
+            for (Node n : path)
+                seen.add(n);
+        }
+        path.pop();
+    }
+
+    List<Entity[]> toEntityPath (List<Node[]> paths) {
+        return paths.stream()
+            .map(p -> Arrays.stream(p).map(n -> Entity.getEntity(n))
+                 .collect(Collectors.toList()).toArray(new Entity[0]))
+            .collect(Collectors.toList());
+    }
     
+    /*
+     * return paths starting at the specified node
+     */
+    List<Node[]> paths (long id, Direction dir, StitchKey... keys) {
+        List<Node[]> paths = new ArrayList<>();
+        try {
+            Node node = gdb.getNodeById(id);
+            traversal (node, new LinkedList<Node>(), paths,
+                       new HashSet<Node>(), dir, keys);
+        }
+        catch (NotFoundException ex) {
+            logger.warning("Node not found: "+id);
+        }
+        return paths;
+    }
+    
+    public List<Entity[]> _parents (long id, StitchKey... keys) {
+        return toEntityPath (paths (id, Direction.OUTGOING, keys));
+    }
+
+    public List<Entity[]> parents (long id, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            List<Entity[]> paths = _parents (id, keys);
+            tx.success();
+            return paths;
+        }
+    }
+
+    public List<Entity[]> _children (long id, StitchKey... keys) {
+        return toEntityPath (paths (id, Direction.INCOMING, keys));
+    }
+
+    public List<Entity[]> children (long id, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            List<Entity[]> paths = _children (id, keys);
+            tx.success();
+            return paths;
+        }
+    }
+
+    /**
+     * return a tree based containing the specified node by traversing
+     * the directed stitch key provided
+     */
+    public EntityTree _tree (long id, StitchKey... keys) {
+        List<Node[]> parents = paths (id, Direction.OUTGOING, keys);
+        EntityTree tree = null;
+        for (Node[] p : parents) {
+            if (tree == null)
+                tree = new EntityTree (p);
+            else {
+                tree.add(p);
+            }
+        }
+        
+        List<Node[]> children = paths (id, Direction.INCOMING, keys);
+        for (Node[] p : children) {
+            for (int i = 0, j = p.length-1; i < j; ++i, --j) {
+                Node t = p[i];
+                p[i] = p[j];
+                p[j] = t;
+            }
+            
+            if (tree == null)
+                tree = new EntityTree (p);
+            else {
+                tree.add(p);
+            }
+        }
+        return tree;
+    }
+
+    public EntityTree tree (long id, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            EntityTree tree = _tree (id, keys);
+            tx.success();
+            return tree;
+        }
+    }
+
     public void shutdown () {
         graphDb.shutdown();
     }

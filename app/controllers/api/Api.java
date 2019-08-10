@@ -171,6 +171,55 @@ public class Api extends Controller {
         }
     }
 
+    public Result paths (List<Entity[]> paths, String... props) {
+        try {
+            ObjectNode json = mapper.createObjectNode();
+            json.put("count", paths.size());
+            ArrayNode ap = mapper.createArrayNode();
+            for (Entity[] p : paths) {
+                ArrayNode n = mapper.createArrayNode();
+                for (Entity e : p) {
+                    ObjectNode ne = mapper.createObjectNode();
+                    ne.put("node", e.getId());
+                    for (String k : props) {
+                        Object v = e.payload(k);
+                        if (v != null)
+                            ne.put(k, mapper.valueToTree(v));
+                    }
+                    n.add(ne);
+                }
+                ap.add(n);
+            }
+            json.put("paths", ap);
+            return ok (json);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return internalServerError (ex.getMessage());
+        }
+    }
+
+    public Result parentPaths (long node) {
+        String[] fields = request().queryString().get("field");
+        List<Entity[]> paths =
+            es.getEntityFactory().parents(node, StitchKey.R_subClassOf);
+        return paths (paths, fields);
+    }
+
+    public Result childrenPaths (long node) {
+        String[] fields = request().queryString().get("field");
+        List<Entity[]> paths =
+            es.getEntityFactory().children(node, StitchKey.R_subClassOf);
+        return paths (paths, fields);
+    }
+
+    public Result tree (long node) {
+        String[] fields = request().queryString().get("field");
+        EntityTree tree = es.getEntityFactory()
+            .tree(node, StitchKey.R_subClassOf);
+        return ok (tree.root.toJson(fields));
+    }
+
     @Transactional
     @BodyParser.Of(value = BodyParser.MultipartFormData.class)
     public Result uploader () {
