@@ -87,11 +87,13 @@ public class EntityTree implements Iterable<Entity> {
         void toJson (ObjectNode json, ENode node, String... fields) {
             json.put("node", node.node.getId());
             Entity e = node.entity();
-            
-            for (String f: fields) {
-                Object v = e.payload(f);
-                if (v != null)
-                    json.put(f, mapper.valueToTree(v));
+
+            if (fields != null) {
+                for (String f: fields) {
+                    Object v = e.payload(f);
+                    if (v != null)
+                        json.put(f, mapper.valueToTree(v));
+                }
             }
             
             ArrayNode children = mapper.createArrayNode();

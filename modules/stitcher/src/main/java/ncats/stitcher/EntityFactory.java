@@ -2502,7 +2502,12 @@ public class EntityFactory implements Props, AutoCloseable {
                     // find a property that matches the name
                     Map<String, Object> props = n.getAllProperties();
                     for (Map.Entry<String, Object> p : props.entrySet()) {
-                        if (p.getValue().equals(name)) {
+                        String key = p.getKey();
+                        if (p.getValue().equals(name)
+                            // sigh...
+                            && ("id".equalsIgnoreCase(key)
+                                || "notation".equalsIgnoreCase(key)
+                                || "P207".equalsIgnoreCase(key))) {
                             return _tree (_getEntityNode (n.getId()), keys);
                         }
                     }

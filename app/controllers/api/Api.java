@@ -217,7 +217,8 @@ public class Api extends Controller {
         String[] fields = request().queryString().get("field");
         EntityTree tree = es.getEntityFactory()
             .tree(id, StitchKey.R_subClassOf);
-        return ok (tree.root.toJson(fields));
+        return tree != null ? ok (tree.root.toJson(fields))
+            : notFound("{}").as("application/json");
     }
 
     @Transactional
