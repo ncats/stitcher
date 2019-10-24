@@ -9,7 +9,7 @@ curr_time=$(date +%s)
 
 echo $(date) > $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db data/dump-public-2018-07-19.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2018-07-19.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 # these add additional data for event calculator

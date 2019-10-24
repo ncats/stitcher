@@ -22,19 +22,19 @@ public class MakeABigDump {
 
         String neoDB = "neo4j.db";
         String ginas = "ginas";
-        String ginasfile = "../inxight-planning/files/public2015-11-30.gsrs";
+        String ginasfile = "../stitcher-rawinputs/files/public2015-11-30.gsrs";
         String npc = "npc-dump";
-        String npcFile = "../inxight-planning/files/npc-dump-1.2-04-25-2012_annot.sdf.gz";
+        String npcFile = "../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz";
         String integr = "integr";
-        String integrFile = "../inxight-planning/files/integr.sdf.gz";
+        String integrFile = "../stitcher-rawinputs/files/integr.sdf.gz";
         String iuphar = "iuphar";
-        String iupharFile = "../inxight-planning/files/iuphar_lig_targets.sdf";
+        String iupharFile = "../stitcher-rawinputs/files/iuphar_lig_targets.sdf";
         String drugbank = "drugbank";
-        String drugbankFile = "../inxight-planning/files/DrugBank_targets.sdf";
+        String drugbankFile = "../stitcher-rawinputs/files/DrugBank_targets.sdf";
         String chembl = "chembl20";
         String chemblURL = "jdbc:mysql://pauli.ncats.nih.gov/chembl_20?user=chembl_20&password=chembl_20";
         String ncgc = "ncgc";
-        String ncgcFile = "../inxight-planning/files/NCGC_lib.txt.gz";
+        String ncgcFile = "../stitcher-rawinputs/files/NCGC_lib.txt.gz";
 
         if (argv.length != 0) {
             logger.info("Usage: "+MakeABigDump.class.getName()+" Whoa! Do this by hand you dummy!");
