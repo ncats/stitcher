@@ -80,13 +80,13 @@ public class Event implements Cloneable{
             }
         },
         USWithdrawn,
+        USUnapproved,
         USPreviouslyMarketed {
             @Override
             public boolean wasMarketed(){
                 return true;
             }
         },
-        USUnapproved,
         Marketed {
             @Override
             public boolean wasMarketed(){
@@ -100,13 +100,13 @@ public class Event implements Cloneable{
             }
         },
         Withdrawn,
-        USAnimalDrug,
         Clinical,
         Excipient,
         Designation,
+        USAnimalDrug,
+        Other,
         Publication,
-        Filing,
-        Other
+        Filing
         ;
 
         public boolean isApproved(){
