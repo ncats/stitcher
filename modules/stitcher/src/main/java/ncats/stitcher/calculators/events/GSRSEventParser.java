@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class GSRSEventParser extends EventParser {
     public GSRSEventParser() {
-        super ("G-SRS, April 2019");
+        super ("G-SRS, Oct 2019");
     }
 
     public void produceEvents(Map<String, Object> payload) {
@@ -32,7 +32,7 @@ public class GSRSEventParser extends EventParser {
         if (syn != null && syn.getClass().isArray())
         for (int i=0; i<Array.getLength(syn); i++) {
             String name = Array.get(syn, i).toString();
-            if (name.indexOf(" [") > -1) {
+            if (name.indexOf(" [") > -1 && name.lastIndexOf(']') > name.lastIndexOf(" [")) {
                 String suffix = name.substring(
                         name.lastIndexOf(" [")+2,
                         name.lastIndexOf(']'));
