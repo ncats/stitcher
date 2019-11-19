@@ -640,21 +640,18 @@ public class Util {
         }
 
         JsonNode rels = node.get("relationships");
-        if (rels != null && rels.isArray()) {
-            StringBuilder sb = new StringBuilder ();
+        StringBuilder sb = new StringBuilder();
+        if (rels != null && rels.isArray() && rels.size() > 0) {
             for (int i = 0; i < rels.size(); ++i) {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
-                if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
-                    String id = n.get("relatedSubstance")
+                String id = n.get("relatedSubstance")
                         .get("approvalID").asText();
-                    if (sb.length() > 0) sb.append("\n");
-                    sb.append(id);
-                }
+                if (sb.length() > 0) sb.append("\n");
+                sb.append(type+"|"+id);
             }
-                        
-            if (sb.length() > 0)
-                mol.setProperty("ActiveMoieties", sb.toString());
+
+            mol.setProperty("relationships", sb.toString());
         }
         
         return mol;
@@ -741,26 +738,20 @@ public class Util {
 
         JsonNode rels = node.get("relationships");
         if (rels != null && rels.isArray()) {
-            StringBuilder sb = new StringBuilder ();
             for (int i = 0; i < rels.size(); ++i) {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
-                if ("ACTIVE MOIETY".equalsIgnoreCase(type)) {
-                    JsonNode rel = n.get("relatedSubstance")
-                        .get("approvalID");
-                    if (rel != null) {
-                        String id = rel.asText();
-                        Object val = map.get("ActiveMoieties");
-                        if (val != null)
-                            val = Util.merge(val, id);
-                        else
-                            val = id;
-                        map.put("ActiveMoieties", val);
-                    }
-                }
+                String id = n.get("relatedSubstance")
+                        .get("approvalID").asText();
+                Object val = map.get("relationships");
+                if (val != null)
+                    val = Util.merge(val, type+"|"+id);
+                else
+                    val = type+"|"+id;
+                map.put("relationships", val);
             }
         }
-        
+
         return map;
     }
     
