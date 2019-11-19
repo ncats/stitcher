@@ -17,6 +17,18 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static final Logger logger =
         Logger.getLogger(SRSJsonEntityFactory.class.getName());
 
+    static String RELATIONSHIPS = "relationships"; // GSRS keyword denoting an active moiety relationship
+    static Map<String, StitchKey> mappedRels = new HashMap<>();
+    static {
+        mappedRels.put("ACTIVE MOIETY", R_activeMoiety);
+        // TODO These other relationships cause OutOfMemory ... and excessive traverses
+        //mappedRels.put("SALT/SOLVATE->PARENT", R_rel);
+        //mappedRels.put("PARENT->SALT/SOLVATE", R_rel);
+        //mappedRels.put("METABOLITE ACTIVE->PARENT", R_rel);
+        //mappedRels.put("PARENT->METABOLITE ACTIVE", R_rel);
+        //mappedRels.put("METABOLITE ACTIVE->PRODRUG", R_rel);
+        //mappedRels.put("PRODRUG->METABOLITE ACTIVE", R_rel);
+    }
     Map<String, Entity> activeMoieties = new HashMap<>();
     Map<String, Set<Entity>> unresolved = new HashMap<>();
     int count = 0;
@@ -45,7 +57,6 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         add (I_UNII, "UNII");
         add (I_CID, "PUBCHEM");
         add (T_Keyword, "Class");
-        //add (R_activeMoiety, "ActiveMoieties");
     }
 
     void register (String line, int total) {
@@ -70,25 +81,11 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
             }
             
             Entity ent = register (mol);
-            String moieties = mol.getProperty("ActiveMoieties");
-            if (moieties != null) {
-                String[] actives = moieties.split("\n");
-                for (String a : actives) {
-                    if (a.equals(mol.getProperty("UNII"))) {
-                        activeMoieties.put(a, ent);
-                    }
-                    else if (activeMoieties.containsKey(a)) {
-                        Entity e = activeMoieties.get(a);
-                        // create manual stitch from ent -> e
-                        if (!ent.equals(e))
-                            ent.stitch(e, R_activeMoiety, a);
-                    }
-                    else {
-                        Set<Entity> ents = unresolved.get(a);
-                        if (ents == null)
-                            unresolved.put(a, ents = new HashSet<>());
-                        ents.add(ent);
-                    }
+            String relationships = mol.getProperty(RELATIONSHIPS);
+            if (relationships != null && relationships.length() > 0) {
+                String[] rels = relationships.split("\n");
+                for (String rel : rels) {
+                    processGSRSRel(ent, rel, false);
                 }
             }
 
@@ -99,48 +96,61 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
             properties.addAll(map.keySet());
             
             Entity ent = register (map);
-            vobj = map.get("ActiveMoieties");
+            vobj = map.get(RELATIONSHIPS);
             if (vobj != null) {
                 String unii = (String)map.get("UNII");
                 if (vobj.getClass().isArray()) {
                     for (int i = 0; i < Array.getLength(vobj); ++i) {
-                        String a = (String)Array.get(vobj, i);
-                        if (unii.equals(a))
-                            activeMoieties.put(a, ent);
-                        else if (activeMoieties.containsKey(a)) {
-                            Entity e = activeMoieties.get(a);
-                            // create manual stitch from ent -> e
-                            if (!ent.equals(e))
-                                ent.stitch(e, R_activeMoiety, a);
-                        }
-                        else {
-                            Set<Entity> ents = unresolved.get(a);
-                            if (ents == null)
-                                unresolved.put(a, ents = new HashSet<>());
-                            ents.add(ent);
-                        }
+                        processGSRSRel(ent, (String)Array.get(vobj, i), false);
                     }
                 }
-                else if (unii != null && unii.equals(vobj)) {
+                else if (unii != null && ((String)vobj).contains(unii)) {
                     activeMoieties.put(unii, ent);
                 }
                 else {
-                    unii = (String)vobj;
-                    if (activeMoieties.containsKey(unii)) {
-                        Entity e = activeMoieties.get(unii);
-                        // create manual stitch from ent -> e
-                        if (!ent.equals(e))
-                            ent.stitch(e, R_activeMoiety, unii);
-                    }
-                    else {
-                        Set<Entity> ents = unresolved.get(unii);
-                        if (ents == null)
-                            unresolved.put(unii, ents = new HashSet<>());
-                        ents.add(ent);
-                    }
+                    processGSRSRel(ent, (String)vobj, false);
                 }
             }
             ++count;
+        }
+    }
+
+    private void processGSRSRel(Entity ent, String rel, boolean force) {
+        String entry[] = rel.split("\\|");
+        String type = entry[0];
+        if (entry.length == 1) {
+            System.err.println("oops");
+            return;
+        }
+        String id = entry[1];
+        StitchKey link;
+        if (mappedRels.containsKey(type))
+            link = mappedRels.get(type);
+        else return;
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put(type, id);
+        if (activeMoieties.containsKey(id)) {
+            Entity e = activeMoieties.get(id);
+            // create manual stitch from ent -> e
+            if (!ent.equals(e))
+                ent.stitch(e, link, id, attrs);
+        } if (force) {
+            int cnt = 0;
+            for (Iterator<Entity> it = find (I_UNII, id);
+                 it.hasNext(); ++cnt) {
+                Entity active = it.next();
+                if (!active.equals(ent))
+                    ent.stitch(active, link, id, attrs);
+            }
+
+            if (cnt == 0)
+                logger.warning("** Unknown reference to "+type+": "
+                        +id+":"+rel);
+        } else {
+            Set<Entity> ents = unresolved.get(rel);
+            if (ents == null)
+                unresolved.put(rel, ents = new HashSet<>());
+            ents.add(ent);
         }
     }
 
@@ -164,28 +174,37 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
 
         logger.info("## "+unresolved.size()+" unresolved active moieties!");
         for (Map.Entry<String, Set<Entity>> me : unresolved.entrySet()) {
-            Entity active = activeMoieties.get(me.getKey());
-            if (active != null) {
-                for (Entity e : me.getValue())
-                    if (!active.equals(e))
-                        e.stitch(active, R_activeMoiety, me.getKey());
-            }
-            else {
-                int cnt = 0;
-                for (Iterator<Entity> it = find (I_UNII, me.getKey());
-                     it.hasNext(); ++cnt) {
-                    active = it.next();
-                    for (Entity e : me.getValue())
-                        if (!active.equals(e))
-                            e.stitch(active, R_activeMoiety, me.getKey());
-                }
-                
-                if (cnt == 0)
-                    logger.warning("** Unknown reference to active moiety: "
-                                   +me.getKey());
-            }
+            for (Entity ent : me.getValue())
+                processGSRSRel(ent, me.getKey(), true);
+//            String rel = me.getKey();
+//            String entry[] = rel.split("\\|");
+//            String type = entry[0];
+//            String id = entry[1];
+//            StitchKey link = R_rel;
+//            if (type.equals("ACTIVE MOIETY"))
+//                link = R_activeMoiety;
+//            Entity active = activeMoieties.get(id);
+//            if (active != null) {
+//                for (Entity e : me.getValue())
+//                    if (!active.equals(e))
+//                        e.stitch(active, link, id);
+//            }
+//            else {
+//                int cnt = 0;
+//                for (Iterator<Entity> it = find (I_UNII, id);
+//                     it.hasNext(); ++cnt) {
+//                    active = it.next();
+//                    for (Entity e : me.getValue())
+//                        if (!active.equals(e))
+//                            e.stitch(active, link, id);
+//                }
+//
+//                if (cnt == 0)
+//                    logger.warning("** Unknown reference to active moiety: "
+//                                   +id+":"+me.getKey());
+//            }
         }
-        
+
         return count;
     }
 
