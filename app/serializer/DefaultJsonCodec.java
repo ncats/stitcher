@@ -18,7 +18,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import ncats.stitcher.*;
 import services.EntityService;
@@ -95,7 +94,71 @@ public class DefaultJsonCodec implements JsonCodec, Props {
         return labels;
     }
 
-    
+    class Graph {
+        List<Long> nodes = new ArrayList<>();
+        List<GEdge> edges = new ArrayList<>();
+        public Long root = null;
+        public String SELF = "Self";
+        public HashMap<String, String> typeMap = new HashMap<>();
+        {
+            typeMap.put("PARENT->SALT/SOLVATE", "Salt/Solvate");
+            typeMap.put("METABOLITE ACTIVE->PRODRUG", "Prodrug");
+            //typeMap.put("ACTIVE MOIETY", "Do not use this!"); //Overwrites salt relationship
+        }
+
+        class GEdge {
+            public Long start;
+            public Long end;
+            public String type;
+
+            public GEdge(Long start, Long end, String type) {
+                this.start = start;
+                this.end = end;
+                this.type = type;
+            }
+        }
+
+        public void addNode(Long node) {
+            nodes.add(node);
+        }
+
+        public void addEdge(GEdge edge) {
+            edges.add(edge);
+        }
+        public void addEdge(Long start, Long end, String type) {
+            GEdge edge = new GEdge(start, end, type);
+            addEdge(edge);
+        }
+
+        public String path(Long node1, Long node2) {
+            if (node1.longValue() == node2.longValue())
+                return "ACTIVE MOIETY";
+            HashMap<Long,String> paths = new HashMap<>();
+            HashMap<Long,String> newPaths = new HashMap<>();
+            newPaths.put(root, "");
+            while (newPaths.size() > 0) {
+                for (Map.Entry<Long,String> me: newPaths.entrySet())
+                    paths.put(me.getKey(), me.getValue());
+                newPaths = new HashMap<>();
+                for (Map.Entry<Long, String> me : paths.entrySet())
+                    for (GEdge e : this.edges) {
+                        if (e.start.longValue() == me.getKey().longValue() && !paths.containsKey(e.end.longValue())) {
+                            String type = me.getValue() + e.type;
+                            if (me.getValue().length() > 0 && e.type.length() > 0)
+                                type = me.getValue() + " " + e.type;
+                            if (e.end.longValue() == node2.longValue()) {
+                                if (type.length() == 0)
+                                    type = "Active Moiety";
+                                return type;
+                            }
+                            newPaths.put(e.end, type);
+                        }
+                    }
+            }
+            return "Other";
+        }
+    }
+
     JsonNode toJson (Node _node) {
         ObjectNode node = mapper.createObjectNode();
 
@@ -169,7 +232,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                 ObjectNode member = mapper.createObjectNode();
                 //member.put("dataNode", n.getId());
                 member.put(SOURCE, (String)rel.getProperty(SOURCE));
-                                
+
                 for (Map.Entry<String, Object> me
                          : n.getAllProperties().entrySet()) {
                     if (me.getValue().getClass().isArray()) {
@@ -197,7 +260,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                     member.put("payloadNode", n.getId());
                     if (stitchParent == n.getId())
                         stitchParent = sn.getId();
-                    
+
                     String src = (String) sn.getProperty(SOURCE, null);
                     ds = es.getDataSourceFactory().getDataSourceByKey(src);
                     if (ds != null) {
@@ -224,7 +287,7 @@ public class DefaultJsonCodec implements JsonCodec, Props {
                     else {
                         Logger.warn("Unknown data source: "+src);
                     }
-                    
+
                     Map<String, Object> map = new TreeMap<>();
                     for (Relationship srel : sn.getRelationships
                              (EnumSet.allOf(StitchKey.class)
@@ -315,6 +378,59 @@ public class DefaultJsonCodec implements JsonCodec, Props {
         }
 
         if (!members.isEmpty()) {
+            Graph g = new Graph();
+            Map<String,Long> gmap = new HashMap<>();
+            for (ObjectNode entry: members) {
+                long pn = entry.get("payloadNode").asLong();
+                long en = entry.get("node").asLong();
+                String id = entry.get("id").asText();
+                gmap.put(id, pn);
+                g.addNode(en);
+                g.addNode(pn);
+                g.addEdge(en, pn, "");
+            }
+            g.root = stitchParent;
+            if (!properties.isEmpty() && properties.containsKey("relationships")) {
+                Object value = properties.get("relationships");
+                Map[] vals;
+                if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    vals = new Map[len];
+                    for (int i = 0; i < len; ++i) {
+                        Object v = Array.get(value, i);
+                        Map m = new TreeMap();
+                        m.put("value", v);
+                        m.put("node", refs.get(v.toString()));
+                        vals[i] = m;
+                    }
+                } else {
+                    vals = new Map[1];
+                    Map m = new TreeMap();
+                    m.put("value", value);
+                    m.put("node", refs.get(value.toString()));
+                    vals[0] = m;
+                }
+                for (int i = 0; i < vals.length; i++) {
+                    long n1 = (long) vals[i].get("node");
+                    String v = vals[i].get("value").toString();
+                    String type = v.substring(0, v.indexOf('|'));
+                    String id2 = v.substring(v.indexOf('|') + 1);
+                    if (gmap.containsKey(id2)) {
+                        long n2 = Long.valueOf(gmap.get(id2));
+                        if (g.typeMap.containsKey(type))
+                            g.addEdge(n2, n1, g.typeMap.get(type));
+                    }
+                }
+            }
+            for (ObjectNode member: members) {
+                if (member.get(SOURCE).asText().startsWith("G-SRS")) {
+                    //String id = member.get("id").asText();
+                    long en = member.get("payloadNode").asLong();
+                    String stitchType = g.path(stitchParent, en);
+                    member.put("stitchType", stitchType);
+                }
+            }
+
             stitches.put("parent", stitchParent);
             stitches.put("members", mapper.valueToTree(members));
         }
