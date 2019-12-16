@@ -421,9 +421,6 @@ public class OntEntityFactory extends EntityRegistry {
                 case "OBOL:AUTOMATIC":
                 case "NCIT:P378":
                 case "FMA:TA":
-                case "http://purl.obolibrary.org/obo/NCBITaxon_2":
-                case "http://purl.obolibrary.org/obo/CHEBI_24431": // entity
-                case "http://www.ebi.ac.uk/efo/EFO_0002888": // homo sapiens cell line
                     others.add(x);
                 break;
                 default:
