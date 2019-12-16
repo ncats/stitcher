@@ -722,6 +722,7 @@ public class GARDEntityFactory extends EntityRegistry {
             .add(N_Name, "synonyms")
             .add(I_CODE, "gard_id")
             .add(I_CODE, "xrefs")
+            .add(I_CODE, "HPO")
             .add(T_Keyword, "categories")
             .add(T_Keyword, "sources")
             ;
