@@ -375,7 +375,7 @@ public class OntEntityFactory extends EntityRegistry {
             if (obj != null)
                 data.put("hasRelatedSynonym", obj);
         }
-        
+
         if (ontology == null) {
         }
         else if (ontology.resource != null
@@ -401,6 +401,56 @@ public class OntEntityFactory extends EntityRegistry {
             obj = data.get("P93");
             if (obj != null)
                 xrefs.add("UNIPROTKB:"+obj);
+        }
+        else if (ontology.links.containsKey("versionIRI")
+                 && ontology.links.get("versionIRI")
+                 .toString().endsWith("efo.owl")) {
+
+            Object smiles = data.remove("SMILES");
+            if (smiles != null)
+                data.put("smiles", smiles);
+            
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                switch (u) {
+                case "CHEBI":
+                case "IUPAC":
+                case "UNIPROT":
+                case "KEGG_COMPOUND":
+                    others.add(x);
+                break;
+                default:
+                    {
+                        int start = x.indexOf(':'),
+                            end = x.indexOf('\"', start);
+                        if (end < 0) end = x.length();
+                        if (u.startsWith("GOC:")
+                            || u.startsWith("HPO:")
+                            || u.equals("FMA:TA")) {
+                            others.add(x);
+                        }
+                        else if (x.startsWith("MSH:")) {
+                            useful.add("MESH:"+x.substring(start+1, end));
+                        }
+                        else if (x.startsWith("MONDO:")) {
+                            if (Character.isDigit(x.charAt(start+1)))
+                                useful.add(x);
+                            else if (x.startsWith("patterns/", start+1)) {
+                                String p = x.substring
+                                    (x.indexOf('/', start+1)+1);
+                                Object old = data.get("inSubset");
+                                data.put("inSubset", old != null
+                                         ? Util.merge(old, p) : p);
+                                others.add(x);
+                            }
+                            else
+                                others.add(x);
+                        }
+                        else if (end < x.length())
+                            useful.add(x.substring(0, end).trim());
+                    }
+                }
+            }
         }
         else if (ontology.links.containsKey("versionIRI")
                  && ontology.links.get("versionIRI")
@@ -975,16 +1025,58 @@ public class OntEntityFactory extends EntityRegistry {
 
         Model model = ModelFactory.createDefaultModel();
         model.read(file);
-
-        reset ();        
-        Set<OntologyResource> axioms = new HashSet<>();
+        reset ();
         
-        logger.info("Loading resources...");
         ResIterator iter = model.listSubjects();
         while (iter.hasNext()) {
             Resource res = iter.nextResource();
             OntologyResource or = new OntologyResource (res);
-            if (or.isAxiom()) {
+            if (or.isOntology()) {
+                ontology = or;
+                for (Map.Entry<String, Object> me : or.props.entrySet())
+                    if (!"".equals(me.getKey()))
+                        ds.set(me.getKey(), me.getValue());
+                
+                for (Map.Entry<String, Object> me : or.links.entrySet()) {
+                    Object value = me.getValue();
+                    if (value.getClass().isArray()) {
+                        int len = Array.getLength(value);
+                        String[] vals = new String[len];
+                        for (int i = 0; i < len; ++i) {
+                            Resource r = (Resource) Array.get(value, i);
+                            vals[i] = getURI (r);
+                        }
+                        ds.set(me.getKey(), vals);
+                    }
+                    else {
+                        Resource r = (Resource) me.getValue();
+                        String uri = getURI (r);
+                        if (uri != null)
+                            ds.set(me.getKey(), uri);
+                    }
+                }
+                logger.info(">>>>>>> Ontology <<<<<<<<\n"+or);
+                break;
+            }
+        }
+        iter.close();
+
+        if (ontology == null) {
+            logger.warning("!!! No ontology class found! !!!");
+        }
+        
+        Set<OntologyResource> axioms = new HashSet<>();
+        
+        logger.info("Loading resources...");
+        model = ModelFactory.createDefaultModel();
+        model.read(file);
+        iter = model.listSubjects();
+        while (iter.hasNext()) {
+            Resource res = iter.nextResource();
+            OntologyResource or = new OntologyResource (res);
+            if (or.isOntology()) {
+            }
+            else if (or.isAxiom()) {
                 res = (Resource) or.links.get("annotatedSource");
                 OntologyResource ref = resources.get(res);
                 if (ref != null)
@@ -1016,37 +1108,15 @@ public class OntEntityFactory extends EntityRegistry {
                 else
                     logger.warning("Ignore class "+res);
             }
-            else if (or.isOntology()) {
-                ontology = or;
-                for (Map.Entry<String, Object> me : or.props.entrySet())
-                    if (!"".equals(me.getKey()))
-                        ds.set(me.getKey(), me.getValue());
-                
-                for (Map.Entry<String, Object> me : or.links.entrySet()) {
-                    Object value = me.getValue();
-                    if (value.getClass().isArray()) {
-                        int len = Array.getLength(value);
-                        String[] vals = new String[len];
-                        for (int i = 0; i < len; ++i) {
-                            Resource r = (Resource) Array.get(value, i);
-                            vals[i] = getURI (r);
-                        }
-                        ds.set(me.getKey(), vals);
-                    }
-                    else {
-                        Resource r = (Resource) me.getValue();
-                        String uri = getURI (r);
-                        if (uri != null)
-                            ds.set(me.getKey(), uri);
-                    }
-                }
-                logger.info(">>>>>>> Ontology <<<<<<<<\n"+or);
-            }
             else {
                 logger.warning("Resource type "
                                +or.type+" not recognized:\n"+or);
                 others.add(or);
             }
+            /*
+            if (resources.size() > 5000)
+                break;
+            */
         }
         iter.close();
         logger.info("###### "+resources.size()+" class resources and "
