@@ -417,6 +417,13 @@ public class OntEntityFactory extends EntityRegistry {
                 case "IUPAC":
                 case "UNIPROT":
                 case "KEGG_COMPOUND":
+                case "ZFIN:CURATOR":
+                case "OBOL:AUTOMATIC":
+                case "NCIT:P378":
+                case "FMA:TA":
+                case "http://purl.obolibrary.org/obo/NCBITaxon_2":
+                case "http://purl.obolibrary.org/obo/CHEBI_24431": // entity
+                case "http://www.ebi.ac.uk/efo/EFO_0002888": // homo sapiens cell line
                     others.add(x);
                 break;
                 default:
@@ -425,8 +432,7 @@ public class OntEntityFactory extends EntityRegistry {
                             end = x.indexOf('\"', start);
                         if (end < 0) end = x.length();
                         if (u.startsWith("GOC:")
-                            || u.startsWith("HPO:")
-                            || u.equals("FMA:TA")) {
+                            || u.startsWith("HPO:")) {
                             others.add(x);
                         }
                         else if (x.startsWith("MSH:")) {
