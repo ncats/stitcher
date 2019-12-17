@@ -1721,12 +1721,12 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1998	Maxalt	Rizatriptan Benzoate	WR978S7QHH	06-29-98	NDA	20-864		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20864		
 1998	Sucraid	Sacrosidase	8A7F670F2Y	04-09-98	NDA	20-772		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20772		
 1998	Renagel	Sevelamer Hydrochloride	GLS2PGI8QG	10-30-98	NDA	20-926		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20926		
-1998	Viagra	Sildenafil Citrate	BW9B0ZE037	03-27-98	NDA	20-895 		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=2095 		
+1998	Viagra	Sildenafil Citrate	BW9B0ZE037	03-27-98	NDA	20-895 		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20895 		
 1998	Micardis	Telmisartan	U5SYW473RQ	11-10-98	NDA	20-850		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20850		
 1998	Thalomid	Thalidomide	4Z8R6ORS6L	07-16-98	NDA	20-785		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20785		
 1998	Aggrastat	Tirofiban Hydrochloride	IKE1P4X57J	05-14-98	NDA	20-912		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20912		
 1998	Tasmar	Tolcapone	CIF6334OLY	01-29-98	NDA	20-697		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20697		
-1998	Detrol	Tolterodine Tartrate	5T619TQR3R	03-25-98	NDA	20-771 		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=2071 		
+1998	Detrol	Tolterodine Tartrate	5T619TQR3R	03-25-98	NDA	20-771 		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20771 		
 1998	Herceptin	Trastuzumab	P188ANX8CK	09-25-98	BLA	103-792		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=103792		
 1998	Valstar	Valrubicin	2C6NUM6878	09-25-98	NDA	20-892		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20892		
 1999	Panretin	Alitretinoin	1UA8E65KDZ	02-02-99	NDA	20-886		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20886		
