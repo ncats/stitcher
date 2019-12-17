@@ -13,3 +13,4 @@ data/hash.db/
 stitch.out
 .idea/
 temp/
+.DS_Store
