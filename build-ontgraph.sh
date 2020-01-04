@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v10"
+version="v12"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -27,7 +27,8 @@ owl="DOID.owl.gz \
    ogg.owl.gz \
    ogms.owl \
    pato.owl.gz \
-   pr.owl.gz"
+   pr.owl.gz \
+   efo.owl.gz"
 owl_path="owl"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files

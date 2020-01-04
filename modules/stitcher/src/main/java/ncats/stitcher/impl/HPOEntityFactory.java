@@ -65,10 +65,10 @@ public class HPOEntityFactory extends EntityRegistry {
                     for (Entity d : diseases) {
                         if (!p.equals(d)) {
                             d.stitch(p, R_rel, "has_phenotype", attr);
-                            d.addLabel(source.getName());
+                            d.addLabel(source.getLabel());
                         }
                     }
-                    p.addLabel(source.getName());
+                    p.addLabel(source.getLabel());
                 }
                 ++count;
             }

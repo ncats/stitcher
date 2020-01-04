@@ -327,7 +327,7 @@ public class GARDEntityFactory extends EntityRegistry {
     }
 
     static class GARD implements AutoCloseable {
-        PreparedStatement pstm1, pstm2, pstm3, pstm4;
+        PreparedStatement pstm1, pstm2, pstm3, pstm4, pstm5, pstm6;
         
         Map<Integer, String> idtypes = new TreeMap<>();
         Map<Integer, String> diseasetypes = new TreeMap<>();
@@ -349,6 +349,13 @@ public class GARDEntityFactory extends EntityRegistry {
                  +"and d.DiseaseID=?");
             pstm4 = con.prepareStatement
                 ("select * from RD_ascDiseaseTypes where DiseaseID=?");
+            pstm5 = con.prepareStatement
+                ("select * from vw_DiseaseResourceOrganizations "
+                 +"where DiseaseID=? and ResourceClassificationID=5");
+            pstm6 = con.prepareStatement
+                ("select PhenoTypeIdentifier,PhenoTypeName "
+                 +"from ascDiseasePhenoType a, tblPhenoType b " 
+                 +"where a.DiseaseID = ? and a.PhenoTypeID = b.PhenoTypeID");
             
             Statement stm = con.createStatement();
             ResultSet rset = stm.executeQuery
@@ -385,8 +392,11 @@ public class GARDEntityFactory extends EntityRegistry {
             data.put("uri", "http://purl.obolibrary.org/obo/"+format(id,'_'));
             identifiers (data);
             categories (data);
+            phenotypes (data);
             resources (data);
             relationships (data);
+            organizations (data);
+            
             return data;
         }
 
@@ -425,6 +435,20 @@ public class GARDEntityFactory extends EntityRegistry {
             if (!synonyms.isEmpty())
                 data.put("synonyms", synonyms.toArray(new String[0]));
             
+            return data;
+        }
+
+        Map<String, Object> phenotypes (Map<String, Object> data)
+            throws SQLException {
+            pstm6.setLong(1, (Long)data.get("id"));
+            ResultSet rset = pstm6.executeQuery();
+            List<String> hpo = new ArrayList<>();
+            while (rset.next()) {
+                String id = rset.getString(1);
+                String name = rset.getString(2);
+                hpo.add(id);
+            }
+            data.put("HPO", hpo.toArray(new String[0]));
             return data;
         }
 
@@ -496,12 +520,52 @@ public class GARDEntityFactory extends EntityRegistry {
             }
             return data;
         }
+
+        Map<String, Object> organizations (Map<String, Object> data)
+            throws SQLException {
+            pstm5.setLong(1, (Long)data.get("id"));
+            ResultSet rset = pstm5.executeQuery();
+            List<Map> orgs = new ArrayList<>();
+            while (rset.next()) {
+                Map<String, String> addr = new LinkedHashMap<>();
+                String value = rset.getString("ResourceName");
+                if (value != null) addr.put("Name", value);
+                value = rset.getString("Address1");
+                if (value != null) addr.put("Address1", value);
+                value = rset.getString("Address2");
+                if (value != null) addr.put("Address2", value);
+                value = rset.getString("City");
+                if (value != null) addr.put("City", value);
+                value = rset.getString("State");
+                if (value != null) addr.put("State", value);
+                value = rset.getString("ZipCode");
+                if (value != null) addr.put("ZipCode", value);
+                value = rset.getString("Country");
+                if (value != null) addr.put("Country", value);
+                value = rset.getString("EmailAddress");
+                if (value != null) addr.put("Email", value);
+                value = rset.getString("URL");
+                if (value != null) addr.put("URL", value);
+                value = rset.getString("Phone");
+                if (value != null) addr.put("Phone", value);
+                value = rset.getString("Fax");
+                if (value != null) addr.put("Fax", value);
+                value = rset.getString("TollFree");
+                if (value != null) addr.put("TollFree", value);
+                orgs.add(addr);
+            }
+            data.put("organizations", orgs);
+            rset.close();
+            return data;
+        }
         
         public void close () throws Exception {
             pstm1.close();
             pstm2.close();
             pstm3.close();
             pstm4.close();
+            pstm5.close();
+            pstm6.close();
         }
     } // GARD
 
@@ -658,6 +722,7 @@ public class GARDEntityFactory extends EntityRegistry {
             .add(N_Name, "synonyms")
             .add(I_CODE, "gard_id")
             .add(I_CODE, "xrefs")
+            .add(I_CODE, "HPO")
             .add(T_Keyword, "categories")
             .add(T_Keyword, "sources")
             ;
@@ -677,12 +742,19 @@ public class GARDEntityFactory extends EntityRegistry {
         setDataSource (ds);
         try (ResultSet rset = stm.executeQuery
              ("select * from RD_tblDisease where StatusID=4 and isSpanish=0 "
+              //+"and DiseaseID=6507"
               //+"and isRare = 1"
               );
              GARD gard = new GARD (con)) {
             int count = 0;
             Map<Long, Entity> entities = new HashMap<>();
             Map<Long, Object> parents = new HashMap<>();
+            
+            File file = new File ("gard-diseases.json");
+            PrintStream ps = new PrintStream (new FileOutputStream (file));
+            ObjectMapper mapper = new ObjectMapper ();
+            ps.println("[");
+
             for (; rset.next(); ++count) {
                 long id = rset.getLong("DiseaseID");
                 String name = rset.getString("DiseaseName");
@@ -690,7 +762,8 @@ public class GARDEntityFactory extends EntityRegistry {
                 Map<String, Object> data = gard.instrument(id);
                 data.put("name", name);
                 data.put("is_rare", rset.getInt("isRare") == 1);
-                
+                Object orgs = data.remove("organizations");
+
                 Entity ent = register (data);
                 logger.info
                     ("+++++ "+data.get("id")+": "+name+" ("+ent.getId()+")");
@@ -698,7 +771,14 @@ public class GARDEntityFactory extends EntityRegistry {
                     parents.put(id, data.get("parents"));
                 }
                 entities.put(id, ent);
+
+                data.remove("uri");
+                data.put("organizations", orgs);
+                if (count > 0) ps.print(",");
+                ps.print(mapper.writeValueAsString(data));
             }
+            ps.println("]");
+            ps.close();
             
             // now setup relationships
             for (Map.Entry<Long, Object> me : parents.entrySet()) {
