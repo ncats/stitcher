@@ -50,7 +50,11 @@ public class ClinicalTrialsEventParser extends EventParser {
             //event.endDate;
             //event.active;
             event.source = name;
-            event.URL = "https://clinicaltrials.gov/ct2/show/" + payload.get("NCT_ID");
+            String ctid = payload.get("NCT_ID").toString();
+            if (ctid.startsWith("NCT0"))
+                event.URL = "https://clinicaltrials.gov/ct2/show/" + ctid;
+            else
+                event.URL = "http://apps.who.int/trialsearch/Trial3.aspx?trialid=" + ctid;
             //event.approvalAppId;
             event.product = payload.get("NCT_ID") + ": " + status + " " + (String) payload.get("CONDITION");
             //event.sponsor;
