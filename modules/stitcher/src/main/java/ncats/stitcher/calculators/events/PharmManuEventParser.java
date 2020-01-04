@@ -17,6 +17,7 @@ public class PharmManuEventParser extends EventParser {
 
     public void produceEvents(Map<String, Object> payload) {
         Object id = payload.get("UNII");
+        if (id == null) id = payload.get("UNII PT");
 
         String content = (String) payload.get("Drug Products");
         if (content != null) {
@@ -28,7 +29,7 @@ public class PharmManuEventParser extends EventParser {
                         String year = node.get("Year Introduced").asText();
                         try {
                             Date date = EventCalculator.SDF.parse(year+"-12-31");
-                            event.startDate = date;
+                            //event.startDate = date;
                         }
                         catch (Exception ex) {
                             EventCalculator.logger.log(Level.SEVERE,
