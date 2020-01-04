@@ -322,7 +322,6 @@ N21FAR7B4S	Approval Year	2004		Application:NDA021264 US WORLDMEDS https://www.ac
 UH95VD7V76	Approval Year	1963		Application:NDA050118 [Approval Date Uncertain] APOTHECON https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050118	08/04/1963	PREDICTED
 JRM708L703	Approval Year	1991		Application:NDA019851 US PHARMS HOLDINGS I https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019851	06/25/1991	Drugs@FDA
 AVX3D5A4LM	Approval Year	1998		Application:NDA020898 GENZYME https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020898	11/30/1998	Drugs@FDA
-78OY3Z0P7Z	Approval Year	1962		Application:NDA012470 [Approval Date Uncertain] SCHERING https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012470	10/02/1962	PREDICTED
 RE91AN4S8G	Approval Year	2013		Application:NDA204153 MEDICIS https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=204153	11/14/2013	Drugs@FDA
 414JW8YPVE	Approval Year	1977		Application:NDA017775 GE HEALTHCARE https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=017775	04/01/1977	Drugs@FDA
 4G7DS2Q64Y	Approval Year	1957		Application:NDA009238 [Approval Date Uncertain] LILLY https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=009238	09/19/1957	PREDICTED
