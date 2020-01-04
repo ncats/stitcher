@@ -96,26 +96,26 @@ public class WithdrawnEventParser extends EventParser{
 
             e.source = name;
             //e.jurisdiction;
-            if (payload.containsKey("date_launched") && !"NA".equals(payload.get("date_launched")))
-                e.startDate = EventCalculator.SDF
-                        .parse((String)payload.get("date_launched"));
-            else if (payload.containsKey("year_launched") && !"NA".equals(payload.get("year_launched")))
-                try {
-                    e.startDate = EventCalculator.SDF
-                            .parse(payload.get("year_launched")+"-12-31");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            if (payload.containsKey("date_withdrawn") && !"NA".equals(payload.get("date_withdrawn")))
-                e.endDate = EventCalculator.SDF
-                        .parse((String)payload.get("date_withdrawn"));
-            else if (payload.containsKey("year_withdrawn") && !"NA".equals(payload.get("year_withdrawn")))
-                try {
-                    e.endDate = EventCalculator.SDF
-                            .parse(payload.get("year_withdrawn") + "-12-31");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+//            if (payload.containsKey("date_launched") && !"NA".equals(payload.get("date_launched")))
+//                e.startDate = EventCalculator.SDF
+//                        .parse((String)payload.get("date_launched"));
+//            else if (payload.containsKey("year_launched") && !"NA".equals(payload.get("year_launched")))
+//                try {
+//                    e.startDate = EventCalculator.SDF
+//                            .parse(payload.get("year_launched")+"-12-31");
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
+//            if (payload.containsKey("date_withdrawn") && !"NA".equals(payload.get("date_withdrawn")))
+//                e.endDate = EventCalculator.SDF
+//                        .parse((String)payload.get("date_withdrawn"));
+//            else if (payload.containsKey("year_withdrawn") && !"NA".equals(payload.get("year_withdrawn")))
+//                try {
+//                    e.endDate = EventCalculator.SDF
+//                            .parse(payload.get("year_withdrawn") + "-12-31");
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
             //e.active;
             if (payload.containsKey("URL") && !"NA".equals(payload.get("URL")))
                 e.URL = (String)payload.get("URL");
