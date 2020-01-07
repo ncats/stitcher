@@ -8,6 +8,8 @@ import urllib2
 import json
 import time
 import argparse
+import ssl
+import codecs
 
 # check that the python version is correct (need 2)
 if sys.version_info[0] > 2:
@@ -52,7 +54,7 @@ opener.addheaders = [
     ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
                     'Windows NT 5.2; .NET CLR 1.1.4322)'))
 ]
-
+ssl._create_default_https_context = ssl._create_unverified_context # Only for gangstars
 
 def requestJson(uri):
     try:
@@ -91,7 +93,9 @@ def iterateCurations(fp):
                     items.append([obj2['_timestamp'], entry])
                 items.sort()
                 for item in items:
-                    fp.write(str(entity['id'])+"\t"+str(entity['source'])+"\t"+str(entity['datasource'])+"\t"+str(item[-1])+"\n")
+                    outline = unicode(entity['id'])+"\t"+unicode(entity['source'])+"\t"+unicode(entity['datasource'])
+                    outline = outline+"\t"+unicode(item[-1])+"\n"
+                    fp.write(outline)
         sys.stderr.write(uri+"\n")
         sys.stderr.flush()
         skip = skip + top
@@ -99,6 +103,6 @@ def iterateCurations(fp):
 
 if __name__=="__main__":
 
-    fp = open(outfile, "w")
+    fp = codecs.open(outfile, "w", encoding='utf-8')
     iterateCurations(fp)
     fp.close()

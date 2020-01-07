@@ -86,7 +86,7 @@ public class DrugBankXmlEventParser extends EventParser {
         eventElems.put("fda-application-number", "approvalAppId");
         eventElems.put("country", "jurisdiction");
         eventElems.put("ended-marketing-on", "endDate");
-        eventElems.put("started-marketing-on", "startDate");
+        //eventElems.put("started-marketing-on", "startDate");
         eventElems.put("name", "product");
         eventElems.put("labeller", "sponsor");
         eventElems.put("route", "route");

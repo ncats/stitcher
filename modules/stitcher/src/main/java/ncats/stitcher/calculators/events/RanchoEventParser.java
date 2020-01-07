@@ -60,7 +60,7 @@ public class RanchoEventParser extends EventParser {
                 if (!"Unknown".equals(d))
                 try {
                     Date date = EventCalculator.SDF.parse(d);
-                        event.startDate = date;
+                        //event.startDate = date;
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     EventCalculator.logger.log(Level.SEVERE,
