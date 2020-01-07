@@ -151,3 +151,19 @@ match p=(n:`S_GARD`)-[:I_GENE]-(m:`S_GARD`) where id(n) <> id(m) return count(di
 match (n:`S_RANCHO-DISEASE-DRUG_2018-12-18_13-30`)-[]-(d:DATA) with n,d match p=(n)-[:I_CODE|:N_Name*1..2]-(m:`S_GARD`) return p,d limit 200
 
 match (n:`S_FDAORPHANGARD_20190216`)-[]-(d:DATA) with n,d match p=(n)-[:I_CODE|:N_Name*1..2]-(m:`S_GARD`) return p,d limit 200
+
+match(n:`S_GARD`)-[]-(m:DATA) where m.is_rare=true with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`)-[]-(b:DATA) return count(distinct n) as `GARD`,count(distinct a) as `ICD10`
+
+match(n:`S_ORDO`)-[]-(m:DATA) where not exists(m.symbol) and not exists(m.reason_for_obsolescence) with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `ORDO`, count(distinct a) as `ICD10`
+
+match(n:`S_GHR`)-[]-(m:DATA)  with n match p=(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `GHR`, count(distinct a) as `ICD10`
+
+match(n:`S_DOID`)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) where not exists(n.status) return count(distinct n) as `DOID`, count(distinct a) as `ICD10`
+
+match(n:`S_OMIM`:T047)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) where not exists(n.status) return count(distinct n) as `OMIM`, count(distinct a) as `ICD10`
+
+match(n:`S_MEDLINEPLUS`)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `MEDLINE`, count(distinct a) as `ICD10`
+
+match(n:`S_MONDO`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `MONDO`,count(distinct a) as `ICD10`
+
+match(n:`S_HPO`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `HPO`,count(distinct a) as `ICD10`

@@ -27,7 +27,7 @@
   harmonization across ontologies} 
 \author{Dac-Trung Nguyen\and Qian Zhu\\[1em] \emph{NCATS Informatics}}
 %\date{{\Large$\pi\!$}, 2019}
-\date{May 15, 2019}
+\date{Jan 6, 2020}
 
 \begin{document}
 
@@ -59,7 +59,7 @@
       \item Build on our previous effort for
         \href{https://stitcher.ncats.io/app/stitches/latest}{drug harmonization} using
         in-house
-        \href{https://spotlite.nih.gov/ncats/stitcher.git}{stitcher} codebase
+        \href{https://github.com/ncats/stitcher}{stitcher} codebase
       \item Focus on the GARD subset
     \end{enumerate}
   \end{block}
@@ -73,17 +73,17 @@
     \centerline{\href{https://disease.ncats.io/browser}{\texttt{https://disease.ncats.io/browser}}}
     \begin{itemize}
     \item No username/password required
-    \item Use \texttt{disease.ncats.io:7687} as the \textbf{Host}
+    \item Use \texttt{disease.ncats.io:80} as the \textbf{Host}
     \end{itemize}
-  \item 1,636,132 entities spanning diseases, genes, proteins, drugs,
+  \item 1,806,027 entities spanning diseases, genes, proteins, drugs,
     phenotypes, tissues, FDA orphan designations.
-  \item 131,608,737 relationships that span ontological (e.g.,
+  \item 473,382,893 relationships that span ontological (e.g.,
     \texttt{subclassOf}), phenotypic (e.g.,
     \texttt{manifestation\_of}), disease association (e.g.,
     \texttt{is\_associated\_disease\_of}), etc.
   \item Accessible programmatically via numerous Neo4j drivers
     \begin{itemize}
-      \item Python example \href{https://spotlite.nih.gov/snippets/29}{\texttt{https://spotlite.nih.gov/snippets/29}}
+      \item Python 2.7 example \href{https://github.com/ncats/gitlab-snippets/blob/master/neo4j-disease.py}{https://github.com/ncats/gitlab-snippets/blob/master/neo4j-disease.py}
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -94,27 +94,30 @@
     \tiny
     \begin{tabular}{rl}\toprule
       Data Source & Entities\\ \midrule
-      \texttt{GARD}&6763\\
-      \texttt{BRENDATISSUE}&5902\\
-      \texttt{GHR}&1287\\
-      \texttt{DOID}&12694\\
-      \texttt{HPO}&17387\\
-      \texttt{MEDLINEPLUS}&2238\\
-      \texttt{MESH}&275329\\
-      \texttt{MONDO}&110363\\
-      \texttt{OMIM}&102715\\
-      \texttt{UBERON}&15909\\
-      \texttt{ORDO}&13871\\
-      \texttt{GO}&49290\\
-      \texttt{OGG}&69688\\
-      \texttt{PR}&315937\\
+      \texttt{GARD}&6,763\\
+      \texttt{BRENDATISSUE}&5,902\\
+      \texttt{GHR}&1,287\\
+      \texttt{DOID}&12,694\\
+      \texttt{HPO}&17,387\\
+      \texttt{MEDLINEPLUS}&2,238\\
+      \texttt{MESH}&275,329\\
+      \texttt{MONDO}&110,363\\
+      \texttt{OMIM}&102,715\\
+      \texttt{UBERON}&15,909\\
+      \texttt{ORDO}&13,871\\
+      \texttt{GO}&49,290\\
+      \texttt{OGG}&69,688\\
+      \texttt{PR}&315,937\\
       \texttt{OGMS}&91\\
-      \texttt{PATO}&2730\\
-      \texttt{CHEBI}&130403\\
-      \texttt{FDAOrphanGARD\_20190216.txt}&6074\\
-      \texttt{RANCHO-DISEASE-DRUG\_2018-12-18\_13-30}&19817\\
-      \texttt{HPO\_ANNOTATION\_100918}&164448\\
-      \texttt{MEDGEN} &216700\\ \bottomrule
+      \texttt{PATO}&2,730\\
+      \texttt{CHEBI}&130,403\\
+      \texttt{FDAOrphanGARD\_20190216.txt}&6,074\\
+      \texttt{RANCHO-DISEASE-DRUG\_2018-12-18\_13-30}&19,817\\
+      \texttt{HPO\_ANNOTATION\_100918}&164,448\\
+      \texttt{MEDGEN} &216,700\\
+      \texttt{ICD10} &94,645 \\
+      \texttt{NCI Thesaurus} & 144,695\\
+      \texttt{EFO} & 26,300\\ \bottomrule
     \end{tabular}
   \end{center}
 \end{frame}
@@ -207,6 +210,8 @@
       NORD & \href{https://rarediseases.org}{\texttt{https://rarediseases.org}}\\
       MEDGEN & \href{https://www.ncbi.nlm.nih.gov/medgen/}{\texttt{https://www.ncbi.nlm.nih.gov/medgen/}}\\
       NCI & \href{https://ncit.nci.nih.gov/}{\texttt{https://ncit.nci.nih.gov/}}\\
+      ICD10 & \href{https://www.icd10data.com/}{https://www.icd10data.com/}\\
+      EFO & \href{https://www.ebi.ac.uk/efo/}{https://www.ebi.ac.uk/efo/}
     \end{tabular}
   \end{center}
 \end{frame}
@@ -229,7 +234,8 @@
         HPO &730&868&143&1,510&1,458&1,382\\
         NORD & 1,049 & 617 &364 &741 &703 &937 \\
         MEDGEN &4,896 &7,753 &989 &6,796 &7,147 &9,400 \\
-        NCI & 1,465 &1,435 &501 &2,319 &1,633 &2,430 \\ \bottomrule
+        NCI & 1,465 &1,435 &501 &2,319 &1,633 &2,430 \\
+        ICD10 & 963 & 1,252& 167& 3,015& 1,258&2,394\\ \bottomrule
       \end{tabular}
     \end{center}
     The matrix is asymmetric due to $1-n$ and/or $m-1$ mappings; e.g.,
@@ -242,27 +248,28 @@
 \begin{frame}
   \frametitle{Disease overlap matrix (cont'd)}
   \begin{center}\tiny
-    \begin{tabular}{rcccccc}\toprule
-      & MEDLINE+&MONDO & HPO & NORD & MEDGEN & NCI\\ \midrule
-      GARD & 257&5,796&715&1,153&4,075 & 1,410\\
-      Orphanet &280&8,973&858 & 642& 5,952& 1,439\\
-      GHR &99 &1,125 &143 &365 &879 &490\\
-      DO &722 &8,679 &1,502 &810 &4,417 &2,108\\
-      OMIM &664 &11,374 &2,491 &1,053 &9,010 &2,657\\
-      MeSH &653 &7,882 &1,153 &1,003 &7,357 &2,074\\
-      MEDLINE+ &\textbf{2,238} &662 &440 &202 &801 &765\\
-      MONDO &645 &\textbf{21,826} &2,385 &1,633 &11,672 &3,377\\
-      HPO &379 &2,237 &\textbf{13,725} &277 &2,160 &1,072\\
-      NORD &190 &1,163 &249 &\textbf{1,251} &938 &622\\
-      MEDGEN &668 &13,221 &2,934 &1,361&\textbf{37,546} &3,632 \\
-      NCI &593 &3,329 &1,092 &703 &3,450&\textbf{5,323}\\ \bottomrule
+    \begin{tabular}{rccccccc}\toprule
+      & MEDLINE+&MONDO & HPO & NORD & MEDGEN & NCI & ICD10\\ \midrule
+      GARD & 257&5,796&715&1,153&4,075 & 1,410 &964\\
+      Orphanet &280&8,973&858 & 642& 5,952& 1,439 &1,245\\
+      GHR &99 &1,125 &143 &365 &879 &490 &187\\
+      DO &722 &8,679 &1,502 &810 &4,417 &2,108 &2,525\\
+      OMIM &664 &11,374 &2,491 &1,053 &9,010 &2,657 &2,029\\
+      MeSH &653 &7,882 &1,153 &1,003 &7,357 &2,074 &1,896\\
+      MEDLINE+ &\textbf{2,238} &662 &440 &202 &801 &765 &1,228\\
+      MONDO &645 &\textbf{21,826} &2,385 &1,633 &11,672 &3,377 &3,273\\
+      HPO &379 &2,237 &\textbf{13,725} &277 &2,160 &1,072 &1,695\\
+      NORD &190 &1,163 &249 &\textbf{1,251} &938 &622&371\\
+      MEDGEN &668 &13,221 &2,934 &1,361&\textbf{37,546} &3,632 &4,727\\
+      NCI &593 &3,329 &1,092 &703 &3,450&\textbf{5,323} &1,880\\
+      ICD10 &1,213 & 3,379& 1,820& 368& 4,301& 2,024&\textbf{16,066}\\ \bottomrule
     \end{tabular}
   \end{center}
 \end{frame}
 
 \begin{frame}
   \frametitle{So how many rare diseases are there?}
-  According to MONDO, there are currently \textbf{10,577} rare
+  According to MONDO,\footnote{\href{https://www.nature.com/articles/d41573-019-00180-y}{How many rare diseases are there?}} there are currently \textbf{10,393} rare
   diseases. This number includes diseases that are (i) not considered
   as rare by GARD (e.g., \emph{Klinefelter syndrome}) and (ii) having
   UMLS semantic type other than \emph{Disease or Syndrome} (e.g.,
