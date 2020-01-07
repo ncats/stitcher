@@ -148,14 +148,14 @@ public class DailyMedEventParser extends EventParser {
             content = payload.get("InitialYearApproval");
             if (content != null) {
                 String year = Integer.toString(Float.valueOf(content.toString()).intValue());
-                date = EventCalculator.SDF.parse(year + "-12-31");
+                //date = EventCalculator.SDF.parse(year + "-12-31");
             }
 
             content = payload.get("MarketDate");
             if (content != null && !"1900-01-01".equals(content)) {
                 Date date2 = EventCalculator.SDF.parse((String)content);
-                if (date == null || date.after(date2))
-                    date = date2;
+                //if (date == null || date.after(date2))
+                    //date = date2;
             }
             //exclude veterinary products from approved and/or Marketed
             if (!isVeterinaryProduct && date != null) {
