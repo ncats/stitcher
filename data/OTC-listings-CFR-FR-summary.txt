@@ -350,7 +350,7 @@ OTC_ID	UNII	OTC_Ingredient	OTC_Monograph	OTC_Status	OTC_Ref_Text	OTC_URL
 349	QTT17582CB	hydrochloric acid	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 350	9679TC07X4	iodine	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 351		iron ox bile	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
-352	XK4IUX8MNB	johnswort	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
+352	UFH8805FKA	johnswort	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 353		juniper	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 354	24H4NWX5CO	kaolin, colloidal	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
 355	64Y2IV7284	knotgrass	digestive aid	Previously Marketed	21 CFR 310.545(a)(8)(ii)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec310-545.xml
