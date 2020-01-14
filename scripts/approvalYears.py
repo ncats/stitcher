@@ -274,6 +274,13 @@ def writeInitApp(outfp, unii, early, earlyDate, myunii):
     appsponsor = early[-3]
     product = early[-8]
     appno = ''
+    try:
+        appno = str(int(early[0][0:6]))
+        while len(appno) < 6:
+            appno = "0" + appno
+    except:
+        appno = ''
+
     appurl = ''
     active = "true"
     if early[-5] != "Prescription" and early[-5] != "Over-the-counter":
@@ -295,7 +302,8 @@ def writeInitApp(outfp, unii, early, earlyDate, myunii):
         #outfp = fperr
         active = "false"
         if method.find('OB NME Appendix 1950-') > -1:
-            appno = early[0][0:6]
+            #appno = early[0][0:6]
+            appno = appno
         elif method.find('http') > -1:
             appurl = method
             method = "Literature"
@@ -306,13 +314,6 @@ def writeInitApp(outfp, unii, early, earlyDate, myunii):
                     entry = prods[prod]
                     if entry[0] == early[0]:
                         unii = otherunii
-
-    try:
-        appno = str(int(early[0][0:6]))
-        while len(appno) < 6:
-            appno = "0" + appno
-    except:
-        appno = ''
 
     #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
     #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
