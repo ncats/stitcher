@@ -55,20 +55,20 @@ Herein we report on our recent data integration effort to build a comprehensive 
 
 %\enlargethispage{12pt}
 
-\section{Approach}
+%\section{Approach}
+
+\begin{methods}
+\section{Methods}\label{sec:methods}
 The core premise behind \textbf{Stitcher} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
 \begin{unlist}
 \item{\emph{Data quality}.} A reference data source is typically selected such that it is of high quality. Here, we can also impose other data quality constraints (e.g., no synonyms can span multiple entities) to guide entity resolution.
 \item{\emph{Data resolution}.} Entity resolution is particularly challenging when data integration involves ontologies. A reference data source can serve as the anchor ontology from which other ontologies can be mapped. As with data quality, we can also impose any additional semantic constraints; e.g., prostate cancer is not one of the diagnoses for a female patient in an electronic health record.
 \item{\emph{Data curation}.} Generating ground-truth data is more managable with a single data source than across multiple data sources. This is particularly important due to the iterative feedback between data curation and data integration.
 \end{unlist}
-
-
-\begin{methods}
-\section{Methods and implementation}
-In general, data integration with \textbf{Stitcher} consists of four basic steps: (i) \emph{ingestion}, (ii) \emph{stitching}, (iii) \emph{entity resolution}, and (iv) \emph{entity normalization}. 
+In general, data integration with \textbf{Stitcher} consists of four basic steps: \emph{ingestion}, \emph{stitching}, \emph{entity resolution}, and \emph{entity normalization}. With the exception of \emph{entity resolution}, all other steps---as they are currently implemented in \textbf{Stitcher}---are generic and can be applied to a wide range of entity types.
 
 \subsection{Data ingrestion}
+\textbf{Stitcher} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to \emph{stitch keys}.
 
 \subsection{Data stitching}
 
@@ -79,25 +79,7 @@ In general, data integration with \textbf{Stitcher} consists of four basic steps
 
 %\enlargethispage{6pt}
 
-\begin{table}[!t]
-\processtable{This is table caption\label{Tab:01}} {\begin{tabular}{@{}llll@{}}\toprule head1 &
-head2 & head3 & head4\\\midrule
-row1 & row1 & row1 & row1\\
-row2 & row2 & row2 & row2\\
-row3 & row3 & row3 & row3\\
-row4 & row4 & row4 & row4\\\botrule
-\end{tabular}}{This is a footnote}
-\end{table}
-
 \end{methods}
-
-\begin{figure}[!tpb]%figure1
-\fboxsep=0pt\colorbox{gray}{\begin{minipage}[t]{235pt} \vbox to 100pt{\vfill\hbox to
-235pt{\hfill\fontsize{24pt}{24pt}\selectfont FPO\hfill}\vfill}
-\end{minipage}}
-%\centerline{\includegraphics{fig01.eps}}
-\caption{Caption, caption.}\label{fig:01}
-\end{figure}
 
 %\begin{figure}[!tpb]%figure2
 %%\centerline{\includegraphics{fig02.eps}}
