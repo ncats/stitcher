@@ -55,16 +55,23 @@ Herein we report on our recent data integration effort to build a comprehensive 
 
 %\enlargethispage{12pt}
 
-%\section{Approach}
-
-\begin{methods}
-\section{Methods}\label{sec:methods}
-The core premise behind \textbf{Stitcher} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
+\section{Approach}
+The main premise behind \textbf{Stitcher} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
 \begin{unlist}
 \item{\emph{Data quality}.} A reference data source is typically selected such that it is of high quality. Here, we can also impose other data quality constraints (e.g., no synonyms can span multiple entities) to guide entity resolution.
 \item{\emph{Data resolution}.} Entity resolution is particularly challenging when data integration involves ontologies. A reference data source can serve as the anchor ontology from which other ontologies can be mapped. As with data quality, we can also impose any additional semantic constraints; e.g., prostate cancer is not one of the diagnoses for a female patient in an electronic health record.
 \item{\emph{Data curation}.} Generating ground-truth data is more managable with a single data source than across multiple data sources. This is particularly important due to the iterative feedback between data curation and data integration.
 \end{unlist}
+
+The conceptual data model underlying \textbf{Stitcher} is a \emph{multigraph}. Within this multigraph, a node can either be a \emph{stitch node} or \emph{data node}. Each data node represents a ``raw'' entity as ingested; its corresponding stitch node is a \emph{standardized} representation that is used for \emph{stitching}. An edge between two stitch nodes can either be a \emph{stitch key} (undirected) or \emph{relationship} (directed). A unique \emph{stitch value} is associated with each stitch key such that it forms a clique \citep{Croset2015}. Figure~\ref{fig:graph1} shows an example of a stitching multigraph.
+
+\begin{figure}[!tpb]
+\centerline{\includegraphics[scale=0.5]{graph1}}
+\caption{A multigraph with \emph{stitch nodes} (large) and corresponding \emph{data nodes} (small). Each stitch value forms a clique within this multigraph.}\label{fig:graph1}
+\end{figure}
+
+\begin{methods}
+\section{Methods}\label{sec:methods}
 In general, data integration with \textbf{Stitcher} consists of four basic steps: \emph{ingestion}, \emph{stitching}, \emph{entity resolution}, and \emph{entity normalization}. With the exception of \emph{entity resolution}, all other steps---as they are currently implemented in \textbf{Stitcher}---are generic and can be applied to a wide range of entity types.
 
 \subsection{Data ingrestion}
@@ -102,7 +109,7 @@ In general, data integration with \textbf{Stitcher} consists of four basic steps
 
 \section*{Acknowledgements}
 
-We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-reading of early drafts of the manuscript. We also appreciate our colleague, Tongan Zhao, for his help in developing a curation user interface for Stitcher.
+We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-reading of early drafts of the manuscript. We also thank our colleague, Tongan Zhao, for his help in developing a prototype curation user interface for \textbf{Stitcher}.
 
 \bibliographystyle{natbib}
 %\bibliographystyle{achemnat}
