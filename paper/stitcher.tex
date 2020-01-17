@@ -5,6 +5,9 @@
 \access{Advance Access Publication Date: Day Month Year}
 \appnotes{Manuscript Category}
 
+\newcommand\st{\textbf{Stitcher}}
+\newcommand\ix{\textbf{InXight Drugs}}
+
 \begin{document}
 \firstpage{1}
 
@@ -15,7 +18,7 @@
 Ivan Grishagin,$^{\text{\sfb 1}}$
 Daniel Katzel,$^{\text{\sfb 1}}$
 Tyler Peryea,$^{\text{\sfb 1,2}}$ and Noel Southall\,$^{\text{\sfb 1},\ast}$}
-\address{$^{\text{\sf 1}}$Division of Pre-clinical Innovation, National Center for Advancing Translational Sciences, National Institutes of Health, USA\\
+\address{$^{\text{\sf 1}}$Division of Pre-clinical Innovation, National Center for Advancing Translational Sciences (NCATS), National Institutes of Health, USA\\
 $^{\text{\sf 2}}$Present address: Office of Health Informatics, Office of Chief Scientist, Food and Drug Administration, USA}
 
 \corresp{$^\ast$To whom correspondence should be addressed.}
@@ -28,7 +31,7 @@ $^{\text{\sf 2}}$Present address: Office of Health Informatics, Office of Chief 
 \\
 \textbf{Results:} Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text
 Text Text Text Text Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text\\
-\textbf{Availability:} The complete source code along with data and build instructions for \textbf{Stitcher} is readily available on Github \url{https://github.com/ncats/stitcher}. The \textbf{InXight Drugs} resource is accessible at \url{https://drugs.ncats.io}.\\
+\textbf{Availability:} The complete source code along with data and build instructions for \st{} is readily available on Github \url{https://github.com/ncats/stitcher}. The \ix{} resource is accessible at \url{https://drugs.ncats.io}.\\
 \textbf{Contact:} \href{mailto:southalln@mail.nih.gov}{southalln@mail.nih.gov}\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics}
 online.}
@@ -38,7 +41,7 @@ online.}
 \section{Introduction}
 As the volume of biological data continues to grow at an unprecedented rate, data de-duplication---also commonly known as record linkage or \emph{entity resolution}---is proportionally playing a prominent role in data integration. From the construction of training data for machine learning to building knowledge graphs as epistemological frameworks for artificial intelligence, proper entity resolution is essential in generating ground-truth data. The core challenge of entity resolution is in establishing \emph{uniqueness}. For well-defined entity types (e.g., gene, tissue, cell line), uniqueness is determined solely based on established identifiers and nomenclature; for other entity types (e.g., drug, disease, phenotype), however, uniqueness is not as well-established due to conceptual ambiguities in how entities are defined and represented. Take the disease entity type as an example. The discrepancy between the theoretical concept of ``disease entity'' from its clinical nosology \citep{Hucklenbroich14} is what makes disease entity resolution extremely challenging.
 
-Herein we report on our recent data integration effort to build a comprehensive resource of drugs that have either been marketed or approved in the United States for human use. Such a resource is not only instrumental for drug repurposing but also serves as a valuable tool to further our understanding of the mechanistic properties of molecular targets \citep{Huang2019}. To the best of our knowledge, \textbf{InXight Drugs} is currently the most comprehensive resource of its kind. In the remainder of this paper, we discuss data integration challenges associated with drug data, conceptually as well as technically. This discussion serves as the backdrop for the development of \textbf{Stitcher}, an entity resolution framework that we have developed to address the shortcomings of traditional approaches.
+Herein we report on our recent data integration effort to build a comprehensive resource of drugs that have either been marketed or approved in the United States for human use. Such a resource is not only instrumental for drug repurposing but also serves as a valuable tool to further our understanding of the mechanistic properties of molecular targets \citep{Huang2019}. To the best of our knowledge, \ix{} is currently the most comprehensive resource of its kind. In the remainder of this paper, we discuss data integration challenges associated with drug data, conceptually as well as technically. This discussion serves as the backdrop for the development of \st, an entity resolution framework that we have developed to address the shortcomings of traditional approaches.
 
 \subsection{What is a ``drug''?}
 \begin{itemize}
@@ -56,30 +59,31 @@ Herein we report on our recent data integration effort to build a comprehensive 
 %\enlargethispage{12pt}
 
 \section{Approach}
-The main premise behind \textbf{Stitcher} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
+The basic premise behind \st{} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
 \begin{unlist}
 \item{\emph{Data quality}.} A reference data source is typically selected such that it is of high quality. Here, we can also impose other data quality constraints (e.g., no synonyms can span multiple entities) to guide entity resolution.
 \item{\emph{Data resolution}.} Entity resolution is particularly challenging when data integration involves ontologies. A reference data source can serve as the anchor ontology from which other ontologies can be mapped. As with data quality, we can also impose any additional semantic constraints; e.g., prostate cancer is not one of the diagnoses for a female patient in an electronic health record.
 \item{\emph{Data curation}.} Generating ground-truth data is more managable with a single data source than across multiple data sources. This is particularly important due to the iterative feedback between data curation and data integration.
 \end{unlist}
 
-The conceptual data model underlying \textbf{Stitcher} is a \emph{multigraph}. Within this multigraph, a node can either be a \emph{stitch node} or \emph{data node}. Each data node represents a ``raw'' entity as ingested; its corresponding stitch node is a \emph{standardized} representation that is used for \emph{stitching}. An edge between two stitch nodes can either be a \emph{stitch key} (undirected) or \emph{relationship} (directed). A unique \emph{stitch value} is associated with each stitch key such that it forms a clique \citep{Croset2015}. Figure~\ref{fig:graph1} shows an example of a stitching multigraph.
-
+The conceptual data model underlying \st{} is a \emph{multigraph}. Within this multigraph, a node can either be a \emph{stitch node} or \emph{data node}. Each data node represents a ``raw'' entity as ingested from the data source; its corresponding stitch node is a \emph{standardized} representation that is used for \emph{stitching}. An edge between two stitch nodes can either be a \emph{stitch key} (undirected) or \emph{relationship} (directed). A unique \emph{stitch value} is associated with each stitch key such that it forms a clique. Figure~\ref{fig:graph1} shows an instance of a stitch multigraph with overlapping cliques.
 \begin{figure}[!tpb]
-\centerline{\includegraphics[scale=0.5]{graph1}}
-\caption{A multigraph with \emph{stitch nodes} (large) and corresponding \emph{data nodes} (small). Each stitch value forms a clique within this multigraph.}\label{fig:graph1}
+\centerline{\includegraphics[scale=0.5]{graph2}}
+\caption{A multigraph with \emph{stitch nodes} (medium) and corresponding \emph{data nodes} (small). Each stitch value forms a clique within this multigraph. The edge labels between stitch nodes represent the stitch keys.}\label{fig:graph1}
 \end{figure}
+
+A connected component in the stitch multigraph represents the basic unit of work for entity resolution. While the majority of connected components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the real challenges center around effective strategies for handling very large connected components---or also affectionally known as \emph{hairballs} \citep{Croset2015}. For example, the current version of the \ix{} resource has an hairball of close to 30,000 stitch nodes across 15 data sources. We discuss our strategies in detail for untangling through such an hairball in Section~\ref{sec:methods_er}.
 
 \begin{methods}
 \section{Methods}\label{sec:methods}
-In general, data integration with \textbf{Stitcher} consists of four basic steps: \emph{ingestion}, \emph{stitching}, \emph{entity resolution}, and \emph{entity normalization}. With the exception of \emph{entity resolution}, all other steps---as they are currently implemented in \textbf{Stitcher}---are generic and can be applied to a wide range of entity types.
+In general, data integration with \st{} consists of four basic steps: \emph{ingestion}, \emph{stitching}, \emph{entity resolution}, and \emph{entity normalization}. With the exception of \emph{entity resolution}, all other steps---as they are currently implemented in \st---are generic and can be applied to a wide range of entity types.
 
 \subsection{Data ingrestion}
-\textbf{Stitcher} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to \emph{stitch keys}.
+\st{} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to \emph{stitch keys}.
 
 \subsection{Data stitching}
 
-\subsection{Entity resolution}
+\subsection{Entity resolution}\label{sec:methods_er}
 
 \subsection{Entity normalization}
 
@@ -109,7 +113,7 @@ In general, data integration with \textbf{Stitcher} consists of four basic steps
 
 \section*{Acknowledgements}
 
-We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-reading of early drafts of the manuscript. We also thank our colleague, Tongan Zhao, for his help in developing a prototype curation user interface for \textbf{Stitcher}.
+We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-reading of early drafts of the manuscript. We also thank our colleague, Tongan Zhao, for his help in developing a prototype curation user interface for \st.
 
 \bibliographystyle{natbib}
 %\bibliographystyle{achemnat}
