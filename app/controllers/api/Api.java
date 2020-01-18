@@ -1111,7 +1111,7 @@ public class Api extends Controller {
         String uri = routes.Api.structure(id, format, size).url();
         Logger.debug(uri);
 
-        Entity e = es.getEntityFactory().entity(id);
+        Entity e = es.getEntityFactory().getEntity(id);
         if (e != null) {
             Molecule mol = e.mol();
             
