@@ -73,7 +73,13 @@ The primary goal of entity resolution is to determine the number of unique entit
 \end{figure}
 
 \subsection{Stitch keys}
-Stitch key is a core concept in \st. It defines how entities are matched, which, in turn, determines how cliques and connected components are formed. By virtue of its importance, stitch key should reflect the true identity of the entity as much as posible.
+Stitch key is a core concept in \st. It defines how entities are matched, which, in turn, determines how cliques and connected components are formed. By virtue of its importance, the stitch key should reflect the true identity of the entity as much as possible. Depending on the entity type, the stitch key can be generic (e.g., synonym) or very specific (e.g., molecular hash key). For drug entity type, \st\ relies on the following stitch keys for each entity:
+\begin{unlist}
+\item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
+\item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CODE}.}
+\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.}
+\item{\texttt{R\_activeMoiety}.}
+\end{unlist}
 
 \subsection{Data sources}
 To build the \ix{} resource, \st\ currently utilizes 15 diverse data sources.
@@ -90,7 +96,7 @@ The basic premise behind \st{} is that data integration is often done within the
 \section{Methods}\label{sec:methods}
 In general, data integration with \st{} consists of four basic steps: \emph{ingestion}, \emph{stitching}, \emph{entity resolution}, and \emph{entity normalization}. With the exception of \emph{entity resolution}, all other steps---as they are currently implemented in \st---are generic and can be applied to a wide range of entity types.
 
-\subsection{Data ingrestion}
+\subsection{Data ingestion}
 \st{} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to \emph{stitch keys}.
 
 \subsection{Data stitching}
