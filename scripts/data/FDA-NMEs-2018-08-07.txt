@@ -2259,6 +2259,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1899	Aspirin	acetylsalicylic acid	R16CO5Y76E				"Friedr. Bayer & Co., Elberfeld, Germany"	https://catalog.hathitrust.org/Record/100782317		
 1899	Hyoscine	hyoscine	DL48G20X8X					https://en.wikipedia.org/wiki/Hyoscine		
 1901	Cuprocitrol	cupric citrate	F70D117TTU					https://books.google.com/books?id=b7FJAQAAMAAJ&newbks=1&newbks_redir=0&dq=cuprocitrol&pg=RA2-PA47#v=onepage&q=cuprocitrol&f=false		
+1901	Adrenalin	takemine	YKH834O4BH				Parke Davis	https://babel.hathitrust.org/cgi/pt?id=mdp.39015064545372&view=1up&seq=65		
 1903	Veronal	barbital	5WZ53ENE2P				"Friedr. Bayer 8: Co., Elberfeld, Germany, and E. Merck, Darmstadt, Germany."	https://catalog.hathitrust.org/Record/100782317		
 1904	Isopral	1,1,1-trichloro-2-propanol	63H9A1KXE5					https://books.google.com/books?id=6GcBAAAAYAAJ&newbks=1&newbks_redir=0&dq=isopral&pg=PA22#v=onepage&q=isopral&f=false		
 1905	Hedonal	1-methylbutyl carbamate	1T1KN15LF8					https://books.google.com/books?id=6GcBAAAAYAAJ&newbks=1&newbks_redir=0&dq=hedonal&pg=PA249#v=onepage&q=hedonal&f=false		
@@ -2300,15 +2301,18 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1928	Pitocin	oxytocin	1JQS135EYN	10-20-28				https://books.google.com/books?id=AymgAAAAMAAJ&lpg=PA514&ots=Sv2C9092O9&dq=pitocin%201928&pg=PA514#v=onepage&q=pitocin%201928&f=false		
 1928	Pyridium	phenazopyridine hydrochloride	0EWG668W17					https://www.ncbi.nlm.nih.gov/pubmed/982458		
 1929	secobarbital	secobarbital	1P7H87IN75					https://archive.org/details/newnonofficialre39coun		
-1929	ephedrine	ephedrine	GN83C131XS					https://archive.org/details/newnonofficialre39coun		
+1929	ephedrine sulfate	ephedrine sulfate	U6X61U5ZEG				Lilly	https://archive.org/details/newnonofficialre39coun		
 1929	Sandoptal	butalbital	KHS0AZ4JVK				Sandoz	https://books.google.com/books?id=i9BQAAAAYAAJ&q=SANDOPTAL&dq=SANDOPTAL&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwj_i7-Hg_TmAhVDU98KHX8dCOAQ6AEwAHoECAYQAg		
 1929	Metrazol	pentylenetetrazol	WM5Z385K7T				Knoll	https://books.google.com/books?id=2QJtAAAAMAAJ&q=metrazol&dq=metrazol&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwiTueXIhv_mAhVOpFkKHSgHAgUQ6AEwAHoECAAQAg		
 1930	Nembutal	pentobarbital	I4744080IR					https://archive.org/details/newnonofficialre39coun		
 1930	Dibucaine; Nupercaine	cinchocaine hydrochloride	Z97702A5DG				"Society of Chemical Industry in Basle, Basle, Switzerland (Ciba Company, Inc., New York, distributor)."	https://archive.org/details/newnonofficialre39coun		
 1916	Benzyl Succinate	dibenzyl succinate	CK14UG55AV				"Seydel Chemical Company, 86 Forest Street, Jersey City, N. J. (Nitro, W. Va.)"	https://archive.org/details/syntheticorganic1930unit		
 1930	Di-Hydronol	4-heptylresorcinol	4340A7X1C2					https://archive.org/details/syntheticorganic1930unit		
+1930	Vinethene	divinyl ether	2H2T044E11				Merck	https://jada.ada.org/article/S0002-8177(43)23008-6/pdf		
 1931	dibucaine	dibucaine	L6JW2TJG99					https://archive.org/details/newnonofficialre39coun		
+1931	Sympatol	synephrine	PEG5DP7434					https://en.wikipedia.org/wiki/Synephrine		
 1931	Benzedrine Inhaler	amphetamin	CK833KGX7E					https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2377281/		
+1931	Theelin	estrone	2DI9HA706A				Parke Davis	https://en.wikipedia.org/wiki/Estrone_(medication)		
 1932	tetracaine	tetracaine	0619F35CGV					https://archive.org/details/newnonofficialre39coun		
 1933	hexobarbital	hexobarbital	AL8Z8K3P6S					https://archive.org/details/newnonofficialre39coun		
 1933	Prostigmin	neostigmine	3982TWQ96G					https://archive.org/details/newnonofficialre39coun		
@@ -2316,6 +2320,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1934	thiopental	thiopental	JI8Z5M7NA3					https://archive.org/details/newnonofficialre39coun		
 1934	helium	helium	206GF3GB41					https://journals.sagepub.com/doi/abs/10.3181/00379727-32-7724P		
 1934	Proluton	progesterone	4G7DS2Q64Y					https://archive.org/details/newnonofficialre39coun		
+1934	Neosynephrine	phenylephrine	1WS297W6MV					https://books.google.com/books?id=kcVEAQAAMAAJ&newbks=1&newbks_redir=0&dq=phenylephrine%201934&pg=PA760#v=onepage&q=phenylephrine%201934&f=false		
 1935	trichloroethylene	trichloroethylene	290YE8AR51					https://archive.org/details/newnonofficialre39coun		
 1935	Paredrine	hydroxyamphetamine	FQR280JW2N	4-17-35				https://trademarks.justia.com/713/72/paredrine-71372217.html
 1937	Dexedrine	dextroamphetamine sulfate	JJ768O327N				Smith Kline French	https://web.archive.org/web/20091219120223/http://www.medic8.com/medicines/Dexedrine.html		
@@ -2328,6 +2333,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1936	sulfanilamide	sulfanilamide	21240MF57M					https://archive.org/details/newnonofficialre39coun		
 1936	Cyclopal	cyclopentobarbital	2230XWG55Q	05-10-36			Upjohn	https://books.google.com/books?id=zc9DmlcJuq4C&lpg=PA19&ots=u7z3LgObJ4&dq=cyclopal%201937&pg=PA19#v=onepage&q=cyclopal%201937&f=false		
 1937	Niacin	nicotinic acid	2679MF687A				"Merck & Co, Inc."	https://archive.org/details/in.ernet.dli.2015.145864		
+1937	Kephrine	adrenalone hydrochloride	NN82YWE2IC					https://archive.org/stream/newnonofficialre37coun/newnonofficialre37coun_djvu.txt		
 1937	Oreton-F	testosterone	3XMK78S47O				Schering	https://archive.org/details/in.ernet.dli.2015.145864		
 1937	Oreton	testosterone propionate	WI93Z9138A				Schering	https://archive.org/details/in.ernet.dli.2015.145864		
 1937	Calcium pentothate	calcium pantothenate	568ET80C3D					https://books.google.com/books?newbks=1&newbks_redir=0&id=LlpLAAAAMAAJ&dq=dispensatory+pantothenate&focus=searchwithinvolume&q=pantothenate		
@@ -2405,6 +2411,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1921	Ammonium Valerate U.S.P.	ammonium valerate	0U3170A41K					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Sweet Almond U.S.P.	sweet almond	3Z252A2K9G					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Amyl Nitrite U.S.P.	amyl nitrite	22T8Z09XAK					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
+1880	Amyl Nitrite U.S.P.	amyl nitrite	22T8Z09XAK					https://books.google.com/books?id=WO5NAAAAMAAJ&newbks=1&newbks_redir=0&dq=united%20states%20pharmacopeia%201880&pg=PA14#v=onepage&q=amyl%20nitrite&f=false		
 1921	Angelica Fruit N.F.	angelica fruit	S7E6K05K7Z					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Angelica Root N.F.	angelica root	DTN01M69SN					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Anise U.S.P.	anise	21C2F5E8RE					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
