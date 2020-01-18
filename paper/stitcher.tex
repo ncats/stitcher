@@ -59,20 +59,32 @@ Herein we report on our recent data integration effort to build a comprehensive 
 %\enlargethispage{12pt}
 
 \section{Approach}
+
+\subsection{Preliminary concepts}
+The conceptual data model underlying \st{} is a \emph{multigraph}. Within this multigraph, a node can either be a \emph{stitch node} or \emph{data node}. Each data node represents a ``raw'' entity as ingested from the data source; its corresponding stitch node is a \emph{standardized} representation that is used for \emph{stitching}. An edge between two stitch nodes can either be a \emph{stitch key} (undirected) or \emph{relationship} (directed). A unique \emph{stitch value} is associated with each stitch key such that it forms a clique. Figure~\ref{fig:graph1} shows an instance of a connected component of a stitch multigraph with overlapping cliques.
+
+A connected component in the stitch multigraph represents the basic unit of work for entity resolution. While the majority of connected components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the real challenges center around effective strategies for handling very large connected components---or also commonly known as \emph{hairballs} \citep{Croset2015}. For example, the current version of the \ix{} resource has an hairball close to 30,000 stitch nodes spanning across 15 data sources. We discuss our strategies in detail for untangling through such an hairball in Section~\ref{sec:methods_er}.
+
+The primary goal of entity resolution is to determine the number of unique entities in a connected component. These derived entities are represented as \emph{sgroup nodes} in \st. There can be multiple instances of sgroup nodes for any given set of stitch nodes, with each instance reflects a specific algorithmic strategy or version. Figure~\ref{fig:graph1} shows that there is only one unique entity as determined by the entity resolution algorithm for the given connected component.
+
+\begin{figure}[!tpb]
+\centerline{\includegraphics[scale=0.5]{graph2}}
+\caption{A connected component in the stitch multigraph with four \emph{stitch nodes} (medium) and corresponding \emph{data nodes} (small). Each stitch value forms a clique within this connected component. The edge labels between stitch nodes are the stitch keys. The large node is the derived entity (i.e., sgroup node) generated from entity resolution.}\label{fig:graph1}
+\end{figure}
+
+\subsection{Stitch keys}
+Stitch key is a core concept in \st. It defines how entities are matched, which, in turn, determines how cliques and connected components are formed. By virtue of its importance, stitch key should reflect the true identity of the entity as much as posible.
+
+\subsection{Data sources}
+To build the \ix{} resource, \st\ currently utilizes 15 diverse data sources.
+
+\subsection{Overall strategy}
 The basic premise behind \st{} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
 \begin{unlist}
 \item{\emph{Data quality}.} A reference data source is typically selected such that it is of high quality. Here, we can also impose other data quality constraints (e.g., no synonyms can span multiple entities) to guide entity resolution.
 \item{\emph{Data resolution}.} Entity resolution is particularly challenging when data integration involves ontologies. A reference data source can serve as the anchor ontology from which other ontologies can be mapped. As with data quality, we can also impose any additional semantic constraints; e.g., prostate cancer is not one of the diagnoses for a female patient in an electronic health record.
 \item{\emph{Data curation}.} Generating ground-truth data is more managable with a single data source than across multiple data sources. This is particularly important due to the iterative feedback between data curation and data integration.
 \end{unlist}
-
-The conceptual data model underlying \st{} is a \emph{multigraph}. Within this multigraph, a node can either be a \emph{stitch node} or \emph{data node}. Each data node represents a ``raw'' entity as ingested from the data source; its corresponding stitch node is a \emph{standardized} representation that is used for \emph{stitching}. An edge between two stitch nodes can either be a \emph{stitch key} (undirected) or \emph{relationship} (directed). A unique \emph{stitch value} is associated with each stitch key such that it forms a clique. Figure~\ref{fig:graph1} shows an instance of a stitch multigraph with overlapping cliques.
-\begin{figure}[!tpb]
-\centerline{\includegraphics[scale=0.5]{graph2}}
-\caption{A multigraph with \emph{stitch nodes} (medium) and corresponding \emph{data nodes} (small). Each stitch value forms a clique within this multigraph. The edge labels between stitch nodes represent the stitch keys.}\label{fig:graph1}
-\end{figure}
-
-A connected component in the stitch multigraph represents the basic unit of work for entity resolution. While the majority of connected components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the real challenges center around effective strategies for handling very large connected components---or also affectionally known as \emph{hairballs} \citep{Croset2015}. For example, the current version of the \ix{} resource has an hairball of close to 30,000 stitch nodes across 15 data sources. We discuss our strategies in detail for untangling through such an hairball in Section~\ref{sec:methods_er}.
 
 \begin{methods}
 \section{Methods}\label{sec:methods}
