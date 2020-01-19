@@ -44,15 +44,10 @@ As the volume of biological data continues to grow at an unprecedented rate, dat
 Herein we report on our recent data integration effort to build a comprehensive resource of drugs that have either been marketed or approved in the United States for human use. Such a resource is not only instrumental for drug repurposing but also serves as a valuable tool to further our understanding of the mechanistic properties of molecular targets \citep{Huang2019}. To the best of our knowledge, \ix{} is currently the most comprehensive resource of its kind. In the remainder of this paper, we discuss data integration challenges associated with drug data, conceptually as well as technically. This discussion serves as the backdrop for the development of \st, an entity resolution framework that we have developed to address the shortcomings of traditional approaches.
 
 \subsection{What is a ``drug''?}
-\begin{itemize}
-\item Summarize from \citep{Huang2011}
-\item Distinction between different drug classes (e.g., small molecule, monoclonal antibodies, etc.); cite ISO 11238?
-\item Introduce concepts for active moiety, salt form, excipient, etc.
-\end{itemize}
+While the word is included within the name of the organization, the US Food and Drug Administration (FDA) does not have a straightforward definition of the word ``drug''. The Federal Food Drug and Cosmetic Act (FD\&C Act) and FDA regulations define the term drug, in part, by reference to its intended use, as ``articles intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease” and “articles (other than food) intended to affect the structure or any function of the body of man or other animals.'' \citep{FDADrug}
+More practically, the agency defines ``drug substance'' and ``drug product'' respectively as the physical ingredients found in marketed products. Others use the word ``drug'' to sometimes refer to ``drug substances'' and sometimes to ``drug products'' as convienient, and this causes a great deal of semantic confusion within drug data found on the web. The National Library of Medicine produces a semantic product, RxNorm, that provides a variety of precise semantic types for ingredients, tradenames, dose forms, semantic clinical drug components, semantic clinical drug forms, and semantic clinical drugs which facilitate working with drug data, but its terminology is unfortunately limited to commonly used prescription drugs, ``clinically significant ingredients,'' and adoption of this complex semantic scheme is limited \citep{RxNorm2020}.
 
-While the word is included within the name of the organization, the US Food and Drug Administration (FDA) does not have a straightforward definition of the word ``drug''. The Federal Food Drug and Cosmetic Act (FD&C Act) and FDA regulations define the term drug, in part, by reference to its intended use, as “articles intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease” and “articles (other than food) intended to affect the structure or any function of the body of man or other animals.” \citep{FDADrug} More practically, the agency defines ``drug substance'' and ``drug product'' respectively as the physical ingredients found in marketed products. Others use the word ``drug'' to sometimes refer to ``drug substances'' and sometimes to ``drug products'' as convienient, and this causes a great deal of semantic confusion within drug data found on the web. The National Library of Medicine produces a semantic product, RxNorm, that provides a variety of precise semantic types for ingredients, tradenames, dose forms, semantic clinical drug components, semantic clinical drug forms, and semantic clinical drugs which facilitate working with drug data, but its terminology is unfortunately limited to commonly used prescription drugs, ``clinically significant ingredients'', and adoption of this complex semantic scheme is limited. [https://www.nlm.nih.gov/research/umls/rxnorm/RxNorm.pdf]
-
-There is a third definition of the word drug that is commonly used in the literature and used by the FDA when it refers to an active moiety and a new molecular entity. In this case, ingredients whose pharmacological effect occurs through the same molecular entity are considered the same drug. This holds for different salt forms such as sumatriptan succinate and sumatriptan hemisulfate, but it also holds for prodrugs and their metabolized active forms such as brincidofovir and cidofovir. [https://www.fda.gov/drugs/development-approval-process-drugs/new-drugs-fda-cders-new-molecular-entities-and-new-therapeutic-biological-products] An active moiety is a molecule or ion, excluding those appended portions of the molecule that cause the drug to be an ester, salt (including a salt with hydrogen or coordination bonds), or other noncovalent derivative (such as a complex, chelate, or clathrate) of the molecule, responsible for the physiological or pharmacological action of the drug substance. [CFR] Under the Food and Drug Administration Amendments Act of 2007, all newly introduced active moieties must first be reviewed by an advisory committee before the FDA can approve these products. [cite]
+There is a third definition of the word drug that is commonly used in the literature and used by the FDA when it refers to an active moiety and a new molecular entity. In this case, ingredients whose pharmacological effect occurs through the same molecular entity are considered the same drug. This holds for different salt forms such as sumatriptan succinate and sumatriptan hemisulfate, but it also holds for prodrugs and their metabolized active forms such as brincidofovir and cidofovir \citep{NME2020}. An active moiety is a molecule or ion, excluding those appended portions of the molecule that cause the drug to be an ester, salt (including a salt with hydrogen or coordination bonds), or other noncovalent derivative (such as a complex, chelate, or clathrate) of the molecule, responsible for the physiological or pharmacological action of the drug substance. [CFR] Under the Food and Drug Administration Amendments Act of 2007, all newly introduced active moieties must first be reviewed by an advisory committee before the FDA can approve these products. [cite]
 
 As in other information domains, the names used to refer to drug substances and products are particularly problematic because their definitions change as a function of location or jurisdiction, time and context. FDA and other national regulators of medicines have collaborated to produce ISO 11238 [ref] which endeavors to define provide an information scheme for the unambiguous identification of all ingredients found in medicinal products, and FDA uses an implementation of ISO 11238 as the backbone of its information systems within the agency. [GSRS] While this facilitates data exchange within the FDA and with other national authorities, the task still remains to be able to map other, external data sources into this rigorously-defined scheme using whatever names and data are at hand.
 
@@ -81,7 +76,7 @@ The primary goal of entity resolution is to determine the number of unique entit
 \subsection{Stitch keys}
 Stitch key is a core concept in \st. It defines how entities are matched, which, in turn, determines how cliques and connected components are formed. By virtue of its importance, the stitch key should reflect the true identity of the entity as much as possible. Depending on the entity type, the stitch key can be generic (e.g., synonym) or very specific (e.g., molecular hash key). For drug entity type, \st\ relies on the following stitch keys for each entity:
 \begin{unlist}
-\item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., trade name, INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
+\item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., tradename, INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
 \item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CODE}.} These stitch keys represent (i) unique identifiers assigned to the entity by a well-known registrar (e.g., the U.S. Food and Drug Administration in the case of UNII) or (ii) internal company code. Both \texttt{I\_UNII} and \texttt{I\_CAS} are specific to drug (or substance in general) entity type, whereas \texttt{I\_CODE} can be used for any type of identifiers. The decision to use specific stitch keys over generic ones ultimately rests on the strategies used within entity resolution.
 \item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.} For the small molecule class of drugs, perhaps more important than any identifiers is the underlying chemical structure definition. These stitch keys are hash values of the molecular structure at different resolutions \citep{lychi2019}.
 \item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the active moiety relationship between two drugs provides a strong evidence of equivalence. While this relationship can be infered directly from the chemical structures (e.g., freebase and salt forms, with and without esters), there is some level of curation needed to handle structures with metal complex.
@@ -147,61 +142,5 @@ We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-
 %
 %\bibliographystyle{plain}
 %
-\bibliography{document}
-
-
-\begin{thebibliography}{}
-\bibitem[Croset \emph{et al}., 2015]{Croset2015}
-Croset, S., Rupp, J., Romacker, M. (2016) Flexible data integration and curation using a graph-based approach, \emph{Bioinformatics}, \textbf{32(6)}, 918--925.
-
-\bibitem[Huang \emph{et al}., 2019]{Huang2019}
-Huang, R., Zhu, H., Shinn, P., Ngan, D., Ye, L., Thakur, A.,
-Grewal, G., Zhao, T., Southall, N., Hall, M., Simeonov, A., Austin, C. (2019) The NCATS Pharmaceutical Collection: a 10-year update, \emph{Drug Discovery Today}, \textbf{12(24)}, 2341--2349.
-
-\bibitem[Huang \emph{et al}., 2011]{Huang2011}
-Huang, R., Southall, N., Wang, Y., Yasgar, A., Shinn, P.,
-Jadhav, A., Nguyen, D-T., Austin, C. (2011) The NCGC Pharmaceutical Collection:
-A Comprehensive Resource of Clinically Approved Drugs Enabling Repurposing and Chemical Genomics, \emph{Science Translational Medicine}, \textbf{80(3)}, 80ps16.
-
-\bibitem[Hucklenbroich, 2014]{Hucklenbroich14}
-Hucklenbroich, P. (2014) ``Disease Entity'' as the Key Theoretical Concept of Medicine, \emph{Journal of Medicine and Philosophy}, \textbf{39}, 609--633.
-
-\bibitem[Human Drugs]{FDADrug}
-https://www.fda.gov/industry/regulated-products/human-drugs
-
-\bibitem[LyChI, 2019]{lychi2019}
-\emph{Layered Chemical Identifier} (2019), \url{https://github.com/ncats/lychi}, accessed October, 2019.
-
-% \bibitem[Bofelli {\it et~al}., 2000]{Boffelli03}
-% Bofelli,F., Name2, Name3 (2003) Article title, {\it Journal Name}, {\bf 199}, 133-154.
-
-% \bibitem[Bag {\it et~al}., 2001]{Bag01}
-% Bag,M., Name2, Name3 (2001) Article title, {\it Journal Name}, {\bf 99}, 33-54.
-
-% \bibitem[Yoo \textit{et~al}., 2003]{Yoo03}
-% Yoo,M.S. \textit{et~al}. (2003) Oxidative stress regulated genes
-% in nigral dopaminergic neurnol cell: correlation with the known
-% pathology in Parkinson's disease. \textit{Brain Res. Mol. Brain
-% Res.}, \textbf{110}(Suppl. 1), 76--84.
-
-% \bibitem[Lehmann, 1986]{Leh86}
-% Lehmann,E.L. (1986) Chapter title. \textit{Book Title}. Vol.~1, 2nd edn. Springer-Verlag, New York.
-
-% \bibitem[Crenshaw and Jones, 2003]{Cre03}
-% Crenshaw, B.,III, and Jones, W.B.,Jr (2003) The future of clinical
-% cancer management: one tumor, one chip. \textit{Bioinformatics},
-% doi:10.1093/bioinformatics/btn000.
-
-% \bibitem[Auhtor \textit{et~al}. (2000)]{Aut00}
-% Auhtor,A.B. \textit{et~al}. (2000) Chapter title. In Smith, A.C.
-% (ed.), \textit{Book Title}, 2nd edn. Publisher, Location, Vol. 1, pp.
-% ???--???.
-
-% \bibitem[Bardet, 1920]{Bar20}
-% Bardet, G. (1920) Sur un syndrome d'obesite infantile avec
-% polydactylie et retinite pigmentaire (contribution a l'etude des
-% formes cliniques de l'obesite hypophysaire). PhD Thesis, name of
-% institution, Paris, France.
-
-\end{thebibliography}
+%\bibliography{stitcher}
 \end{document}
