@@ -71,20 +71,20 @@ The conceptual data model underlying \st{} is a \emph{multigraph}. Within this m
 
 A connected component in the stitch multigraph represents the basic unit of work for entity resolution. While the majority of connected components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the real challenges center around effective strategies for handling very large connected components---or also commonly known as \emph{hairballs} \citep{Croset2015}. For example, the current version of the \ix{} resource has an hairball close to 30,000 stitch nodes spanning across 15 data sources. We discuss our strategies in detail for untangling through such an hairball in Section~\ref{sec:methods_er}.
 
-The primary goal of entity resolution is to determine the number of unique entities in a connected component. These derived entities are represented as \emph{sgroup nodes} in \st. There can be multiple instances of sgroup nodes for any given set of stitch nodes, with each instance reflects a specific algorithmic strategy or version. Figure~\ref{fig:graph1} shows that there is only one unique entity as determined by the entity resolution algorithm for the given connected component.
+The primary goal of entity resolution is to determine the number of unique entities in a connected component. These derived entities are represented as \emph{sgroup nodes} in the stitch multigraph. There can be multiple instances of sgroup nodes for any given set of stitch nodes, with each instance reflects a specific algorithmic strategy or version. Figure~\ref{fig:graph1} shows that there is only one unique entity as determined by the entity resolution algorithm for the given connected component.
 
 \begin{figure}[!tpb]
-\centerline{\includegraphics[scale=0.5]{graph2}}
+\centerline{\includegraphics[scale=0.5]{graph3}}
 \caption{A connected component in the stitch multigraph with four \emph{stitch nodes} (medium) and corresponding \emph{data nodes} (small). Each stitch value forms a clique within this connected component. The edge labels between stitch nodes are the stitch keys. The large node is the derived entity (i.e., sgroup node) generated from entity resolution.}\label{fig:graph1}
 \end{figure}
 
 \subsection{Stitch keys}
 Stitch key is a core concept in \st. It defines how entities are matched, which, in turn, determines how cliques and connected components are formed. By virtue of its importance, the stitch key should reflect the true identity of the entity as much as possible. Depending on the entity type, the stitch key can be generic (e.g., synonym) or very specific (e.g., molecular hash key). For drug entity type, \st\ relies on the following stitch keys for each entity:
 \begin{unlist}
-\item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
-\item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CODE}.}
-\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.}
-\item{\texttt{R\_activeMoiety}.}
+\item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., trade name, INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
+\item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CODE}.} These stitch keys represent (i) unique identifiers assigned to the entity by a well-known registrar (e.g., the U.S. Food and Drug Administration in the case of UNII) or (ii) internal company code. Both \texttt{I\_UNII} and \texttt{I\_CAS} are specific to drug (or substance in general) entity type, whereas \texttt{I\_CODE} can be used for any type of identifiers. The decision to use specific stitch keys over generic ones ultimately rests on the strategies used within entity resolution.
+\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.} For the small molecule class of drugs, perhaps more important than any identifiers is the underlying chemical structure definition. These stitch keys are hash values of the molecular structure at different resolutions \citep{lychi2019}.
+\item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the active moiety relationship between two drugs provides a strong evidence of equivalence. While this relationship can be infered directly from the chemical structures (e.g., freebase and salt forms, with and without esters), there is some level of curation needed to handle structures with metal complex.
 \end{unlist}
 
 \subsection{Data sources}
@@ -111,10 +111,10 @@ In general, data integration with \st{} consists of four basic steps: \emph{inge
 
 \subsection{Entity normalization}
 
-
 %\enlargethispage{6pt}
-
 \end{methods}
+
+\section{Results}
 
 %\begin{figure}[!tpb]%figure2
 %%\centerline{\includegraphics{fig02.eps}}
@@ -152,16 +152,16 @@ We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-
 
 \begin{thebibliography}{}
 \bibitem[Croset \emph{et al}., 2015]{Croset2015}
-Croset, S., Rupp, J., Romacker, M. (2016) Flexible data integration and curation using a graph-based approach, \textbf{32(6)}, 918--925.
+Croset, S., Rupp, J., Romacker, M. (2016) Flexible data integration and curation using a graph-based approach, \emph{Bioinformatics}, \textbf{32(6)}, 918--925.
 
 \bibitem[Huang \emph{et al}., 2019]{Huang2019}
 Huang, R., Zhu, H., Shinn, P., Ngan, D., Ye, L., Thakur, A.,
-Grewal, G., Zhao, T., Southall, N., Hall, M., Simeonov, A., Austin, C. (2019) The NCATS Pharmaceutical Collection: a 10-year update, \textbf{12(24)}, 2341--2349.
+Grewal, G., Zhao, T., Southall, N., Hall, M., Simeonov, A., Austin, C. (2019) The NCATS Pharmaceutical Collection: a 10-year update, \emph{Drug Discovery Today}, \textbf{12(24)}, 2341--2349.
 
 \bibitem[Huang \emph{et al}., 2011]{Huang2011}
 Huang, R., Southall, N., Wang, Y., Yasgar, A., Shinn, P.,
 Jadhav, A., Nguyen, D-T., Austin, C. (2011) The NCGC Pharmaceutical Collection:
-A Comprehensive Resource of Clinically Approved Drugs Enabling Repurposing and Chemical Genomics, \textbf{80(3)}, 80ps16.
+A Comprehensive Resource of Clinically Approved Drugs Enabling Repurposing and Chemical Genomics, \emph{Science Translational Medicine}, \textbf{80(3)}, 80ps16.
 
 \bibitem[Hucklenbroich, 2014]{Hucklenbroich14}
 Hucklenbroich, P. (2014) ``Disease Entity'' as the Key Theoretical Concept of Medicine, \emph{Journal of Medicine and Philosophy}, \textbf{39}, 609--633.
@@ -169,6 +169,8 @@ Hucklenbroich, P. (2014) ``Disease Entity'' as the Key Theoretical Concept of Me
 \bibitem[Human Drugs]{FDADrug}
 https://www.fda.gov/industry/regulated-products/human-drugs
 
+\bibitem[LyChI, 2019]{lychi2019}
+\emph{Layered Chemical Identifier} (2019), \url{https://github.com/ncats/lychi}, accessed October, 2019.
 
 % \bibitem[Bofelli {\it et~al}., 2000]{Boffelli03}
 % Bofelli,F., Name2, Name3 (2003) Article title, {\it Journal Name}, {\bf 199}, 133-154.

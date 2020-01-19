@@ -180,7 +180,7 @@ public class App extends Controller {
                 .filter("id", "'"+name+"'", "stitch_v"+version);
             
             return ok (stitches.render
-                       (version, "UNII="+name, new int[]{entities.length},
+                       (version, name, new int[]{entities.length},
                         1, entities.length, entities.length,
                         Arrays.stream(entities).map(e -> Stitch.getStitch(e))
                         .toArray(Stitch[]::new)));
