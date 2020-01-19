@@ -171,9 +171,13 @@ $ bash restart-stitcher.sh ncats-stitcher-master-20171110-400d1f1 stitchv1.db
 
 ## Useful links
 
-https://stitcher.ncats.io/app/stitches/latest  
-https://stitcher.ncats.io/app/stitches/latest/ + UNII  
+https://stitcher.ncats.io/app/stitches/latest
+https://stitcher.ncats.io/app/stitches/latest/ + UNII
+https://stitcher.ncats.io/app/stitches/latest/aspirin
 https://stitcher.ncats.io/api/datasources  
 
 
+Access to underlying Neo4j database
+===================================
 
+The underlying Neo4j for stitcher is publicly accessible [here](https://stitcher.ncats.io/browser/). Please specify ```stitcher.ncats.io:80``` in the ```Host``` field. No credentials are needed.
