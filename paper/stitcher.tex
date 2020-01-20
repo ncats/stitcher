@@ -47,7 +47,7 @@ Herein we report on our recent data integration effort to build a comprehensive 
 
 \subsection{What is a ``drug''?}
 While the word is included within the name of the organization, the U.S. Food and Drug Administration (FDA) does not have a straightforward definition of the word ``drug.'' The Federal Food Drug and Cosmetic Act (FD\&C Act) and FDA regulations define the term drug, in part, by reference to its intended use, as ``articles intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease” and “articles (other than food) intended to affect the structure or any function of the body of man or other animals.'' \citep{FDADrug}
-More practically, the agency defines ``drug substance'' and ``drug product'' respectively as the physical ingredients found in marketed products. Others use the word ``drug'' to sometimes refer to ``drug substances'' and sometimes to ``drug products'' as convienient, and this causes a great deal of semantic confusion within drug data found on the web. The National Library of Medicine produces a semantic product, RxNorm, that provides a variety of precise semantic types for ingredients, tradenames, dose forms, semantic clinical drug components, semantic clinical drug forms, and semantic clinical drugs which facilitate working with drug data, but its terminology is unfortunately limited to commonly used prescription drugs, ``clinically significant ingredients,'' and adoption of this complex semantic scheme is limited \citep{RxNorm}.
+More practically, the agency defines ``drug substance'' and ``drug product'' respectively as the physical ingredients found in marketed products. Others use the word ``drug'' to sometimes refer to ``drug substances'' and sometimes to ``drug products'' as convenient, and this causes a great deal of semantic confusion within drug data found on the web. The National Library of Medicine produces a semantic product, RxNorm, that provides a variety of precise semantic types for ingredients, tradenames, dose forms, semantic clinical drug components, semantic clinical drug forms, and semantic clinical drugs which facilitate working with drug data, but its terminology is unfortunately limited to commonly used prescription drugs, ``clinically significant ingredients,'' and adoption of this complex semantic scheme is limited \citep{RxNorm}.
 
 There is a third definition of the word drug that is commonly used in the literature and used by the FDA when it refers to an active moiety and a new molecular entity. In this case, ingredients whose pharmacological effect occurs through the same molecular entity are considered the same drug. This holds for different salt forms such as sumatriptan succinate and sumatriptan hemisulfate, but it also holds for prodrugs and their metabolized active forms such as brincidofovir and cidofovir \citep{NME}. An active moiety is a molecule or ion, excluding those appended portions of the molecule that cause the drug to be an ester, salt (including a salt with hydrogen or coordination bonds), or other noncovalent derivative (such as a complex, chelate, or clathrate) of the molecule, responsible for the physiological or pharmacological action of the drug substance. [CFR] Under the Food and Drug Administration Amendments Act of 2007, all newly introduced active moieties must first be reviewed by an advisory committee before the FDA can approve these products. [cite]
 
@@ -86,10 +86,10 @@ Stitch key is a core concept in \st. It defines how entities are matched, which,
 Table~\ref{tab:imatinib} shows an example of stitch keys and stitch values for
 the drug entity \emph{imatinib mesylate}. In this example, the \texttt{R\_activeMoiety} relationship specifies the UNII of the freebase form of imatinib mesylate.
 
-\begin{table}[!t]
+\begin{table}[thb]
 \processtable{Stitch keys and stitch values for the
 drug \emph{imatinib mesylate}\label{tab:imatinib}}
-{\begin{tabular}{@{}llll@{}}\toprule Stitch key &
+{\begin{tabular}{@{}ll@{}}\toprule Stitch key &
 Stitch value\\\midrule
 \texttt{N\_Name} & \texttt{IMATINIB MESYLATE}; \texttt{GLEEVEC}; \texttt{GLIVEC}\\
 \texttt{I\_UNII} & \texttt{8A1O1M485B}\\
@@ -103,7 +103,30 @@ Stitch value\\\midrule
 \end{table}
 
 \subsection{Data sources}
-To build the \ix{} resource, \st\ currently utilizes a number of diverse data sources. Of particular importance is the public G-SRS data dump from the FDA \cite{GSRSData}. This data source is well-curated and contains over 100K substances across six different classes: chemical, structurally diverse, protein, mixture, polymer, and nucleic acid.
+\st\ utilizes a number of diverse data sources for the \ix{} resource. Among the data sources, of particular importance is the public G-SRS data source from the FDA \cite{GSRSData}. This data source is well-curated and contains over 100K substances across six different classes: chemical, structurally diverse, protein, mixture, polymer, and nucleic acid. As a data source derived from the FDA's internal substance registry system, the G-SRS data source naturally forms the basis of our data integration effort. The complete list of data sources is shown in Table~\ref{tab:data-sources}.
+
+\begin{table}[thb]
+\processtable{\label{tab:data-sources}}
+{\begin{tabular}{@{}ll@{}}\toprule
+Data source & Size\\ \midrule
+G-SRS, April 2019&	105019\\
+Withdrawn and Shortage Drugs List Feb 2018 &	674\\
+Broad Institute Drug List 2018-09-07 &	6125\\
+NCATS Pharmaceutical Collection, April 2012 &	14814\\
+Rancho BioSciences, March 2019 &	51591\\
+Pharmaceutical Manufacturing Encyclopedia (Third Edition) &	2268\\
+DailyMed Rx, January 2019 &	74850\\
+DrugBank, December 2018&	11922\\
+DailyMed Other, January 2019&	13393\\
+DailyMed OTC, January 2019&	79448\\
+Drugs\@FDA \& Orange Book, July 2019&	28256\\
+ClinicalTrials, December 2017&	305833\\
+OTC Monographs, December 2018&	2713\\
+FDA NADA and ANADAs, December 2018&	554\\
+FDA Excipients, December 2018&	10212\\ \botrule
+\end{tabular}}{}
+\end{table}
+
 
 \subsection{Overall strategy}
 The basic premise behind \st{} is that data integration is often done within the context of a specific data source. This is a reasonable assumption given the data quality varies when integrating across disparate sources. Futhermore, by establishing a reference data source for data integration, we have finer control over the following:
@@ -112,6 +135,7 @@ The basic premise behind \st{} is that data integration is often done within the
 \item{\emph{Data resolution}.} Entity resolution is particularly challenging when data integration involves ontologies. A reference data source can serve as the anchor ontology from which other ontologies can be mapped. As with data quality, we can also impose any additional semantic constraints; e.g., prostate cancer is not one of the diagnoses for a female patient in an electronic health record.
 \item{\emph{Data curation}.} Generating ground-truth data is more managable with a single data source than across multiple data sources. This is particularly important due to the iterative feedback between data curation and data integration.
 \end{unlist}
+The G-SRS data source serves as an ideal reference data source. Its rigorous substance models and well-structured data elements give us a good starting point for drug data integration. In the next section, we discuss our strategies in utilizing the G-SRS reference data source to address entity resolution for drug data.
 
 \begin{methods}
 \section{Methods}\label{sec:methods}
