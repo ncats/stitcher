@@ -51,7 +51,7 @@ More practically, the agency defines ``drug substance'' and ``drug product'' res
 
 There is a third definition of the word drug that is commonly used in the literature and used by the FDA when it refers to an active moiety and a new molecular entity. In this case, ingredients whose pharmacological effect occurs through the same molecular entity are considered the same drug. This holds for different salt forms such as sumatriptan succinate and sumatriptan hemisulfate, but it also holds for prodrugs and their metabolized active forms such as brincidofovir and cidofovir \citep{NME}. An active moiety is a molecule or ion, excluding those appended portions of the molecule that cause the drug to be an ester, salt (including a salt with hydrogen or coordination bonds), or other noncovalent derivative (such as a complex, chelate, or clathrate) of the molecule, responsible for the physiological or pharmacological action of the drug substance. [CFR] Under the Food and Drug Administration Amendments Act of 2007, all newly introduced active moieties must first be reviewed by an advisory committee before the FDA can approve these products. [cite]
 
-As in other information domains, the names used to refer to drug substances and products are particularly problematic because their definitions change as a function of location or jurisdiction, time and context. FDA and other national regulators of medicines have collaborated to produce ISO 11238 [ref] which endeavors to define provide an information scheme for the unambiguous identification of all ingredients found in medicinal products, and FDA uses an implementation of ISO 11238 as the backbone of its information systems within the agency. [GSRS] While this facilitates data exchange within the FDA and with other national authorities, the task still remains to be able to map other, external data sources into this rigorously-defined scheme using whatever names and data are at hand.
+As in other information domains, the names used to refer to drug substances and products are particularly problematic because their definitions change as a function of location or jurisdiction, time and context. FDA and other national regulators of medicines have collaborated to produce ISO 11238 [ref] which endeavors to define an information scheme for the unambiguous identification of all ingredients found in medicinal products, and FDA uses an implementation of ISO 11238 as the backbone of its information systems within the agency. [GSRS] While this facilitates data exchange within the FDA and with other national authorities, the task still remains to be able to map other, external data sources into this rigorously-defined scheme using whatever names and data are at hand.
 
 \subsection{When are two drugs equivalent? (or Drug identity and equivalence)}
 \begin{itemize}
@@ -66,7 +66,7 @@ As in other information domains, the names used to refer to drug substances and 
 \subsection{Preliminary concepts}
 The conceptual data model underlying \st{} is a \emph{multigraph}. Within this multigraph, a node can either be a \emph{stitch node} or \emph{data node}. Each data node represents a ``raw'' entity as ingested from the data source; its corresponding stitch node is a \emph{standardized} representation that is used for \emph{stitching}. An edge between two stitch nodes can either be a \emph{stitch key} (undirected) or \emph{relationship} (directed). A unique \emph{stitch value} is associated with each stitch key such that it forms a clique. Figure~\ref{fig:graph1} shows an instance of a connected component of a stitch multigraph with overlapping cliques.
 
-A connected component in the stitch multigraph represents the basic unit of work for entity resolution. While the majority of connected components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the real challenges center around effective strategies for handling very large connected components---or also commonly known as \emph{hairballs} \citep{Croset2015}. For example, the current version of the \ix{} resource has an hairball close to 30,000 stitch nodes spanning across 15 data sources. We discuss our strategies in detail for untangling through such an hairball in Section~\ref{sec:methods_er}.
+A connected component in the stitch multigraph represents the basic unit of work for entity resolution. While the majority of connected components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the real challenges center around effective strategies for handling very large connected components---or also commonly known as \emph{hairballs} \citep{Croset2015}. For example, the current version of the \ix{} resource has an hairball close to 30,000 stitch nodes spanning across 15 data sources. We discuss our strategies in detail for untangling through such an hairball in Section~\ref{sec:methods-er}.
 
 The primary goal of entity resolution is to determine the number of unique entities in a connected component. These derived entities are represented as \emph{sgroup nodes} in the stitch multigraph. There can be multiple instances of sgroup nodes for any given set of stitch nodes, with each instance reflects a specific algorithmic strategy or version. Figure~\ref{fig:graph1} shows that there is only one unique entity as determined by the entity resolution algorithm for the given connected component.
 
@@ -80,7 +80,7 @@ Stitch key is a core concept in \st. It defines how entities are matched, which,
 \begin{unlist}
 \item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., tradenames, INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
 \item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CODE}.} These stitch keys represent (i) unique identifiers assigned to the entity by a well-known registrar (e.g., the U.S. Food and Drug Administration in the case of UNII) or (ii) internal company code. Both \texttt{I\_UNII} and \texttt{I\_CAS} are specific to drug (or substance in general) entity type, whereas \texttt{I\_CODE} can be used for any type of identifiers. The decision to use specific stitch keys over generic ones ultimately rests on the strategies used within entity resolution.
-\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.} For the small molecule class of drugs, perhaps more important than any identifiers is the underlying chemical structure definition. These stitch keys are hash values of the molecular structure at different resolutions \citep{lychi2019}.
+\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.} For the small molecule class of drugs, perhaps more important than any identifiers is the underlying chemical structure definition. These stitch keys are hash values derived from the molecular structure at different resolutions \citep{lychi2019}. Section~\ref{sec:methods-ingest} discusses in detail how these derived stitch values are generated.
 \item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the active moiety relationship between two drugs provides a strong evidence of equivalence. While this relationship can be infered directly from the chemical structures (e.g., freebase and salt forms, with and without esters), there is some level of curation needed to handle structures with metal complex.
 \end{unlist}
 Table~\ref{tab:imatinib} shows an example of stitch keys and stitch values for
@@ -99,11 +99,11 @@ Stitch value\\\midrule
 \texttt{H\_LYCHI\_L4} & \texttt{VLU17BQBSGWU-N}; \texttt{K83X3L3XSSHK-S}\\
 \texttt{H\_LYCHI\_L3} & \texttt{VL3FPUQ59CU-N}; \texttt{K846NBMB7T3-S}\\
 \texttt{R\_activeMoiety} & \texttt{BKJ8M8G5HI}\\\botrule
-\end{tabular}}{The suffix in the LyChI hash key of each molecular component can be one of \texttt{-S}, \texttt{-M}, or \texttt{-N} to indicate the component is a \emph{salt}, \emph{metal}, or \emph{neither}, respectively.}
+\end{tabular}}{}
 \end{table}
 
 \subsection{Data sources}
-\st\ utilizes a number of diverse data sources for the \ix{} resource. Among the data sources, of particular importance is the public G-SRS data source from the FDA \cite{GSRSData}. This data source is well-curated and contains over 100K substances across six different classes: chemical, structurally diverse, protein, mixture, polymer, and nucleic acid. As a data source derived from the FDA's internal substance registry system, the G-SRS data source naturally forms the basis of our data integration effort. The complete list of data sources is shown in Table~\ref{tab:data-sources}.
+\st\ utilizes a number of diverse data sources for the \ix{} resource. Among the data sources, of particular importance is the public G-SRS data source from the FDA \citep{GSRSData}. This data source is well-curated and contains over 100K substances across six different classes: chemical, structurally diverse, protein, mixture, polymer, and nucleic acid. As a data source derived from the FDA's internal substance registry system, the G-SRS data source naturally forms the basis of our data integration effort. The complete list of data sources is shown in Table~\ref{tab:data-sources}.
 
 \begin{table}[thb]
 \processtable{\label{tab:data-sources}}
@@ -141,12 +141,16 @@ The G-SRS data source serves as an ideal reference data source. Its rigorous sub
 \section{Methods}\label{sec:methods}
 In general, data integration with \st{} consists of four basic steps: \emph{ingestion}, \emph{stitching}, \emph{entity resolution}, and \emph{entity normalization}. With the exception of \emph{entity resolution}, all other steps---as they are currently implemented in \st---are generic and can be applied to a wide range of entity types.
 
-\subsection{Data ingestion}
-\st{} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to \emph{stitch keys}.
+\subsection{Data ingestion}\label{sec:methods-ingest}
+\st{} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to stitch keys.
+
+An important step in data ingestion is the standaridzation and validation of stitch values. For \texttt{N\_Name} stitch key, the standardization procedure is simply to convert the input string to uppercase; no validation is performed. For \texttt{I\_UNII} and \texttt{I\_CAS} stitch keys, no standardization is required, and validation is a simple checksum calculation to ensure the stitch value is proper. Depending on the input format, \st\ also provides basic utilities (e.g., regular expression) to help with data transformation during ingest.
+
+Perhaps the most unique feature of \st\ is its ability to incorporate knowledge of chemical structures into entity resolution. Whereas traditional approaches rely on names and identifiers to determine equivalence relation among substances, \st\ goes a step further and utilizes the underlying chemical structures to infer equivalence. [Provide non-obvious example here.]
 
 \subsection{Data stitching}
 
-\subsection{Entity resolution}\label{sec:methods_er}
+\subsection{Entity resolution}\label{sec:methods-er}
 
 \subsection{Entity normalization}
 
