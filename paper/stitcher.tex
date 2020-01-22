@@ -9,6 +9,7 @@
 
 \newcommand\st{\textbf{Stitcher}}
 \newcommand\ix{\textbf{InXight Drugs}}
+\newcommand\bangedup{\framebox{\parbox{\textwidth}{\it Dear Reviewer: Due to technical difficulties with our typesetting software, we were unable to generate proper references for this paper before the submission deadline. However, the complete ``source code'' and bibliographies of the paper are available at \url{https://github.com/ncats/stitcher/paper} should you have any concerns.}}}
 
 \begin{document}
 \firstpage{1}
@@ -36,7 +37,9 @@ Text Text Text Text Text Text Text Text Text Text Text Text Text  Text Text Text
 \textbf{Availability:} The complete source code along with data and build instructions for \st{} is readily available on Github \url{https://github.com/ncats/stitcher}. The \ix{} resource is accessible at \url{https://drugs.ncats.io}.\\
 \textbf{Contact:} \href{mailto:southalln@mail.nih.gov}{southalln@mail.nih.gov}\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics}
-online.}
+online.\\%[2em]
+%\bangedup
+}
 
 \maketitle
 
@@ -49,15 +52,15 @@ Herein we report on our recent data integration effort to build a comprehensive 
 While the word is included within the name of the organization, the U.S. Food and Drug Administration (FDA) does not have a straightforward definition of the word ``drug.'' The Federal Food Drug and Cosmetic Act (FD\&C Act) and FDA regulations define the term drug, in part, by reference to its intended use, as ``articles intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease” and “articles (other than food) intended to affect the structure or any function of the body of man or other animals.'' \citep{FDADrug}
 More practically, the agency defines ``drug substance'' and ``drug product'' respectively as the physical ingredients found in marketed products. Others use the word ``drug'' to sometimes refer to ``drug substances'' and sometimes to ``drug products'' as convenient, and this causes a great deal of semantic confusion within drug data found on the web. The National Library of Medicine produces a semantic product, RxNorm, that provides a variety of precise semantic types for ingredients, tradenames, dose forms, semantic clinical drug components, semantic clinical drug forms, and semantic clinical drugs which facilitate working with drug data, but its terminology is unfortunately limited to commonly used prescription drugs, ``clinically significant ingredients,'' and adoption of this complex semantic scheme is limited \citep{RxNorm}.
 
-There is a third definition of the word drug that is commonly used in the literature and used by the FDA when it refers to an active moiety and a new molecular entity. In this case, ingredients whose pharmacological effect occurs through the same molecular entity are considered the same drug. This holds for different salt forms such as sumatriptan succinate and sumatriptan hemisulfate, but it also holds for prodrugs and their metabolized active forms such as brincidofovir and cidofovir \citep{NME}. An active moiety is a molecule or ion, excluding those appended portions of the molecule that cause the drug to be an ester, salt (including a salt with hydrogen or coordination bonds), or other noncovalent derivative (such as a complex, chelate, or clathrate) of the molecule, responsible for the physiological or pharmacological action of the drug substance. [CFR] Under the Food and Drug Administration Amendments Act of 2007, all newly introduced active moieties must first be reviewed by an advisory committee before the FDA can approve these products. [cite]
+There is a third definition of the word drug that is commonly used in the literature and used by the FDA when it refers to an active moiety and a new molecular entity. In this case, ingredients whose pharmacological effect occurs through the same molecular entity are considered the same drug. This holds for different salt forms such as sumatriptan succinate and sumatriptan hemisulfate, but it also holds for prodrugs and their metabolized active forms such as brincidofovir and cidofovir \citep{NME}. \emph{An active moiety is a molecule or ion, excluding those appended portions of the molecule that cause the drug to be an ester, salt (including a salt with hydrogen or coordination bonds), or other noncovalent derivative (such as a complex, chelate, or clathrate) of the molecule, responsible for the physiological or pharmacological action of the drug substance.} [CFR] Under the Food and Drug Administration Amendments Act of 2007, all newly introduced active moieties must first be reviewed by an advisory committee before the FDA can approve these products. [cite]
 
 As in other information domains, the names used to refer to drug substances and products are particularly problematic because their definitions change as a function of location or jurisdiction, time and context. FDA and other national regulators of medicines have collaborated to produce ISO 11238 [ref] which endeavors to define an information scheme for the unambiguous identification of all ingredients found in medicinal products, and FDA uses an implementation of ISO 11238 as the backbone of its information systems within the agency. [GSRS] While this facilitates data exchange within the FDA and with other national authorities, the task still remains to be able to map other, external data sources into this rigorously-defined scheme using whatever names and data are at hand.
 
-\subsection{When are two drugs equivalent? (or Drug identity and equivalence)}
-\begin{itemize}
-\item Layout the challenges in determining when two drugs are equivalent. This will depend on drug classes. For example, for small molecules, discuss salt forms, metals, and esters; for biologics, biosimilar; etc.
-\item Discuss the different types of identifier; INN, USAN, IUPAC, InChI, CAS, UNII, PubChem, company code, etc. Also address the challenge on the evolution of the drug identifier from discovery (where stereochemistry can be ambiguous) to approval.
-\end{itemize}
+\subsection{When are two drugs equivalent?}
+%\begin{itemize}
+%\item Layout the challenges in determining when two drugs are equivalent. This will depend on drug classes. For example, for small molecules, discuss salt forms, metals, and esters; for biologics, biosimilar; etc.
+%\item Discuss the different types of identifier; INN, USAN, IUPAC, InChI, CAS, UNII, PubChem, company code, etc. Also address the challenge on the evolution of the drug identifier from discovery (where stereochemistry can be ambiguous) to approval.
+%\end{itemize}
 
 %\enlargethispage{12pt}
 
@@ -80,7 +83,7 @@ Stitch key is a core concept in \st. It defines how entities are matched, which,
 \begin{unlist}
 \item{\texttt{N\_Name}.} This is the most generic stitch key available. Stitch values associated with this stitch key can be any established names or nomenclature; e.g., tradenames, INN (International Nonproprietary Names), USAN (United States Adopted Names), IUPAC (International Union of Pure and Applied Chemistry).
 \item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CODE}.} These stitch keys represent (i) unique identifiers assigned to the entity by a well-known registrar (e.g., the U.S. Food and Drug Administration in the case of UNII) or (ii) internal company code. Both \texttt{I\_UNII} and \texttt{I\_CAS} are specific to drug (or substance in general) entity type, whereas \texttt{I\_CODE} can be used for any type of identifiers. The decision to use specific stitch keys over generic ones ultimately rests on the strategies used within entity resolution.
-\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.} For the small molecule class of drugs, perhaps more important than any identifiers is the underlying chemical structure definition. These stitch keys are hash values derived from the molecular structure at different resolutions \citep{lychi2019}. Section~\ref{sec:methods-ingest} discusses in detail how these derived stitch values are generated.
+\item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.} For the small molecule class of drugs, perhaps more important than any identifiers is the underlying chemical structure definition. These stitch keys are hash values derived from the molecular structure at different resolutions \citep{lychi}. Section~\ref{sec:methods-ingest} discusses in detail how these derived stitch values are generated.
 \item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the active moiety relationship between two drugs provides a strong evidence of equivalence. While this relationship can be infered directly from the chemical structures (e.g., freebase and salt forms, with and without esters), there is some level of curation needed to handle structures with metal complex.
 \end{unlist}
 Table~\ref{tab:imatinib} shows an example of stitch keys and stitch values for
@@ -103,7 +106,7 @@ Stitch value\\\midrule
 \end{table}
 
 \subsection{Data sources}
-\st\ utilizes a number of diverse data sources for the \ix{} resource. Among the data sources, of particular importance is the public G-SRS data source from the FDA \citep{GSRSData}. This data source is well-curated and contains over 100K substances across six different classes: chemical, structurally diverse, protein, mixture, polymer, and nucleic acid. As a data source derived from the FDA's internal substance registry system, the G-SRS data source naturally forms the basis of our data integration effort. The complete list of data sources is shown in Table~\ref{tab:data-sources}.
+\st\ utilizes a number of diverse data sources for the \ix{} resource. Among the data sources, of particular importance is the public G-SRS data source from the FDA \citep{GSRSData}. This data source is well-curated and contains over 100K substances across six different classes: chemical, structurally diverse, protein, mixture, polymer, and nucleic acid. As a data source derived from the FDA's internal substance registry system, the G-SRS data source naturally forms the basis of our data integration effort. The complete list of data sources currently used by \st\ is shown in Table~\ref{tab:data-sources}.
 
 \begin{table}[thb]
 \processtable{\label{tab:data-sources}}
@@ -144,9 +147,11 @@ In general, data integration with \st{} consists of four basic steps: \emph{inge
 \subsection{Data ingestion}\label{sec:methods-ingest}
 \st{} is capable of ingesting data in a wide variety of sources and formats. Semantic formats such as OWL, RDF, and Turtle are supported as are JSON, delimiter separated text, and custom formats. For non-semantic format, a separate configuration file is required to map properties to stitch keys.
 
-An important step in data ingestion is the standaridzation and validation of stitch values. For \texttt{N\_Name} stitch key, the standardization procedure is simply to convert the input string to uppercase; no validation is performed. For \texttt{I\_UNII} and \texttt{I\_CAS} stitch keys, no standardization is required, and validation is a simple checksum calculation to ensure the stitch value is proper. Depending on the input format, \st\ also provides basic utilities (e.g., regular expression) to help with data transformation during ingest.
+An important step in data ingestion is the standaridzation and validation of stitch values. For \texttt{N\_Name} stitch key, the standardization procedure is simply to convert the input string to uppercase; no validation is performed. For \texttt{I\_UNII} and \texttt{I\_CAS} stitch keys, no standardization is required, and validation is a simple checksum calculation to ensure the stitch value is proper. Depending on the input format, \st\ also provides basic utilities (e.g., regular expression) to help with data transformation during ingestion.
 
-Perhaps the most unique feature of \st\ is its ability to incorporate knowledge of chemical structures into entity resolution. Whereas traditional approaches rely on names and identifiers to determine equivalence relation among substances, \st\ goes a step further and utilizes the underlying chemical structures to infer equivalence. [Provide non-obvious example here.]
+Perhaps the most unique feature of \st\ is its ability to incorporate knowledge of chemical structures into entity resolution. Whereas traditional approaches rely on names and identifiers to determine equivalence relation among substances, \st\ goes a step further and utilizes the underlying chemical structures to infer equivalence. This is particularly relevant when the drug is a mixture, prodrug, or active moiety with complex excipient (or derivative thereof). As an example, consider the drug entity \emph{IMATINIB MESYLATE} and its active ingredient \emph{IMATINIB}. Here, it is obvious that the two entities cannot be matched by name alone. Instead, having structural information by way of molecular hash keys for each molecular component allows us to determine equivalence from the common active moiety \emph{IMATINIB} between the two entities. This trivial example might suggest that, instead of comparing names exactly, we find the longest common substring of the names. The approach would certainly work in this example, but to make it work in general would require very specialized parsing rules and dictionaries.
+
+For data sources with chemical structures, the most computationally demanding step in data ingestion is the generation of molecular hash keys. Hash keys are generated for three different structural levels: \texttt{L5}, \texttt{L4}, and \texttt{L3}, which correspond to stitch keys \texttt{H\_LYCHI\_L5}, \texttt{H\_LYCHI\_L4}, and \texttt{H\_LYCHI\_L3}, respectively. Level \texttt{L5} is the most specific; it represents the molecular structure as-is, i.e., without structure normalization and standardization. A match at this level is preferred over other stitch keys. The next level \texttt{L4} represents the structure after normalization and standardization \citep{lychi}. A match at this level implies that two structures are the same insofar as the valence bond theory is valid. And the last level \texttt{L3} represents chemical structures with incorrect or missing stereochemistry. A match at this level is considered weak and does not constitute equivalence without significant supporting evidence. For each hash key, a suffix \texttt{-M}, \texttt{-S}, or \texttt{-N} is also assigned to denote the molecular component is a \emph{metal}, \emph{salt}, or \emph{neither}, respectively.
 
 \subsection{Data stitching}
 
@@ -175,9 +180,6 @@ Perhaps the most unique feature of \st\ is its ability to incorporate knowledge 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Conclusion}
-
-
 \section*{Acknowledgements}
 
 We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-reading of early drafts of the manuscript. We also thank our colleague, Tongan Zhao, for his help in developing a prototype curation user interface for \st.
@@ -190,5 +192,5 @@ We thank our colleagues, Mark Williams and Tyler Beck, for their valuable proof-
 %
 %\bibliographystyle{plain}
 %
-%\bibliography{stitcher}
+\bibliography{stitcher}
 \end{document}
