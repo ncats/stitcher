@@ -3,6 +3,8 @@
 \copyrightyear{2020} \pubyear{2020}
 
 \usepackage[colorlinks=true,urlcolor=black,citecolor=blue]{hyperref}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{multicol}
 
 \access{Advance Access Publication Date: Day Month Year}
 \appnotes{Manuscript Category}
@@ -112,21 +114,21 @@ Stitch value\\\midrule
 \processtable{\label{tab:data-sources}}
 {\begin{tabular}{@{}ll@{}}\toprule
 Data source & Size\\ \midrule
-G-SRS, April 2019&	105019\\
+G-SRS, April 2019&	105,019\\
 Withdrawn and Shortage Drugs List Feb 2018 &	674\\
-Broad Institute Drug List 2018-09-07 &	6125\\
-NCATS Pharmaceutical Collection, April 2012 &	14814\\
-Rancho BioSciences, March 2019 &	51591\\
-Pharmaceutical Manufacturing Encyclopedia (Third Edition) &	2268\\
-DailyMed Rx, January 2019 &	74850\\
-DrugBank, December 2018&	11922\\
-DailyMed Other, January 2019&	13393\\
-DailyMed OTC, January 2019&	79448\\
-Drugs\@FDA \& Orange Book, July 2019&	28256\\
-ClinicalTrials, December 2017&	305833\\
-OTC Monographs, December 2018&	2713\\
+Broad Institute Drug List 2018-09-07 &	6,125\\
+NCATS Pharmaceutical Collection, April 2012 &	14,814\\
+Rancho BioSciences, March 2019 &	51,591\\
+Pharmaceutical Manufacturing Encyclopedia (Third Edition) &	2,268\\
+DailyMed Rx, January 2019 &	74,850\\
+DrugBank, December 2018&	11,922\\
+DailyMed Other, January 2019&	13,393\\
+DailyMed OTC, January 2019&	79,448\\
+Drugs\@FDA \& Orange Book, July 2019&	28,256\\
+ClinicalTrials, December 2017&	305,833\\
+OTC Monographs, December 2018&	2,713\\
 FDA NADA and ANADAs, December 2018&	554\\
-FDA Excipients, December 2018&	10212\\ \botrule
+FDA Excipients, December 2018&	10,212\\ \botrule
 \end{tabular}}{}
 \end{table}
 
@@ -151,9 +153,36 @@ An important step in data ingestion is the standaridzation and validation of sti
 
 Perhaps the most unique feature of \st\ is its ability to incorporate knowledge of chemical structures into entity resolution. Whereas traditional approaches rely on names and identifiers to determine equivalence relation among substances, \st\ goes a step further and utilizes the underlying chemical structures to infer equivalence. This is particularly relevant when the drug is a mixture, prodrug, or active moiety with complex excipient (or derivative thereof). As an example, consider the drug entity \emph{IMATINIB MESYLATE} and its active ingredient \emph{IMATINIB}. Here, it is obvious that the two entities cannot be matched by name alone. Instead, having structural information by way of molecular hash keys for each molecular component allows us to determine equivalence from the common active moiety \emph{IMATINIB} between the two entities. This trivial example might suggest that, instead of comparing names exactly, we find the longest common substring of the names. The approach would certainly work in this example, but to make it work in general would require very specialized parsing rules and dictionaries.
 
-For data sources with chemical structures, the most computationally demanding step in data ingestion is the generation of molecular hash keys. Hash keys are generated for three different structural levels: \texttt{L5}, \texttt{L4}, and \texttt{L3}, which correspond to stitch keys \texttt{H\_LYCHI\_L5}, \texttt{H\_LYCHI\_L4}, and \texttt{H\_LYCHI\_L3}, respectively. Level \texttt{L5} is the most specific; it represents the molecular structure as-is, i.e., without structure normalization and standardization. A match at this level is preferred over other stitch keys. The next level \texttt{L4} represents the structure after normalization and standardization \citep{lychi}. A match at this level implies that two structures are the same insofar as the valence bond theory is valid. And the last level \texttt{L3} represents chemical structures with incorrect or missing stereochemistry. A match at this level is considered weak and does not constitute equivalence without significant supporting evidence. For each hash key, a suffix \texttt{-M}, \texttt{-S}, or \texttt{-N} is also assigned to denote the molecular component is a \emph{metal}, \emph{salt}, or \emph{neither}, respectively.
+For data sources with chemical structures, the most computationally demanding step in data ingestion is the generation of molecular hash keys. Hash keys are generated for each component of a chemical structure in three different structural levels: \texttt{L5}, \texttt{L4}, and \texttt{L3}, which correspond to stitch keys \texttt{H\_LYCHI\_L5}, \texttt{H\_LYCHI\_L4}, and \texttt{H\_LYCHI\_L3}, respectively. Level \texttt{L5} is the most specific; it represents the chemical structure as-is, i.e., without structure normalization and standardization. With the exception of the relation \texttt{R\_activeMoiety}, a match at this level has higher priority over other stitch keys. The next level \texttt{L4} represents the structure after normalization and standardization per the LyChI software package \citep{lychi}. A match at this level implies that two structures are equivalent
+%insofar as \textcolor{red}{the valence bond theory is valid}
+in terms of stereochemistry, resonance, and tautomerism. And the last level \texttt{L3} is the same as \texttt{L4} but without stereochemistry. A match at this level is considered weak and does not constitute equivalence without other significant supporting evidence. The purpose for \texttt{L3} is in anticipation of incorrect or missing stereo information, which is one of the most common type of errors associated with chemical structures. For each hash key, a suffix \texttt{-M}, \texttt{-S}, or \texttt{-N} is also assigned to designate the molecular component as either a \emph{metal}, \emph{salt}, or \emph{neither}, respectively. Table~\ref{tab:imatinib} illustrates all three representations for the drug \emph{IMATINIB MESYLATE}. Note that the cardinality for \texttt{L5} is always one, whereas for \texttt{L4} and \texttt{L3} the cardinality is equal to the number of non-hydrate molecular components. (Hydrate components are removed prior to processing.)
 
 \subsection{Data stitching}
+\emph{Stitching} is the process by which the stitch multigraph is incrementally constructed as data is ingested. Algorithm~\ref{algo:stitching} describes the basic stitching algorithm in \st. This algorithm is applied to each data source, and upon its completion yields a stitch multigraph such that any stitch value that spans $N$ stitch nodes forms an induced clique, i.e., a complete subgraph of $N$ nodes and $\frac{N(N-1)}{2}$ edges. Overlapping induced cliques form the basis for the proposed entity resolution approach discussed in the next section.
+
+\begin{algorithm}\label{algo:stitching}
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\SetKwFunction{Union}{Union}
+\SetKwFunction{Find}{Find}
+\SetAlgoLined
+\DontPrintSemicolon
+Let $W$ denote the set of stitch nodes created in the data ingestion step for a given data source $D$.\\
+Let $\langle k, v\rangle$ be the tuple of stitch key and value, respectively, defined for a stitch node $w$.\\
+$G=(V,E)$ is current stitch multigraph.\\
+\Find{$k, v$} is a function that returns all stitch nodes in $V$ containing stitch key $k$ and stitch value $v$.\\
+\Union{$w,z$} is a union-find algorithm for tracking disjoint sets (i.e., connected components).\\
+ \For{$w \in W$}{
+    \For{$\langle k_i, v_i\rangle \in w$}{
+      \For{$z \in$ \Find{$k_i,v_i$}}{
+         $E \leftarrow E \cup z\thicksim w$\;
+         \Union{$w,z$}\;
+      }
+    }
+    $V \leftarrow V \cup w$\;
+ }
+ \caption{Entity stitching algorithm}
+\end{algorithm}
 
 \subsection{Entity resolution}\label{sec:methods-er}
 
