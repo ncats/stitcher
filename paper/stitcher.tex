@@ -265,8 +265,18 @@ well-curated and contains over 100K substances across six different
 classes: chemical, structurally diverse, protein, mixture, polymer,
 and nucleic acid. As a data source derived from the FDA's internal
 substance registry system, the G-SRS data source naturally forms the
-basis of our data integration effort. The complete list of data
-sources currently used by \st\ is shown in
+basis of our data integration
+effort. Using this data source as
+the ``seed'' from which other data
+sources can map onto has the following benefits:
+\begin{itemize}
+\item Since the G-SRS data source implements the ISO 11238
+standard \citep{ISO11238} for defining medicinal substances, it serves
+as an ideal starting point for what constitutes a ``drug.''
+\item The data is a public version of the internal substance registry
+within the FDA; as such, it is well-curated and up-to-date.
+\end{itemize}
+The complete list of data sources currently used by \st\ is shown in
 Table~\ref{tab:data-sources}. 
 
 \begin{table}[thb]
@@ -420,7 +430,7 @@ Let $W$ denote the set of stitch nodes created in the data ingestion
 step for a given data source $D$.\\
 Let $\langle k, v\rangle$ be the tuple of stitch key and value,
 respectively, defined for a stitch node $w$.\\
-$G=(V,E)$ is current stitch multigraph.\\
+$G=(V,E)$ is the current stitch multigraph.\\
 \Find{$k, v$} is a function that returns all stitch nodes in $V$
 containing stitch key $k$ and stitch value $v$.\\
 \Union{$w,z$} is a union-find algorithm for tracking disjoint sets
@@ -439,48 +449,79 @@ containing stitch key $k$ and stitch value $v$.\\
 
 \subsection{Entity resolution}\label{sec:methods-er}
 After all data sources have been stitched together, the next step is
-to identify unique entities from the stitch multigraph. Formally, this
+to identify \emph{unique} entities from the stitch multigraph. Formally, this
 step is known as \emph{entity resolution} and is the only step
-within \st\ that is specific to the drug entity type. This is to be
+within \st\ that is specific to the drug entity type. (This is to be
 expected: Given that entity resolution is about adjudicating
 the splitting and merging of entities, a reasonable amount of
 knowledge of the entity type is required for the adjudication to be
-effective. At the core of our proposed approach to entity resolution
-for drug data is the reference G-SRS data source \citep{GSRSData}.
-Using this data source as the ``seed'' from which other data sources
-can map onto has several benefits:
-\begin{itemize}
-\item Since the G-SRS data source implements the ISO 11238
-standard \citep{ISO11238} for defining medicinal substances, it serves
-as an ideal starting point for  what constitutes a ``drug.''
-\item The data is a public version of the internal substance registry
-within the FDA; as such, it is well-curated and up-to-date.
-\item 
-\end{itemize}
-
-The input to entity resolution is a connected component. Within \st\
-the process of entity splitting and merging for a connected componoent
-is known as \emph{untangling}. At a high level, this process works as
-follows. 
+effective.) For a given connected component, the iterative process of
+assigning equivalence labels to stitch nodes is known
+as \emph{untangling}. Algorithm~\ref{algo:untangle} gives a high level
+outline of the untangling process.
 
 \begin{algorithm}\label{algo:untangle}
-\SetKwFunction{Union}{Union}
-\SetKwFunction{Find}{Find}
+\SetKwFunction{MergeNodes}{MergeNodes}
+\SetKwFunction{MergeCliques}{MergeCliques}
+\SetKwFunction{MergeSingletons}{MergeSingletons}
 \SetAlgoLined
 \DontPrintSemicolon
-$G=(V,E)$ is current stitch multigraph.\\
- \For{$w \in W$}{
-    \For{$\langle k_i, v_i\rangle \in w$}{
-      \For{$z \in$ \Find{$k_i,v_i$}}{
-         $E \leftarrow E \cup z\thicksim w$\;
-         \Union{$w,z$}\;
-      }
-    }
-    $V \leftarrow V \cup w$\;
- }
+Let $U$ be the disjoint set of entity labels.\\
+Let $S$ denote the set of unlabeled entities (i.e., singletons).\\
+$C=(V,E)$ is the connected component.\\
+\MergeNodes{$U, r$} is a function that performs transitive closure on
+stitch nodes in $C$ which are connected by relation $r\in E$. The results are
+accumulated in $U$.\\
+\MergeCliques{$U, K$} is a function that takes a set of stitch keys
+$K$, finds overlapping cliques that span two or more stitch keys,
+and performs transitive closure on the entities.\\
+\MergeSingletons{$U, S, K$} is a function that also takes in a set of
+stitch keys $K$, a set of singleton stitch node $S$, and find the best
+mapping to an already labeled stitch node.\\
+\MergeNodes{$U,$\texttt{R\_activeMoiety}}\;
+\MergeNodes{$U,$\texttt{I\_UNII}}\;
+\MergeNodes{$U,$\texttt{H\_LyChI\_L4}}\;
+\MergeCliques{$U,$\texttt{N\_Name},\texttt{I\_CAS},\texttt{I\_CID},\texttt{H\_LyChI\_L4}}\;
+\MergeSingletons{$U,S,$\texttt{N\_Name},\texttt{I\_CAS}}\;
  \caption{An algorithm to untangle a connected component}
 \end{algorithm}
+At the core of the algorithm is the implied priorities associated with
+the stitch keys. The relation \texttt{R\_activeMoiety} has the highest
+precedent as it is manually generated and is a special relation
+that only available to the G-SRS data source. As an
+example, consider the entities \emph{acetylsalicylic acid}
+(\emph{aspirin} is its common name) and \emph{ethyl acetylsalicylate}
+shown in Figures~\ref{fig:aspirin} and \ref{fig:ethyl},
+respectively. While the two entities have nothing in common, in G-SRS
+\emph{acetylsalicylic acid} is annotated as being an \emph{active
+moiety} of \emph{ethyl acetylsalicylate}. Further examination of the
+structural differences shows that only an \emph{ester} separates the
+two entites; this falls well within what the FDA considers as
+equivalent drugs. This example also highlights a quagmire:
+Computationally, there is nothing to prevent us from
+imputing \emph{active moiety} relationships through efficient (sub-)
+graph isomorphisms. This, however, is a very tempted trap that we have
+resisted due other forms of \emph{active moiety} relationships---e.g.,
+metabolites and metals---that we are just not able to have a good
+handle on at the moment.
+\begin{figure}[!tpb]
+\centering
+\begin{minipage}{.45\textwidth}
+\centerline{\includegraphics[scale=0.5]{aspirin-crop}}
+\caption{Chemical structure for acetylsalicylic
+acid.}\label{fig:aspirin}
+\end{minipage}
+\hfill
+\begin{minipage}{.45\textwidth}
+\centerline{\includegraphics[scale=0.5]{VX19C5613T-crop}}
+\caption{Chemical structure for ethyl acetylsalicylate.}\label{fig:ethyl}
+\end{minipage}
+\end{figure}
 
+The next priority is the stitch key \texttt{I\_UNII}. As UNII is
+the primary identifier for the G-SRS data source, any data source that
+provides mapping based on this identifier implies the data source has
+sufficient knowledge of G-SRS (i.e., guilt by association).
 
 \subsection{Entity normalization}
 Text describing entity normalization
@@ -490,6 +531,12 @@ Text describing entity normalization
 
 \section{Results}
 Discussion of results and highlight interesting examples here.
+
+\begin{figure}[!tpb]
+\centerline{\includegraphics[scale=0.5]{graph4-crop}}
+\caption{A dense connected component that resolved to three unique
+drug entities.}\label{fig:graph2}  
+\end{figure}
 
 \section{Discussion}
 
