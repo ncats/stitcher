@@ -1,5 +1,6 @@
 Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref		
-1939	Cyverine hydrochloride	cyverine hydrochloride	H5DOV3J7EP	07-27-39	NDA	0-939	Frederick Stearns	https://books.google.com/books?id=pm9KAQAAIAAJ&lpg=PA470&ots=aA7IeOI1kb&dq=cyverine%20suspended&pg=PA470#v=onepage&q=cyverine%20suspended&f=false		
+1938	Paredrinol	pholedrine	AY28O44JGD		NDA	1-379	Smith Kline & French	https://books.google.com/books?id=4lDaPUCtJIsC&pg=RA3-PA879&dq=PAREDRINOL+1938		
+1938	Cyverine hydrochloride	cyverine hydrochloride	H5DOV3J7EP	07-27-39	NDA	0-939	Frederick Stearns	https://books.google.com/books?id=pm9KAQAAIAAJ&lpg=PA470&ots=aA7IeOI1kb&dq=cyverine%20suspended&pg=PA470#v=onepage&q=cyverine%20suspended&f=false		
 1939	Perandren	testosterone propionate	WI93Z9138A	03-07-39	NDA	0-499	Ciba	https://www.gpo.gov/fdsys/pkg/FR-1998-05-04/html/98-11684.htm		
 1940	Furmerane	2-hydroxymercurifuran	5199501633				Searle	DeHaen 1940-1975 NMEs		
 1940	Ephynal Acetate	alpha tocopherol	H4N855PNZ1				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
@@ -16,12 +17,13 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1940	Progynon-DP	estradiol dipropionate	NIG5418BXB		NDA	1-802	Schering	DeHaen 1940-1975 NMEs		
 1940	Mannitol Hexanitrate	mannitol hexanitrate	99AU28W1G9				Various Mfrs.	DeHaen 1940-1975 NMEs		
 1940	Kayquinone	menadione	723JX6CXY5				Abbott	DeHaen 1940-1975 NMEs		
-1940	Hykinone	menadione sodium bisulfite	97K34V88SA				Abbott	DeHaen 1940-1975 NMEs		
+1940	Hykinone	menadione sodium bisulfite	97K34V88SA		NDA	2-694	Abbott	DeHaen 1940-1975 NMEs		
 1940	Sulfathiazole	sulfathiazole	Y7FKS2XWQH				Merck	DeHaen 1940-1975 NMEs		
 1940	Sulfathiazole	sulfathiazole	Y7FKS2XWQH	07-19-40	NDA	2-712	Winthrop	https://books.google.com/books?id=pm9KAQAAIAAJ&lpg=PA470&ots=aA7IeOI1kb&dq=cyverine%20suspended&pg=PA470#v=onepage&q=cyverine%20suspended&f=false		
 1940	Proloid	thyroglobulin	NN2P9VPL7M				Maltine (WarnerLambert)	DeHaen 1940-1975 NMEs		
 1940	Delvinal	vinbarbital	7NZH2C1T6O				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
 1940	Synkamin	vitamin K	S5Z3U87QHF				Parke-Davis	DeHaen 1940-1975 NMEs		
+1940	Calcium mandelate	calcium mandelate	29CS07FZII		NDA	0-934	Baxter	https://books.google.com/books?id=Qh_nAAAAMAAJ&q=CALCIUM+MANDELATE&dq=CALCIUM+MANDELATE		
 1941	Amethone HCl	amolanone HCl	M36927R46E				Abbott	DeHaen 1940-1975 NMEs		
 1941	Monocaine Formate	butethamine formate	N7626F65HF				Novocol	DeHaen 1940-1975 NMEs		
 1941	Ceepryn	cetylpyridinium chloride	D9OM4SK49P				Merrell	DeHaen 1940-1975 NMEs		
@@ -41,6 +43,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1941	Sulfaguanidine	sulfaguanidine	15XQ8043FN				Lederle	DeHaen 1940-1975 NMEs		
 1941	Glucophylline	theophylline meglumine	1442U7XKHA				Abbott	DeHaen 1940-1975 NMEs		
 1941	Pitressin Tannate	vasopressin tannate	4R069M4O1P				Parke-Davis	DeHaen 1940-1975 NMEs		
+1941	Synkamin	vitamin K5	KKP97T7O0X		NDA	3-472	Parke-Davis	https://books.google.com/books?id=vvHnAAAAMAAJ&q=synkamin&dq=synkamin		
 1942	Pavatrine	2-diethylaminoethyl 9-fluorenecarboxylate	23AHS3XR5K				Searle	DeHaen 1940-1975 NMEs		
 1942	Phosphaljel	aluminum phosphate	F92V3S521O				Wyeth	DeHaen 1940-1975 NMEs		
 1942	Benzestrol	benzestrol	A27512LR47				Schieffelin	DeHaen 1940-1975 NMEs		
@@ -64,6 +67,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1943	Sulfamerazine	sulfamerazine	UR1SAB295F				Lederle	DeHaen 1940-1975 NMEs		
 1943	Tuamine Sulfate	tuaminoheptane sulfate	WZK5LN5CNW				Lilly	DeHaen 1940-1975 NMEs		
 1943	Delvinal Sodium	vinbarbital sodium	BAS6234GZ7				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
+1943	Monomestrol	mestilbol	N44U12UW5N		NDA	5-015	Wallace & Tiernan	https://books.google.com/books?id=Z_gjAQAAMAAJ&q=monomestrol&dq=monomestrol		
+1943	Zinc sulfathiazole	zinc sulfathiazole	4KCI0QUF9Q		NDA	5-027	Squibb	https://books.google.com/books?id=Z_gjAQAAMAAJ&q=ZINC+SULFATHIAZOLE&dq=ZINC+SULFATHIAZOLE		
 1944	Merbak	acetomeroctol	W8OY9Y1132				Schieffelin	DeHaen 1940-1975 NMEs		
 1944	Butaphyllamine	ambuphylline	VOU5V0B772				Merrell (MerrellNational)	DeHaen 1940-1975 NMEs		
 1944	Carbarsone	carbarsone	8PK70TXE1T				Lilly	DeHaen 1940-1975 NMEs		
@@ -75,12 +80,13 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1944	Furmethide	furtrethonium iodide	1D064NLD7G				Smith Kline & French	DeHaen 1940-1975 NMEs		
 1942	Demerol HCl	meperidine HCl	N8E7F7Q170	11-10-42	NDA	5-010	Winthrop	DeHaen 1940-1975 NMEs		
 1944	Mercuhydrin	meralluride	R062D0212H				Lakeside (MerrellNational)	DeHaen 1940-1975 NMEs		
-1944	Methedrine	methamphetamine HCl	997F43Z9CV				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
-1945	Dexedrine	dextroamphetamine sulfate	JJ768O327N				Smith Kline French	DeHaen 1940-1975 NMEs		
+1944	Methedrine	methamphetamine HCl	997F43Z9CV		NDA	5-504	Burroughs Wellcome	DeHaen 1940-1975 NMEs		
+1944	Sulfapyrazine	sulfapyrazine sodium	2937C57J2U		NDA	5-300	Mead Johnson	https://www.sciencedirect.com/science/article/abs/pii/S0022347644800026		
+1945	Miller-Drine	DL-DESOXYEPHEDRINE HYDROCHLORIDE	24GNZ56D62		NDA	6-003	Smith, Miller and Patch	https://books.google.com/books?id=cQSYeYNQ8_4C&lpg=PA160&ots=LQpLcBbp0s&dq=methedrine%20nda&pg=PA160#v=onepage&q=methedrine%20nda&f=false		
 1944	Tuamine	tuaminoheptane	Z0420GYD84				Lilly	DeHaen 1940-1975 NMEs		
 1945	Lauron	aurothioglycanide	2A9D34A16M				Endo	DeHaen 1940-1975 NMEs		
 1945	Chloresium	"chlorophyll, water soluble"	00WNZ48OR9				Rystan	DeHaen 1940-1975 NMEs		
-1945	Chotbyn clihydrogen cit.	choline dihydrogen citrate	DQ8HHP07GL				Flint	DeHaen 1940-1975 NMEs		
+1945	Chotbyn clihydrogen cit.	choline dihydrogen citrate	DQ8HHP07GL		NDA	5-846	Flint	DeHaen 1940-1975 NMEs		
 1945	Dichlor Mapharsen	dichlorophenarsine HCl	571850CM3R				Parke-Davis	DeHaen 1940-1975 NMEs		
 1945	Algyn	dihydroxyaluminum aminoacetate	DO250MG0W6				Brayten (Chattem)	DeHaen 1940-1975 NMEs		
 1945	Promin Sodium	glucosulfone sodium	I6RLN7D44F				Parke-Davis	DeHaen 1940-1975 NMEs		
@@ -89,7 +95,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1945	Penicillin G Potassium	penicillin G potassium	VL775ZTH4C				Various Mfrs.	DeHaen 1940-1975 NMEs		
 1945	Seconal	secobarbital	1P7H87IN75		NDA	7-392	Lilly	DeHaen 1940-1975 NMEs		
 1945	Sodium Caprylate	sodium caprylate	9XTM81VK2B				Pennwalt	DeHaen 1940-1975 NMEs		
-1946	Streptomycin HCl	streptomycin hydrochloride	8P331B9592	02-18-46	NDA	60-076	Merck	DeHaen 1940-1975 NMEs		
+1945	Alphatron	Radon RN-222	3Z30NQN07C		NDA	5-924	Canadian Radium & Uranium	https://archive.org/stream/pennsylvaniamedi5019medi/pennsylvaniamedi5019medi_djvu.txt		
+1946	Streptomycin HCl	streptomycin hydrochloride	8P331B9592		NDA	60-113	Philadelphia	DeHaen 1940-1975 NMEs		
 1945	Desenex Sol.	undecylenic acid	K3D86KJ24N				Pennwalt	DeHaen 1940-1975 NMEs		
 1946	Oralator	2-amino-6-methylheptane	3GQ9E911BI				Smith Kline & French	DeHaen 1940-1975 NMEs		
 1946	Bistrimate	bismuth sodium triglycollamate	X9A8P4D3IF				Smith Pharmacal	DeHaen 1940-1975 NMEs		
@@ -102,12 +109,13 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1945	Furacin	nitrofurazone	X8XI70B5Z6	10-04-45	NDA	5-795	Eaton	DeHaen 1940-1975 NMEs		
 1946	Sulfathalidine	phthalylsulfathiazole	6875L5852V				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
 1946	Salicylanilide	salicylanilide	LHP8NEY345				Various Mfrs.	DeHaen 1940-1975 NMEs		
-1946	Streptomycin Sulfate	streptomycin sulfate	CW25IKJ202	02-18-46	NDA	60-076	Various Mfrs.	DeHaen 1940-1975 NMEs		
+1946	Streptomycin Sulfate	streptomycin sulfate	CW25IKJ202	02-18-46	NDA	60-076	Pfizer	DeHaen 1940-1975 NMEs		
 1946	Sodium Sulamyd	sulfacetamide sodium	4NRT660KJQ				Schering	DeHaen 1940-1975 NMEs		
 1946	Monotheamin	theophylline ethanolamine	9Z1S0O31SL				Lilly	DeHaen 1940-1975 NMEs		
 1946	Thiouracil	thiouracil	59X161SCYL				Lilly	DeHaen 1940-1975 NMEs		
 1946	Thrombin	thrombin	25ADE2236L				Upjohn	DeHaen 1940-1975 NMEs		
 1946	Tridione	trimethadione	R7GV3H6FQ4	01-25-46	NDA	5-856	Abbott	DeHaen 1940-1975 NMEs		
+1946	Anthallan	anthallan	70K7ST68DA		NDA	5-801	Medico	https://books.google.com/books?id=HYsxrxsyjeEC&newbks=1&newbks_redir=0&dq=anthallan&pg=RA2-PA5#v=onepage&q=anthallan&f=false		
 1948	Pyribenzamine HCl	tripelennamine hydrochloride	FWV8GJ56ZN	02-19-48	NDA	5-914	Ciba	DeHaen 1940-1975 NMEs		
 1945	Tubocurarine Chloride	tubocurarine chloride	900961Z8VR	02-20-45	NDA	5-657	Squibb	DeHaen 1940-1975 NMEs		
 1947	Dalyde	"3,5-dibromosalicylaldehyde"	7A260PBI3A				"Hynson, Westcott & Dunning"	DeHaen 1940-1975 NMEs		
@@ -135,7 +143,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1947	Streptomycin Cal. Chloride	streptomycin calcium chloride	8P331B9592				Merck	DeHaen 1940-1975 NMEs		
 1947	Sulfamethazine	sulfamethazine	48U51W007F				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
 1947	Diasone Sodium	sulfoxone sodium	57OWB0Q221		NDA	6-044	Abbott	DeHaen 1940-1975 NMEs		
-1947	Etamon Chloride	tetraethylammonium chloride	8B82Z83XNN				Parke-Davis	DeHaen 1940-1975 NMEs		
+1947	Etamon Chloride	tetraethylammonium chloride	8B82Z83XNN		NDA	6-205	Parke-Davis	DeHaen 1940-1975 NMEs		
+1947	Cremostaticin	caronamide	6ZV1PP6LGM		NDA	6-464	Sharp & Dohme	DeHaen 1940-1975 NMEshttps://books.google.com/books?id=jqBK_LOUZ7MC&pg=PA671&dq=Cremostaticin		
 1947	Theoglycinate	theophylline sodium glycinate	2S36N8T753	10-17-47	NDA	6-333	Brayten (Chattern)	DeHaen 1940-1975 NMEs		
 1948	Pamisyl	aminosalicylic acid	5B2658E0N2				Parke-Davis	DeHaen 1940-1975 NMEs		
 1948	Antistine HCl	antazoline HCl	FP8Q8F72JH				Ciba	DeHaen 1940-1975 NMEs		
@@ -174,6 +183,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1949	Stigrnonene Bromide	benzylpyridinium bromide					Warner (Warner/ Chilcott)	DeHaen 1940-1975 NMEs		
 1948	Urecholine Chloride	bethanechol chloride	H4QBZ2LO84	10-12-48	NDA	6-536	Merck	DeHaen 1940-1975 NMEs		
 1949	Panparnit HCl	caramiphen HCl	4858SN190E				Geigy	DeHaen 1940-1975 NMEs		
+1949	Benodaine	piperoxan hydrochloride	KS0DZ1UQNW		NDA	6-790	Merck Sharp & Dohme	https://books.google.com/books?id=UnEbAQAAMAAJ&newbks=1&newbks_redir=0&dq=benodaine%201949&pg=PA728#v=onepage&q=benodaine%201949&f=false		
+1949	Lucaine	piridocaine hydrochloride	VG6P406YHV		NDA	6-807	Wallace & Tiernan	https://books.google.com/books?id=PrRYAAAAYAAJ&q=LUCAINE+hydrochloride&dq=LUCAINE+hydrochloride		
+1949	Aptrol	4-methylamphetamine	9E273KL7HS		NDA	6-996	Smith Kline & French	https://books.google.com/books?id=ZXobAQAAMAAJ&newbks=1&newbks_redir=0&dq=aptrol%2B%20smith%20kline&pg=PA726#v=onepage&q=aptrol+%20smith%20kline&f=false		
 1951	Chloromycetin	chloramphenicol	66974FR9Q1	06-01-51	NDA	50-156	Parke-Davis	DeHaen 1940-1975 NMEs		
 1949	Perazil	chlorcyclizine HCl	NPB7A7874U				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
 1950	Chlor-Trimeton	chlorpheniramine maleate	V1Q0O9OJ9Z	08-15-50	NDA	7-638	Schering	DeHaen 1940-1975 NMEs		
@@ -205,8 +217,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1949	Gantrisin	sulfisoxazole	740T4C525W		NDA	9-182	Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1949	Gantrisin Diolaminel	sulfisoxazole diolamine	30S4B46J8B				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1949	Gantrisin Ointment 	sulfisoxazole diolamine	30S4B46J8B				Alcon	DeHaen 1940-1975 NMEs		
-1949	Artane	trihexyphenidyl HCl	AO61G82577	05-13-49	NDA	6-773	Lederlc	DeHaen 1940-1975 NMEs		
+1949	Artane	trihexyphenidyl HCl	AO61G82577	05-13-49	NDA	6-773	Lederle	DeHaen 1940-1975 NMEs		
 1949	Pyribenzamine Citrate	tripelennamine citrate	30OC46A3J9				Ciba	DeHaen 1940-1975 NMEs		
+1949	Pyrabrom	pyrabrom	360MH2GO0I		NDA	7-375	Brayten	https://books.google.com/books?id=IhMsAQAAMAAJ&q=pyrabrom&dq=pyrabrom		
 1950	Percodan	Oxycodone Hydrochloride	C1ENJ2TE6C	04-12-50	NDA	7-337	Endo	OB NME Appendix 1950-1993		
 1950	Protamine Sulfate	Protamine Sulfate	0DE9724IHC	04-14-50	NDA	7-413	Upjohn	OB NME Appendix 1950-1985		
 1950	Bentyl	dicyclomine HCl	CQ903KQA31	05-11-50	NDA	7-409	Merrell (MerrellNational)	OB NME Appendix 1950-1985		
@@ -242,6 +255,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1949	Thiantoin Sodium	phenthenylate sodium	0H34NO7B6N	03-21-49	NDA	6-713	Lilly	DeHaen 1940-1975 NMEs		
 1950	Ogen	piperazine estrone sulfate	SVI38UY019				Abbott	DeHaen 1940-1975 NMEs		
 1950	Natolone	pregnenolone	73R90F7MQ8				National (MerrellNational)	DeHaen 1940-1975 NMEs		
+1951	Precursone	pregnenolone acetate	0G0WWV404B		NDA	7-186	Wyeth	https://books.google.com/books?id=PYwbAQAAMAAJ&lpg=PA927&ots=HF-tZg3qst&dq=pregnenolone%20acetate%20wyeth%201950&pg=PA927#v=onepage&q=pregnenolone%20acetate%20wyeth%201950&f=false		
 1950	Sucaryl Sodium	sodium cyclamate	1I6F42RME1				Abbott	DeHaen 1940-1975 NMEs		
 1950	Trocinate	thiphenamil HCl	4OQ4SP44R2				Poythress	DeHaen 1940-1975 NMEs		
 1951	Kwell	Lindane	59NEE7PCAB	01-11-51	NDA	6-309	Reed & Carnrick	OB NME Appendix 1950-1993		
@@ -257,7 +271,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1951	Tryptar	"trypsin, crystallized"	GV54A213NN	08-10-51	NDA	8-135	Armour	OB NME Appendix 1950-1985		
 1951	Prantal	diphemanil methylsulfate	W2ZG23MGYI	08-20-51	NDA	8-114	Schering	OB NME Appendix 1950-1985		
 1951	Antabuse	disulfiram	TR3MLJ1UAI	08-28-51	NDA	7-883	Ayerst	OB NME Appendix 1950-1985		
-1951	Peritrate	Pentaerythritol	SU420W1S6N	08-29-51	NDA	8-072	Parke-Davis	OB NME Appendix 1950-1993		
+1951	Peritrate	Pentaerythritol tetranitrate	10L39TRG1Z	08-29-51	NDA	8-072	Parke-Davis	OB NME Appendix 1950-1993		
 1951	Tace	chlorotrianisene	6V5034L121	08-31-51	NDA	8-102	Merrell (MerrellNational)	OB NME Appendix 1950-1985		
 1951	NAI (131I)	"Sodium Iodide, I-131"	29VCO8ACHH	11-23-51	NDA	8-200	Abbott	OB NME Appendix 1950-1985		
 1951	Mytolon Chloride	benzoquinonium chloride	O6HVT48T15				Winthrop	DeHaen 1940-1975 NMEs		
@@ -269,6 +283,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1951	Quotane	dimethisoquin HCl	SMP2689462				Smith Kline & French	DeHaen 1940-1975 NMEs		
 1951	Paveril Phosphate	dioxyline phosphate	9M18MC2SIE				Lilly	DeHaen 1940-1975 NMEs		
 1951	Bistrium Bromide	hexamethonium bromide	8J77X3S603				Squibb	DeHaen 1940-1975 NMEs		
+1951	Hexameton	hexamethonium chlorida	8J77X3S603		NDA	8-441	Burroughs	DeHaen 1940-1975 NMEs		
 1951	Tolanate	inositol hexanitrate	686T63H73D				Commercial Solvents	DeHaen 1940-1975 NMEs		
 1950	Levophed Bitartrate	levarterenol bitartrate	IFY5PE3ZRW	07-13-50	NDA	7-513	Winthrop	DeHaen 1940-1975 NMEs		
 1951	Dormison	meparfynol	B017BC5B1N				Schering	DeHaen 1940-1975 NMEs		
@@ -290,6 +305,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1951	Elkosin	sulfisomidine	W03L3ODK6E				Ciba	DeHaen 1940-1975 NMEs		
 1951	Depo Testosterone	testosterone cypionate	M0XW1UBI14				Upjohn	DeHaen 1940-1975 NMEs		
 1951	Thiocarbarsone	thiocarbarsone	5ZBS38PFRD				Lilly	DeHaen 1940-1975 NMEs		
+1951	Levo-isomethadone	levoisomethadone hydrochloride	9ZYE0A32A9		NDA	7-890	Winthrop Stearns	https://books.google.com/books?id=JLBLAAAAMAAJ&newbks=1&newbks_redir=0&dq=levo-isomethadone&pg=RA4-PA4#v=onepage&q=isomethadone&f=false		
 1952	Sunstick	Digalloyl Trioleate	PGQ9BY2MDE	01-15-52	NDA	8-301	Parke Davis	OB NME Appendix 1950-1985		
 1952	Nalline HCl	nalorphine HCl	9FPE56Z2TW	01-24-52	NDA	8-279	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
 1952	Elkosin	Sulfisomidine	W03L3ODK6E	01-29-52	NDA	8-070	Ciba-Geigy	OB NME Appendix 1950-1993		
@@ -653,6 +669,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1958	Vancocin	vancomycin HCl	71WO621TJD	11-14-58	NDA	11-520	Lilly	DeHaen 1940-1975 NMEs		
 1958	Pre-Creatine betaine	betaine	3SCV180C9W	09-19-58	NDA	11-230	Mercury Pharmaceuticals	https://books.google.com/books?id=pm9KAQAAIAAJ&lpg=PA470&ots=aA7IeOI1kb&dq=cyverine%20suspended&pg=PA470#v=onepage&q=cyverine%20suspended&f=false		
 1958	Pre-Creatine glycocyamine	glycocyamine	GO52O1A04E	09-19-58	NDA	11-230	Mercury Pharmaceuticals	https://books.google.com/books?id=pm9KAQAAIAAJ&lpg=PA470&ots=aA7IeOI1kb&dq=cyverine%20suspended&pg=PA470#v=onepage&q=cyverine%20suspended&f=false		
+1958	Pentaiets	homarylamine hydrochloride	6FJ4B5B368		NDA	11-083	Merck Sharp & Dohme	https://books.google.com/books?id=rfgvAQAAMAAJ&q=Homarylamine&dq=Homarylamine		
+1958	Orabilex	bunamiodyl sodium	NTI7T2IEIE	10-24-58	NDA	11-584	Fougera	https://books.google.com/books?id=hMy_eBdARCAC&newbks=1&newbks_redir=0&dq=orabilex%201958&pg=PA717#v=onepage&q=orabilex%201958&f=false		
 1959	Lanesta	Chlorindanol	7902N03BH0	01-20-59	NDA	11-460	Sterling	OB NME Appendix 1950-1993		
 1959	Neptazane	Methazolamide	W733B0S9SD	01-26-59	NDA	11-721	Lederle	OB NME Appendix 1950-1985		
 1959	IC-Green	Indocyanine Green	IX6J1063HV	02-09-59	NDA	11-525	"Hynson, Westcott, Dunning"	OB NME Appendix 1950-1985		
@@ -706,8 +724,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1959	Grisactin	griseofulvin	32HRV3E3D5				Ayerst	DeHaen 1940-1975 NMEs		
 1959	Polybrene	hexadimethrine bromide	4C905MSK4W				Abbott	DeHaen 1940-1975 NMEs		
 1959	HydroDiuril	hydrochlorothiazide	0J48LPH2TH	02-24-59	NDA	11-835	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
-1959	Neptazane Phospholine Iodide	methazolamide	W733B0S9SD	01-26-59	NDA	11-721	Lederle Campbell (Ayerst)	DeHaen 1940-1975 NMEs		
-1959	Neptazane Phospholine Iodide	echothiophate iodide	BA9QH3P00T	01-26-59	NDA	11-721	Lederle Campbell (Ayerst)	DeHaen 1940-1975 NMEs		
 1959	Tentone	methoxypromazine maleate	OR0RPY2Y2V				Lederle	DeHaen 1940-1975 NMEs		
 1959	Depo-Medrol	methylprednisolone acetate	43502P7F0P	05-27-59	NDA	11-757	Upjohn	DeHaen 1940-1975 NMEs		
 1959	Solu-Medrol	methylprednisolone sodium succinate	LEC9GKY20K	05-18-59	NDA	11-856	Upjohn	DeHaen 1940-1975 NMEs		
@@ -2304,6 +2320,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1929	ephedrine sulfate	ephedrine sulfate	U6X61U5ZEG				Lilly	https://archive.org/details/newnonofficialre39coun		
 1929	Sandoptal	butalbital	KHS0AZ4JVK				Sandoz	https://books.google.com/books?id=i9BQAAAAYAAJ&q=SANDOPTAL&dq=SANDOPTAL&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwj_i7-Hg_TmAhVDU98KHX8dCOAQ6AEwAHoECAYQAg		
 1929	Metrazol	pentylenetetrazol	WM5Z385K7T				Knoll	https://books.google.com/books?id=2QJtAAAAMAAJ&q=metrazol&dq=metrazol&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwiTueXIhv_mAhVOpFkKHSgHAgUQ6AEwAHoECAAQAg		
+1929	Sodium Morrhuate	sodium morrhuate	652U49DZTP					https://books.google.com/books?newbks=1&newbks_redir=0&id=uARtAAAAMAAJ&dq=sodium+morrhuate&focus=searchwithinvolume&q=sodium+morrhuate		
+1929	Anthralin	anthralin	U8CJK0JH5M				Abbott	https://books.google.com/books?id=TAhtAAAAMAAJ&q=anthralin+drug&dq=anthralin+drug		
 1930	Nembutal	pentobarbital	I4744080IR					https://archive.org/details/newnonofficialre39coun		
 1930	Dibucaine; Nupercaine	cinchocaine hydrochloride	Z97702A5DG				"Society of Chemical Industry in Basle, Basle, Switzerland (Ciba Company, Inc., New York, distributor)."	https://archive.org/details/newnonofficialre39coun		
 1916	Benzyl Succinate	dibenzyl succinate	CK14UG55AV				"Seydel Chemical Company, 86 Forest Street, Jersey City, N. J. (Nitro, W. Va.)"	https://archive.org/details/syntheticorganic1930unit		
@@ -2325,6 +2343,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1935	Paredrine	hydroxyamphetamine	FQR280JW2N	4-17-35				https://trademarks.justia.com/713/72/paredrine-71372217.html
 1937	Dexedrine	dextroamphetamine sulfate	JJ768O327N				Smith Kline French	https://web.archive.org/web/20091219120223/http://www.medic8.com/medicines/Dexedrine.html		
 1935	Prontosil	sulfamidochrysoidine hydrochloride	2N9562JWVL					https://en.wikipedia.org/wiki/Prontosil		
+1938	Neoprontosil	azosulfamide	Z69KWU34JE	5-16-38			Winthrop	https://books.google.com/books?id=baSX6QtmoSEC&lpg=PA963&ots=AlokqAT5na&dq=Neoprontosil%20winthrop&pg=PA963#v=onepage		
 1935	Salyrgan	mersalyl	5X1IO031V8				Winthrop	https://www.govinfo.gov/content/pkg/FR-1972-07-28/pdf/FR-1972-07-28.pdf
 1880	Betain	betaine	3SCV180C9W					https://books.google.com/books?id=hg5KAAAAMAAJ&newbks=1&newbks_redir=0&dq=betaine%20cooley&pg=PA316#v=onepage&q=betaine&f=false
 1935	Decholin	dehydrocholic acid	NH5000009I				Riedel	https://books.google.com/books?id=2QJtAAAAMAAJ&q=DECHOLIN&dq=DECHOLIN&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwi2y6KA8_7mAhUnVt8KHUuZDas4ChDoATAEegQICRAC		
@@ -2338,12 +2357,17 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1937	Oreton	testosterone propionate	WI93Z9138A				Schering	https://archive.org/details/in.ernet.dli.2015.145864		
 1937	Calcium pentothate	calcium pantothenate	568ET80C3D					https://books.google.com/books?newbks=1&newbks_redir=0&id=LlpLAAAAMAAJ&dq=dispensatory+pantothenate&focus=searchwithinvolume&q=pantothenate		
 1937	Diothane	diperodon hydrochloride	5YZ5R8I73Y				Merrell	https://books.google.com/books?id=c4Q3AAAAMAAJ&q=diothane&dq=diothane&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwjA98LI04DnAhVvdt8KHcfdBHEQ6AEwAHoECAYQAg		
+1937	Diodrast	iodopyracet	ZTK4026YJ5				Winthrop	https://books.google.com/books?id=c4Q3AAAAMAAJ&q=diodrast+nonofficial&dq=diodrast+nonofficial		
 1938	Plasmoquine E	quinacrine hydrochloride	G6242H2NAA					https://books.google.com/books?id=jglFsz5EJR8C&lpg=PA381&ots=DG2kaw3Z_a&dq=AMINACRINE%20first%20marketed&pg=PA381#v=onepage&q=AMINACRINE%20first%20marketed&f=false		
 1938	Atabrine	quinacrine hydrochloride	G6242H2NAA				Winthrop	https://www.govinfo.gov/content/pkg/FR-1973-02-06/pdf/FR-1973-02-06.pdf
 1938	Oreton-M	methyltestosterone	V9EFU16ZIF				Schering	https://archive.org/details/in.ernet.dli.2015.145864		
 1938	Dilantin	phenytoin	6158TKW0C5	06-23-38			Parke-Davis	http://triggered.edina.clockss.org/ServeContent?rft_id=info:doi/10.1124/mi.9.5.1		
 1938	M&B 693	sulfapyridine	Y5V2N1KE8U				May & Baker	https://books.google.com/books?id=AqzmCwAAQBAJ&lpg=PA9&ots=WuZEH-OpEK&dq=sulfapyridine%20introduced%20to%20the%20US&pg=PA9#v=onepage&q=sulfapyridine%20introduced%20to%20the%20US&f=false		
+1921	Caroid	papain	A236A06Y32					https://books.google.com/books?id=-Uk2AQAAMAAJ&newbks=1&newbks_redir=0&dq=papain%20first%20marketed&pg=RA1-PA446#v=onepage&q=papain%20first%20marketed&f=false		
+1921	Rubbing Alcohol	isopropyl alcohol	ND2M416302					https://books.google.com/books?id=1n4gAQAAMAAJ&newbks=1&newbks_redir=0&dq=alcohol%20rubbing%20usp&pg=PA85#v=onepage&q=alcohol%20rubbing%20usp&f=false		
 1921	Absinthium N.F.	absinthium	F84709P2XV					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
+1921	Mixed Tocopherols N.F.	tocopherol	R0ZB2556P8					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
+1921	Glycocoll	aminoacetic acid	TE7660XO1C					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Acacia U.S.P.	acacia	5C5403N26O					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Acetanilid U.S.P.	acetanilid	SP86R356CC					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
 1921	Acetone U.S.P.	acetone	1364PS73AF					https://www.gutenberg.org/files/41778/41778-h/41778-h.htm		
@@ -3022,6 +3046,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	NAPENTAL SODIUM PENTOBARBITAL	sodium pentobarbital	NJJ0475N0S	12-30-61	NDA	2-368	BEECHAM LABS	https://archive.org/details/federalregister37gunit/page/n1047?q=NAPENTAL
 1961	AMINOPHYLLIN AMINOPHYLLIN	aminophyllin	27Y3KJK423	12-30-61	NDA	2-385	SEARLE	https://books.google.ru/books?id=uo0QFvym_90C&pg=PA327&lpg=PA327&dq=AMINOPHYLLIN+oral+SEARLE&source=bl&ots=EzhmknZuYX&sig=WviJgvWisDJlikrd07OJbPzpojc&hl=ru&sa=X&ved=2ahUKEwiIgt-087_fAhXpwYsKHU44B_sQ6AEwAXoECAkQAQ#v=onepage&q=AMINOPHYLLIN%20oral%20SEARLE&f=false|https://archive.org/details/delawarestatemed19unse/page/108?q=AMINOPHYLLIN+SEARLE
 1961	POTASSIUM THIOCYANATE	potassium thiocyanate	TM7213864A	12-30-61	NDA	2-411	LILLY	
+1961	SODIUM THIOCYANATE	sodium thiocyanate	5W0K9HKA05	12-30-61	NDA	1-616	Smith-Dorsey Company	
 1961	NOV PONT W/NEOCOBEFRIN MEPIVACAINE HYDROCHLORIDE	mepivacaine hydrochloride	4VFX2L7EM5	12-30-61	NDA	2-604	COOKE-WAITE	
 1961	NOV PONT W/NEOCOBEFRIN LEVONORDEFRIN	levonordefrin	V008L6478D	12-30-61	NDA	2-604	COOKE-WAITE	
 1961	HYKINONE INJ	menadione sodium bisulfite	6XF3C2HK77	12-30-61	NDA	2-694	ABBOTT	https://www.govinfo.gov/content/pkg/FR-1970-08-25/pdf/FR-1970-08-25.pdf
