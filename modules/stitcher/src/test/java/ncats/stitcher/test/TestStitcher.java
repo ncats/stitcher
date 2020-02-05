@@ -63,14 +63,12 @@ public class TestStitcher {
             List<Long> comps = new ArrayList<>();
             int nc = reg.components(comps);
             assertTrue ("Expect 1 component but instead got "+nc, nc == 1);
-            /*
-              for (Long id : comps) {
-              Component comp = reg.component(id);
-              reg.untangle(new UntangleCompoundComponent (ds, threshold, comp));
-              }
-            */
+	    for (Long id : comps) {
+		Component comp = reg.component(id);
+		reg.untangle(new UntangleCompoundComponent (ds, comp));
+	    }
             
-            reg.untangle(new UntangleCompoundStitches (ds, threshold));
+            //reg.untangle(new UntangleCompoundStitches (ds, threshold));
             
             count = reg.count(ds.getName());
             assertTrue ("Expect "+ncomp
@@ -123,7 +121,7 @@ public class TestStitcher {
             (name.getMethodName(), 3, null,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
     }
-
+    /*
     @Test
     public void testStitch5 () throws Exception {
         logger.info("##################################### "
@@ -159,4 +157,5 @@ public class TestStitcher {
             (name.getMethodName(), 6, null,
              EntityRegistry.class.getResourceAsStream("/69312.json"));
     }
+    */
 }
