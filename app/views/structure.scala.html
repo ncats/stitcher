@@ -1,0 +1,16 @@
+@import ncats.stitcher.Entity
+@import ncats.stitcher.Props
+@import play.twirl.api.HtmlFormat
+@(e: Entity, size: Int = 400)
+
+@main("Structure for entity: "+e.name()){
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <img alt='' src='@api.routes.Api.structure(e.getId,"svg",size)'>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+</div>
+}(HtmlFormat.empty)
