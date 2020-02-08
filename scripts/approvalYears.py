@@ -7,6 +7,7 @@ import urllib2
 import zipfile
 import gzip
 import numpy
+import re
 #import matplotlib.pyplot as plt
 #from scipy.interpolate import interp1d
 
@@ -17,6 +18,18 @@ resolverCache["INSULIN LISPRO RECOMBINANT"] = "GFX7QIS1II"
 resolverCache["INSULIN SUSP ISOPHANE RECOMBINANT HUMAN"] = "1Y17CTI5SR"
 resolverCache["PITAVASTATIN MAGNESIUM"] = "M5681Q5F9P"
 resolverCache["IVACAFTOR, TEZACAFTOR"] = "8RW88Y506K"
+resolverCache["NITROGEN, NF"] = "N762921K75"
+resolverCache["ELEXACAFTOR, IVACAFTOR, TEZACAFTOR"] = "RRN67GMB0V"
+resolverCache["GALLIUM DOTATOC GA-68"] = "Y68179SY2L"
+resolverCache["GALLIUM DOTATATE GA-68"] = "9L17Y0H71P"
+resolverCache["SIPONIMOD FUMARIC ACID"] = "Z7G02XZ0M6"
+resolverCache["OMEGA-3ACID ETHYL ESTERS"] = "D87YGH4Z0Q"
+resolverCache["OMEGA-3-ACID ETHYL ESTERS TYPE A"] = "D87YGH4Z0Q"
+resolverCache["GRISEOFULVIN, ULTRAMICROSIZE"] = "32HRV3E3D5"
+resolverCache["FISH OIL TRIGLYCERIDES"] = "XGF7L72M0F"
+resolverCache["VERARD"] = "A7V27PHC7A" #https://books.google.com/books?id=IXWOXUpylO8C&pg=PA47&lpg=PA47&dq=verard+drug&source=bl&ots=WYI8qC1dDL&sig=ACfU3U3fGdeaopIKKyPWB3agXtKCHqNb9g&hl=en&sa=X&ved=2ahUKEwiwlc3pobnmAhVIwVkKHZ6lCIAQ6AEwCHoECAoQAQ#v=onepage&q=verard%20drug&f=false
+resolverCache["COAGULATION FACTOR XA (RECOMBINANT), INACTIVATED - ZHZO"] = "BI009E452R"
+resolverCache["FAM-TRASTUZUMAB DERUXTECAN-NXKI"] = "5384HK7574"
 
 def getTimeStamp():
     ts = time.gmtime()
@@ -249,7 +262,7 @@ def apprDateRegression(prods):
                     prods[prod][-1] = 'PREDICTED'
     return prods
 
-def writeInitApp(outfp, unii, early, earlyDate):
+def writeInitApp(outfp, unii, early, earlyDate, myunii):
     date = ''
     year = ''
     if len(earlyDate) > 0:
@@ -261,18 +274,25 @@ def writeInitApp(outfp, unii, early, earlyDate):
     appsponsor = early[-3]
     product = early[-8]
     appno = ''
+    try:
+        appno = str(int(early[0][0:6]))
+        while len(appno) < 6:
+            appno = "0" + appno
+    except:
+        appno = ''
+
     appurl = ''
     active = "true"
     if early[-5] != "Prescription" and early[-5] != "Over-the-counter":
         active = "false"
 
     if early[-1].find('https://www.accessdata.fda.gov/') > -1:
-        appno = early[0][0:6]
+        #appno = early[0][0:6]
 
         appurl = early[-1]
         method = "Drugs@FDA"
     elif len(early[0]) > 6 and early[0][6] == '/':
-        appno = early[0][0:6]
+        #appno = early[0][0:6]
 
         if method == "PREDICTED":
             year = "[Approval Date Uncertain] "+year
@@ -282,11 +302,12 @@ def writeInitApp(outfp, unii, early, earlyDate):
         #outfp = fperr
         active = "false"
         if method.find('OB NME Appendix 1950-') > -1:
-            appno = early[0][0:6]
+            #appno = early[0][0:6]
+            appno = appno
         elif method.find('http') > -1:
             appurl = method
             method = "Literature"
-
+            
         for otherunii in activeMoiety[unii]:
             if UNII2prods.has_key(otherunii):
                 for prod in UNII2prods[otherunii]:
@@ -298,50 +319,23 @@ def writeInitApp(outfp, unii, early, earlyDate):
     #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
     #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
     comment = early[0].decode('latin-1').encode('ascii', 'replace')
-    outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
+    outline = myunii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
     outfp.write(outline)
 
-if __name__=="__main__":
-
-    maindir = getMainDir()
-
-    drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
-    syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
-    print syscall
-
-    if not os.path.exists(drugsAtfdafile):
-        os.system(syscall)
-
+def readUniiFile(maindir):
     uniifile = maindir+"/temp/UNIIs-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+uniifile + " " + getUNIIZipURL()
     print syscall
 
     if not os.path.exists(uniifile):
         os.system(syscall)
-    obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
-    syscall = "curl --insecure -o "+obfile + " " + getOBZipURL()
-    print syscall
-    if not os.path.exists(obfile):
-        os.system(syscall)
-
-    appYrsfile = maindir+"/scripts/data/approvalYears.txt"
-    if not os.path.exists(appYrsfile):
-        raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
-
-    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2019-04-03.gsrs'
-    if not os.path.exists(gsrsDumpfile):
-        raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
-
-    fdaNMEfile = maindir+'/scripts/data/FDA-NMEs-2018-08-07.txt'
-    if not os.path.exists(fdaNMEfile):
-        raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
-
+    
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
     fp = zfp.open(names[-1], 'r')
     line = fp.readline()
 
-    if line[:-2] != "Name\tType\tUNII\tDisplay Name":
+    if line[:-2].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME":
         raise ValueError('Problem reading UNII file:'+line)
 
     line = fp.readline()
@@ -358,13 +352,171 @@ if __name__=="__main__":
         uniiALL[sline[0]] = sline[2]
         line = fp.readline()
     print "UNIIs in memory:", len(uniiPT), len(uniiALL)
+    return uniiPT, uniiALL
+
+def writeCBERBLAs(fpout, uniiPT, uniiALL):
+    
+    #print getTimeStamp()
+    # approvalsList https://www.fda.gov/media/76363/download
+    # approval lsit with BLAs https://www.fda.gov/media/113210/download
+    # prodDates https://www.fda.gov/media/76356/download
+    # Use Adobe Acrobat -> Export to text (plain)
+
+    #Sort	Applicant / License #	Proprietary Name	Proper Name	BLA STN#	Product #	Total Drug Content (Concentration)	Approval Date	Dosage Form/Route/Presentation	Discontinued Date
+    #1	ADMA BIOLOGICS INC / 2019	ASCENIV	"IMMUNE GLOBULIN INTRAVENOUS, HUMAN-SLRA 10%"	125590 / 0	1	5000 MG/50 ML ( 100 MG/ML )	04/01/2019	SOLUTION / INTRAVENOUS / SINGLE-DOSE VIAL	
+
+    cberBLAs = dict()
+    w = re.compile('\w+')
+    fp = open(getMainDir()+"/scripts/data/User Fee Billable Biologic Products and Potencies Approved Under Section 351 of PHS  Act.txt", "r")
+    data = readTabFP(fp)
+    fp.close()
+    #print data['header']
+    for item in data['table']:
+        if len(item) < 10:
+            print item
+            sys.exit()
+        for i in range(len(item)):
+            if len(item[i]) > 2 and item[i][0] == '"' and item[i][-1] == '"':
+                item[i] = item[i][1:-1]
+        ingred = item[3]
+        while len(ingred) > 5:
+            if ingred in uniiALL:
+                break
+            matches = list(re.finditer(w, ingred))
+            if len(matches) > 1:
+                if ingred[matches[-2].span()[1]] == ')' or ingred[matches[-2].span()[1]] == '%':
+                    ingred = ingred[:matches[-2].span()[1]+1]                   
+                else:
+                    ingred = ingred[:matches[-2].span()[1]]
+            else:
+                ingred = ''
+        unii = ''
+        if ingred in uniiALL:
+            unii = uniiALL[ingred]
+        product = item[3]
+        brand = item[2]
+        if len(brand) == 0:
+            brand = product
+        manu = item[1][:item[1].find(" / ")]
+        bla = item[4][:item[4].find(" / ")]
+        date = item[7]
+        form = item[8][:item[8].find(" / ")]
+        route = item[8][item[8].find(" / ")+3:item[8].rfind(" / ")]
+        comment = product + " " + route + " " + form
+        discndate = item[9]
+        active = "true"
+        if len(discndate) > 0:
+            active = "false"
+            comment = comment + " Discontinued: " + discndate
+        url = "https://www.fda.gov/media/113210/download"
+        # UNII	Approval_Year	Date	Date_Method	App_Type	App_No	Sponsor	Product	Url	active	Comment
+        #R9400W927I	2000	04/25/2000	Drugs@FDA	ANDA	075581	TEVA	KETOCONAZOLE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=075581	true	075581/001
+        entry = unii+"\t"+date[-4:]+"\t"+date+"\tCBER-BLAs\tBLA\t"+bla+"\t"+manu+"\t"+brand+"\t"+url+"\t"+active+"\t"+comment+"\n"
+        if unii not in cberBLAs:
+            cberBLAs[unii] = []
+        if entry not in cberBLAs[unii]:
+            cberBLAs[unii].append(entry)
+    #print len(cberBLAs)
+    for unii in cberBLAs:
+        for entry in cberBLAs[unii]:
+            fpout.write(entry)
+
+    initUniis = cberBLAs.keys()
+    
+    licTxt = open(getMainDir()+"/scripts/data/LicEstablishList.txt", "r").readlines()
+    url = "https://www.fda.gov/media/76356/download"
+    
+    idregex = re.compile('\d\d\d\d\s')
+    dateregex = re.compile('\s\d\d-[A-S][A-Z][A-Z]-\d\d\d\d\s')
+
+    i = 1
+    while i < len(licTxt):
+        idmatch = re.match(idregex, licTxt[i])
+        id = idmatch.group(0)[:-1]
+        name = licTxt[i][len(id)+1:-1]
+        if re.search(dateregex, name):
+            print "problem with name", name
+            sys.exit()
+        #print id, name
+        address = ''
+        i = i + 1
+        while (not re.findall(dateregex, licTxt[i])):
+            address = address + licTxt[i]
+            i = i + 1
+        #print address
+        prodstr = ''
+        while i<len(licTxt) and not re.match(idregex, licTxt[i]):
+            prodstr = prodstr + licTxt[i]
+            i = i + 1
+        prodstr = prodstr.replace("\n", " ").replace("\t", " ")
+        datematch = re.findall(dateregex, prodstr)
+        datematch.reverse()
+        prods = []
+        for match in datematch:
+            if prodstr.rfind(match) > 0:
+                prods.append(prodstr[prodstr.rfind(match):])
+                prodstr = prodstr[:prodstr.rfind(match)]
+        prods.append(prodstr)
+        #print prods
+        prods2 = [] #[date, product]
+        for prod in prods:
+            prods2.append([prod[1:12], prod[13:].strip()])
+        #print prods2
+        for prod in prods2:
+            if prod[1].upper() in uniiALL:
+                unii = uniiALL[prod[1].upper()]
+                if unii not in initUniis:
+                    # UNII	Approval_Year	Date	Date_Method	App_Type	App_No	Sponsor	Product	Url	active	Comment
+                    #R9400W927I	2000	04/25/2000	Drugs@FDA	ANDA	075581	TEVA	KETOCONAZOLE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=075581	true	075581/001
+                    ts = time.strptime(prod[0], "%d-%b-%Y")
+                    date = time.strftime("%m/%d/%Y", ts)
+                    entry = unii+"\t"+prod[0][-4:]+"\t"+date+"\tCBER-BLAs\tBLA\t\t"+name+"\t"+prod[1]+"\t"+url+"\ttrue\t\n"
+                    if unii not in cberBLAs:
+                        cberBLAs[unii] = []
+                    if entry not in cberBLAs[unii]:
+                        cberBLAs[unii].append(entry)
+                    fpout.write(entry)
+            elif prod[0] == prod[1]:
+                print "Something very wrong"
+                sys.exit()
+
+if __name__=="__main__":
+
+    maindir = getMainDir()
+
+    drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
+    syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
+    print syscall
+
+    if not os.path.exists(drugsAtfdafile):
+        os.system(syscall)
+
+    obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
+    syscall = "curl --insecure -o "+obfile + " " + getOBZipURL()
+    print syscall
+    if not os.path.exists(obfile):
+        os.system(syscall)
+
+    appYrsfile = maindir+"/scripts/data/approvalYears.txt"
+    if not os.path.exists(appYrsfile):
+        raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
+
+    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2019-10-11.gsrs'
+    if not os.path.exists(gsrsDumpfile):
+        raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
+
+    fdaNMEfile = maindir+'/scripts/data/FDA-NMEs-2018-08-07.txt'
+    if not os.path.exists(fdaNMEfile):
+        raise ValueError("Can't find FDA NMEs file for historical approval dates: "+fdaNMEfile)
+
+    uniiPT, uniiALL = readUniiFile(maindir)
 
     zfp = zipfile.ZipFile(drugsAtfdafile, 'r')
     fp = zfp.open('Products.txt', 'r')
     #ApplNo\tProductNo\tForm\tStrength\tReferenceDrug\tDrugName\tActiveIngredient\tReferenceStandard
     #0       1          2     3         4              5         6                 7
     line = fp.readline()
-    if line[:-2] != "ApplNo\tProductNo\tForm\tStrength\tReferenceDrug\tDrugName\tActiveIngredient\tReferenceStandard":
+    if line.find("ApplNo\tProductNo\tForm\tStrength\tReferenceDrug\tDrugName\tActiveIngredient") != 0:
         raise ValueError('Problem reading Products file:'+line)
     line = fp.readline()
     UNII2prods = dict()
@@ -555,6 +707,8 @@ if __name__=="__main__":
     fdaNMEdates = dict()
 
     for entry in fdaNMEs['table']:
+        if len(entry) < 5:
+            sys.stderr.write("Bad entry:"+str(entry)+"\n")
         unii = entry[3]
         year = entry[0]
         date = year+"-12-31"
@@ -701,6 +855,13 @@ if __name__=="__main__":
                 print early
                 raise ValueError('Tyler had other info here:'+appl)
 
+    #print UNII2prods['PV2WI7495P']
+    #for unii in activeMoiety['6Y24O4F92S']:
+    #    #for unii in activeMoiety['PV2WI7495P']:
+    #    if unii in UNII2prods:
+    #        for prod in UNII2prods[unii]:
+    #            print prods[prod]
+
     # write out new approval years file
     outfile =  maindir+"/data/approvalYears-"+getTimeStamp()+".txt"
     fp = open(outfile, 'w')
@@ -758,9 +919,17 @@ if __name__=="__main__":
                         earlyDate = entry[-2]
 
         for key in early.keys():
+            myunii = unii
+            for otherunii in activeMoiety[unii]:
+                if UNII2prods.has_key(otherunii):
+                    for prod in UNII2prods[otherunii]:
+                        akey = prods[prod][0][0:6]
+                        if akey == key:
+                            myunii = otherunii
+
             if early[key][-2] != '' and early[key][-2][0:4] == earlyDate[0:4] and early[key][-2] > earlyDate:
                 early[key][-2] = earlyDate
-            writeInitApp(fp, unii, early[key], early[key][-2])
+            writeInitApp(fp, unii, early[key], early[key][-2], myunii)
             # date = earlyDate[5:7]+"/"+earlyDate[8:]+"/"+earlyDate[0:4]
             # year = date[-4:]
             # method = early[-1]
@@ -799,6 +968,9 @@ if __name__=="__main__":
             # outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
             # outfp.write(outline)
 
+    # write out additional CBER BLAs
+    writeCBERBLAs(fp, uniiPT, uniiALL)
+            
     # write out all products data
     prod2UNIIs = dict()
     for unii in UNII2prods.keys():

@@ -180,7 +180,7 @@ public class App extends Controller {
                 .filter("id", "'"+name+"'", "stitch_v"+version);
             
             return ok (stitches.render
-                       (version, "UNII="+name, new int[]{entities.length},
+                       (version, name, new int[]{entities.length},
                         1, entities.length, entities.length,
                         Arrays.stream(entities).map(e -> Stitch.getStitch(e))
                         .toArray(Stitch[]::new)));
@@ -194,5 +194,13 @@ public class App extends Controller {
             return badRequest ("No latest version defined!");
 
         return stitch (version, name);
+    }
+
+    public Result structure (Long id, Integer size ) {
+	Entity e = es.getEntityFactory().getEntity(id);
+	if (e != null) {
+	    return ok (structure.render(e, size));
+	}
+	return badRequest ("Unknown entity: "+id);
     }
 }

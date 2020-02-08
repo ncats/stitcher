@@ -1,0 +1,75 @@
+{
+    "node": {
+        "diameter": "50px",
+        "color": "#A5ABB6",
+        "border-color": "#000000",
+        "border-width": "1px",
+        "text-color-internal": "#ffffff",
+        "font-size": "10px"
+    },
+    "relationship": {
+        "color": "#A5ABB6",
+        "shaft-width": "1px",
+        "font-size": "8px",
+        "padding": "3px",
+        "text-color-external": "#000000",
+        "text-color-internal": "#FFFFFF",
+        "caption": "<type>"
+    },
+    "node.DATA": {
+	"diameter": "25px",
+	"color": "#777777"
+    },
+    "node.SGROUP": {
+        "color": "#fad87e",
+	"diameter": "75px",
+	"text-color-internal": "#000000"
+    },
+    "node.S_BROAD INSTITUTE DRUG LIST 2018-09-07": {
+        "color": "#ef7d73",
+        "text-color-internal": "#000000"
+    },
+    "node.S_DRUGBANK, DECEMBER 2018": {
+        "color": "#e05f0f"
+    },
+    "node.S_G-SRS, APRIL 2019": {
+        "color": "#7bbdf1",
+        "text-color-internal": "#000000"
+    },
+    "node.S_NCATS PHARMACEUTICAL COLLECTION, APRIL 2012": {
+        "color": "#85cba2",
+        "text-color-internal": "#000000"
+    },
+    "node.S_PHARMACEUTICAL MANUFACTURING ENCYCLOPEDIA (THIRD EDITION)": {
+        "color": "#00a000"
+    },
+    "node.S_RANCHO BIOSCIENCES, MARCH 2019": {
+        "color": "#d4a0f4",
+        "text-color-internal": "#000000"
+    },
+    "node.S_WITHDRAWN AND SHORTAGE DRUGS LIST FEB 2018": {
+	"color": "#36828c"
+    },
+    "relationship.R_activeMoiety": {
+	"shaft-width": "3px",
+	"color": "#bc0000"
+    },
+    "relationship.I_UNII": {
+	"shaft-width": "3px",
+	"color": "#001eff"
+    },
+    "relationship.H_LyChI_L5": {
+	"shaft-width": "3px",
+	"color": "#db820f"
+    },
+    "relationship.H_LyChI_L4": {
+	"color": "#36828c",
+	"shaft-width": "2px"
+    },
+    "relationship.STITCH": {
+	"font-size": "5px"
+    },
+    "relationship.PAYLOAD": {
+	"font-size": "5px"
+    }
+}

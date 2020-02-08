@@ -238,9 +238,8 @@ public class TestCore extends EntityRegistry {
 
         logger.info("Connected components...");
         int comp = 1;
-        for (Iterator<Entity[]> it = connectedComponents ();
-             it.hasNext(); ++comp) {
-            Entity[] cc = it.next();
+        for (Component component : components ()) {
+            Entity[] cc = component.entities();
             StringBuilder sb = new StringBuilder ();
             sb.append("Component "+comp+": ["+cc[0].getId()
                       +"."+cc[0].payload("name")+"]");

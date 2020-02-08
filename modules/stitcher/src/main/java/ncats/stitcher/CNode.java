@@ -40,7 +40,9 @@ public class CNode implements Props, Comparable<CNode> {
     static final String[] MOLFIELDS = new String[]{
         "MOLFILE",
         "SMILES",
-        "SMILES_ISO"
+        "SMILES_ISO",
+        "molfile",
+        "smiles"
     };
 
     protected ObjectMapper mapper = new ObjectMapper ();
