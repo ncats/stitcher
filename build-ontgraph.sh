@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="v12"
+version="v202002"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -10,26 +10,36 @@ ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 ###########################
 ##### DON'T MESS BELOW
 ###########################
+
 # make sure MONDO is last in disease ontologies
-owl="DOID.owl.gz \
-   HPO.owl.gz \
+owl="doid.owl.gz \
+   hp.owl.gz \
    MEDLINEPLUS.ttl.gz \
    MESH.ttl.gz \
    OMIM.ttl.gz \
    ICD10CM.ttl.gz \
-   ordo.owl.gz \
+   ordo_orphanet.owl.gz \
    Thesaurus.owl.gz \
-   MONDO.owl.gz \
+   mondo.owl.gz \
    VANDF.ttl.gz \
-   BrendaTissue.owl.gz \
-   UBERON.owl.gz \
-   GO.owl.gz \
+   bto.owl.gz \
+   clo.owl.gz \
+   cl.owl.gz \
+   ddiem.owl.gz \
+   uberon.owl.gz \
+   go.owl.gz \
+   geno.owl.gz \
    ogg.owl.gz \
+   pw.owl.gz \
+   mp.owl.gz \
+   oae.owl.gz \
+   rxno.owl.gz \
    ogms.owl \
    pato.owl.gz \
+   fma.owl.gz \
    pr.owl.gz \
    efo.owl.gz"
-owl_path="owl"
+owl_path="owl-202002"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
 
