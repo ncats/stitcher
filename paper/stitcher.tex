@@ -27,7 +27,7 @@ concerns.}}}
 \title[Stitcher: An entity resolution framework]{Stitcher: An entity
 resolution framework for comprehensive data integration of approved
 drugs}
-\author[Nguyen \textit{et~al}.]{Dac-Trung Nguyen,$^{\text{\sfb 1}}$
+\author[Nguyen \textit{et~al}.]{Dac-Trung Nguyen,$^{\text{\sfb 1},\ast}$
 Ivan Grishagin,$^{\text{\sfb 1}}$
 Daniel Katzel,$^{\text{\sfb 1}}$
 Tyler Peryea,$^{\text{\sfb 1,2}}$
@@ -46,12 +46,28 @@ of Chief Scientist, Food and Drug Administration, USA}
 \editor{Associate Editor: XXXXXXX}
 
 \abstract{\textbf{Motivation:}
-\\
-\textbf{Results:} Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text
-Text Text Text Text Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text\\
+As biomedical data continues to grow at a rapid rate, the need to
+integrate diverse data across scales and modalities has never been
+more urgent. In the context of drug data, the data integration
+challenges are considerably more complex due to the lack of clarity
+around the term ``drug.'' What is considered as ``drug'' can,
+therefore, vary significantly between data sources. The data
+integration challenges and the lack of a comprehensive resource of
+drugs that been marketed or approved in the United States for human
+use are the primary goals behind our current work.\\
+\textbf{Results:}
+Through the combination of a reference data source
+(G-SRS) and entity resolution strategies tailored specifically for
+drug entity type, we have developed a comprehensive data integration
+pipeline (\st) for drug data. The
+resource \url{https://drugs.ncats.io} is a comprehensive drug
+resource that is supported by \st. \\
 \textbf{Availability:} The complete source code along with data and
 build instructions for \st{} is readily available on
-Github \url{https://github.com/ncats/stitcher}. The \ix{} resource is
+Github \url{https://github.com/ncats/stitcher}. The latest version of
+the stitch multigraph is available as a Neo4j database
+at \url{https://stitcher.ncats.io/browser}
+(use \texttt{stitcher.ncats.io:80} as the hostname). And the \ix{} resource is
 accessible at \url{https://drugs.ncats.io}.\\ 
 \textbf{Contact:} \href{mailto:southalln@mail.nih.gov}{southalln@mail.nih.gov}\\
 \textbf{Supplementary information:} Supplementary data are available
@@ -85,7 +101,7 @@ comprehensive resource of drugs that have either been marketed or
 approved in the United States for human use. Such a resource is not
 only instrumental for drug repurposing but also serves as a valuable
 tool to further our understanding of the mechanistic properties of
-molecular targets \citep{Huang2019}. To the best of our
+molecular targets \citep{Huang2011,Huang2019}. To the best of our
 knowledge, \ix{} is currently the most comprehensive resource of its
 kind. In the remainder of this paper, we discuss data integration
 challenges associated with drug data, conceptually as well as
@@ -138,16 +154,16 @@ As in other information domains, the names used to refer to drug
 substances and products are particularly problematic because their
 definitions change as a function of location or jurisdiction, time and
 context. FDA and other national regulators of medicines have
-collaborated to produce ISO 11238 [ref] which endeavors to define an
-information scheme for the unambiguous identification of all
+collaborated to produce ISO 11238 \citep{ISO11238} which endeavors to
+define an information scheme for the unambiguous identification of all
 ingredients found in medicinal products, and FDA uses an
 implementation of ISO 11238 as the backbone of its information systems
-within the agency. [GSRS] While this facilitates data exchange within
+within the agency \citep{GSRS}. While this facilitates data exchange within
 the FDA and with other national authorities, the task still remains to
 be able to map other, external data sources into this
 rigorously-defined scheme using whatever names and data are at hand. 
 
-\subsection{When are two drugs equivalent?}
+%\subsection{When are two drugs equivalent?}
 %\begin{itemize}
 %\item Layout the challenges in determining when two drugs are equivalent. This will depend on drug classes. For example, for small molecules, discuss salt forms, metals, and esters; for biologics, biosimilar; etc.
 %\item Discuss the different types of identifier; INN, USAN, IUPAC, InChI, CAS, UNII, PubChem, company code, etc. Also address the challenge on the evolution of the drug identifier from discovery (where stereochemistry can be ambiguous) to approval.
@@ -230,7 +246,7 @@ different resolutions \citep{lychi}. Section~\ref{sec:methods-ingest}
 discusses in detail how these derived stitch values are generated. 
 \item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the
 active moiety relationship between two drugs provides a strong
-evidence of equivalence. While this relationship can be infered
+evidence of equivalence. While this relationship can be inferred
 directly from the chemical structures (e.g., freebase and salt forms,
 with and without esters), there is some level of curation needed to
 handle structures with metal complex. 
@@ -264,13 +280,22 @@ data source from the FDA \citep{GSRSData}. This data source is
 well-curated and contains over 100K substances across six different
 classes: chemical, structurally diverse, protein, mixture, polymer,
 and nucleic acid. As a data source derived from the FDA's internal
-substance registry system, the G-SRS data source naturally forms the
-basis of our data integration effort. The complete list of data
-sources currently used by \st\ is shown in
+substance registry system \citep{GSRS}, the G-SRS data source
+naturally forms the basis of our data integration effort. Using this
+data source as the ``seed'' from which other data sources can map onto
+has the following benefits: 
+\begin{itemize}
+\item Since the G-SRS data source implements the ISO 11238
+standard \citep{ISO11238} for defining medicinal substances, it serves
+as an ideal starting point for what constitutes a ``drug.''
+\item The data is a public version of the internal substance registry
+within the FDA; as such, it is well-curated and up-to-date.
+\end{itemize}
+The complete list of data sources currently used by \st\ is shown in
 Table~\ref{tab:data-sources}. 
 
 \begin{table}[thb]
-\processtable{\label{tab:data-sources}}
+\processtable{Data sources used in the current version of \st.\label{tab:data-sources}}
 {\begin{tabular}{@{}ll@{}}\toprule
 Data source & Size\\ \midrule
 G-SRS, April 2019&	105,019\\
@@ -296,7 +321,7 @@ FDA Excipients, December 2018&	10,212\\ \botrule
 The basic premise behind \st{} is that data integration is often done
 within the context of a specific data source. This is a reasonable
 assumption given the data quality varies when integrating across
-disparate sources. Futhermore, by establishing a reference data source
+disparate sources. Furthermore, by establishing a reference data source
 for data integration, we have finer control over the following: 
 \begin{unlist}
 \item{\emph{Data quality}.} A reference data source is typically
@@ -310,7 +335,7 @@ ontologies can be mapped. As with data quality, we can also impose any
 additional semantic constraints; e.g., prostate cancer is not one of
 the diagnoses for a female patient in an electronic health record. 
 \item{\emph{Data curation}.} Generating ground-truth data is more
-managable with a single data source than across multiple data sources.
+manageable with a single data source than across multiple data sources.
 This is particularly important due to the iterative feedback between
 data curation and data integration. 
 \end{unlist}
@@ -336,7 +361,7 @@ as are JSON, delimiter separated text, and custom formats. For
 non-semantic format, a separate configuration file is required to map
 properties to stitch keys. 
 
-An important step in data ingestion is the standaridzation and
+An important step in data ingestion is the standardization and
 validation of stitch values. For \texttt{N\_Name} stitch key, the
 standardization procedure is simply to convert the input string to
 uppercase; no validation is performed. For \texttt{I\_UNII}
@@ -349,8 +374,8 @@ during ingestion.
 Perhaps the most unique feature of \st\ is its ability to incorporate
 knowledge of chemical structures into entity resolution. Whereas
 traditional approaches rely on names and identifiers to determine
-equivalence relation among substances, \st\ goes a step further and
-utilizes the underlying chemical structures to infer equivalence. This
+equivalence substances, \st\ goes a step further and utilizes the
+underlying chemical structures to infer equivalence. This 
 is particularly relevant when the drug is a mixture, prodrug, or
 active moiety with complex excipient (or derivative thereof). As an
 example, consider the drug entity \emph{IMATINIB MESYLATE} and its
@@ -420,7 +445,7 @@ Let $W$ denote the set of stitch nodes created in the data ingestion
 step for a given data source $D$.\\
 Let $\langle k, v\rangle$ be the tuple of stitch key and value,
 respectively, defined for a stitch node $w$.\\
-$G=(V,E)$ is current stitch multigraph.\\
+$G=(V,E)$ is the current stitch multigraph.\\
 \Find{$k, v$} is a function that returns all stitch nodes in $V$
 containing stitch key $k$ and stitch value $v$.\\
 \Union{$w,z$} is a union-find algorithm for tracking disjoint sets
@@ -439,65 +464,210 @@ containing stitch key $k$ and stitch value $v$.\\
 
 \subsection{Entity resolution}\label{sec:methods-er}
 After all data sources have been stitched together, the next step is
-to identify unique entities from the stitch multigraph. Formally, this
+to identify \emph{unique} entities from the stitch multigraph. Formally, this
 step is known as \emph{entity resolution} and is the only step
-within \st\ that is specific to the drug entity type. This is to be
+within \st\ that is specific to the drug entity type. (This is to be
 expected: Given that entity resolution is about adjudicating
 the splitting and merging of entities, a reasonable amount of
 knowledge of the entity type is required for the adjudication to be
-effective. At the core of our proposed approach to entity resolution
-for drug data is the reference G-SRS data source \citep{GSRSData}.
-Using this data source as the ``seed'' from which other data sources
-can map onto has several benefits:
-\begin{itemize}
-\item Since the G-SRS data source implements the ISO 11238
-standard \citep{ISO11238} for defining medicinal substances, it serves
-as an ideal starting point for  what constitutes a ``drug.''
-\item The data is a public version of the internal substance registry
-within the FDA; as such, it is well-curated and up-to-date.
-\item 
-\end{itemize}
-
-The input to entity resolution is a connected component. Within \st\
-the process of entity splitting and merging for a connected componoent
-is known as \emph{untangling}. At a high level, this process works as
-follows. 
+effective.) For a given connected component, the iterative process of
+assigning equivalence labels to stitch nodes is known
+as \emph{untangling}. Algorithm~\ref{algo:untangle} gives a high level
+outline of the untangling process.
 
 \begin{algorithm}\label{algo:untangle}
-\SetKwFunction{Union}{Union}
-\SetKwFunction{Find}{Find}
+\SetKwFunction{MergeNodes}{MergeNodes}
+\SetKwFunction{MergeCliques}{MergeCliques}
+\SetKwFunction{MergeSingletons}{MergeSingletons}
 \SetAlgoLined
 \DontPrintSemicolon
-$G=(V,E)$ is current stitch multigraph.\\
- \For{$w \in W$}{
-    \For{$\langle k_i, v_i\rangle \in w$}{
-      \For{$z \in$ \Find{$k_i,v_i$}}{
-         $E \leftarrow E \cup z\thicksim w$\;
-         \Union{$w,z$}\;
-      }
-    }
-    $V \leftarrow V \cup w$\;
- }
+Let $U$ be the disjoint set data structure for all entities.\\
+Let $S$ denote the set of unlabeled entities (i.e., singletons).\\
+$C=(V,E)$ is the connected component.\\
+\MergeNodes{$U, r$} is a function that performs transitive closure on
+stitch nodes in $C$ which are connected by a relation $r\in E$. The results are
+accumulated in $U$.\\
+\MergeCliques{$U, K$} is a function that takes a set of stitch keys
+$K$, finds overlapping cliques that span two or more stitch keys,
+and performs transitive closure on the entities.\\
+\MergeSingletons{$U, S, K$} is a function that also takes in a set of
+stitch keys $K$, a set of singleton stitch node $S$, and find the best
+mapping to an already labeled stitch node.\\
+\MergeNodes{$U,$\texttt{R\_activeMoiety}}\;
+\MergeNodes{$U,$\texttt{I\_UNII}}\;
+\MergeNodes{$U,$\texttt{H\_LyChI\_L4}}\;
+\MergeCliques{$U,$\texttt{N\_Name},\texttt{I\_CAS},\texttt{I\_CID},\texttt{H\_LyChI\_L4}}\;
+\MergeSingletons{$U,S,$\texttt{N\_Name},\texttt{I\_CAS}}\;
  \caption{An algorithm to untangle a connected component}
 \end{algorithm}
+At the core of the algorithm is the implied priorities associated with
+the stitch keys. The relation \texttt{R\_activeMoiety} has the highest
+priority as it is manually generated and is a special relation
+that only available to the G-SRS data source. As an
+example, consider the entities \emph{acetylsalicylic acid}
+(or also commonly known as \emph{aspirin}) and \emph{ethyl acetylsalicylate}
+shown in Figures~\ref{fig:aspirin} and \ref{fig:ethyl},
+respectively. While the two entities have nothing in common, in G-SRS
+\emph{acetylsalicylic acid} is annotated as being an \emph{active
+moiety} of \emph{ethyl acetylsalicylate}. Further examination of the
+structural differences shows that only an \emph{ester} separates the
+two entities; this falls well within what the FDA considers as
+equivalent drugs. This example also highlights a quagmire:
+Computationally, there is nothing to prevent us from
+imputing \emph{active moiety} relationships through efficient (sub-)
+graph isomorphisms. This, however, is a very tempted trap that we have
+thus far resisted due to other forms of \emph{active moiety} relationships---e.g.,
+metabolites and metals---that would require considerable investment of effort.
+\begin{figure}[!tpb]
+\centering
+\begin{minipage}{.45\textwidth}
+\centerline{\includegraphics[scale=0.5]{aspirin-crop}}
+\caption{Chemical structure for acetylsalicylic
+acid.}\label{fig:aspirin}
+\end{minipage}
+\hfill
+\begin{minipage}{.45\textwidth}
+\centerline{\includegraphics[scale=0.5]{VX19C5613T-crop}}
+\caption{Chemical structure for ethyl acetylsalicylate.}\label{fig:ethyl}
+\end{minipage}
+\end{figure}
 
+The next priority is the stitch key \texttt{I\_UNII}. As UNII is
+the primary identifier for the G-SRS data source, any data source that
+provides mapping based on this identifier implies that the data source has
+sufficient knowledge of G-SRS (i.e., guilt by association). For
+entities that can be represented by chemical structures, the stitch
+key \texttt{H\_LyChI\_L4} has the next level of priority. The
+complexity required for two entities to have the same stitch values
+means that the entities are less likely to match by errors. The rest
+of the stitch keys
+(i.e., \texttt{N\_Name}, \texttt{I\_CAS}, \texttt{I\_CID}) all have the
+lowest priority.
+
+At the completion of Algorithm~\ref{algo:untangle}, the disjoint set
+data structure $U$ contains all equivalence entity classes such that
+each class is represented by an \emph{sgroup} node in the stitch
+multigraph. The sgroup nodes are the \emph{resolved entities}.
 
 \subsection{Entity normalization}
-Text describing entity normalization
+The last step in the data integration pipeline is to decide how the
+resolved entities are defined. This step is referred to as \emph{entity
+normalization} and its goals are to have (i) clear and consistent
+strategies for merging properties and (ii) conflict resolution
+(semantic as well as self consistency). While this step can be quite
+trivial if the properties are mutually exclusive across all data
+sources, to address this in a general setting will require considerable
+efforts in terms of understanding the data source and its metadata. Within the
+context of the current work, we resort to a simple strategy: When
+merging properties, we preferentially use those that come from G-SRS
+with a basic consistency constraint that a synonym is never associated
+with more than one resolved entity. It also helps that many of the
+data sources in Table~\ref{tab:data-sources} have mutually exclusive
+properties; e.g., the property ``drug approval year'' in the Drugs@FDA
+data source is not a property of G-SRS.
 
 %\enlargethispage{6pt}
 \end{methods}
 
 \section{Results}
-Discussion of results and highlight interesting examples here.
+\st\ and the data integration pipeline developed for the \ix\ resource
+are available in source form
+at \url{https://github.com/ncats/stitcher}. The stitch multigraph
+built with data sources listed in Table~\ref{tab:data-sources} is also
+available as a Neo4j database
+at \url{https://stitcher.ncats.io/browser}. (While no credentials are
+needed for the database, the web interface requires that the
+string \texttt{stitcher.ncats.io:80} is entered into the
+field \texttt{Host}.) This database currently contains 192,413 stitch
+nodes and 11,948,470 edges (relationships and stitch
+keys). Tables~\ref{tab:stitch-keys} and \ref{tab:stitch-values} give a
+breakdown of the stitch- keys and values, respectively, in the stitch
+multigraph. All figures used throughout this paper have been generated
+directly from this database.
 
-\section{Discussion}
+\begin{table}[thb]
+\processtable{Distribution of edge types for the stitch multigraph.\label{tab:stitch-keys}}
+{\begin{tabular}{@{}ll@{}}\toprule
+Stitch key & Size\\ \midrule
+\texttt{H\_LyChI\_L3}	& 6,140,942\\
+\texttt{H\_LyChI\_L4} &	5,300,078\\
+\texttt{N\_Name} &	177,446\\
+\texttt{H\_LyChI\_L5} &	162,160\\
+\texttt{I\_UNII} &	139,176\\
+\texttt{R\_activeMoiety} & 14,940\\
+\texttt{I\_CAS}	& 11,684\\
+\texttt{I\_CID} &	2,044\\ \botrule
+\end{tabular}}{}
+\end{table}
 
-\section*{Acknowledgements}
+\begin{table}[thb]
+\processtable{Top stitch value for each stitch key.\label{tab:stitch-values}}
+{\begin{tabular}{@{}lll@{}}\toprule
+Stitch key & Stitch value & Size\\ \midrule
+\texttt{H\_LyChI\_L3}	& \texttt{VUSPQLGXN18-M} &	1,344,440\\
+\texttt{H\_LyChI\_L4} &	\texttt{VU8BQZFPPYTZ-M} & 1,307,592\\
+\texttt{N\_Name} & \texttt{ROFECOXIB} &72 \\
+\texttt{H\_LyChI\_L5} &	\texttt{9DKQLD7D29DN-N} & 162,160\\
+\texttt{I\_UNII} & \texttt{UNKNOWN} &210 \\
+\texttt{R\_activeMoiety} & \texttt{2M83C4R6ZB} & 106\\
+\texttt{I\_CAS}	& \texttt{25322-68-3} & 1,806\\
+\texttt{I\_CID} & \texttt{121225712} & 380\\ \botrule
+\end{tabular}}{The LyChI hash keys \texttt{L3} and \texttt{L4}
+correspond to the potassium ion (K+).}
+\end{table}
+
+In the remainder of this section, we provide examples that highlight
+different entity resolution challenges.
+\subsection{ASPIRIN}
+\emph{ASPIRIN} is a versatile drug that can be used alone or in
+combination with other drugs. Shown in Figure~\ref{fig:ASPIRIN} is the
+induced subgraph of the much larger \emph{ASPIRIN} connected component that
+forms the \emph{ASPIRIN} entity.
+\begin{figure}[!tpb]
+\centerline{\includegraphics[scale=0.5]{graph5-crop}}
+\caption{A connected component for ASPIRIN.}\label{fig:ASPIRIN}
+\end{figure}
+This example demonstrates \st's ability to tease out only the relevant
+stitch nodes for which \emph{ASPIRIN} is likely to be the active
+moiety for the underlying substance.
+
+\subsection{LEVOMETHADYL}
+\emph{LEVOMETHADYL} and its derivative \emph{LEVACETYLMETHADOL} are
+often considered as two separate drugs. This is readily apparent in
+Figure~\ref{fig:LEVOMETHADYL}, which shows that there are two distinct
+``clusters'' in the stitch multigraph. If entity resolution is based on
+graph metrics (e.g., betweenness centrality), it is likely that this
+connected component will yield two drugs instead of one. Here, the
+priority of the stitch key allows the two clusters to be merged to
+indicate that there is only one drug.
+\begin{figure}[!tpb]
+\centerline{\includegraphics[scale=0.5]{graph6-crop}}
+\caption{A connected component for LEVOMETHADYL that clearly shows two
+distinct clusters.}\label{fig:LEVOMETHADYL}
+\end{figure}
+
+\subsection{BENOXAPROFEN} Figure~\ref{fig:BENOXAPROFEN} shows the
+connected component for \emph{BENOXAPROFEN}, a nonsteroidal
+antiinflammatory drug approved in 1982. This drug is a racemic
+mixture. The density of this connected component is a reflection of
+the lack of specified stereocenter that caused many spurious stitch
+keys. \st\ is able to disambiguate the connected component into three
+distinct entities that represent the mixture, \emph{R-}, and \emph{S-}.
+\begin{figure}[!tpb]
+\centerline{\includegraphics[scale=0.5]{graph4-crop}}
+\caption{A dense connected component for BENOXAPROFEN that resolved to
+three unique entities.}\label{fig:BENOXAPROFEN}
+\end{figure}
+
+%\section{Discussion}
+
+\section*{Acknowledgments}
 We thank our colleagues, Mark Williams and Tyler Beck, for their
 valuable proof-reading of early drafts of the manuscript. We also
 thank our colleague, Tongan Zhao, for his help in developing a
-prototype curation user interface for \st.
+prototype curation user interface for \st. We are particularly grateful
+to Alexey Zakharov and Tim Sheils for their constant encouragement and
+support.
 
 \bibliographystyle{natbib}
 %\bibliographystyle{achemnat}
