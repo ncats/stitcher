@@ -566,9 +566,13 @@ public class Api extends Controller {
 
     private String parseUpdatePropertyJson(String jsonPath, JsonNode oldV, JsonNode newV) throws Exception {
         if (oldV instanceof ObjectNode) {
-            return oldV.findValue("key").asText();
+            if (oldV.has("key"))
+                return oldV.findValue("key").asText();
+            else return oldV.fieldNames().next();
         } else if (newV instanceof ObjectNode) {
-            return newV.findValue("key").asText();
+            if (newV.has("key"))
+                return newV.findValue("key").asText();
+            else return newV.fieldNames().next();
         }
 
         if (jsonPath.contains("$.properties")) {
@@ -593,7 +597,9 @@ public class Api extends Controller {
         // parse object into key and value
         if (node instanceof ObjectNode) {
             //updateProperty = node.findValue("key").asText();
-            node = node.findValue("value");
+            if (node.has("value"))
+                node = node.findValue("value");
+            else node = node.get(node.fieldNames().next());
         }
 
         if (node == null || node.isNull() || node.isMissingNode())
@@ -824,12 +830,12 @@ public class Api extends Controller {
                             response = "payload updated";
                         }
 
-                        if (sk != null) { // check if stitching needs to be redone
+                        if (sk != null && (oldValO != null || newValO != null)) { // check if stitching needs to be redone
                             List<Stitch> sL = new ArrayList();
                             sL.add(updateNode.getStitch(ver));
 
                             updateNode.update(sk, oldValO, newValO);
-                            for (Entity e : updateNode.neighbors(sk, newVal)) {
+                            for (Entity e : updateNode.neighbors(sk, newValO)) {
                                 Stitch s = e.getStitch(ver);
                                 if (s != null && !sL.contains(s)) {
                                     sL.add(s);
@@ -1105,7 +1111,7 @@ public class Api extends Controller {
         String uri = routes.Api.structure(id, format, size).url();
         Logger.debug(uri);
 
-        Entity e = es.getEntityFactory().entity(id);
+        Entity e = es.getEntityFactory().getEntity(id);
         if (e != null) {
             Molecule mol = e.mol();
             

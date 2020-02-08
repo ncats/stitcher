@@ -244,6 +244,11 @@ public class DailyMedEventParser extends EventParser {
                 if(route !=null){
                     event.route = (String) route;
                 }
+
+                // only trust DailyMed for Allergenic Extract events Event.EventKind.USApprovalAllergenic
+                if (event.kind == Event.EventKind.USApprovalRx ||
+                        event.kind == Event.EventKind.USApprovalOTC)
+                    event.kind = Event.EventKind.Marketed;
             }
 
 

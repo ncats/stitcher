@@ -2,6 +2,7 @@ package ncats.stitcher.calculators.events;
 
 import ncats.stitcher.calculators.EventCalculator;
 
+import java.lang.reflect.Array;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
@@ -23,8 +24,18 @@ public class DrugsAtFDAEventParser extends EventParser {
                 event.startDate = date;
                 //event.endDate;
                 event.active = (String) payload.get("active");
-                event.source = (String) payload.get("Date_Method");
-                event.URL = (String) payload.get("Url");
+                Object source = payload.get("Date_Method");
+                if (source != null && source.getClass().isArray()) {
+                    event.source = (String) Array.get(source,0);
+                } else {
+                    event.source = (String) source;
+                }
+                Object url = payload.get("Url");
+                if (url != null && url.getClass().isArray()) {
+                    event.URL = (String) Array.get(url,0);
+                } else {
+                    event.URL = (String) url;
+                }
                 Object appType = payload.get("App_Type");
                 if ("true".equals(event.active)) {
                     event.approvalAppId = (String) payload.get("App_Type") +
@@ -38,7 +49,7 @@ public class DrugsAtFDAEventParser extends EventParser {
             }
             catch (Exception ex) {
                 EventCalculator.logger.log(Level.SEVERE,
-                           "Can't parse startDate: \""+content+"\"", ex);
+                           "Can't parse "+id+" startDate: \""+content+"\"", ex);
             }
         }
 

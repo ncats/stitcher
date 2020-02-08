@@ -13,4 +13,4 @@ GET	/stitches/v$version<[1-9][0-9]*>/:name	controllers.app.App.stitch(version: I
 GET	/stitches/latest	controllers.app.App.latestStitches(q: String ?=null, rows: Int ?= 5, page: Int ?= 1)
 GET	/stitches/v$version<[1-9][0-9]*>	controllers.app.App.stitches(version: Int, q: String ?= null, rows: Int ?= 5, page: Int ?= 1)
 DELETE	/payload		controllers.app.App.delete(key: String)
-
+GET	/structure/:id	controllers.app.App.structure(id: Long, size: Int ?= 400)

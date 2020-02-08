@@ -383,7 +383,9 @@ public class DefaultJsonCodec implements JsonCodec, Props {
             for (ObjectNode entry: members) {
                 long pn = entry.get("payloadNode").asLong();
                 long en = entry.get("node").asLong();
-                String id = entry.get("id").asText();
+                String id = "";
+                if (entry.has("id"))
+                    id = entry.get("id").asText();
                 gmap.put(id, pn);
                 g.addNode(en);
                 g.addNode(pn);

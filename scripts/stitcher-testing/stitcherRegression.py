@@ -53,26 +53,59 @@ def uniiClashes(unii2stitch, stitch):
     return unii2stitch
 
 def approvedStitches(approved, stitch):
-    if stitch.has_key('USapproved') and stitch['USapproved'] != 'null':
-        apprYear = "not given"
-        if stitch.has_key('initiallyMarketedUS'):
-            apprYear = stitch['initiallyMarketedUS']
-        elif stitch.has_key('initiallyMarketed'):
-            apprYear = stitch['initiallyMarketed']
+    appr = ''
+    if stitch.has_key('highestPhase'):
         for event in stitch['events']:
-            if event['id'] == apprYear:
-                apprYear = event['startDate'][0:4]
+            if event['id'] == stitch['highestPhase']:
+                if event['kind'] in ['USApprovalRx', 'USPreviouslyMarketed']:
+                    appr = stitch['highestPhase']
+    if appr != '':
+        if stitch.has_key('initiallyMarketedUS') and stitch['initiallyMarketedUS'] != "null":
+            appr = stitch['initiallyMarketedUS']
+        elif stitch.has_key('initiallyMarketed') and stitch['initiallyMarketed'] != "null":
+            appr = stitch['initiallyMarketed']
+
+        unii = ''
         parent = stitch['sgroup']['parent']
         rank = stitch['rank']
-        unii = ''
         for node in stitch['sgroup']['members']:
             if node['node'] == parent:
                 if not node.has_key('id'):
                     unii = node['name']
                 else:
                     unii = node['id']
+
+        apprDate = ''
+        apprType = ''
+        apprUnii = unii
+        for event in stitch['events']:
+            if event['id'] == appr:
+                apprType = event['kind']
+                apprDate = 'unknown'
+                if 'startDate' in event:
+                    apprDate = event['startDate']
+                #find unii of product ingredient
+                maxct = 0
+                for member in stitch['sgroup']['members']:
+                    if member['source'][0:5] == 'G-SRS':
+                        memUnii = member['id']
+                        if 'data' in member:
+                            for data in member['data']:
+                                memct = 0
+                                for item1 in event.values():
+                                    for item2 in data.values():
+                                        if item1 == item2:
+                                            memct = memct + 1
+                                if memct > maxct:
+                                    maxct = memct
+                                    apprUnii = memUnii
+
         name = getName(stitch)
-        approved[unii] = [apprYear, parent, rank]
+
+        approved[unii] = [apprDate, parent, rank, name, apprUnii, apprType]
+        #if unii != apprUnii:
+        #    print unii, approved[unii]
+        #sys.exit()
     return approved
 
 def highestStatus(approved, stitch):
@@ -353,8 +386,9 @@ if __name__=="__main__":
     #uniiClashes: Different stitches (listed by id) that share a UNII - candidates for merge
     #findOrphans: Some resource entries were supposed to be stitched, but are orphaned
     #approvedStitches: Report on all the approved stitches from API
-    
-    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
+
+    #tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
+    tests = [approvedStitches]
     testHeaders = dict()
     testHeaders['nmeClashes'] = 'nmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['nmeClashes2'] = '\nnmeClashes2\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
@@ -392,13 +426,14 @@ if __name__=="__main__":
     outputs = iterateStitches(tests)
 
     # remove unimportant output for uniiClashes
-    outputindex = tests.index(uniiClashes)
-    output = outputs[outputindex]
-    newoutput = dict()
-    for key in output:
-        if len(output[key]) > 1:
-            newoutput[key] = output[key]
-    outputs[outputindex] = newoutput
+    if uniiClashes in tests:
+        outputindex = tests.index(uniiClashes)
+        output = outputs[outputindex]
+        newoutput = dict()
+        for key in output:
+            if len(output[key]) > 1:
+                newoutput[key] = output[key]
+        outputs[outputindex] = newoutput
             
     # write out results
     for i in range(len(tests)):
