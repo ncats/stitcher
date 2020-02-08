@@ -38,6 +38,7 @@ lazy val commonDependencies = Seq(
   "org.reflections" % "reflections" % "0.9.10",// notTransitive (),
   "junit"             % "junit"           % "4.12"  % "test",
   "com.novocode"      % "junit-interface" % "0.11"  % "test",
+  "org.testng" % "testng" % "7.1.0" % "test",
   "log4j" % "log4j" % "1.2.17",
   "org.webjars" %% "webjars-play" % "2.6.1",
   "org.webjars" % "bootstrap" % "3.3.6",
