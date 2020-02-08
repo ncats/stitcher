@@ -410,6 +410,8 @@ public class GARDEntityFactory extends EntityRegistry {
             while (rset.next()) {
                 int tid = rset.getInt("IdentifierTypeID");
                 String value = rset.getString("DiseaseIdentifier");
+                if (value != null)
+                    value = value.trim();
                 String type = idtypes.get(tid);
                 if (type != null) {
                     if ("synonym".equalsIgnoreCase(type)) {
