@@ -76,8 +76,18 @@ public class TextIndexer extends TransactionEventHandler.Adapter
         public List<String> tokens () { return tokens; }
     }
 
+    public static class Result {
+        public final Node node;
+        public final float score;
+
+        Result (Node node, float score) {
+            this.node = node;
+            this.score = score;
+        }
+    }
+    
     public static class SearchResult {
-        public final List<Node> nodes = new ArrayList<>();
+        public final List<Result> matches = new ArrayList<>();
         public final int skip;
         public final int top;
         public final int total;
@@ -91,7 +101,7 @@ public class TextIndexer extends TransactionEventHandler.Adapter
             this.top = top;
             this.total = total;
         }
-        public int size () { return nodes.size();  }
+        public int size () { return matches.size();  }
     }
 
     public static final SearchResult EMPTY_RESULT = new SearchResult ();
@@ -156,11 +166,10 @@ public class TextIndexer extends TransactionEventHandler.Adapter
         doc.add(new TextField (field, s, Field.Store.NO));
         int pos = s.indexOf(':');
         if (pos > 0) {
-            doc.add(new TextField (s.substring(0, pos),
-                                   s.substring(pos+1),
-                                   Field.Store.NO));
-            doc.add(new TextField (FIELD_TEXT, s.substring(pos+1),
-                                   Field.Store.NO));
+            String value = s.substring(pos+1);
+            doc.add(new TextField
+                    (s.substring(0, pos), value, Field.Store.NO));
+            doc.add(new TextField (FIELD_TEXT, value, Field.Store.NO));
         }
         else 
             doc.add(new TextField (FIELD_TEXT, s, Field.Store.NO));
@@ -265,13 +274,22 @@ public class TextIndexer extends TransactionEventHandler.Adapter
     
     public SearchResult search (String query, int skip, int top)
         throws Exception {
+        String field = FIELD_TEXT;
+        /*
+        int pos = query.indexOf(':');
+        if (pos > 0) {
+            field = query.substring(0, pos);
+            query = query.substring(pos+1);
+        }
+        */
         QueryParser parser = new QueryParser
-            (FIELD_TEXT, indexWriter.getAnalyzer());
+            (field, indexWriter.getAnalyzer());
         return search (parser.parse(queryRewrite (query)), skip, top);
     }
     
     public SearchResult search (Query query, int skip, int top)
         throws Exception {
+        //System.err.println("** query: "+query);
         try (IndexReader reader = DirectoryReader.open(indexWriter)) {
             IndexSearcher searcher = new IndexSearcher (reader);
             TopDocs hits = searcher.search(query, top+skip);
@@ -286,8 +304,15 @@ public class TextIndexer extends TransactionEventHandler.Adapter
                         try {
                             long id = Long.parseLong(did.substring(pos+1));
                             Node n = gdb.getNodeById(id);
-                            if (n != null && n.hasLabel(DATA))
-                                result.nodes.add(n);
+                            if (n != null && n.hasLabel(DATA)) {
+                                float score = hits.scoreDocs[i].score;
+                                /*
+                                System.err.println(id+":"+String.format
+                                            ("%1$.3f", score)+" "
+                                            +n.getAllProperties());
+                                */
+                                result.matches.add(new Result (n, score));
+                            }
                         }
                         catch (NumberFormatException ex) {
                             logger.log(Level.SEVERE, "Bogus id field: "+did,ex);

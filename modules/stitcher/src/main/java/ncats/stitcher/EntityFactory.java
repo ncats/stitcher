@@ -2284,15 +2284,23 @@ public class EntityFactory implements Props, AutoCloseable {
                        String query, int skip, int top) {
         int total = 0;
         try (Transaction tx = gdb.beginTx()) {
-            TextIndexer.SearchResult result = indexer.search(query, skip, top);
+            TextIndexer.SearchResult result = indexer.search(query, 0, 1000);
             List<Entity> results = new ArrayList<>();
-            for (Node u : result.nodes) {
+            Set<Long> unique = new HashSet<>();
+            for (TextIndexer.Result r : result.matches) {
+                Node u = r.node;
                 Relationship rel = u.getSingleRelationship
                     (AuxRelType.PAYLOAD, Direction.OUTGOING);
-                Entity e = Entity._getEntity(rel.getOtherNode(u));
-                results.add(e);
+                if (rel != null) {
+                    Node v = rel.getOtherNode(u);
+                    if (!unique.contains(v.getId())) {
+                        Entity e = Entity._getEntity(v);
+                        results.add(e);
+                        unique.add(v.getId());
+                    }
+                }
             }
-            total = result.total;
+            total = unique.size();
             out.put("total", total);
             out.put("entities", results.toArray(new Entity[0]));
             out.put("count", results.size());
@@ -2498,7 +2506,8 @@ public class EntityFactory implements Props, AutoCloseable {
                 }
                 
                 Node node = null;
-                for (Node n : result.nodes) {
+                for (TextIndexer.Result r : result.matches) {
+                    Node n = r.node;
                     // find a property that matches the name
                     Map<String, Object> props = n.getAllProperties();
                     for (Map.Entry<String, Object> p : props.entrySet()) {
