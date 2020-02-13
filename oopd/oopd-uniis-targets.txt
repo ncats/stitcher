@@ -1,0 +1,1487 @@
+Generic Name	Trade Name	UNII	Gene	UniProt	Family	Name
+Sermorelin acetate	Geref	00IBG87IQW	GHRHR	Q02643	GPCR	Growth hormone-releasing hormone receptor
+Coagulation factor IX (recombinant), Fc fusion protein	Alprolix	02E00T2QDE				
+Tinidazole	Tindamax	033KF7V46H				
+tinidazole	Tindamax	033KF7V46H				
+Cytarabine liposomal	Depocyt	04079A1RDZ				
+obeticholic acid	Ocaliva	0462Z4S4OZ	NR1H4	Q96RI1	NR	Bile acid receptor
+Aprotinin	Trasylol	04XPW8C0FL	PLG	P00747	Enzyme	Plasminogen
+Aprotinin	Trasylol	04XPW8C0FL	KLKB1	P03952	Enzyme	Plasma kallikrein
+Fluocinolone	Retisert	0CD5FD6S2M				
+Levocarnitine	Carnitor	0G389FZZ9M				
+Levocarnitine	Carnitor	0G389FZZ9M				
+Levocarnitine	Carnitor	0G389FZZ9M				
+chenodiol	Chenix	0GEI24LG0J	NR1H4	Q96RI1	NR	Bile acid receptor
+Topiramate	Topamax	0H73WJJ391	SCN1A	P35498	IC	Sodium channel protein type 1 subunit alpha
+Topiramate	Topamax	0H73WJJ391	SCN5A	Q14524	IC	Sodium channel protein type 5 subunit alpha
+Topiramate	Topamax	0H73WJJ391	GABRA1	P14867	IC	Gamma-aminobutyric acid receptor subunit alpha-1
+Topiramate	Topamax	0H73WJJ391	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+Topiramate	Topamax	0H73WJJ391	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+Topiramate	Topamax	0H73WJJ391	CA2	P00918	Enzyme	Carbonic anhydrase 2
+Topiramate	Topamax	0H73WJJ391	CA4	P22748	Enzyme	Carbonic anhydrase 4
+Topiramate	Topamax	0H73WJJ391	GRIA1	P42261	IC	Glutamate receptor 1
+Topiramate	Topamax	0H73WJJ391	GRIA2	P42262	IC	Glutamate receptor 2
+Topiramate	Topamax	0H73WJJ391	GRIA3	P42263	IC	Glutamate receptor 3
+Topiramate	Topamax	0H73WJJ391	GRIA4	P48058	IC	Glutamate receptor 4
+Topiramate	Topamax	0H73WJJ391	GRIK1	P39086	IC	Glutamate receptor ionotropic, kainate 1
+Topiramate	Topamax	0H73WJJ391	GRIK2	Q13002	IC	Glutamate receptor ionotropic, kainate 2
+Topiramate	Topamax	0H73WJJ391	GRIK3	Q13003	IC	Glutamate receptor ionotropic, kainate 3
+Topiramate	Topamax	0H73WJJ391	GRIK4	Q16099	IC	Glutamate receptor ionotropic, kainate 4
+Topiramate	Topamax	0H73WJJ391	GRIK5	Q16478	IC	Glutamate receptor ionotropic, kainate 5
+Taliglucerase alfa	Elelyso For Injection	0R4NLX88O4				
+L-glutamine	Endari	0RH81L854J				
+Glutamine	Nutrestore	0RH81L854J				
+Pilocarpine	Salagen	0WW6D218XJ	CHRM3	P20309	GPCR	Muscarinic acetylcholine receptor M3
+Pilocarpine HCl	Salagen	0WW6D218XJ	CHRM3	P20309	GPCR	Muscarinic acetylcholine receptor M3
+Botulinum toxin type B	Myobloc	0Y70779M1F				
+Cytomegalovirus immune globulin (human)	Cytogam	129L90A25N				
+elotuzumab	Empliciti	1351PE5UGS	SLAMF7	Q9NQ25	Unknown	SLAM family member 7
+elotuzumab	Empliciti	1351PE5UGS	SLAMF7	Q9NQ25	Unknown	SLAM family member 7
+Metronidazole (topical)	Metrogel	140QMO216E				
+mipomersen	Kynamro	18EAY4870E				
+niraparib	Zejula	195Q483UZD	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+niraparib	Zejula	195Q483UZD	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+niraparib	Zejula	195Q483UZD	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+niraparib	Zejula	195Q483UZD	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+cannabidiol	Epidiolex	19GBJ60SN5				
+cannabidiol	Epidiolex	19GBJ60SN5				
+Potassium Iodide Oral Solution	Thyroshield	1C4QK22F9J				
+letermovir	Prevymis	1H09Y5WO1F				
+cinacalcet	Sensipar	1K860WSG25	CASR	P41180	GPCR	Extracellular calcium-sensing receptor
+cinacalcet	Sensipar	1K860WSG25	CASR	P41180	GPCR	Extracellular calcium-sensing receptor
+cinacalcet	Sensipar	1K860WSG25	CASR	P41180	GPCR	Extracellular calcium-sensing receptor
+Alitretinoin	Panretin	1UA8E65KDZ	RARG	P13631	NR	Retinoic acid receptor gamma
+Alitretinoin	Panretin	1UA8E65KDZ	RARB	P10826	NR	Retinoic acid receptor beta
+Alitretinoin	Panretin	1UA8E65KDZ	RXRG	P48443	NR	Retinoic acid receptor RXR-gamma
+Alitretinoin	Panretin	1UA8E65KDZ	RXRB	P28702	NR	Retinoic acid receptor RXR-beta
+Alitretinoin	Panretin	1UA8E65KDZ	RXRA	P19793	NR	Retinoic acid receptor RXR-alpha
+Alitretinoin	Panretin	1UA8E65KDZ	RARA	P10276	NR	Retinoic acid receptor alpha
+melphalan	Evomela	1VXP4V453T				
+Rifabutin	Mycobutin	1W306TDA6S				
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+ibrutinib	Imbruvica	1X70OSD4VX	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+Fludarabine phosphate	Fludara	1X9VK9O1SC	POLA1	P09884	Enzyme	DNA polymerase alpha catalytic subunit
+afamelanotide	Scenesse	1XCC161YKC	MC1R	Q01726	GPCR	Melanocyte-stimulating hormone receptor
+Balsalazide disodium	Colazal	1XL6BJI034	PTGS1	P23219	Enzyme	Prostaglandin G/H synthase 1
+Balsalazide disodium	Colazal	1XL6BJI034	PTGS2	P35354	Enzyme	Prostaglandin G/H synthase 2
+Balsalazide disodium	Colazal	1XL6BJI034	ALOX5	P09917	Enzyme	Arachidonate 5-lipoxygenase
+Balsalazide disodium	Colazal	1XL6BJI034	PPARG	P37231	NR	Peroxisome proliferator-activated receptor gamma
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+ivacaftor	Kalydeco	1Y740ILL1Z	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+vemurafenib	Zelboraf	207SMY3FQT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+vemurafenib	Zelboraf	207SMY3FQT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+tolvaptan	Jynarque	21G72T1950	AVPR2	P30518	GPCR	Vasopressin V2 receptor
+Interferon gamma-1b	Actimmune	21K6M2I7AG				
+Interferon gamma 1-b	Actimmune	21K6M2I7AG				
+Epirubicin	Ellence	22966TX7J5				
+lanadelumab-flyo	Takhzyro	2372V1TKXK				
+velaglucerase-alfa	Vpriv	23HYE36B0I				
+Toremifene	Fareston	2498Y783QT	ESR1	P03372	NR	Estrogen receptor
+regorafenib	Stivarga	24T2A1DOYB	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+regorafenib	Stivarga	24T2A1DOYB	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+regorafenib	Stivarga	24T2A1DOYB	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+regorafenib	Stivarga	24T2A1DOYB	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+denileukin diftitox	Ontak	25E79B5CTM	IL2RA	P01589	Unknown	Interleukin-2 receptor subunit alpha
+denileukin diftitox	Ontak	25E79B5CTM	IL2RB	P14784	Unknown	Interleukin-2 receptor subunit beta
+denileukin diftitox	Ontak	25E79B5CTM	IL2RG	P31785	Unknown	Cytokine receptor common subunit gamma
+hydroxyprogesterone caproate	Makena	276F2O42F5	PGR	P06401	NR	Progesterone receptor
+hydroxyprogesterone caproate	Makena	276F2O42F5	PGR	P06401	NR	Progesterone receptor
+Alglucerase injection	Ceredase	27T56C7KK0				
+dantrolene sodium suspension for injection	Ryanodex	287M0347EV	RYR1	P21817	IC	Ryanodine receptor 1
+dantrolene sodium suspension for injection	Ryanodex	287M0347EV	RYR3	Q15413	IC	Ryanodine receptor 3
+obiltoxaximab	Anthim	29Z5DNL48C				
+Valrubicin	Valstar	2C6NUM6878	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+glucarpidase	Voraxaze	2GFP9BJD79				
+Icodextrin 7.5% with Electrolytes Peritoneal Dialysis Solution	Extraneal (With 7.5% Icodextrin) Peritoneal Dialysis Solutio	2NX48Z0A9G				
+pemetrexed disodium	Alimta	2PKU919BA9	DHFR	P00374	Enzyme	Dihydrofolate reductase
+pemetrexed disodium	Alimta	2PKU919BA9	TYMS	P04818	Enzyme	Thymidylate synthase
+pemetrexed disodium	Alimta	2PKU919BA9	GART	P22102	Unknown	Trifunctional purine biosynthetic protein adenosine-3
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+bevacizumab	Avastin	2S9ZZM9Q9V	VEGFA	P15692	Unknown	Vascular endothelial growth factor A
+Pretomanid	Pretomanid	2XOI31YC4N				
+Nitric oxide	Inomax	31C4KY9ESH	GUCY1B2	O75343	Enzyme	Guanylate cyclase soluble subunit beta-2
+Nitric oxide	Inomax	31C4KY9ESH	GUCY1A2	P33402	Enzyme	Guanylate cyclase soluble subunit alpha-2
+Nitric oxide	Inomax	31C4KY9ESH	GUCY1A1	Q02108	Enzyme	Guanylate cyclase soluble subunit alpha-1
+Nitric oxide	Inomax	31C4KY9ESH	GUCY1B1	Q02153	Enzyme	Guanylate cyclase soluble subunit beta-1
+isavuconazonium sulfate	Cresemba	31Q44514JV				
+isavuconazonium sulfate	Cresemba	31Q44514JV				
+nivolumab	Opdivo	31YO63LBSN	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+nivolumab	Opdivo	31YO63LBSN	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+nivolumab	Opdivo	31YO63LBSN	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+nivolumab	Opdivo	31YO63LBSN	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+nivolumab	Opdivo	31YO63LBSN	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+nivolumab	Opdivo	31YO63LBSN	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+mifepristone	Korlym	320T6RNW1F	PGR	P06401	NR	Progesterone receptor
+mifepristone	Korlym	320T6RNW1F	NR3C1	P04150	NR	Glucocorticoid receptor
+icatibant	Firazyr	325O8467XK	BDKRB2	P30411	GPCR	B2 bradykinin receptor
+intravenous carbamazepine	Carnexiv	33CM23913M				
+Varicella Zoster Immune Globulin (Human)	Varizig	33T61IWL27				
+pazopanib	Votrient	33Y9ANM545	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+pazopanib	Votrient	33Y9ANM545	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+pazopanib	Votrient	33Y9ANM545	FGFR3	P22607	Kinase	Fibroblast growth factor receptor 3
+pazopanib	Votrient	33Y9ANM545	PDGFRA	P16234	Kinase	Platelet-derived growth factor receptor alpha
+pazopanib	Votrient	33Y9ANM545	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+pazopanib	Votrient	33Y9ANM545	FGFR1	P11362	Kinase	Fibroblast growth factor receptor 1
+pazopanib	Votrient	33Y9ANM545	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+pazopanib	Votrient	33Y9ANM545	CSF1R	P07333	Kinase	Macrophage colony-stimulating factor 1 receptor
+pazopanib	Votrient	33Y9ANM545	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+pazopanib	Votrient	33Y9ANM545	LCK	P06239	Kinase	Tyrosine-protein kinase Lck
+pazopanib	Votrient	33Y9ANM545	ITK	Q08881	Kinase	Tyrosine-protein kinase ITK/TSK
+canakinumab	Ilaris	37CQ2C7X93	IL1B	P01584	Unknown	Interleukin-1 beta
+canakinumab	Ilaris	37CQ2C7X93	IL1B	P01584	Unknown	Interleukin-1 beta
+canakinumab	Ilaris	37CQ2C7X93	IL1B	P01584	Unknown	Interleukin-1 beta
+canakinumab	Ilaris	37CQ2C7X93	IL1B	P01584	Unknown	Interleukin-1 beta
+canakinumab	Ilaris	37CQ2C7X93	IL1B	P01584	Unknown	Interleukin-1 beta
+Leuprolide acetate	Lupron Injection	37JNS02E7V				
+Coagulation Factor IX (recombinant)	Benefix	382L14738L				
+coagulation factor IX (recombinant)	Rixubis	382L14738L				
+pentostatin for injection	Nipent	395575MZO7	ADA	P00813	Enzyme	Adenosine deaminase
+lenvatinib	Lenvima	3J78384F61	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+lenvatinib	Lenvima	3J78384F61	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+lenvatinib	Lenvima	3J78384F61	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+lenvatinib	Lenvima	3J78384F61	FGFR1	P11362	Kinase	Fibroblast growth factor receptor 1
+lenvatinib	Lenvima	3J78384F61	PDGFRA	P16234	Kinase	Platelet-derived growth factor receptor alpha
+lenvatinib	Lenvima	3J78384F61	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+lenvatinib	Lenvima	3J78384F61	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+lenvatinib	Lenvima	3J78384F61	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+lenvatinib	Lenvima	3J78384F61	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+lenvatinib	Lenvima	3J78384F61	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+lenvatinib	Lenvima	3J78384F61	FGFR1	P11362	Kinase	Fibroblast growth factor receptor 1
+lenvatinib	Lenvima	3J78384F61	PDGFRA	P16234	Kinase	Platelet-derived growth factor receptor alpha
+lenvatinib	Lenvima	3J78384F61	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+lenvatinib	Lenvima	3J78384F61	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+Recombinant human luteinizing hormone	Luveris	3JGY52XJNA				
+dehydrated alcohol	Ablysinol	3K9958V90M				
+telotristat etiprate	Xermelo	3T25U84H4U				
+buprenorphine in combination with naloxone	Suboxone	40D3SCR4GZ				
+rucaparib	Rubraca	41AX9SJ8KO	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+rucaparib	Rubraca	41AX9SJ8KO	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+rucaparib	Rubraca	41AX9SJ8KO	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+rucaparib	Rubraca	41AX9SJ8KO	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+rucaparib	Rubraca	41AX9SJ8KO	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+rucaparib	Rubraca	41AX9SJ8KO	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+Allopurinol sodium	Aloprim For Injection	428673RC2Z	XDH	P47989	Enzyme	Xanthine dehydrogenase/oxidase
+ruxolitinib phosphate	Jakafi	436LRU32H5	JAK2	O60674	Kinase	Tyrosine-protein kinase JAK2
+ruxolitinib phosphate	Jakafi	436LRU32H5	JAK1	P23458	Kinase	Tyrosine-protein kinase JAK1
+ruxolitinib	Jakafi	436LRU32H5	JAK2	O60674	Kinase	Tyrosine-protein kinase JAK2
+ruxolitinib	Jakafi	436LRU32H5	JAK1	P23458	Kinase	Tyrosine-protein kinase JAK1
+ruxolitinib	Jakafi	436LRU32H5	JAK2	O60674	Kinase	Tyrosine-protein kinase JAK2
+ruxolitinib	Jakafi	436LRU32H5	JAK1	P23458	Kinase	Tyrosine-protein kinase JAK1
+ixazomib citrate	Ninlaro	46CWK97Z3K	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+triclabendazole	Egaten	4784C8E03O				
+Cladribine	Leustatin Injection	47M74X9YT5				
+Interferon alfa-2a	Roferon A	47RRR83SK7				
+Interferon alfa-2a (recombinant)	Roferon-A	47RRR83SK7				
+Rho (D) immune globulin intravenous (human)	Winrho Sd	48W7181FLP				
+ribavirin	Rebetol	49717AWG6K	IMPDH1	P20839	Enzyme	Inosine-5'-monophosphate dehydrogenase 1
+zidovudine	Retrovir	4B9XT59T7S				
+nusinersen	Spinraza	4CHB7QQU1Q				
+denosumab	Xgeva	4EQZ6YO2HI	TNFSF11	O14788	Unknown	Tumor necrosis factor ligand superfamily member 11
+denosumab	Xgeva	4EQZ6YO2HI	TNFSF11	O14788	Unknown	Tumor necrosis factor ligand superfamily member 11
+rituximab	Rituxan	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+rituximab	Rituxan	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+rituximab and recombinant human hyaluronidase	Rituxan Sc	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+rituximab and recombinant human hyaluronidase	Rituxan Sc	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+rituximab	Rituxan	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+rituximab	Rituxan	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+raloxifene	Evista	4F86W47BR6	ESR2	Q92731	NR	Estrogen receptor beta
+raloxifene	Evista	4F86W47BR6	ESR1	P03372	NR	Estrogen receptor
+blinatumomab	Blincyto	4FR53SIF3A	CD19	P15391	Unknown	B-lymphocyte antigen CD19
+blinatumomab	Blincyto	4FR53SIF3A	CD3D	P04234	Unknown	T-cell surface glycoprotein CD3 delta chain
+blinatumomab	Blincyto	4FR53SIF3A	CD3E	P07766	Unknown	T-cell surface glycoprotein CD3 epsilon chain
+blinatumomab	Blincyto	4FR53SIF3A	CD3G	P09693	Unknown	T-cell surface glycoprotein CD3 gamma chain
+blinatumomab	Blincyto	4FR53SIF3A	CD19	P15391	Unknown	B-lymphocyte antigen CD19
+blinatumomab	Blincyto	4FR53SIF3A	CD3D	P04234	Unknown	T-cell surface glycoprotein CD3 delta chain
+blinatumomab	Blincyto	4FR53SIF3A	CD3E	P07766	Unknown	T-cell surface glycoprotein CD3 epsilon chain
+blinatumomab	Blincyto	4FR53SIF3A	CD3G	P09693	Unknown	T-cell surface glycoprotein CD3 gamma chain
+Epoprostenol	Flolan	4K04IQ1OF4	PTGIR	P43119	GPCR	Prostacyclin receptor
+epoprostenol	Flolan	4K04IQ1OF4	PTGIR	P43119	GPCR	Prostacyclin receptor
+Eflornithine HCl	Ornidyl	4NH22NDW9H	ODC1	P11926	Enzyme	Ornithine decarboxylase
+ibritumomab tiuxetan	Zevalin	4Q52C550XK	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+eltrombopag	Promacta	4U07F515LG	MPL	P40238	Unknown	Thrombopoietin receptor
+eltrombopag	Promacta	4U07F515LG	MPL	P40238	Unknown	Thrombopoietin receptor
+eltrombopag	Promacta	4U07F515LG	MPL	P40238	Unknown	Thrombopoietin receptor
+duvelisib	Copiktra	4WD61MR063				
+duvelisib	Copiktra	4WD61MR063				
+daratumumab	Darzalex	4Z63YK6E0E	CD38	P28907	Enzyme	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase 1
+daratumumab	Darzalex	4Z63YK6E0E	CD38	P28907	Enzyme	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase 1
+daratumumab	Darzalex	4Z63YK6E0E	CD38	P28907	Enzyme	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase 1
+daratumumab	Darzalex	4Z63YK6E0E	CD38	P28907	Enzyme	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase 1
+daratumumab	Darzalex	4Z63YK6E0E	CD38	P28907	Enzyme	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase 1
+daratumumab	Darzalex	4Z63YK6E0E	CD38	P28907	Enzyme	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase 1
+Thalidomide	Thalomid	4Z8R6ORS6L	CRBN	Q96SW2	Unknown	Protein cereblon
+Thalidomide	Thalomid	4Z8R6ORS6L	CRBN	Q96SW2	Unknown	Protein cereblon
+bosutinib	Bosulif	5018V4AEZ0	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+bosutinib	Bosulif	5018V4AEZ0	SRC	P12931	Kinase	Proto-oncogene tyrosine-protein kinase Src
+bosutinib	Bosulif	5018V4AEZ0	HCK	P08631	Kinase	Tyrosine-protein kinase HCK
+bosutinib	Bosulif	5018V4AEZ0	LYN	P07948	Kinase	Tyrosine-protein kinase Lyn
+bosutinib	Bosulif	5018V4AEZ0	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+bosutinib	Bosulif	5018V4AEZ0	SRC	P12931	Kinase	Proto-oncogene tyrosine-protein kinase Src
+bosutinib	Bosulif	5018V4AEZ0	HCK	P08631	Kinase	Tyrosine-protein kinase HCK
+bosutinib	Bosulif	5018V4AEZ0	LYN	P07948	Kinase	Tyrosine-protein kinase Lyn
+dacomitinib	Vizimpro	5092U85G58				
+Lodoxamide tromethamine	Alomide Ophthalmic Solution	50LV9A548L				
+mitomycin-C	Mitosol	50SG953SK6				
+atezolizumab	Tecentriq	52CMI0WC3Y	CD274	Q9NZQ7	Unknown	Programmed cell death 1 ligand 1
+Dexrazoxane	Zinecard	5346058Q7S				
+crizotinib	Xalkori	53AH36668S	MET	P08581	Kinase	Hepatocyte growth factor receptor
+crizotinib	Xalkori	53AH36668S	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+crizotinib	Xalkori	53AH36668S	MET	P08581	Kinase	Hepatocyte growth factor receptor
+crizotinib	Xalkori	53AH36668S	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+miltefosine	Impavido	53EY29W7EC				
+Tretinoin	Vesanoid	5688UTC01R	RARG	P13631	NR	Retinoic acid receptor gamma
+Tretinoin	Vesanoid	5688UTC01R	RARB	P10826	NR	Retinoic acid receptor beta
+Tretinoin	Vesanoid	5688UTC01R	RARA	P10276	NR	Retinoic acid receptor alpha
+Corticorelin ovine triflutate	Acthrel	56X54T817Q				
+nimodipine	Nymalize	57WA9QZ5WH	CACNA1D	Q01668	IC	Voltage-dependent L-type calcium channel subunit alpha-1D
+nimodipine	Nymalize	57WA9QZ5WH	CACNA1C	Q13936	IC	Voltage-dependent L-type calcium channel subunit alpha-1C
+vorinostat	Zolinza	58IFB293JI	HDAC6	Q9UBN7	Epigenetic	Histone deacetylase 6
+vorinostat	Zolinza	58IFB293JI	HDAC1	Q13547	Epigenetic	Histone deacetylase 1
+vorinostat	Zolinza	58IFB293JI	HDAC3	O15379	Epigenetic	Histone deacetylase 3
+vorinostat	Zolinza	58IFB293JI	HDAC2	Q92769	Epigenetic	Histone deacetylase 2
+Midodrine HCl	Amatine	59JV96YTXV	ADRA1A	P35348	GPCR	Alpha-1A adrenergic receptor
+N-acetylgalactosamine-4-sulfatase, recombinant human	Naglazyme	59UA429E5G				
+Aminosalicylic acid	Paser Granules	5B2658E0N2	PTGS1	P23219	Enzyme	Prostaglandin G/H synthase 1
+Aminosalicylic acid	Paser Granules	5B2658E0N2	PTGS2	P35354	Enzyme	Prostaglandin G/H synthase 2
+selexipag	Uptravi	5EXC0E384L	PTGIR	P43119	GPCR	Prostacyclin receptor
+nilotinib	Tasigna	5JHU0N1R6K	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+nilotinib	Tasigna	5JHU0N1R6K	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+carglumic acid	Carbaglu	5L0HB4V1EW	CPS1	P31327	Enzyme	Carbamoyl-phosphate synthase [ammonia], mitochondrial
+Daunorubicin citrate liposome injection	Daunoxome	5L84T2Z6NP	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+Glatiramer acetate	Copaxone	5M691HL4BO				
+C1-esterase inhibitor (recombinant)	Ruconest	5QS67N4551				
+gilteritinib	Xospata	5RZZ0Z1GJT				
+artemether/lumefantrine	Coartem	5T2U51A0MW				
+Sorafenib	Nexavar	5T62Q3B36J	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+Sorafenib	Nexavar	5T62Q3B36J	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+Sorafenib	Nexavar	5T62Q3B36J	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+Sorafenib	Nexavar	5T62Q3B36J	RAF1	P04049	Kinase	RAF proto-oncogene serine/threonine-protein kinase
+Sorafenib	Nexavar	5T62Q3B36J	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+Sorafenib	Nexavar	5T62Q3B36J	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Sorafenib	Nexavar	5T62Q3B36J	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Sorafenib	Nexavar	5T62Q3B36J	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+Sorafenib	Nexavar	5T62Q3B36J	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+Sorafenib	Nexavar	5T62Q3B36J	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+Sorafenib	Nexavar	5T62Q3B36J	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+Sorafenib	Nexavar	5T62Q3B36J	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+Sorafenib	Nexavar	5T62Q3B36J	RAF1	P04049	Kinase	RAF proto-oncogene serine/threonine-protein kinase
+Sorafenib	Nexavar	5T62Q3B36J	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+Sorafenib	Nexavar	5T62Q3B36J	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Sorafenib	Nexavar	5T62Q3B36J	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Sorafenib	Nexavar	5T62Q3B36J	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+Sorafenib	Nexavar	5T62Q3B36J	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+sorafenib	Nexavar	5T62Q3B36J	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+sorafenib	Nexavar	5T62Q3B36J	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+sorafenib	Nexavar	5T62Q3B36J	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+sorafenib	Nexavar	5T62Q3B36J	RAF1	P04049	Kinase	RAF proto-oncogene serine/threonine-protein kinase
+sorafenib	Nexavar	5T62Q3B36J	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+sorafenib	Nexavar	5T62Q3B36J	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+sorafenib	Nexavar	5T62Q3B36J	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+sorafenib	Nexavar	5T62Q3B36J	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+sorafenib	Nexavar	5T62Q3B36J	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+Antihemophilic factor/von Willebrand factor complex (human), dried, pasteurized	Humate-P	5T6B772R4Q				
+Idarubicin HCl for injection	Idamycin	5VV3MDU5IE	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+idursulfase	Elaprase	5W8JGG2651				
+mefloquine HCL	Lariam	5Y9L3636O3				
+mefloquine HCL	Lariam	5Y9L3636O3				
+nelarabine	Arranon	60158CV180				
+Temsirolimus	Torisel	624KN6GM2T	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+paricalcitol	Zemplar	6702D36OG5	VDR	P11473	NR	Vitamin D3 receptor
+Pentamidine isethionate	Pentam 300	673LC5J4LQ				
+antihemophilic factor (recombinant), porcine sequence	Obizur	6892UQT2GK				
+bortezomib	Velcade	69G8BD63PP	PSMA1	P25786	Enzyme	Proteasome subunit alpha type-1
+bortezomib	Velcade	69G8BD63PP	PSMB1	P20618	Enzyme	Proteasome subunit beta type-1
+bortezomib	Velcade	69G8BD63PP	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+bortezomib	Velcade	69G8BD63PP	PSMB2	P49721	Enzyme	Proteasome subunit beta type-2
+bortezomib	Velcade	69G8BD63PP	PSMB8	P28062	Enzyme	Proteasome subunit beta type-8
+bortezomib	Velcade	69G8BD63PP	PSMA1	P25786	Enzyme	Proteasome subunit alpha type-1
+bortezomib	Velcade	69G8BD63PP	PSMB1	P20618	Enzyme	Proteasome subunit beta type-1
+bortezomib	Velcade	69G8BD63PP	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+bortezomib	Velcade	69G8BD63PP	PSMB2	P49721	Enzyme	Proteasome subunit beta type-2
+bortezomib	Velcade	69G8BD63PP	PSMB8	P28062	Enzyme	Proteasome subunit beta type-8
+bortezomib	Velcade	69G8BD63PP	PSMA1	P25786	Enzyme	Proteasome subunit alpha type-1
+bortezomib	Velcade	69G8BD63PP	PSMB1	P20618	Enzyme	Proteasome subunit beta type-1
+bortezomib	Velcade	69G8BD63PP	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+bortezomib	Velcade	69G8BD63PP	PSMB2	P49721	Enzyme	Proteasome subunit beta type-2
+bortezomib	Velcade	69G8BD63PP	PSMB8	P28062	Enzyme	Proteasome subunit beta type-8
+bortezomib	Velcade	69G8BD63PP	PSMA1	P25786	Enzyme	Proteasome subunit alpha type-1
+bortezomib	Velcade	69G8BD63PP	PSMB1	P20618	Enzyme	Proteasome subunit beta type-1
+bortezomib	Velcade	69G8BD63PP	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+bortezomib	Velcade	69G8BD63PP	PSMB2	P49721	Enzyme	Proteasome subunit beta type-2
+bortezomib	Velcade	69G8BD63PP	PSMB8	P28062	Enzyme	Proteasome subunit beta type-8
+bortezomib	Velcade	69G8BD63PP	PSMA1	P25786	Enzyme	Proteasome subunit alpha type-1
+bortezomib	Velcade	69G8BD63PP	PSMB1	P20618	Enzyme	Proteasome subunit beta type-1
+bortezomib	Velcade	69G8BD63PP	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+bortezomib	Velcade	69G8BD63PP	PSMB2	P49721	Enzyme	Proteasome subunit beta type-2
+bortezomib	Velcade	69G8BD63PP	PSMB8	P28062	Enzyme	Proteasome subunit beta type-8
+gabapentin	Gralise	6CW7F3G59X	CACNA2D1	P54289	IC	Voltage-dependent calcium channel subunit alpha-2/delta-1
+gabapentin	Gralise	6CW7F3G59X	CACNA2D2	Q9NY47	IC	Voltage-dependent calcium channel subunit alpha-2/delta-2
+Zalcitabine	Hivid	6L3XT8CB3I				
+ipilimumab	Yervoy	6T8C155666	CTLA4	P16410	Unknown	Cytotoxic T-lymphocyte protein 4
+ipilimumab	Yervoy	6T8C155666	CTLA4	P16410	Unknown	Cytotoxic T-lymphocyte protein 4
+ipilimumab	Yervoy	6T8C155666	CTLA4	P16410	Unknown	Cytotoxic T-lymphocyte protein 4
+Coagulation factor IX	Mononine	6U90Y1795T				
+Selegiline HCl	Eldepryl	6W731X367Q	MAOB	P27338	Enzyme	Amine oxidase [flavin-containing] B
+Zoledronate	Zometa, Zabel	6XC1PAD3KF				
+Technetium Tc99m sulfur colloid injection, lyophilized	Technetium Tc99m Sulfur Colloi	70FD1KFU70				
+carfilzomib	Kyprolis	72X6E3J5AR	PSMB5	P28074	Enzyme	Proteasome subunit beta type-5
+gabapentin enacarbil	Horizant	75OCL1SPBQ	CACNA2D1	P54289	IC	Voltage-dependent calcium channel subunit alpha-2/delta-1
+gabapentin enacarbil	Horizant	75OCL1SPBQ	CACNA2D2	Q9NY47	IC	Voltage-dependent calcium channel subunit alpha-2/delta-2
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR3	P32745	GPCR	Somatostatin receptor type 3
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR1	P30872	GPCR	Somatostatin receptor type 1
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR4	P31391	GPCR	Somatostatin receptor type 4
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR3	P32745	GPCR	Somatostatin receptor type 3
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR1	P30872	GPCR	Somatostatin receptor type 1
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR4	P31391	GPCR	Somatostatin receptor type 4
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR3	P32745	GPCR	Somatostatin receptor type 3
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR1	P30872	GPCR	Somatostatin receptor type 1
+Octreotide	Sandostatin Lar	75R0U2568I	SSTR4	P31391	GPCR	Somatostatin receptor type 4
+clofarabine	Clolar	762RDY0Y2H	POLA1	P09884	Enzyme	DNA polymerase alpha catalytic subunit
+clofarabine	Clolar	762RDY0Y2H	RRM2	P31350	Enzyme	Ribonucleoside-diphosphate reductase subunit M2
+clofarabine	Clolar	762RDY0Y2H	RRM1	P23921	Enzyme	Ribonucleoside-diphosphate reductase large subunit
+decitabine	Dacogen	776B62CQ27	DNMT1	P26358	Enzyme	DNA (cytosine-5)-methyltransferase 1
+decitabine	Dacogen	776B62CQ27	DNMT3A	Q9Y6K1	Epigenetic	DNA (cytosine-5)-methyltransferase 3A
+Respiratory syncytial virus immune globulin (Human)	Respigam	78I1W13C3D				
+Pegaspargase	Oncaspar; Asparlas	7D96IR0PPM				
+Pegaspargase	Oncaspar; Asparlas	7D96IR0PPM				
+Bleomycin sulfate	Blenoxane	7DP3NTV15T				
+sodium oxybate	Xyrem	7G33012534	GABBR2	O75899	GPCR	Gamma-aminobutyric acid type B receptor subunit 2
+sodium oxybate	Xyrem	7G33012534	GABBR1	Q9UBS5	GPCR	Gamma-aminobutyric acid type B receptor subunit 1
+sodium oxybate	Xyrem	7G33012534	GABBR2	O75899	GPCR	Gamma-aminobutyric acid type B receptor subunit 2
+sodium oxybate	Xyrem	7G33012534	GABBR1	Q9UBS5	GPCR	Gamma-aminobutyric acid type B receptor subunit 1
+sodium oxybate	Xyrem	7G33012534	GABBR2	O75899	GPCR	Gamma-aminobutyric acid type B receptor subunit 2
+sodium oxybate	Xyrem	7G33012534	GABBR1	Q9UBS5	GPCR	Gamma-aminobutyric acid type B receptor subunit 1
+Mecasermin	Increlex	7GR9I2683O	IGF1R	P08069	Kinase	Insulin-like growth factor 1 receptor
+Dronabinol	Marinol	7J8897W37S	CNR1	P21554	GPCR	Cannabinoid receptor 1
+Riluzole	Rilutek	7LJ087RS6F	SCN5A	Q14524	IC	Sodium channel protein type 5 subunit alpha
+riluzole oral suspension	Tiglutik	7LJ087RS6F				
+riluzole oral suspension	Tiglutik	7LJ087RS6F				
+teduglutide [rDNA origin]	Gattex	7M19191IKG				
+teduglutide [rDNA origin]	Gattex	7M19191IKG				
+antihemophilic factor (recombinant), Fc fusion protein	Eloctate	7PCM518YLR				
+dexamethasone intravitreal implant	Ozurdex	7S5I7G3JQL				
+Sterile talc powder	Sclerosol Intrapleural Aerosol	7SEV7J4R1U				
+Sterile talc	Steritalc	7SEV7J4R1U				
+Sterile talc	Steritalc	7SEV7J4R1U				
+dinutuximab	Unituxin	7SQY4ZUD30				
+Satumomab pendetide	Oncoscint Cr/Ov	7V9926378A				
+Fosphenytoin	Cerebyx	7VLR55452Z	SCN5A	Q14524	IC	Sodium channel protein type 5 subunit alpha
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+Brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB	P07437	Unknown	Tubulin beta chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+brentuximab vedotin	Adcetris	7XL5ISS668	TNFRSF8	P28908	Unknown	Tumor necrosis factor receptor superfamily member 8
+Amphotericin B lipid complex	Abelcet	7XU7A7DROE				
+Liposomal amphotericin B	Ambisome	7XU7A7DROE				
+Liposomal amphotericin B	Ambisome	7XU7A7DROE				
+mebendazole	Vermox 500 Mg Chewable Tablets	81G6I5V05I				
+Doxorubicin liposome	Doxil	82F2G7BL4E				
+doxorubicin HCL liposome injection	Doxil	82F2G7BL4E	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+lomitapide	Juxtapid	82KUB0583F	MTTP	P55157	Unknown	Microsomal triglyceride transfer protein large subunit
+aripiprazole	Abilify	82VFR53I78	HTR2A	P28223	GPCR	5-hydroxytryptamine receptor 2A
+aripiprazole	Abilify	82VFR53I78	HTR1A	P08908	GPCR	5-hydroxytryptamine receptor 1A
+aripiprazole	Abilify	82VFR53I78	DRD2	P14416	GPCR	D(2) dopamine receptor
+rosuvastatin	Crestor	83MVU38M7Q	HMGCR	P04035	Enzyme	3-hydroxy-3-methylglutaryl-coenzyme A reductase
+imatinib mesylate	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+imatinib mesylate	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+imatinib mesylate	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+imatinib mesylate	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+imatinib mesylate	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+imatinib mesylate	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+imatinib mesylate	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+imatinib mesylate	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+imatinib mesylate	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Imatinib mesylate	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+Imatinib mesylate	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Imatinib mesylate	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Imatinib mesylate	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+Imatinib mesylate	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Imatinib mesylate	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Imatinib mesylate	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+Imatinib mesylate	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Imatinib mesylate	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+imatinib	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+imatinib	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+imatinib	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+imatinib	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+imatinib	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+imatinib	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Imatinib	Gleevec	8A1O1M485B	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+Imatinib	Gleevec	8A1O1M485B	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Imatinib	Gleevec	8A1O1M485B	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Sacrosidase	Sucraid	8A7F670F2Y				
+Nafarelin acetate	Synarel Nasal Solution	8ENZ0QJW4H	GNRHR	P30968	GPCR	Gonadotropin-releasing hormone receptor
+Gemtuzumab ozogamicin	Mylotarg	8GZG754X6M	CD33	P20138	Unknown	Myeloid cell surface antigen CD33
+Gemtuzumab ozogamicin	Mylotarg	8GZG754X6M	CD33	P20138	Unknown	Myeloid cell surface antigen CD33
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNQ3	O43525	IC	Potassium voltage-gated channel subfamily KQT member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNQ2	O43526	IC	Potassium voltage-gated channel subfamily KQT member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH1	O95259	IC	Potassium voltage-gated channel subfamily H member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA2	P16389	IC	Potassium voltage-gated channel subfamily A member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA6	P17658	IC	Potassium voltage-gated channel subfamily A member 6
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA3	P22001	IC	Potassium voltage-gated channel subfamily A member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA4	P22459	IC	Potassium voltage-gated channel subfamily A member 4
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA5	P22460	IC	Potassium voltage-gated channel subfamily A member 5
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNC1	P48547	IC	Potassium voltage-gated channel subfamily C member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNQ1	P51787	IC	Potassium voltage-gated channel subfamily KQT member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNQ4	P56696	IC	Potassium voltage-gated channel subfamily KQT member 4
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNC4	Q03721	IC	Potassium voltage-gated channel subfamily C member 4
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA1	Q09470	IC	Potassium voltage-gated channel subfamily A member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH2	Q12809	IC	Potassium voltage-gated channel subfamily H member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNC3	Q14003	IC	Potassium voltage-gated channel subfamily C member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNB1	Q14721	IC	Potassium voltage-gated channel subfamily B member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA10	Q16322	IC	Potassium voltage-gated channel subfamily A member 10
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNV1	Q6PIU1	IC	Potassium voltage-gated channel subfamily V member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH5	Q8NCM2	IC	Potassium voltage-gated channel subfamily H member 5
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNG3	Q8TAE7	IC	Potassium voltage-gated channel subfamily G member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNG4	Q8TDN1	IC	Potassium voltage-gated channel subfamily G member 4
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNV2	Q8TDN2	IC	Potassium voltage-gated channel subfamily V member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNB2	Q92953	IC	Potassium voltage-gated channel subfamily B member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNS1	Q96KK3	IC	Potassium voltage-gated channel subfamily S member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH8	Q96L42	IC	Potassium voltage-gated channel subfamily H member 8
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNC2	Q96PR1	IC	Potassium voltage-gated channel subfamily C member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNA7	Q96RP8	IC	Potassium voltage-gated channel subfamily A member 7
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNS3	Q9BQ31	IC	Potassium voltage-gated channel subfamily S member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH6	Q9H252	IC	Potassium voltage-gated channel subfamily H member 6
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNF1	Q9H3M0	IC	Potassium voltage-gated channel subfamily F member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNQ5	Q9NR82	IC	Potassium voltage-gated channel subfamily KQT member 5
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH7	Q9NS40	IC	Potassium voltage-gated channel subfamily H member 7
+amifampridine phosphate	Firdapse	8HF8FIN815	KCND1	Q9NSA2	IC	Potassium voltage-gated channel subfamily D member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCND2	Q9NZV8	IC	Potassium voltage-gated channel subfamily D member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNG1	Q9UIX4	IC	Potassium voltage-gated channel subfamily G member 1
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNG2	Q9UJ96	IC	Potassium voltage-gated channel subfamily G member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCND3	Q9UK17	IC	Potassium voltage-gated channel subfamily D member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH3	Q9ULD8	IC	Potassium voltage-gated channel subfamily H member 3
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNS2	Q9ULS6	IC	Potassium voltage-gated channel subfamily S member 2
+amifampridine phosphate	Firdapse	8HF8FIN815	KCNH4	Q9UQ05	IC	Potassium voltage-gated channel subfamily H member 4
+technetium Tc 99m tilmanocept	Lymphoseek	8IHI69PQTC				
+Thiotepa	Tepadina	905Z5W3GKH				
+triptorelin pamoate	Triptodur	9081Y98W2V				
+mepolizumab	Nucala	90Z2UF0E52	IL5	P05113	Unknown	Interleukin-5
+mepolizumab	Nucala	90Z2UF0E52	IL5	P05113	Unknown	Interleukin-5
+Pentosan polysulfate sodium	Elmiron	914032762Y				
+Antivenin crotaline (pit-viper) equine immune F(ab)2)	Anavip	92VV7G83ED				
+Solriamfetol	Sunosi	939U7C91AI				
+Inotersen	Tegsedi	950736UC77				
+Dornase alfa	Pulmozyme	953A26OA1Y				
+riboflavin ophthalmic solution ultraviolet-A (UVA) irradiation	Photrexa Viscous	957E53WV42				
+riboflavin ophthalmic solution & ultraviolet A	Photrexa Viscous	957E53WV42				
+Teniposide	Vumon For Injection	957E6438QA	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+ponatinib	Iclusig	96R6PU3D8J	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+ponatinib	Iclusig	96R6PU3D8J	BCR	P11274	Unknown	Breakpoint cluster region protein
+ponatinib	Iclusig	96R6PU3D8J	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+ponatinib	Iclusig	96R6PU3D8J	BCR	P11274	Unknown	Breakpoint cluster region protein
+Amiodarone HCl	Cordarone	976728SY6Z	KCNH2	Q12809	IC	Potassium voltage-gated channel subfamily H member 2
+bendamustine for 50 ml admixture	Bendeka	981Y8SX18M				
+bendamustine for 50ml admixture	Bendeka	981Y8SX18M				
+Bendamustine hydrochloride	Treanda	981Y8SX18M				
+bendamustine hydrochloride	Treanda	981Y8SX18M				
+Lidocaine patch 5%	Lidoderm Patch	98PI200987	SCN2A	Q99250	IC	Sodium channel protein type 2 subunit alpha
+Lidocaine patch 5%	Lidoderm Patch	98PI200987	SCN5A	Q14524	IC	Sodium channel protein type 5 subunit alpha
+Lidocaine patch 5%	Lidoderm Patch	98PI200987	SCN10A	Q9Y5Y9	IC	Sodium channel protein type 10 subunit alpha
+Lidocaine patch 5%	Lidoderm Patch	98PI200987	SCN4A	P35499	IC	Sodium channel protein type 4 subunit alpha
+Lidocaine patch 5%	Lidoderm Patch	98PI200987	SCN9A	Q15858	IC	Sodium channel protein type 9 subunit alpha
+Lidocaine patch 5%	Lidoderm Patch	98PI200987	SCN3A	Q9NY46	IC	Sodium channel protein type 3 subunit alpha
+Basiliximab	Simulect	9927MT646M	IL2RA	P01589	Unknown	Interleukin-2 receptor subunit alpha
+everolimus	Afinitor	9HW64Q8G6G	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+everolimus	Afinitor	9HW64Q8G6G	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+everolimus	Afinitor	9HW64Q8G6G	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+everolimus	Afinitor	9HW64Q8G6G	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+everolimus	Afinitor	9HW64Q8G6G	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+collagenase clostridium histolyticum	Xiaflex	9X7O8V25IT				
+collagenase clostridium histolyticum	Xiaflex	9X7O8V25IT				
+eculizumab	Soliris	A3ULP0F556	C5	P01031	Unknown	Complement C5
+eculizumab	Soliris	A3ULP0F556	C5	P01031	Unknown	Complement C5
+eculizumab	Soliris	A3ULP0F556	C5	P01031	Unknown	Complement C5
+eculizumab	Soliris	A3ULP0F556	C5	P01031	Unknown	Complement C5
+Ofloxacin	Ocuflox Ophthalmic Solution	A4P49JAZ9H				
+recombinant fusion protein linking coagulation factor IX with albumin (rIX-FP)	Idelvion	A57KX1VL5P				
+Bexarotene	Targretin	A61RXM4375	RXRA	P19793	NR	Retinoic acid receptor RXR-alpha
+Bexarotene	Targretin	A61RXM4375	RXRB	P28702	NR	Retinoic acid receptor RXR-beta
+Bexarotene	Targretin	A61RXM4375	RXRG	P48443	NR	Retinoic acid receptor RXR-gamma
+pralatrexate	Folotyn	A8Q8I19Q20	DHFR	P00374	Enzyme	Dihydrofolate reductase
+miglustat	Zavesca	ADN3S497AZ	UGCG	Q16739	Enzyme	Ceramide glucosyltransferase
+eribulin mesylate	Halaven	AV9U0660CW	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB	P07437	Unknown	Tubulin beta chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+eribulin mesylate	Halaven	AV9U0660CW	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+recombinant human antithrombin	Atryn	AWV6I5L6H2				
+Levomethadyl acetate hydrochloride	Orlaam	B54CW5KG52				
+dabrafenib	Tafinlar	B6DC89I63E	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN2D	O15399	IC	Glutamate receptor ionotropic, NMDA 2D
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN3B	O60391	IC	Glutamate receptor ionotropic, NMDA 3B
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN1	Q05586	IC	Glutamate receptor ionotropic, NMDA 1
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN2A	Q12879	IC	Glutamate receptor ionotropic, NMDA 2A
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN2B	Q13224	IC	Glutamate receptor ionotropic, NMDA 2B
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN2C	Q14957	IC	Glutamate receptor ionotropic, NMDA 2C
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53	GRIN3A	Q8TCU5	IC	Glutamate receptor ionotropic, NMDA 3A
+dalfampridine	Ampyra	BH3B64OKL9				
+Coagulation factor Xa (recombinant), inactivated-zhzo	Andexxa	BI009E452R				
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+trametinib	Mekinist	BSB9VJ5TUT	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+trametinib	Mekinist	BSB9VJ5TUT	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+dabrafenib and trametinib	Mekinist	BSB9VJ5TUT	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+dabrafenib and trametinib	Mekinist	BSB9VJ5TUT	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+dabrafenib and trametinib	Mekinist	BSB9VJ5TUT	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+Tiopronin	Thiola	C5W04GO61S				
+Tiopronin	Thiola	C5W04GO61S				
+Tiopronin	Thiola	C5W04GO61S				
+migalastat hydrochloride	Galafold	CLY7M0XD20	GLA	P06280	Enzyme	Alpha-galactosidase A
+anti-inhibitor coagulant complex	Feiba	CS849DUN3M				
+Somatrem for injection	Protropin	CU8D464EDW	GHR	P10912	Unknown	Growth hormone receptor
+romidepsin	Istodax	CX3T89XQBK	HDAC3	O15379	Epigenetic	Histone deacetylase 3
+romidepsin	Istodax	CX3T89XQBK	HDAC4	P56524	Epigenetic	Histone deacetylase 4
+romidepsin	Istodax	CX3T89XQBK	HDAC1	Q13547	Epigenetic	Histone deacetylase 1
+romidepsin	Istodax	CX3T89XQBK	HDAC7	Q8WUI4	Epigenetic	Histone deacetylase 7
+romidepsin	Istodax	CX3T89XQBK	HDAC2	Q92769	Epigenetic	Histone deacetylase 2
+romidepsin	Istodax	CX3T89XQBK	HDAC10	Q969S8	Epigenetic	Histone deacetylase 10
+romidepsin	Istodax	CX3T89XQBK	HDAC11	Q96DB2	Epigenetic	Histone deacetylase 11
+romidepsin	Istodax	CX3T89XQBK	HDAC8	Q9BY41	Epigenetic	Histone deacetylase 8
+romidepsin	Istodax	CX3T89XQBK	HDAC6	Q9UBN7	Epigenetic	Histone deacetylase 6
+romidepsin	Istodax	CX3T89XQBK	HDAC9	Q9UKV0	Epigenetic	Histone deacetylase 9
+romidepsin	Istodax	CX3T89XQBK	HDAC5	Q9UQL6	Epigenetic	Histone deacetylase 5
+romidepsin	Istodax	CX3T89XQBK	HDAC3	O15379	Epigenetic	Histone deacetylase 3
+romidepsin	Istodax	CX3T89XQBK	HDAC4	P56524	Epigenetic	Histone deacetylase 4
+romidepsin	Istodax	CX3T89XQBK	HDAC1	Q13547	Epigenetic	Histone deacetylase 1
+romidepsin	Istodax	CX3T89XQBK	HDAC7	Q8WUI4	Epigenetic	Histone deacetylase 7
+romidepsin	Istodax	CX3T89XQBK	HDAC2	Q92769	Epigenetic	Histone deacetylase 2
+romidepsin	Istodax	CX3T89XQBK	HDAC10	Q969S8	Epigenetic	Histone deacetylase 10
+romidepsin	Istodax	CX3T89XQBK	HDAC11	Q96DB2	Epigenetic	Histone deacetylase 11
+romidepsin	Istodax	CX3T89XQBK	HDAC8	Q9BY41	Epigenetic	Histone deacetylase 8
+romidepsin	Istodax	CX3T89XQBK	HDAC6	Q9UBN7	Epigenetic	Histone deacetylase 6
+romidepsin	Istodax	CX3T89XQBK	HDAC9	Q9UKV0	Epigenetic	Histone deacetylase 9
+romidepsin	Istodax	CX3T89XQBK	HDAC5	Q9UQL6	Epigenetic	Histone deacetylase 5
+pomalidomide	Pomalyst	D2UX06XLB5	CRBN	Q96SW2	Unknown	Protein cereblon
+Erwinia L-asparaginase	Erwinase	D733ET3F9O				
+pirfenidone	Esbriet	D7NLD2JX7U				
+Clofazimine	Lamprene	D959AE5USF				
+ramucirumab	Cyramza	D99YVK4L0X	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+ramucirumab	Cyramza	D99YVK4L0X	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+Centruroides immune F(ab)2	Anascorp	DDA050FCEA				
+tafenoquine	Krintafel	DL5J0B8VSS				
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+pembrolizumab	Keytruda	DPT0O3T46P	PDCD1	Q15116	Unknown	Programmed cell death protein 1
+cabozantinib	Cabometyx	DR7ST46X58	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+cabozantinib	Cabometyx	DR7ST46X58	MET	P08581	Kinase	Hepatocyte growth factor receptor
+cabozantinib	Cabometyx	DR7ST46X58	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+cabozantinib	Cabometyx	DR7ST46X58	TEK	Q02763	Kinase	Angiopoietin-1 receptor
+cabozantinib	Cabometyx	DR7ST46X58	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+cabozantinib	Cabometyx	DR7ST46X58	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+cabozantinib	Cometriq	DR7ST46X58	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+cabozantinib	Cometriq	DR7ST46X58	MET	P08581	Kinase	Hepatocyte growth factor receptor
+cabozantinib	Cometriq	DR7ST46X58	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+cabozantinib	Cometriq	DR7ST46X58	TEK	Q02763	Kinase	Angiopoietin-1 receptor
+cabozantinib	Cometriq	DR7ST46X58	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+cabozantinib	Cometriq	DR7ST46X58	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Recombinant human acid alpha-glucosidase; alglucosidase alfa	1. Myozyme 2. Lumizyme	DTI67O9503				
+Recombinant human acid alpha-glucosidase; alglucosidase alfa	1. Myozyme 2. Lumizyme	DTI67O9503				
+Recombinant human acid alpha-glucosidase; alglucosidase alfa	1. Myozyme 2. Lumizyme	DTI67O9503				
+Succimer	Chemet Capsules	DX1U2629QE				
+Japanese encephalitis vaccine, inactivated, adsorbed	Ixiaro	DZ854I04ZE				
+belatacept	Nulojix	E3B2GI648A	CD80	P33681	Unknown	T-lymphocyte activation antigen CD80
+belatacept	Nulojix	E3B2GI648A	CD86	P42081	Unknown	T-lymphocyte activation antigen CD86
+mercaptopurine oral solution	Purixan	E7WED276I5				
+Potassium citrate	Urocit-K	EE90ONI6FF				
+Potassium citrate	Urocit-K	EE90ONI6FF				
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+lenalidomide	Revlimid	F0P408N6V4	CRBN	Q96SW2	Unknown	Protein cereblon
+Apomorphine HCl	Apokyn	F39049Y068	DRD2	P14416	GPCR	D(2) dopamine receptor
+Albendazole	Albenza	F4216019LN				
+Albendazole	Albenza	F4216019LN				
+Alpha1-proteinase inhibitor (human)	Prolastin	F43I396OIS				
+Belinostat	Beleodaq	F4H96P17NZ	HDAC4	P56524	Epigenetic	Histone deacetylase 4
+Belinostat	Beleodaq	F4H96P17NZ	HDAC10	Q969S8	Epigenetic	Histone deacetylase 10
+Belinostat	Beleodaq	F4H96P17NZ	HDAC11	Q96DB2	Epigenetic	Histone deacetylase 11
+Belinostat	Beleodaq	F4H96P17NZ	HDAC8	Q9BY41	Epigenetic	Histone deacetylase 8
+Belinostat	Beleodaq	F4H96P17NZ	HDAC9	Q9UKV0	Epigenetic	Histone deacetylase 9
+Belinostat	Beleodaq	F4H96P17NZ	HDAC6	Q9UBN7	Epigenetic	Histone deacetylase 6
+Belinostat	Beleodaq	F4H96P17NZ	HDAC1	Q13547	Epigenetic	Histone deacetylase 1
+Belinostat	Beleodaq	F4H96P17NZ	HDAC3	O15379	Epigenetic	Histone deacetylase 3
+Belinostat	Beleodaq	F4H96P17NZ	HDAC2	Q92769	Epigenetic	Histone deacetylase 2
+Belinostat	Beleodaq	F4H96P17NZ	HDAC5	Q9UQL6	Epigenetic	Histone deacetylase 5
+Belinostat	Beleodaq	F4H96P17NZ	HDAC7	Q8WUI4	Epigenetic	Histone deacetylase 7
+factor XIII concentrate (human)	Corifact	F7R0FBC1XD				
+factor XIII concentrate (human)	Corifact	F7R0FBC1XD				
+propranolol	Hemangeol	F8A3652H1V	ADRB2	P07550	GPCR	Beta-2 adrenergic receptor
+propranolol	Hemangeol	F8A3652H1V	ADRB1	P08588	GPCR	Beta-1 adrenergic receptor
+tecovirimat	Tpoxx	F925RR824R				
+cholic acid	Cholbam	G1JO7801AE				
+Busulfan	Busulfex	G1LN9045DK				
+bictegravir/emtricitabine/tenofovir disoproxil fumarate	Biktarvy	G70B4ETF4S				
+peginterferon alfa-2b	Sylatron	G8RGG88B68	IFNAR1	P17181	Unknown	Interferon alpha/beta receptor 1
+peginterferon alfa-2b	Sylatron	G8RGG88B68	IFNAR2	P48551	Unknown	Interferon alpha/beta receptor 2
+Liothyronine sodium injection	Triostat	GCA9VV7D2N	THRA	P10827	NR	Thyroid hormone receptor alpha
+Liothyronine sodium injection	Triostat	GCA9VV7D2N	THRB	P10828	NR	Thyroid hormone receptor beta
+romiplostim	Nplate	GN5XU2DXKV	MPL	P40238	Unknown	Thrombopoietin receptor
+romiplostim	Nplate	GN5XU2DXKV	MPL	P40238	Unknown	Thrombopoietin receptor
+romiplostim	Nplate	GN5XU2DXKV	MPL	P40238	Unknown	Thrombopoietin receptor
+vigabatrin	Sabril	GR120KRT6K	ABAT	P80404	Enzyme	4-aminobutyrate aminotransferase, mitochondrial
+Halofantrine	Halfan	H77DL0Y630				
+baclofen	Ozobax	H789N3FKE8	GABBR2	O75899	GPCR	Gamma-aminobutyric acid type B receptor subunit 2
+baclofen	Ozobax	H789N3FKE8	GABBR1	Q9UBS5	GPCR	Gamma-aminobutyric acid type B receptor subunit 1
+baclofen	Lioresal Intrathecal	H789N3FKE8	GABBR2	O75899	GPCR	Gamma-aminobutyric acid type B receptor subunit 2
+baclofen	Lioresal Intrathecal	H789N3FKE8	GABBR1	Q9UBS5	GPCR	Gamma-aminobutyric acid type B receptor subunit 1
+Trientine HCl	Syprine	HC3NX54582				
+Sotalol HCl	Betapace	HEC37C70XX	KCNH2	Q12809	IC	Potassium voltage-gated channel subfamily H member 2
+Sotalol HCl	Betapace	HEC37C70XX	ADRB2	P07550	GPCR	Beta-2 adrenergic receptor
+Sotalol HCl	Betapace	HEC37C70XX	ADRB1	P08588	GPCR	Beta-1 adrenergic receptor
+Oprelvekin	Neumega	HM5641GA6F	IL6ST	P40189	Unknown	Interleukin-6 receptor subunit beta
+Oprelvekin	Neumega	HM5641GA6F	IL11RA	Q14626	Unknown	Interleukin-11 receptor subunit alpha
+panobinostat	Farydak	HN0T99OO4V	HDAC10	Q969S8	Epigenetic	Histone deacetylase 10
+panobinostat	Farydak	HN0T99OO4V	HDAC11	Q96DB2	Epigenetic	Histone deacetylase 11
+panobinostat	Farydak	HN0T99OO4V	HDAC8	Q9BY41	Epigenetic	Histone deacetylase 8
+panobinostat	Farydak	HN0T99OO4V	HDAC9	Q9UKV0	Epigenetic	Histone deacetylase 9
+panobinostat	Farydak	HN0T99OO4V	HDAC6	Q9UBN7	Epigenetic	Histone deacetylase 6
+panobinostat	Farydak	HN0T99OO4V	HDAC1	Q13547	Epigenetic	Histone deacetylase 1
+panobinostat	Farydak	HN0T99OO4V	HDAC4	P56524	Epigenetic	Histone deacetylase 4
+panobinostat	Farydak	HN0T99OO4V	HDAC3	O15379	Epigenetic	Histone deacetylase 3
+panobinostat	Farydak	HN0T99OO4V	HDAC2	Q92769	Epigenetic	Histone deacetylase 2
+panobinostat	Farydak	HN0T99OO4V	HDAC5	Q9UQL6	Epigenetic	Histone deacetylase 5
+panobinostat	Farydak	HN0T99OO4V	HDAC7	Q8WUI4	Epigenetic	Histone deacetylase 7
+ambrisentan	Letairis	HW6NV07QEC	EDNRA	P25101	GPCR	Endothelin-1 receptor
+brigatinib	Alunbrig	HYW8DB273J	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+tocilizumab	Actemra	I031V2H011	IL6R	P08887	Unknown	Interleukin-6 receptor subunit alpha
+tocilizumab	Actemra	I031V2H011	IL6ST	P40189	Unknown	Interleukin-6 receptor subunit beta
+tocilizumab	Actemra	I031V2H011	IL6R	P08887	Unknown	Interleukin-6 receptor subunit alpha
+tocilizumab	Actemra	I031V2H011	IL6ST	P40189	Unknown	Interleukin-6 receptor subunit beta
+tocilizumab	Actemra	I031V2H011	IL6R	P08887	Unknown	Interleukin-6 receptor subunit alpha
+tocilizumab	Actemra	I031V2H011	IL6ST	P40189	Unknown	Interleukin-6 receptor subunit beta
+Calcitonin-human for injection	Cibacalcin	I0IO929019				
+acalabrutinib	Calquence	I42748ELQW	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+pasireotide	Signifor	I4P76SY3N4	SSTR3	P32745	GPCR	Somatostatin receptor type 3
+pasireotide	Signifor	I4P76SY3N4	SSTR1	P30872	GPCR	Somatostatin receptor type 1
+pasireotide	Signifor	I4P76SY3N4	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+pasireotide	Signifor	I4P76SY3N4	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+pasireotide	Signifor	I4P76SY3N4	SSTR3	P32745	GPCR	Somatostatin receptor type 3
+pasireotide	Signifor	I4P76SY3N4	SSTR1	P30872	GPCR	Somatostatin receptor type 1
+pasireotide	Signifor	I4P76SY3N4	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+pasireotide	Signifor	I4P76SY3N4	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+midostaurin	Rydapt	ID912S5VON	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+midostaurin	Rydapt	ID912S5VON	FLT3	P36888	Kinase	Receptor-type tyrosine-protein kinase FLT3
+Lanreotide	Somatuline Depot	IEU56G3J9C	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+Lanreotide	Somatuline Depot	IEU56G3J9C	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+lanreotide acetate	Somatuline Depot	IEU56G3J9C	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+lanreotide acetate	Somatuline Depot	IEU56G3J9C	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+droxidopa	Northera	J7A92W69L7	ADRB2	P07550	GPCR	Beta-2 adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRB1	P08588	GPCR	Beta-1 adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRA2A	P08913	GPCR	Alpha-2A adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRB3	P13945	GPCR	Beta-3 adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRA2B	P18089	GPCR	Alpha-2B adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRA2C	P18825	GPCR	Alpha-2C adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRA1D	P25100	GPCR	Alpha-1D adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRA1A	P35348	GPCR	Alpha-1A adrenergic receptor
+droxidopa	Northera	J7A92W69L7	ADRA1B	P35368	GPCR	Alpha-1B adrenergic receptor
+Iloprost inhalation solution	Ventavis	JED5K35YGL				
+Betaine	Cystadane	JK8U8K4D6K				
+repository corticotropin or adrenocorticotropic hormone	H.P. Acthar Gel	K0U68Q2TXA				
+Tositumomab and iodine I 131 tositumomab	Bexxar	K1KT5M40JC				
+ceritinib	Zykadia	K418KG2GET	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+ceritinib	Zykadia	K418KG2GET	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+sebelipase alfa	Kanuma	K4YTU42T8G				
+Nitisinone	Orfadin	K5BN214699	HPD	P32754	Enzyme	4-hydroxyphenylpyruvate dioxygenase
+Nitisinone	Orfadin	K5BN214699	HPD	P32754	Enzyme	4-hydroxyphenylpyruvate dioxygenase
+Pulmonary surfactant replacement, porcine	Curosurf	KE3U2023NP				
+deflazacort	Emflaza	KR5YZ6AE4B				
+deflazacort	Emflaza	KR5YZ6AE4B				
+avelumab (Recombinant human monoclonal IgG1 antibody against programmed death ligand-1)	Bavencio	KXG2PJ551I				
+meclorethamine	Valchlor	L0MR697HHI				
+Trimetrexate glucuronate	Neutrexin	L137U4A79K				
+defibrotide	Defitelio	L7CHH2B2J0				
+Gonadorelin acetate	Lutrepulse	L8CRY8PWF2	GNRHR	P30968	GPCR	Gonadotropin-releasing hormone receptor
+evolocumab	Repatha	LKC0U3A8NJ	PCSK9	Q8NBP7	Enzyme	Proprotein convertase subtilisin/kexin type 9
+Etidronate disodium	Didronel	M16PXG993G				
+Amifostine	Ethyol	M487QF2F4V				
+Amifostine	Ethyol	M487QF2F4V				
+azacitidine	Vidaza	M801H13NRU	DNMT1	P26358	Enzyme	DNA (cytosine-5)-methyltransferase 1
+azacitidine	Vidaza	M801H13NRU	DNMT3A	Q9Y6K1	Epigenetic	DNA (cytosine-5)-methyltransferase 3A
+Aldesleukin	Proleukin	M89N0Q7EQR	IL2RA	P01589	Unknown	Interleukin-2 receptor subunit alpha
+Aldesleukin	Proleukin	M89N0Q7EQR	IL2RB	P14784	Unknown	Interleukin-2 receptor subunit beta
+Aldesleukin	Proleukin	M89N0Q7EQR	IL2RG	P31785	Unknown	Cytokine receptor common subunit gamma
+Aldesleukin	Proleukin	M89N0Q7EQR	IL2RA	P01589	Unknown	Interleukin-2 receptor subunit alpha
+Aldesleukin	Proleukin	M89N0Q7EQR	IL2RB	P14784	Unknown	Interleukin-2 receptor subunit beta
+Aldesleukin	Proleukin	M89N0Q7EQR	IL2RG	P31785	Unknown	Cytokine receptor common subunit gamma
+ofatumumab	Arzerra	M95KG522R0	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+ofatumumab	Arzerra	M95KG522R0	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+ofatumumab	Arzerra	M95KG522R0	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+ofatumumab	Arzerra	M95KG522R0	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+onasemnogene abeparvovec	Zolgensma	MLU3LU3EVV				
+Pentastarch	Pentaspan	MOQ3RNM0SV				
+Ibuprofen lysine	Neoprofen	N01ORX9D6S				
+eliglustat	Cerdelga	N0493335P3	UGCG	Q16739	Enzyme	Ceramide glucosyltransferase
+parathyroid hormone	Natpara	N19A0T0E5J	PTH1R	Q03431	GPCR	Parathyroid hormone/parathyroid hormone-related peptide receptor
+venetoclax	Venclexta	N54AIC43PW	BCL2	P10415	Unknown	Apoptosis regulator Bcl-2
+venetoclax	Venclexta	N54AIC43PW	BCL2	P10415	Unknown	Apoptosis regulator Bcl-2
+venetoclax	Venclexta	N54AIC43PW	BCL2	P10415	Unknown	Apoptosis regulator Bcl-2
+venetoclax	Venclexta	N54AIC43PW	BCL2	P10415	Unknown	Apoptosis regulator Bcl-2
+liposomal amikacin	Arikayce	N6M33094FD				
+Pegvisomant	Somavert	N824AOU5XV	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin for injection	Serostim	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin (rDNA origin)	Saizen	NQX9KB6PCL				
+Somatropin for injection	Nutropin	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin	Genotropin	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin for injection	Humatrope	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin	Nutropin	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin (rDNA origin)	Nutropin Depot	NQX9KB6PCL				
+somatropin [rDNA]	Genotropin	NQX9KB6PCL				
+Somatropin for injection	Nutropin	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin	Humatrope	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin	Norditropin	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin [rDNA]	Genotropin	NQX9KB6PCL				
+Somatropin (r-DNA)	Zorbtive	NQX9KB6PCL				
+Somatropin (rDNA origin) injection	Norditropin	NQX9KB6PCL				
+Somatropin for injection	Nutropin	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Somatropin	Humatrope	NQX9KB6PCL	GHR	P10912	Unknown	Growth hormone receptor
+Mesna	Mesnex	NR7O1405Q9				
+sodium phenylbutyrate	Buphenyl	NT6K61736T				
+coagulation factor XIII A-subunit (recombinant)	Tretten	NU23Q531G1				
+Exemestane	Aromasin	NY22HMQ4BX	CYP19A1	P11511	Enzyme	Aromatase
+Ritonavir powder for oral suspension	Norvir Powder For Oral Suspension	O3J8G9O825				
+obinutuzumab	Gazyva	O43472U9X8	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+obinutuzumab	Gazyva	O43472U9X8	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+obinutuzumab	Gazyva	O43472U9X8	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+plerixafor	Mozobil (R)	OD49913540	CXCR4	P61073	GPCR	C-X-C chemokine receptor type 4
+elosulfase alfa	Vimizim	ODJ69JZG85				
+Lorlatinib	Lorbrena	OSP71S83EU				
+tenofovir	Viread	OTT9J7900I				
+bedaquiline	Sirturo	P04QX2C1A5				
+bedaquiline	Sirturo	P04QX2C1A5				
+d6-tetrabenazine, deutetrabenazine	Austedo	P341G6W9NB				
+Paclitaxel	Taxol	P88XT4IS4D	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB	P07437	Unknown	Tubulin beta chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+Paclitaxel	Taxol	P88XT4IS4D	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+Antihemophilic factor (recombinant)	Kogenate	P89DR4NY54				
+Ganciclovir intravitreal implant	Vitrasert Implant	P9G3CKZ4P5				
+ganciclovir	Zirgan	P9G3CKZ4P5				
+alectinib	Alecensa	P9YY73LO6J	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+alectinib	Alecensa	P9YY73LO6J	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+alectinib	Alecensa	P9YY73LO6J	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+alectinib	Alecensa	P9YY73LO6J	ALK	Q9UM73	Kinase	ALK tyrosine kinase receptor
+ascorbic acid	Ascor	PQ6CK8PD0R				
+cetuximab	Erbitux	PQX0D8J21J	EGFR	P00533	Kinase	Epidermal growth factor receptor
+ivosidenib	Tibsovo	Q2PCN8MAM6				
+ivosidenib	Tibsovo	Q2PCN8MAM6				
+Cromolyn sodium	Gastrocrom	Q2WXR1I0PK				
+Cromolyn sodium 4% ophthalmic solution	Opticrom 4% Ophthalmic Solution	Q2WXR1I0PK				
+bosentan	Tracleer	Q326023R30	EDNRA	P25101	GPCR	Endothelin-1 receptor
+bosentan	Tracleer	Q326023R30	EDNRB	P24530	GPCR	Endothelin receptor type B
+bosentan	Tracleer	Q326023R30	EDNRA	P25101	GPCR	Endothelin-1 receptor
+bosentan	Tracleer	Q326023R30	EDNRB	P24530	GPCR	Endothelin receptor type B
+Diazepam viscous solution for rectal administration	Diastat	Q3JTX2Q7TU				
+Hydroxocobalamin	Cyanokit	Q40X8H422O				
+Melphalan	Alkeran For Injection	Q41OR9510P				
+Iobenguane I 131	Azedra Ultratrace	Q461L7AK4R				
+calfactant	Infasurf	Q4K217VGA9				
+(tisagenlecleucel) Autologous T Cells transduced with lentiviral vector containing a chimeric antigen receptor directed against CD19	Kymriah (Tisagenlecleucel)	Q6C9WHR03O				
+tisagenlecleucel-T	Kymriah	Q6C9WHR03O				
+Imiglucerase	Cerezyme	Q6U6J48BWY				
+Altretamine	Hexalen	Q8BIH59O7H				
+Histrelin	Supprelin La	QMG7HLD1ZE	GNRHR	P30968	GPCR	Gonadotropin-releasing hormone receptor
+Histrelin acetate	Supprelin Injection	QMG7HLD1ZE	GNRHR	P30968	GPCR	Gonadotropin-releasing hormone receptor
+cysteamine enteric coated	Procysbi	QO84GZ3TST				
+cysteamine enteric coated	Procysbi	QO84GZ3TST				
+cysteamine enteric coated	Procysbi	QO84GZ3TST				
+Cysteamine	Cystagon	QO84GZ3TST				
+stiripentol	Diacomit	R02XOT8V8I				
+Synthetic porcine secretin	Secreflo	R0R146K62L				
+Synthetic porcine secretin	Secreflo	R0R146K62L				
+Synthetic porcine secretin	Secreflo	R0R146K62L				
+Modafinil	Provigil	R3UK8X3U3D	SLC6A3	Q01959	Transporter	Sodium-dependent dopamine transporter
+pegloticase	Krystexxa	R581OT55EA				
+midazolam	Nayzilam	R60L0SM5BC	GABRA1	P14867	IC	Gamma-aminobutyric acid receptor subunit alpha-1
+midazolam	Nayzilam	R60L0SM5BC	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Nayzilam	R60L0SM5BC	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Nayzilam	R60L0SM5BC	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Nayzilam	R60L0SM5BC	GABRA3	P34903	IC	Gamma-aminobutyric acid receptor subunit alpha-3
+midazolam	Nayzilam	R60L0SM5BC	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Nayzilam	R60L0SM5BC	GABRA3	P34903	IC	Gamma-aminobutyric acid receptor subunit alpha-3
+midazolam	Nayzilam	R60L0SM5BC	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Nayzilam	R60L0SM5BC	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Nayzilam	R60L0SM5BC	GABRA1	P14867	IC	Gamma-aminobutyric acid receptor subunit alpha-1
+midazolam	Nayzilam	R60L0SM5BC	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Nayzilam	R60L0SM5BC	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Nayzilam	R60L0SM5BC	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Nayzilam	R60L0SM5BC	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+midazolam	Nayzilam	R60L0SM5BC	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Nayzilam	R60L0SM5BC	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+midazolam	Nayzilam	R60L0SM5BC	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Nayzilam	R60L0SM5BC	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Nayzilam	R60L0SM5BC	GABRB3	P28472	IC	Gamma-aminobutyric acid receptor subunit beta-3
+midazolam	Nayzilam	R60L0SM5BC	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+midazolam	Nayzilam	R60L0SM5BC	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Nayzilam	R60L0SM5BC	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Nayzilam	R60L0SM5BC	GABRB3	P28472	IC	Gamma-aminobutyric acid receptor subunit beta-3
+midazolam	Nayzilam	R60L0SM5BC	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+Dasatinib	Sprycel	RBZ1571X5H	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+Dasatinib	Sprycel	RBZ1571X5H	SRC	P12931	Kinase	Proto-oncogene tyrosine-protein kinase Src
+Dasatinib	Sprycel	RBZ1571X5H	EPHA2	P29317	Kinase	Ephrin type-A receptor 2
+Dasatinib	Sprycel	RBZ1571X5H	YES1	P07947	Kinase	Tyrosine-protein kinase Yes
+Dasatinib	Sprycel	RBZ1571X5H	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Dasatinib	Sprycel	RBZ1571X5H	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Dasatinib	Sprycel	RBZ1571X5H	FYN	P06241	Kinase	Tyrosine-protein kinase Fyn
+Dasatinib	Sprycel	RBZ1571X5H	LCK	P06239	Kinase	Tyrosine-protein kinase Lck
+Dasatinib	Sprycel	RBZ1571X5H	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+Dasatinib	Sprycel	RBZ1571X5H	SRC	P12931	Kinase	Proto-oncogene tyrosine-protein kinase Src
+Dasatinib	Sprycel	RBZ1571X5H	EPHA2	P29317	Kinase	Ephrin type-A receptor 2
+Dasatinib	Sprycel	RBZ1571X5H	YES1	P07947	Kinase	Tyrosine-protein kinase Yes
+Dasatinib	Sprycel	RBZ1571X5H	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+Dasatinib	Sprycel	RBZ1571X5H	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+Dasatinib	Sprycel	RBZ1571X5H	FYN	P06241	Kinase	Tyrosine-protein kinase Fyn
+Dasatinib	Sprycel	RBZ1571X5H	LCK	P06239	Kinase	Tyrosine-protein kinase Lck
+dasatinib	Sprycel	RBZ1571X5H	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+dasatinib	Sprycel	RBZ1571X5H	SRC	P12931	Kinase	Proto-oncogene tyrosine-protein kinase Src
+dasatinib	Sprycel	RBZ1571X5H	EPHA2	P29317	Kinase	Ephrin type-A receptor 2
+dasatinib	Sprycel	RBZ1571X5H	YES1	P07947	Kinase	Tyrosine-protein kinase Yes
+dasatinib	Sprycel	RBZ1571X5H	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+dasatinib	Sprycel	RBZ1571X5H	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+dasatinib	Sprycel	RBZ1571X5H	FYN	P06241	Kinase	Tyrosine-protein kinase Fyn
+dasatinib	Sprycel	RBZ1571X5H	LCK	P06239	Kinase	Tyrosine-protein kinase Lck
+dasatinib	Sprycel	RBZ1571X5H	ABL1	P00519	Kinase	Tyrosine-protein kinase ABL1
+dasatinib	Sprycel	RBZ1571X5H	SRC	P12931	Kinase	Proto-oncogene tyrosine-protein kinase Src
+dasatinib	Sprycel	RBZ1571X5H	EPHA2	P29317	Kinase	Ephrin type-A receptor 2
+dasatinib	Sprycel	RBZ1571X5H	YES1	P07947	Kinase	Tyrosine-protein kinase Yes
+dasatinib	Sprycel	RBZ1571X5H	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+dasatinib	Sprycel	RBZ1571X5H	KIT	P10721	Kinase	Mast/stem cell growth factor receptor Kit
+dasatinib	Sprycel	RBZ1571X5H	FYN	P06241	Kinase	Tyrosine-protein kinase Fyn
+dasatinib	Sprycel	RBZ1571X5H	LCK	P06239	Kinase	Tyrosine-protein kinase Lck
+larotrectinib	Vitrakvi	RDF76R62ID				
+osimertinib	Tagrisso	RDL94R2A16	EGFR	P00533	Kinase	Epidermal growth factor receptor
+osimertinib	Tagrisso	RDL94R2A16	EGFR	P00533	Kinase	Epidermal growth factor receptor
+sapropterin	Kuvan	RG277LF5B3	PAH	P00439	Enzyme	Phenylalanine-4-hydroxylase
+Leucovorin	Leucovorin Calcium	RPR1R4C0P4				
+Leucovorin	Leucovorin Calcium	RPR1R4C0P4				
+Mafenide acetate solution	Sulfamylon Solution	RQ6LP6Z0WY				
+riociguat	Adempas	RU3FE2Y4XI	GUCY1B1	Q02153	Enzyme	Guanylate cyclase soluble subunit beta-1
+riociguat	Adempas	RU3FE2Y4XI	GUCY1B1	Q02153	Enzyme	Guanylate cyclase soluble subunit beta-1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNQ3	O43525	IC	Potassium voltage-gated channel subfamily KQT member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNQ2	O43526	IC	Potassium voltage-gated channel subfamily KQT member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH1	O95259	IC	Potassium voltage-gated channel subfamily H member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA2	P16389	IC	Potassium voltage-gated channel subfamily A member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA6	P17658	IC	Potassium voltage-gated channel subfamily A member 6
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA3	P22001	IC	Potassium voltage-gated channel subfamily A member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA4	P22459	IC	Potassium voltage-gated channel subfamily A member 4
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA5	P22460	IC	Potassium voltage-gated channel subfamily A member 5
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNC1	P48547	IC	Potassium voltage-gated channel subfamily C member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNQ1	P51787	IC	Potassium voltage-gated channel subfamily KQT member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNQ4	P56696	IC	Potassium voltage-gated channel subfamily KQT member 4
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNC4	Q03721	IC	Potassium voltage-gated channel subfamily C member 4
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA1	Q09470	IC	Potassium voltage-gated channel subfamily A member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH2	Q12809	IC	Potassium voltage-gated channel subfamily H member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNC3	Q14003	IC	Potassium voltage-gated channel subfamily C member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNB1	Q14721	IC	Potassium voltage-gated channel subfamily B member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA10	Q16322	IC	Potassium voltage-gated channel subfamily A member 10
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNV1	Q6PIU1	IC	Potassium voltage-gated channel subfamily V member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH5	Q8NCM2	IC	Potassium voltage-gated channel subfamily H member 5
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNG3	Q8TAE7	IC	Potassium voltage-gated channel subfamily G member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNG4	Q8TDN1	IC	Potassium voltage-gated channel subfamily G member 4
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNV2	Q8TDN2	IC	Potassium voltage-gated channel subfamily V member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNB2	Q92953	IC	Potassium voltage-gated channel subfamily B member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNS1	Q96KK3	IC	Potassium voltage-gated channel subfamily S member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH8	Q96L42	IC	Potassium voltage-gated channel subfamily H member 8
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNC2	Q96PR1	IC	Potassium voltage-gated channel subfamily C member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNA7	Q96RP8	IC	Potassium voltage-gated channel subfamily A member 7
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNS3	Q9BQ31	IC	Potassium voltage-gated channel subfamily S member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH6	Q9H252	IC	Potassium voltage-gated channel subfamily H member 6
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNF1	Q9H3M0	IC	Potassium voltage-gated channel subfamily F member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNQ5	Q9NR82	IC	Potassium voltage-gated channel subfamily KQT member 5
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH7	Q9NS40	IC	Potassium voltage-gated channel subfamily H member 7
+amifampridine	Ruzurgi	RU4S6E2G0J	KCND1	Q9NSA2	IC	Potassium voltage-gated channel subfamily D member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCND2	Q9NZV8	IC	Potassium voltage-gated channel subfamily D member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNG1	Q9UIX4	IC	Potassium voltage-gated channel subfamily G member 1
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNG2	Q9UJ96	IC	Potassium voltage-gated channel subfamily G member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCND3	Q9UK17	IC	Potassium voltage-gated channel subfamily D member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH3	Q9ULD8	IC	Potassium voltage-gated channel subfamily H member 3
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNS2	Q9ULS6	IC	Potassium voltage-gated channel subfamily S member 2
+amifampridine	Ruzurgi	RU4S6E2G0J	KCNH4	Q9UQ05	IC	Potassium voltage-gated channel subfamily H member 4
+treprostinil (inhalational)	Tyvaso	RUM6K67ESG				
+capsaicin	Qutenza	S07O44R1ZM	TRPV1	Q8NER1	IC	Transient receptor potential cation channel subfamily V member 1
+gefitinib	Iressa	S65743JHBS	EGFR	P00533	Kinase	Epidermal growth factor receptor
+edaravone	Radicava	S798V6YJRP				
+Arsenic trioxide	Trisenox	S7V92P67HO	TXNRD1	Q16881	Enzyme	Thioredoxin reductase 1, cytoplasmic
+Arsenic trioxide	Trisenox	S7V92P67HO	TXNRD1	Q16881	Enzyme	Thioredoxin reductase 1, cytoplasmic
+Beractant	Survanta Intratracheal Suspension	S866O45PIG				
+Beractant	Survanta Intratracheal Suspension	S866O45PIG				
+difluprednate	Durezol	S8A06QG2QE	NR3C1	P04150	NR	Glucocorticoid receptor
+tasimelteon	Hetlioz	SHS4PU80D9	MTNR1A	P48039	GPCR	Melatonin receptor type 1A
+tasimelteon	Hetlioz	SHS4PU80D9	MTNR1B	P49286	GPCR	Melatonin receptor type 1B
+colchicine	Colcrys	SML2Y3J35T				
+Nitazoxanide	Alinia	SOA12P041N				
+nitazoxanide	Alinia	SOA12P041N				
+Antithrombin III (human)	Atnativ	T0LTO7L82X				
+Antithrombin III (human)	Thrombate Iii	T0LTO7L82X				
+methylene blue0.5%	Provayblue	T42P99266K				
+siltuximab	Sylvant	T4H8FMA7IM	IL6	P05231	Unknown	Interleukin-6
+Glasdegib	Daurismo	TH2EV99S4Z				
+Megestrol acetate	Megace	TJ2M0FR8ES	PGR	P06401	NR	Progesterone receptor
+metreleptin	Myalept	TL60C27RLH	LEPR	P48357	Unknown	Leptin receptor
+iron(III)-hexacyanoferrate(II)	Radiogardase	TLE294X33A				
+ivabradine	Corlanor	TP19837BZK	HCN1	O60741	IC	Potassium/sodium hyperpolarization-activated cyclic nucleotide-gated channel 1
+ivabradine	Corlanor	TP19837BZK	HCN2	Q9UL51	IC	Potassium/sodium hyperpolarization-activated cyclic nucleotide-gated channel 2
+ivabradine	Corlanor	TP19837BZK	HCN3	Q9P1Z3	IC	Potassium/sodium hyperpolarization-activated cyclic nucleotide-gated channel 3
+olaratumab	Lartruvo	TT6HN20MVF	PDGFRA	P16234	Kinase	Platelet-derived growth factor receptor alpha
+Interferon beta-1b	Betaseron	TTD90R31WZ	IFNAR1	P17181	Unknown	Interferon alpha/beta receptor 1
+Interferon beta-1b	Betaseron	TTD90R31WZ	IFNAR2	P48551	Unknown	Interferon alpha/beta receptor 2
+Caffeine	Cafcit	U26EO4675Q	ADORA2B	P29275	GPCR	Adenosine receptor A2b
+Caffeine	Cafcit	U26EO4675Q	ADORA1	P30542	GPCR	Adenosine receptor A1
+Caffeine	Cafcit	U26EO4675Q	ADORA2A	P29274	GPCR	Adenosine receptor A2a
+axicabtagene ciloleucel	Yescarta	U2I8T43Y7R				
+axicabtagene ciloleucel	Yescarta	U2I8T43Y7R				
+axicabtagene ciloleucel	Yescarta	U2I8T43Y7R				
+gemcitabine ready-to-use	Infugem	U347PV74IL	POLA1	P09884	Enzyme	DNA polymerase alpha catalytic subunit
+gemcitabine ready-to-use	Infugem	U347PV74IL	POLD1	P28340	Enzyme	DNA polymerase delta catalytic subunit
+gemcitabine ready-to-use	Infugem	U347PV74IL	POLE	Q07864	Enzyme	DNA polymerase epsilon catalytic subunit A
+gemcitabine ready-to-use	Infugem	U347PV74IL	RRM2	P31350	Enzyme	Ribonucleoside-diphosphate reductase subunit M2
+gemcitabine ready-to-use	Infugem	U347PV74IL	RRM1	P23921	Enzyme	Ribonucleoside-diphosphate reductase large subunit
+gemcitabine ready-to-use	Infugem	U347PV74IL	POLA1	P09884	Enzyme	DNA polymerase alpha catalytic subunit
+gemcitabine ready-to-use	Infugem	U347PV74IL	POLD1	P28340	Enzyme	DNA polymerase delta catalytic subunit
+gemcitabine ready-to-use	Infugem	U347PV74IL	POLE	Q07864	Enzyme	DNA polymerase epsilon catalytic subunit A
+gemcitabine ready-to-use	Infugem	U347PV74IL	RRM2	P31350	Enzyme	Ribonucleoside-diphosphate reductase subunit M2
+gemcitabine ready-to-use	Infugem	U347PV74IL	RRM1	P23921	Enzyme	Ribonucleoside-diphosphate reductase large subunit
+Lamotrigine	Lamictal	U3H27498KS	SCN9A	Q15858	IC	Sodium channel protein type 9 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN8A	Q9UQD0	IC	Sodium channel protein type 8 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN3A	Q9NY46	IC	Sodium channel protein type 3 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN1A	P35498	IC	Sodium channel protein type 1 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN10A	Q9Y5Y9	IC	Sodium channel protein type 10 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN5A	Q14524	IC	Sodium channel protein type 5 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN4A	P35499	IC	Sodium channel protein type 4 subunit alpha
+Lamotrigine	Lamictal	U3H27498KS	SCN2A	Q99250	IC	Sodium channel protein type 2 subunit alpha
+Ethanolamine oleate	Ethamolin	U4RY8MRX7C				
+polifeprosan 20 with carmustine	Gliadel	U68WG3173Y				
+polifeprosan 20 with carmustine	Gliadel	U68WG3173Y				
+Mitoxantrone	Novantrone	U6USW86RD0	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+Mitoxantrone	Novantrone	U6USW86RD0	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+Mitoxantrone	Novantrone	U6USW86RD0	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+Mitoxantrone HCl	Novantrone	U6USW86RD0	TOP2A	P11388	Enzyme	DNA topoisomerase 2-alpha
+enasidenib	Idhifa	UF6PC17XAV	IDH2	P48735	Enzyme	Isocitrate dehydrogenase [NADP], mitochondrial
+Fedratinib	Inrebic	UH9J2HBQWJ				
+apremilast	Otezla	UP7QBP99PN	PDE4D	Q08499	Enzyme	cAMP-specific 3',5'-cyclic phosphodiesterase 4D
+afatinib	Gilotrif	V1T5K7RZ0B	EGFR	P00533	Kinase	Epidermal growth factor receptor
+afatinib	Gilotrif	V1T5K7RZ0B	ERBB2	P04626	Kinase	Receptor tyrosine-protein kinase erbB-2
+afatinib	Gilotrif	V1T5K7RZ0B	ERBB4	Q15303	Kinase	Receptor tyrosine-protein kinase erbB-4
+afatinib	Gilotrif	V1T5K7RZ0B	EGFR	P00533	Kinase	Epidermal growth factor receptor
+afatinib	Gilotrif	V1T5K7RZ0B	ERBB2	P04626	Kinase	Receptor tyrosine-protein kinase erbB-2
+afatinib	Gilotrif	V1T5K7RZ0B	ERBB4	Q15303	Kinase	Receptor tyrosine-protein kinase erbB-4
+afatinib	Gilotrif	V1T5K7RZ0B	EGFR	P00533	Kinase	Epidermal growth factor receptor
+afatinib	Gilotrif	V1T5K7RZ0B	ERBB2	P04626	Kinase	Receptor tyrosine-protein kinase erbB-2
+afatinib	Gilotrif	V1T5K7RZ0B	ERBB4	Q15303	Kinase	Receptor tyrosine-protein kinase erbB-4
+Pentamidine isethionate	Nebupent	V2P3K60DA2				
+5-aminolevulinic acid	Gleolan	V35KBM8JGR				
+deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9				
+deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9				
+Deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9				
+Deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9				
+Monooctanoin	Moctanin	VFU0OU98LO				
+meloxicam	Mobic	VG2QF83CGL	PTGS2	P35354	Enzyme	Prostaglandin G/H synthase 2
+Rifampin	Rifadin I.V.	VJT6J7R4TR				
+sirolimus	Rapamune	W36ZG6FT64	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+copanlisib	Aliqopa	W421JK3CPA	PIK3CA	P42336	Kinase	Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit alpha isoform
+copanlisib	Aliqopa	W421JK3CPA	PIK3CD	O00329	Kinase	Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta isoform
+Clonidine	Duraclon	W76I6XXF06	ADRA2C	P18825	GPCR	Alpha-2C adrenergic receptor
+Clonidine	Duraclon	W76I6XXF06	ADRA2B	P18089	GPCR	Alpha-2B adrenergic receptor
+Clonidine	Duraclon	W76I6XXF06	ADRA2A	P08913	GPCR	Alpha-2A adrenergic receptor
+midazolam	Seizalam	W7TTW573JJ	GABRA1	P14867	IC	Gamma-aminobutyric acid receptor subunit alpha-1
+midazolam	Seizalam	W7TTW573JJ	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Seizalam	W7TTW573JJ	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Seizalam	W7TTW573JJ	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Seizalam	W7TTW573JJ	GABRA3	P34903	IC	Gamma-aminobutyric acid receptor subunit alpha-3
+midazolam	Seizalam	W7TTW573JJ	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Seizalam	W7TTW573JJ	GABRA3	P34903	IC	Gamma-aminobutyric acid receptor subunit alpha-3
+midazolam	Seizalam	W7TTW573JJ	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Seizalam	W7TTW573JJ	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Seizalam	W7TTW573JJ	GABRA1	P14867	IC	Gamma-aminobutyric acid receptor subunit alpha-1
+midazolam	Seizalam	W7TTW573JJ	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Seizalam	W7TTW573JJ	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Seizalam	W7TTW573JJ	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Seizalam	W7TTW573JJ	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+midazolam	Seizalam	W7TTW573JJ	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Seizalam	W7TTW573JJ	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+midazolam	Seizalam	W7TTW573JJ	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+midazolam	Seizalam	W7TTW573JJ	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Seizalam	W7TTW573JJ	GABRB3	P28472	IC	Gamma-aminobutyric acid receptor subunit beta-3
+midazolam	Seizalam	W7TTW573JJ	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+midazolam	Seizalam	W7TTW573JJ	GABRG3	Q99928	IC	Gamma-aminobutyric acid receptor subunit gamma-3
+midazolam	Seizalam	W7TTW573JJ	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+midazolam	Seizalam	W7TTW573JJ	GABRB3	P28472	IC	Gamma-aminobutyric acid receptor subunit beta-3
+midazolam	Seizalam	W7TTW573JJ	GABRA5	P31644	IC	Gamma-aminobutyric acid receptor subunit alpha-5
+levoleucovorin	Fusilev	WA16A5Y52X				
+Levoleucovorin	Fusilev	WA16A5Y52X				
+rufinamide	Banzel	WFW942PR79	SCN1A	P35498	IC	Sodium channel protein type 1 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN4A	P35499	IC	Sodium channel protein type 4 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN7A	Q01118	IC	Sodium channel protein type 7 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN5A	Q14524	IC	Sodium channel protein type 5 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN9A	Q15858	IC	Sodium channel protein type 9 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN2A	Q99250	IC	Sodium channel protein type 2 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN3A	Q9NY46	IC	Sodium channel protein type 3 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN11A	Q9UI33	IC	Sodium channel protein type 11 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN8A	Q9UQD0	IC	Sodium channel protein type 8 subunit alpha
+rufinamide	Banzel	WFW942PR79	SCN10A	Q9Y5Y9	IC	Sodium channel protein type 10 subunit alpha
+sofosbuvir	Sovaldi	WJ6CA3ZU8B				
+sofosbuvir	Sovaldi	WJ6CA3ZU8B				
+sofosbuvir	Sovaldi	WJ6CA3ZU8B				
+Tacrolimus	Prograf	WM0HAQ4WNM	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+Tacrolimus granules for oral suspension	Prograf	WM0HAQ4WNM				
+patisiran	Onpattro	WO0YM16LKG				
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+olaparib	Lynparza	WOH1JD9AR8	PARP1	P09874	Enzyme	Poly [ADP-ribose] polymerase 1
+olaparib	Lynparza	WOH1JD9AR8	PARP2	Q9UGN5	Enzyme	Poly [ADP-ribose] polymerase 2
+olaparib	Lynparza	WOH1JD9AR8	PARP3	Q9Y6F1	Enzyme	Poly [ADP-ribose] polymerase 3
+laronidase	Aldurazyme	WP58SVM6R4				
+acetylcysteine	Acetadote	WYQ7N0BPYC				
+acetylcysteine effervescent tablets for oral solution	Cetylev	WYQ7N0BPYC				
+Morphine sulfate concentrate (preservative free)	Infumorph	X3P646A2J0	OPRM1	P35372	GPCR	Mu-type opioid receptor
+hydroxycarbamide (hydroxyurea)	Siklos	X6Q56QN5QC				
+Hydroxyurea	Droxia	X6Q56QN5QC				
+Felbamate	Felbatol	X72RBB02N8	GRIN2B	Q13224	IC	Glutamate receptor ionotropic, NMDA 2B
+Felbamate	Felbatol	X72RBB02N8	GRIN2A	Q12879	IC	Glutamate receptor ionotropic, NMDA 2A
+cerliponase alfa	Brineura	X8R2D92QP1				
+fish oil triglycerides	Omegaven	XGF7L72M0F				
+Rifapentine	Priftin	XJM390A33U				
+aztreonam	Cayston	XNM7LT65NP				
+Interferon beta-1a	Avonex	XRO4566Q4R	IFNAR1	P17181	Unknown	Interferon alpha/beta receptor 1
+Interferon beta-1a	Avonex	XRO4566Q4R	IFNAR2	P48551	Unknown	Interferon alpha/beta receptor 2
+porfimer	Photofrin	Y3834SIK5F				
+Porfimer sodium	Photofrin	Y3834SIK5F				
+Gallium [Ga-68]-N-[(4,7,10-Tricarboxymethyl-1,4,7,10-tetraazacyclododec-1-yl)acetyl]-D-phenylalanyl-L-cysteinyl-L-tyrosyl-D-tryptophanyl-L-lysyl-L-threoninyl-L-cysteinyl-L-threonine-cyclic(2-7)disulfide	Netspot	Y68179SY2L				
+Atovaquone	Mepron	Y883P1Z2LT				
+Atovaquone	Mepron	Y883P1Z2LT				
+temozolomide	Temodar	YF1K15M17Y				
+temozolomide	Temodar	YF1K15M17Y				
+idelalisib	Zydelig	YG57I8T5M0	PIK3CD	O00329	Kinase	Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta isoform
+idelalisib	Zydelig	YG57I8T5M0	PIK3CD	O00329	Kinase	Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta isoform
+methotrexate oral solution	Xatmep	YL5FZ2Y5U1				
+methotrexate oral solution	Xatmep	YL5FZ2Y5U1				
+pexidartinib	Turalio	YS6WAI3XN7				
+Anagrelide	Agrylin	YTM763Y5C8	PDE3A	Q14432	Enzyme	cGMP-inhibited 3',5'-cyclic phosphodiesterase A
+fidaxomicin	Dificid	Z5N076G8YQ				
+Asfotase alfa	Strensiq	Z633861EIM				
+Naltrexone HCl	Trexan	Z6375YW9SF	OPRD1	P41143	GPCR	Delta-type opioid receptor
+Naltrexone HCl	Trexan	Z6375YW9SF	OPRK1	P41145	GPCR	Kappa-type opioid receptor
+Naltrexone HCl	Trexan	Z6375YW9SF	OPRM1	P35372	GPCR	Mu-type opioid receptor
+macitentan	Opsumit	Z9K9Y9WMVL	EDNRA	P25101	GPCR	Endothelin-1 receptor
+macitentan	Opsumit	Z9K9Y9WMVL	EDNRB	P24530	GPCR	Endothelin receptor type B
+Tetrabenazine	Xenazine	Z9O08YRN8O	SLC18A2	Q05940	Transporter	Synaptic vesicular amine transporter
+glycerol phenylbutyrate	Ravicti	ZH6F1VCV7B				
+glycerol phenylbutyrate	Ravicti	ZH6F1VCV7B				
+tafamidis meglumine	Vyndaqel; Vyndamax	ZU7CF08A1A				
+phoxillum	n/a					
+burosumab	Crysvita	G9WJT6RD29				
+burosumab	Crysvita	G9WJT6RD29				
+Emapalumab	Gamifant	3S252O2Z4X				
+emicizumab	Hemlibra	7NL2E3F6K3				
+emicizumab	Hemlibra	7NL2E3F6K3				
+cenegermin	Oxervate	B6E7K36KT8	NTRK1	P04629	Kinase	High affinity nerve growth factor receptor
+cenegermin	Oxervate	B6E7K36KT8	NGFR	P08138	Unknown	Tumor necrosis factor receptor superfamily member 16
+pegvaliase	Palynziq	N6UAH27EUV				
+Tagraxofusp	Elzonris	8ZHS5657EH				
+Ravulizumab	Ultomiris	C3VX249T6L				
+Luspatercept	Reblozyl	AQK7UBA1LS				
+elapegademase	Revcovi	9R3D3Y0UHS				
+lumacaftor/ivacaftor	Orkambi	EGP8L81APK				
+lumacaftor/ivacaftor	Orkambi	EGP8L81APK				
+lumacaftor/ivacaftor	Orkambi	1Y740ILL1Z				
+ledipasvir/sofosbuvir	Harvoni	013TE6E4WV				
+ledipasvir/sofosbuvir	Harvoni	013TE6E4WV				
+ledipasvir/sofosbuvir	Harvoni	WJ6CA3ZU8B				
+biocarbonate infusate	Normocarb Hf					
+vestronidase alfa	Mepsevii	7XZ4062R17				
+trifluridine/tipiracil	Lonsurf	RMW9V5RW38				
+benzoate/phenylacetate	Ammonul	48N6U1781G				
+Immune Globulin (Human)	Gamunex(R)-C	66Y330CJHS				
+Botulism immune globulin	Babybig	X641Y30OA7				
+polatuzumab vedotin	Polivy	KG6VO684Z6				
+moxetumomab pasudotox	Lumoxiti	2NDX4B6N8F				
+voretigene neparvovec	Luxturna	2SPI046IKD				
+elexacaftor/tezacaftor/ivacaftor	Trikafta	RRN67GMB0V				
+immune globulin infusion (human)	Gammagard Liquid	66Y330CJHS				
+Immune globulin intravenous, human	Gamimune N	66Y330CJHS				
+immune globulin intraveous (human)	Gammaplex	66Y330CJHS				
+hepatitis B immune globulin (human)	Hepagam	XII270YC6M				
+Cytarabine:daunorubicin liposome injection	Vyxeos	ZS7284E0ZP				
+Ceramide trihexosidase/alpha-galactosidase A	Fabrazyme	RZD65TSM9U				
+Immune Globulin Subcutaneous (Human), 20% Liquid	Hizentra	66Y330CJHS				
+Buffered intrathecal electrolyte/dextrose injection	Elliotts B Solution					
+botulism antitoxin heptavalent (A, B, C, D, E, F, G) (Equine)	n/a	LE3J6I6DXP				
+Hemin	Panhematin	743LRP9S7N				
+clobazam	Onfi	2MRO291B4U	GABRA1	P14867	IC	Gamma-aminobutyric acid receptor subunit alpha-1
+clobazam	Onfi	2MRO291B4U	GABRG2	P18507	IC	Gamma-aminobutyric acid receptor subunit gamma-2
+clobazam	Onfi	2MRO291B4U	GABRB2	P47870	IC	Gamma-aminobutyric acid receptor subunit beta-2
+Ursodiol	Urso 250	724L30Y2QR	NR1H4	Q96RI1	NR	Bile acid receptor
+anakinra	Kineret	9013DUQ28K	IL1R1	P14778	Unknown	Interleukin-1 receptor type 1
+anakinra	Kineret	9013DUQ28K	IL1RAP	Q9NPH3	Unknown	Interleukin-1 receptor accessory protein
+selinexor	n/a	31TZ62FO8F				
+Voxelotor	Oxbryta	3ZO554A4Q8				
+rituximab	Rituxan(R); Mabthera(R)	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+tadalafil	Adcirca	742SXX0ICT	PDE5A	O76074	Enzyme	cGMP-specific 3',5'-cyclic phosphodiesterase
+rifaximin	Normix	L36O5T016N				
+givosiran	Givlaari	ROV204583W				
+acyclovir	n/a	X4HES1O11F				
+Lepirudin	Refluden	Y43GF64R34	F2	P00734	Enzyme	Prothrombin
+golodirsen	Vyondys 53	033072U4MZ				
+Pitolisant	n/a	4BC83L4PIY	HRH3	Q9Y5N1	GPCR	Histamine H3 receptor
+Fomepizole	Antizole	83LCM6L2BY	ADH1B	P00325	Enzyme	Alcohol dehydrogenase 1B
+Fomepizole	Antizole	83LCM6L2BY	ADH1C	P00326	Enzyme	Alcohol dehydrogenase 1C
+Fomepizole	Antizole	83LCM6L2BY	ADH1A	P07327	Enzyme	Alcohol dehydrogenase 1A
+Fomepizole	Antizole	83LCM6L2BY	ADH1B	P00325	Enzyme	Alcohol dehydrogenase 1B
+Fomepizole	Antizole	83LCM6L2BY	ADH1C	P00326	Enzyme	Alcohol dehydrogenase 1C
+Fomepizole	Antizole	83LCM6L2BY	ADH1A	P07327	Enzyme	Alcohol dehydrogenase 1A
+Rilonacept	Arcalyst	8K80YB5GMG	IL1B	P01584	Unknown	Interleukin-1 beta
+eteplirsen	Exondys 51	AIW6036FAS				
+infliximab	Remicade	B72HH48FLU	TNF	P01375	Unknown	Tumor necrosis factor
+Infliximab	Remicade	B72HH48FLU	TNF	P01375	Unknown	Tumor necrosis factor
+infliximab	Remicade	B72HH48FLU	TNF	P01375	Unknown	Tumor necrosis factor
+Daclizumab	Zenapax	CUJ2MVI71Y	IL2RA	P01589	Unknown	Interleukin-2 receptor subunit alpha
+Daclizumab	Zenapax	CUJ2MVI71Y	IL2RB	P14784	Unknown	Interleukin-2 receptor subunit beta
+Daclizumab	Zenapax	CUJ2MVI71Y	IL2RG	P31785	Unknown	Cytokine receptor common subunit gamma
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+adalimumab	Humira	FYS6T7F842	TNF	P01375	Unknown	Tumor necrosis factor
+nintedanib	Ofev	G6HRD2P839	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+nintedanib	Ofev	G6HRD2P839	FGFR1	P11362	Kinase	Fibroblast growth factor receptor 1
+nintedanib	Ofev	G6HRD2P839	PDGFRA	P16234	Kinase	Platelet-derived growth factor receptor alpha
+nintedanib	Ofev	G6HRD2P839	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+nintedanib	Ofev	G6HRD2P839	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+nintedanib	Ofev	G6HRD2P839	FGFR3	P22607	Kinase	Fibroblast growth factor receptor 3
+nintedanib	Ofev	G6HRD2P839	FGFR4	P22455	Kinase	Fibroblast growth factor receptor 4
+nintedanib	Ofev	G6HRD2P839	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+nintedanib	Ofev	G6HRD2P839	FGFR2	P21802	Kinase	Fibroblast growth factor receptor 2
+nintedanib	Ofev	G6HRD2P839	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+nintedanib	Ofev	G6HRD2P839	FGFR1	P11362	Kinase	Fibroblast growth factor receptor 1
+nintedanib	Ofev	G6HRD2P839	PDGFRA	P16234	Kinase	Platelet-derived growth factor receptor alpha
+nintedanib	Ofev	G6HRD2P839	FLT1	P17948	Kinase	Vascular endothelial growth factor receptor 1
+nintedanib	Ofev	G6HRD2P839	FLT4	P35916	Kinase	Vascular endothelial growth factor receptor 3
+nintedanib	Ofev	G6HRD2P839	FGFR3	P22607	Kinase	Fibroblast growth factor receptor 3
+nintedanib	Ofev	G6HRD2P839	FGFR4	P22455	Kinase	Fibroblast growth factor receptor 4
+nintedanib	Ofev	G6HRD2P839	PDGFRB	P09619	Kinase	Platelet-derived growth factor receptor beta
+nintedanib	Ofev	G6HRD2P839	FGFR2	P21802	Kinase	Fibroblast growth factor receptor 2
+ibalizumab	Trogarzo	LT369U66CE				
+cobicistat	Tybost	LW2E03M5PG	CYP3A4	P08684	Enzyme	Cytochrome P450 3A4
+cobicistat	Tybost	LW2E03M5PG	CYP3A5	P20815	Enzyme	Cytochrome P450 3A5
+cobicistat	Tybost	LW2E03M5PG	CYP3A7	P24462	Enzyme	Cytochrome P450 3A7
+cobicistat	Tybost	LW2E03M5PG	CYP3A43	Q9HB55	Enzyme	Cytochrome P450 3A43
+cobicistat	Tybost	LW2E03M5PG	CYP3A4	P08684	Enzyme	Cytochrome P450 3A4
+cobicistat	Tybost	LW2E03M5PG	CYP3A5	P20815	Enzyme	Cytochrome P450 3A5
+cobicistat	Tybost	LW2E03M5PG	CYP3A7	P24462	Enzyme	Cytochrome P450 3A7
+cobicistat	Tybost	LW2E03M5PG	CYP3A43	Q9HB55	Enzyme	Cytochrome P450 3A43
+moxidectin	n/a	NGU5H31YO9				
+etanercept	Enbrel	OP401G7OJC	TNF	P01375	Unknown	Tumor necrosis factor
+Filgrastim	Neupogen	PVI5M0M1GW	CSF3R	Q99062	Unknown	Granulocyte colony-stimulating factor receptor
+filgrastim	Neupogen	PVI5M0M1GW	CSF3R	Q99062	Unknown	Granulocyte colony-stimulating factor receptor
+Filgrastim	Neupogen	PVI5M0M1GW	CSF3R	Q99062	Unknown	Granulocyte colony-stimulating factor receptor
+Filgrastim	Neupogen	PVI5M0M1GW	CSF3R	Q99062	Unknown	Granulocyte colony-stimulating factor receptor
+Filgrastim	Neupogen	PVI5M0M1GW	CSF3R	Q99062	Unknown	Granulocyte colony-stimulating factor receptor
+Ifosfamide	Ifex	UM20QQM95Y				
+tacrolimus	Envarsus Xr	WM0HAQ4WNM	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+tacrolimus	Envarsus Xr	WM0HAQ4WNM	FKBP1A	P62942	Enzyme	Peptidyl-prolyl cis-trans isomerase FKBP1A
+vandetanib	Caprelsa(R)	YO460OQ37K	EGFR	P00533	Kinase	Epidermal growth factor receptor
+vandetanib	Caprelsa(R)	YO460OQ37K	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+vandetanib	Caprelsa(R)	YO460OQ37K	RET	P07949	Kinase	Proto-oncogene tyrosine-protein kinase receptor Ret
+dexrazoxane	Totect(R)	048L81261F				
+rasburicase	Elitek	08GY9K1EUO				
+necitumumab	n/a	2BT4C47RUI	EGFR	P00533	Kinase	Epidermal growth factor receptor
+deferiprone	Ferriprox	2BTY8KH53L				
+alemtuzumab	Campath	3A189DH42V	CD52	P31358	Unknown	CAMPATH-1 antigen
+avapritinib	Ayvakit	513P80B4YJ				
+ecallantide	Kalbitor	5Q6TZN2HNM	KLKB1	P03952	Enzyme	Plasma kallikrein
+ecallantide	Kalbitor	5Q6TZN2HNM	KLKB1	P03952	Enzyme	Plasma kallikrein
+raxibacumab	Abthraxtm	794PGL549S				
+pasireotide	n/a	98H1T17066	SSTR3	P32745	GPCR	Somatostatin receptor type 3
+pasireotide	n/a	98H1T17066	SSTR1	P30872	GPCR	Somatostatin receptor type 1
+pasireotide	n/a	98H1T17066	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+pasireotide	n/a	98H1T17066	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+ramucirumab	n/a	D99YVK4L0X	KDR	P35968	Kinase	Vascular endothelial growth factor receptor 2
+cobimetinib	n/a	ER29L26N1X	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+Trypan blue	Membraneblue	I2ZWO3LS3M				
+trabectedin	Yondelis	ID0YZQ2TCP				
+entrectinib	n/a	L5ORF0AN1I				
+entrectinib	n/a	L5ORF0AN1I				
+trastuzumab	Herceptin	P188ANX8CK	ERBB2	P04626	Kinase	Receptor tyrosine-protein kinase erbB-2
+Sulfadiazine	n/a	0N7609K889				
+Teriparatide	Parathar	10T9CSU89I	PTH1R	Q03431	GPCR	Parathyroid hormone/parathyroid hormone-related peptide receptor
+Caplacizumab	Cablivi	2R27AB6766				
+nitric oxide	n/a	31C4KY9ESH	GUCY1B2	O75343	Enzyme	Guanylate cyclase soluble subunit beta-2
+nitric oxide	n/a	31C4KY9ESH	GUCY1A2	P33402	Enzyme	Guanylate cyclase soluble subunit alpha-2
+nitric oxide	n/a	31C4KY9ESH	GUCY1A1	Q02108	Enzyme	Guanylate cyclase soluble subunit alpha-1
+nitric oxide	n/a	31C4KY9ESH	GUCY1B1	Q02153	Enzyme	Guanylate cyclase soluble subunit beta-1
+sargramostim	Leukine	5TAA004E22	CSF2RA	P15509	Unknown	Granulocyte-macrophage colony-stimulating factor receptor subunit alpha
+sargramostim	Leukine	5TAA004E22	CSF2RB	P32927	Unknown	Cytokine receptor common subunit beta
+Sargramostim	Leukine	5TAA004E22	CSF2RA	P15509	Unknown	Granulocyte-macrophage colony-stimulating factor receptor subunit alpha
+Sargramostim	Leukine	5TAA004E22	CSF2RB	P32927	Unknown	Cytokine receptor common subunit beta
+sargramostim	Leukine	5TAA004E22	CSF2RA	P15509	Unknown	Granulocyte-macrophage colony-stimulating factor receptor subunit alpha
+sargramostim	Leukine	5TAA004E22	CSF2RB	P32927	Unknown	Cytokine receptor common subunit beta
+Epoetin alfa	Epogen	64FS3BFH5W	EPOR	P19235	Unknown	Erythropoietin receptor
+Epoetin alfa	Epogen	64FS3BFH5W	EPOR	P19235	Unknown	Erythropoietin receptor
+idarucizumab	n/a	97RWB5S1U6				
+sotalol (IV)	So-Aqueous	A6D97U294I				
+zanubrutinib	Brukinsa	AG9MHG098Z				
+Zinc acetate	Galzin	FM5526K07A				
+tazemetostat	n/a	Q40W93WPE1				
+treprostinil	Remodulin;Orenitram	RUM6K67ESG	PTGIR	P43119	GPCR	Prostacyclin receptor
+treprostinil	Remodulin;Orenitram	RUM6K67ESG	PTGIR	P43119	GPCR	Prostacyclin receptor
+teprotumumab	n/a	Y64GQ0KC0A				
+benznidazole	n/a	YC42NRJ1ZD				
+Pegfilgrastim	Neulasta	3A58010674	CSF3R	Q99062	Unknown	Granulocyte colony-stimulating factor receptor
+dexamethasone	n/a	7S5I7G3JQL	NR3C1	P04150	NR	Glucocorticoid receptor
+acalabrutinib	n/a	I42748ELQW	BTK	Q06187	Kinase	Tyrosine-protein kinase BTK
+crizanlizumab	Adakveo	L7451S9126				
+mogamulizumab	Poteligeo	YI437801BE	CCR4	P51679	GPCR	C-C chemokine receptor type 4
+glycopyrrolate	Cuvposa	V92SO9WP2I				
+Urofollitropin	Metrodin	W9BB98U6HP				
+quinine Sulfate	n/a	KF7Z0E0Q2B				
+Calcium acetate	Phos-Lo	Y882YXF34X				
+Thyrotropin alfa	Thyrogen	AVX3D5A4LM	TSHR	P16473	GPCR	Thyrotropin receptor
+Iobenguane I 123	Adreview	P2TH1XYZ84				
+Iobenguane I 123	Adreview	P2TH1XYZ84				
+dichlorphenamide	n/a	VVJ6673MHY	CA12	O43570	Enzyme	Carbonic anhydrase 12
+dichlorphenamide	n/a	VVJ6673MHY	CA1	P00915	Enzyme	Carbonic anhydrase 1
+dichlorphenamide	n/a	VVJ6673MHY	CA2	P00918	Enzyme	Carbonic anhydrase 2
+dichlorphenamide	n/a	VVJ6673MHY	CA4	P22748	Enzyme	Carbonic anhydrase 4
+Thyrotropin alpha	Thyrogen	AVX3D5A4LM				
+Pegademase bovine	Adagen	HW3H7D91F6				
+uridine triacetate	n/a	2WP61F175M				
+uridine triacetate	n/a	2WP61F175M				
+riluzole oral film	Exservan	7LJ087RS6F				
+lanreotide acetate	n/a	IEU56G3J9C	SSTR5	P35346	GPCR	Somatostatin receptor type 5
+lanreotide acetate	n/a	IEU56G3J9C	SSTR2	P30874	GPCR	Somatostatin receptor type 2
+Methotrexate sodium	Methotrexate	3IG1E710ZN	DHFR	P00374	Enzyme	Dihydrofolate reductase
+macimorelin acetate	Macrelin	AQZ1003RMG	GHSR	Q92847	GPCR	Growth hormone secretagogue receptor type 1
+avatrombopag maleate	n/a	GDW7M2P1IS				
+mecasermin rinfabate	Iplex	NZ8M50KKRG				
+Desmopressin acetate	n/a	XB13HYU18U	AVPR2	P30518	GPCR	Vasopressin V2 receptor
+Protein C concentrate	Ceprotin	3Z6S89TXPW				
+inotuzumab ozogamicin	n/a	P93RUU11P7	CD22	P20273	Unknown	B-cell receptor CD22
+diazepam (intranasal)	Valtoco	Q3JTX2Q7TU				
+levodopa and carbidopa	Duopa	46627O600J	DRD2	P14416	GPCR	D(2) dopamine receptor
+levodopa and carbidopa	Duopa	46627O600J	DRD1	P21728	GPCR	D(1A) dopamine receptor
+levodopa and carbidopa	Duopa	46627O600J	DDC	P20711	Enzyme	Aromatic-L-amino-acid decarboxylase
+Botulinum toxin type A	Botox	E211KPY694				
+Botulinum toxin type A	Botox	E211KPY694				
+botulinum toxin type A	Botox	E211KPY694				
+Botulinum toxin type A	Dysport	E211KPY694				
+Botulinum toxin type A	Botox	E211KPY694				
+talimogene laherparepvec	Imlygic	07730V90L6				
+Anthrax Vaccine Adsorbed	Biothrax	873OI62848				
+Synthetic human secretin	Chirostim	A0426J905J				
+lutetium Lu 177 dotatate	n/a	AE221IM3BB				
+Cysteamine hydrochloride	Cystaran	IF1B771SVB				
+ethiodized oil injection	Lipiodol	KZW0R0686Q				
+encorafenib + binimetinib	n/a	181R97MR71				
+encorafenib + binimetinib	n/a	181R97MR71				
+omacetaxine mepesuccinate	Synribo	6FG8041S5B				
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B	BRAF	P15056	Kinase	Serine/threonine-protein kinase B-raf
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B	MAP2K2	P36507	Kinase	Dual specificity mitogen-activated protein kinase kinase 2
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B	MAP2K1	Q02750	Kinase	Dual specificity mitogen-activated protein kinase kinase 1
+Tobramycin for inhalation	Tobi	VZ8RRZ51VK				
+Benzoate and phenylacetate	Ucephan	8SKN0B0MIM				
+Digoxin immune FAB (Ovine)	Digibind	YB12NQZ1YN				
+Coagulation factor X (human)	Coagadex	0P94UQE6SY				
+Coagulation factor X (human)	Coagadex	0P94UQE6SY				
+glecaprevir and pibrentasvir	Mavyret	K6BUU8J72P				
+Follitropin alfa, recombinant	Gonal-F	076WHW89TW				
+C1 esterase inhibitor (human)	Cinryze(R)	6KIC4BB60G				
+C1 esterase inhibitor (human)	Cinryze(R)	6KIC4BB60G				
+Coagulation Factor IX (human)	Alphanine	6U90Y1795T				
+irinotecan liposome injection	n/a	7673326042				
+Antihemophilic factor (human)	Alphanate	839MOZ74GK				
+anthrax immune globulin (human)	n/a	VKZ83S945Z				
+Interferon alfa-2b (recombinant)	Intron A	43K1W2T1M6				
+fostamatinib disodium hexahydrate	n/a	86EEZ49YVB				
+Rifampin, isoniazid, pyrazinamide	Rifater	VJT6J7R4TR				
+coccidioidin SD Skin Test Antigen	n/a	ZP77O7YY70				
+Fludarabine phosphate oral tablets	n/a	1X9VK9O1SC				
+paclitaxel protein-bound particles	Abraxane	P88XT4IS4D				
+Antihemophilic factor (recombinant)	Refacto, Xyntha	P89DR4NY54				
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV				
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV				
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV				
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV				
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV				
+Coagulation Factor VIIa (Recombinant)	Novoseven	AC71R787OV				
+coagulation factor VIIa (recombinant)	Novoseven Rt	AC71R787OV				
+sodium nitrite and sodium thiosulfate	Nithiodote	M0KG633D4F				
+Gallium-68 (DOTA0-Phel-Tyr3)octreotide	n/a	98B30EPP5S				
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB4A	P04350	Unknown	Tubulin beta-4A chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB	P07437	Unknown	Tubulin beta chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB4B	P68371	Unknown	Tubulin beta-4B chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB3	Q13509	Unknown	Tubulin beta-3 chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB2A	Q13885	Unknown	Tubulin beta-2A chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB8	Q3ZCM7	Unknown	Tubulin beta-8 chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB6	Q9BUF5	Unknown	Tubulin beta-6 chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB2B	Q9BVA1	Unknown	Tubulin beta-2B chain
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A	TUBB1	Q9H4B7	Unknown	Tubulin beta-1 chain
+Combination of nivolumab and ipilimumab	n/a	31YO63LBSN	CTLA4	P16410	Unknown	Cytotoxic T-lymphocyte protein 4
+prothrombin complex concentrate (human)	Kcentra	8FB1K07F16				
+prothrombin complex concentrate (human)	Kcentra	8FB1K07F16				
+multi-vitamin infusion without vitamin K	M.V.I.-12	A034SE7857				
+C1-esterase-inhibitor, human, pasteurized	Haegarda	6KIC4BB60G				
+C1-esterase-inhibitor, human, pasteurized	Haegarda	6KIC4BB60G				
+Diethylenetriaminepentaacetic acid (DTPA)	n/a	7A314HQM0I				
+human fibrinogen concentrate, pasteurized	Riastap	N94833051K				
+recombinant von Willebrand factor (rhVWF)	n/a	ZE22NE22F1				
+recombinant von Willebrand factor (rhVWF)	n/a	ZE22NE22F1				
+Brilliant Blue G Ophthalmic Solution 0.025%	Dorc Ilm-Blue	M1ZRX790SI				
+Vaccinia Immune Globulin (Human) Intravenous	Cnj-016	7UB4J759TD				
+Vaccinia Immune Globulin (Human) Intravenous	n/a	7UB4J759TD				
+Tezacaftor and Ivacaftor combination therapy	Symdeko	8RW88Y506K	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+Tezacaftor and Ivacaftor combination therapy	Symdeko	8RW88Y506K	CFTR	P13569	IC	Cystic fibrosis transmembrane conductance regulator
+rituximab and recombinant human hyaluronidase	Rituxin Sc	4F4X42SYQ6	MS4A1	P11836	Unknown	B-lymphocyte antigen CD20
+Colfosceril palmitate, cetyl alcohol, tyloxapol	Exosurf Neonatal For Intratracheal Suspension	Y27PUL9H56				
+Antivenin, crotalidae polyvalent immune Fab (ovine)	Crofab	92VV7G83ED				
+emtricitabine and tenofovir alafenamide combination	Descovy(R)	EL9943AG5J				
+Citric acid, glucono-delta-lactone and magnesium carbonate	Renacidin Irrigation	WQ29KQ9POT				
+Human plasma coagulation Factor VIII and human plasma von Willebrand Factor	Wilate	ZE22NE22F1				

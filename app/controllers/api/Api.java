@@ -160,13 +160,16 @@ public class Api extends Controller {
             json.put("count", (Integer)result.get("count"));
             json.put("total", total);
             Entity[] entities = (Entity[])result.get("entities");
-            ArrayNode results = mapper.createArrayNode();
-            for (Entity e : entities)
-                results.add(jsonCodec.encode(e));
-            json.put("contents", results);
+            if (entities != null) {
+                ArrayNode results = mapper.createArrayNode();
+                for (Entity e : entities)
+                    results.add(jsonCodec.encode(e));
+                json.put("contents", results);
+            }
             return ok (json);
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             return internalServerError (ex.getMessage());
         }
     }
