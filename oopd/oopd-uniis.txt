@@ -1,0 +1,850 @@
+Generic Name	Trade Name	UNII
+Sermorelin acetate	Geref	00IBG87IQW
+Coagulation factor IX (recombinant), Fc fusion protein	Alprolix	02E00T2QDE
+Tinidazole	Tindamax	033KF7V46H
+tinidazole	Tindamax	033KF7V46H
+Cytarabine liposomal	Depocyt	04079A1RDZ
+obeticholic acid	Ocaliva	0462Z4S4OZ
+Aprotinin	Trasylol	04XPW8C0FL
+Fluocinolone	Retisert	0CD5FD6S2M
+Levocarnitine	Carnitor	0G389FZZ9M
+Levocarnitine	Carnitor	0G389FZZ9M
+Levocarnitine	Carnitor	0G389FZZ9M
+chenodiol	Chenix	0GEI24LG0J
+Topiramate	Topamax	0H73WJJ391
+Taliglucerase alfa	Elelyso For Injection	0R4NLX88O4
+L-glutamine	Endari	0RH81L854J
+Glutamine	Nutrestore	0RH81L854J
+Pilocarpine	Salagen	0WW6D218XJ
+Pilocarpine HCl	Salagen	0WW6D218XJ
+Botulinum toxin type B	Myobloc	0Y70779M1F
+Cytomegalovirus immune globulin (human)	Cytogam	129L90A25N
+elotuzumab	Empliciti	1351PE5UGS
+elotuzumab	Empliciti	1351PE5UGS
+Metronidazole (topical)	Metrogel	140QMO216E
+mipomersen	Kynamro	18EAY4870E
+niraparib	Zejula	195Q483UZD
+niraparib	Zejula	195Q483UZD
+cannabidiol	Epidiolex	19GBJ60SN5
+cannabidiol	Epidiolex	19GBJ60SN5
+Potassium Iodide Oral Solution	Thyroshield	1C4QK22F9J
+letermovir	Prevymis	1H09Y5WO1F
+cinacalcet	Sensipar	1K860WSG25
+cinacalcet	Sensipar	1K860WSG25
+cinacalcet	Sensipar	1K860WSG25
+Alitretinoin	Panretin	1UA8E65KDZ
+melphalan	Evomela	1VXP4V453T
+Rifabutin	Mycobutin	1W306TDA6S
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+ibrutinib	Imbruvica	1X70OSD4VX
+Fludarabine phosphate	Fludara	1X9VK9O1SC
+afamelanotide	Scenesse	1XCC161YKC
+Balsalazide disodium	Colazal	1XL6BJI034
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+ivacaftor	Kalydeco	1Y740ILL1Z
+vemurafenib	Zelboraf	207SMY3FQT
+vemurafenib	Zelboraf	207SMY3FQT
+tolvaptan	Jynarque	21G72T1950
+Interferon gamma-1b	Actimmune	21K6M2I7AG
+Interferon gamma 1-b	Actimmune	21K6M2I7AG
+Epirubicin	Ellence	22966TX7J5
+lanadelumab-flyo	Takhzyro	2372V1TKXK
+velaglucerase-alfa	Vpriv	23HYE36B0I
+Toremifene	Fareston	2498Y783QT
+regorafenib	Stivarga	24T2A1DOYB
+regorafenib	Stivarga	24T2A1DOYB
+denileukin diftitox	Ontak	25E79B5CTM
+hydroxyprogesterone caproate	Makena	276F2O42F5
+hydroxyprogesterone caproate	Makena	276F2O42F5
+Alglucerase injection	Ceredase	27T56C7KK0
+dantrolene sodium suspension for injection	Ryanodex	287M0347EV
+obiltoxaximab	Anthim	29Z5DNL48C
+Valrubicin	Valstar	2C6NUM6878
+glucarpidase	Voraxaze	2GFP9BJD79
+Icodextrin 7.5% with Electrolytes Peritoneal Dialysis Solution	Extraneal (With 7.5% Icodextrin) Peritoneal Dialysis Solutio	2NX48Z0A9G
+pemetrexed disodium	Alimta	2PKU919BA9
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+bevacizumab	Avastin	2S9ZZM9Q9V
+Pretomanid	Pretomanid	2XOI31YC4N
+Nitric oxide	Inomax	31C4KY9ESH
+isavuconazonium sulfate	Cresemba	31Q44514JV
+isavuconazonium sulfate	Cresemba	31Q44514JV
+nivolumab	Opdivo	31YO63LBSN
+nivolumab	Opdivo	31YO63LBSN
+nivolumab	Opdivo	31YO63LBSN
+nivolumab	Opdivo	31YO63LBSN
+nivolumab	Opdivo	31YO63LBSN
+nivolumab	Opdivo	31YO63LBSN
+mifepristone	Korlym	320T6RNW1F
+icatibant	Firazyr	325O8467XK
+intravenous carbamazepine	Carnexiv	33CM23913M
+Varicella Zoster Immune Globulin (Human)	Varizig	33T61IWL27
+pazopanib	Votrient	33Y9ANM545
+canakinumab	Ilaris	37CQ2C7X93
+canakinumab	Ilaris	37CQ2C7X93
+canakinumab	Ilaris	37CQ2C7X93
+canakinumab	Ilaris	37CQ2C7X93
+canakinumab	Ilaris	37CQ2C7X93
+Leuprolide acetate	Lupron Injection	37JNS02E7V
+Coagulation Factor IX (recombinant)	Benefix	382L14738L
+coagulation factor IX (recombinant)	Rixubis	382L14738L
+pentostatin for injection	Nipent	395575MZO7
+lenvatinib	Lenvima	3J78384F61
+lenvatinib	Lenvima	3J78384F61
+Recombinant human luteinizing hormone	Luveris	3JGY52XJNA
+dehydrated alcohol	Ablysinol	3K9958V90M
+telotristat etiprate	Xermelo	3T25U84H4U
+buprenorphine in combination with naloxone	Suboxone	40D3SCR4GZ
+rucaparib	Rubraca	41AX9SJ8KO
+rucaparib	Rubraca	41AX9SJ8KO
+Allopurinol sodium	Aloprim For Injection	428673RC2Z
+ruxolitinib phosphate	Jakafi	436LRU32H5
+ruxolitinib	Jakafi	436LRU32H5
+ruxolitinib	Jakafi	436LRU32H5
+ixazomib citrate	Ninlaro	46CWK97Z3K
+triclabendazole	Egaten	4784C8E03O
+Cladribine	Leustatin Injection	47M74X9YT5
+Interferon alfa-2a	Roferon A	47RRR83SK7
+Interferon alfa-2a (recombinant)	Roferon-A	47RRR83SK7
+Rho (D) immune globulin intravenous (human)	Winrho Sd	48W7181FLP
+ribavirin	Rebetol	49717AWG6K
+zidovudine	Retrovir	4B9XT59T7S
+nusinersen	Spinraza	4CHB7QQU1Q
+denosumab	Xgeva	4EQZ6YO2HI
+denosumab	Xgeva	4EQZ6YO2HI
+rituximab	Rituxan	4F4X42SYQ6
+rituximab	Rituxan	4F4X42SYQ6
+rituximab and recombinant human hyaluronidase	Rituxan Sc	4F4X42SYQ6
+rituximab and recombinant human hyaluronidase	Rituxan Sc	4F4X42SYQ6
+rituximab	Rituxan	4F4X42SYQ6
+rituximab	Rituxan	4F4X42SYQ6
+raloxifene	Evista	4F86W47BR6
+blinatumomab	Blincyto	4FR53SIF3A
+blinatumomab	Blincyto	4FR53SIF3A
+Epoprostenol	Flolan	4K04IQ1OF4
+epoprostenol	Flolan	4K04IQ1OF4
+Eflornithine HCl	Ornidyl	4NH22NDW9H
+ibritumomab tiuxetan	Zevalin	4Q52C550XK
+eltrombopag	Promacta	4U07F515LG
+eltrombopag	Promacta	4U07F515LG
+eltrombopag	Promacta	4U07F515LG
+duvelisib	Copiktra	4WD61MR063
+duvelisib	Copiktra	4WD61MR063
+daratumumab	Darzalex	4Z63YK6E0E
+daratumumab	Darzalex	4Z63YK6E0E
+daratumumab	Darzalex	4Z63YK6E0E
+daratumumab	Darzalex	4Z63YK6E0E
+daratumumab	Darzalex	4Z63YK6E0E
+daratumumab	Darzalex	4Z63YK6E0E
+Thalidomide	Thalomid	4Z8R6ORS6L
+Thalidomide	Thalomid	4Z8R6ORS6L
+bosutinib	Bosulif	5018V4AEZ0
+bosutinib	Bosulif	5018V4AEZ0
+dacomitinib	Vizimpro	5092U85G58
+Lodoxamide tromethamine	Alomide Ophthalmic Solution	50LV9A548L
+mitomycin-C	Mitosol	50SG953SK6
+atezolizumab	Tecentriq	52CMI0WC3Y
+Dexrazoxane	Zinecard	5346058Q7S
+crizotinib	Xalkori	53AH36668S
+crizotinib	Xalkori	53AH36668S
+miltefosine	Impavido	53EY29W7EC
+Tretinoin	Vesanoid	5688UTC01R
+Corticorelin ovine triflutate	Acthrel	56X54T817Q
+nimodipine	Nymalize	57WA9QZ5WH
+vorinostat	Zolinza	58IFB293JI
+Midodrine HCl	Amatine	59JV96YTXV
+N-acetylgalactosamine-4-sulfatase, recombinant human	Naglazyme	59UA429E5G
+Aminosalicylic acid	Paser Granules	5B2658E0N2
+selexipag	Uptravi	5EXC0E384L
+nilotinib	Tasigna	5JHU0N1R6K
+nilotinib	Tasigna	5JHU0N1R6K
+carglumic acid	Carbaglu	5L0HB4V1EW
+Daunorubicin citrate liposome injection	Daunoxome	5L84T2Z6NP
+Glatiramer acetate	Copaxone	5M691HL4BO
+C1-esterase inhibitor (recombinant)	Ruconest	5QS67N4551
+gilteritinib	Xospata	5RZZ0Z1GJT
+artemether/lumefantrine	Coartem	5T2U51A0MW
+Sorafenib	Nexavar	5T62Q3B36J
+Sorafenib	Nexavar	5T62Q3B36J
+sorafenib	Nexavar	5T62Q3B36J
+Antihemophilic factor/von Willebrand factor complex (human), dried, pasteurized	Humate-P	5T6B772R4Q
+Idarubicin HCl for injection	Idamycin	5VV3MDU5IE
+idursulfase	Elaprase	5W8JGG2651
+mefloquine HCL	Lariam	5Y9L3636O3
+mefloquine HCL	Lariam	5Y9L3636O3
+nelarabine	Arranon	60158CV180
+Temsirolimus	Torisel	624KN6GM2T
+paricalcitol	Zemplar	6702D36OG5
+Pentamidine isethionate	Pentam 300	673LC5J4LQ
+antihemophilic factor (recombinant), porcine sequence	Obizur	6892UQT2GK
+bortezomib	Velcade	69G8BD63PP
+bortezomib	Velcade	69G8BD63PP
+bortezomib	Velcade	69G8BD63PP
+bortezomib	Velcade	69G8BD63PP
+bortezomib	Velcade	69G8BD63PP
+gabapentin	Gralise	6CW7F3G59X
+Zalcitabine	Hivid	6L3XT8CB3I
+ipilimumab	Yervoy	6T8C155666
+ipilimumab	Yervoy	6T8C155666
+ipilimumab	Yervoy	6T8C155666
+Coagulation factor IX	Mononine	6U90Y1795T
+Selegiline HCl	Eldepryl	6W731X367Q
+Zoledronate	Zometa, Zabel	6XC1PAD3KF
+Technetium Tc99m sulfur colloid injection, lyophilized	Technetium Tc99m Sulfur Colloi	70FD1KFU70
+carfilzomib	Kyprolis	72X6E3J5AR
+gabapentin enacarbil	Horizant	75OCL1SPBQ
+Octreotide	Sandostatin Lar	75R0U2568I
+Octreotide	Sandostatin Lar	75R0U2568I
+Octreotide	Sandostatin Lar	75R0U2568I
+clofarabine	Clolar	762RDY0Y2H
+decitabine	Dacogen	776B62CQ27
+Respiratory syncytial virus immune globulin (Human)	Respigam	78I1W13C3D
+Pegaspargase	Oncaspar; Asparlas	7D96IR0PPM
+Pegaspargase	Oncaspar; Asparlas	7D96IR0PPM
+Bleomycin sulfate	Blenoxane	7DP3NTV15T
+sodium oxybate	Xyrem	7G33012534
+sodium oxybate	Xyrem	7G33012534
+sodium oxybate	Xyrem	7G33012534
+Mecasermin	Increlex	7GR9I2683O
+Dronabinol	Marinol	7J8897W37S
+Riluzole	Rilutek	7LJ087RS6F
+riluzole oral suspension	Tiglutik	7LJ087RS6F
+riluzole oral suspension	Tiglutik	7LJ087RS6F
+teduglutide [rDNA origin]	Gattex	7M19191IKG
+teduglutide [rDNA origin]	Gattex	7M19191IKG
+antihemophilic factor (recombinant), Fc fusion protein	Eloctate	7PCM518YLR
+dexamethasone intravitreal implant	Ozurdex	7S5I7G3JQL
+Sterile talc powder	Sclerosol Intrapleural Aerosol	7SEV7J4R1U
+Sterile talc	Steritalc	7SEV7J4R1U
+Sterile talc	Steritalc	7SEV7J4R1U
+dinutuximab	Unituxin	7SQY4ZUD30
+Satumomab pendetide	Oncoscint Cr/Ov	7V9926378A
+Fosphenytoin	Cerebyx	7VLR55452Z
+Brentuximab vedotin	Adcetris	7XL5ISS668
+brentuximab vedotin	Adcetris	7XL5ISS668
+brentuximab vedotin	Adcetris	7XL5ISS668
+brentuximab vedotin	Adcetris	7XL5ISS668
+brentuximab vedotin	Adcetris	7XL5ISS668
+brentuximab vedotin	Adcetris	7XL5ISS668
+brentuximab vedotin	Adcetris	7XL5ISS668
+Amphotericin B lipid complex	Abelcet	7XU7A7DROE
+Liposomal amphotericin B	Ambisome	7XU7A7DROE
+Liposomal amphotericin B	Ambisome	7XU7A7DROE
+mebendazole	Vermox 500 Mg Chewable Tablets	81G6I5V05I
+Doxorubicin liposome	Doxil	82F2G7BL4E
+doxorubicin HCL liposome injection	Doxil	82F2G7BL4E
+lomitapide	Juxtapid	82KUB0583F
+aripiprazole	Abilify	82VFR53I78
+rosuvastatin	Crestor	83MVU38M7Q
+imatinib mesylate	Gleevec	8A1O1M485B
+imatinib mesylate	Gleevec	8A1O1M485B
+imatinib mesylate	Gleevec	8A1O1M485B
+Imatinib mesylate	Gleevec	8A1O1M485B
+Imatinib mesylate	Gleevec	8A1O1M485B
+Imatinib mesylate	Gleevec	8A1O1M485B
+imatinib	Gleevec	8A1O1M485B
+imatinib	Gleevec	8A1O1M485B
+Imatinib	Gleevec	8A1O1M485B
+Sacrosidase	Sucraid	8A7F670F2Y
+Nafarelin acetate	Synarel Nasal Solution	8ENZ0QJW4H
+Gemtuzumab ozogamicin	Mylotarg	8GZG754X6M
+Gemtuzumab ozogamicin	Mylotarg	8GZG754X6M
+amifampridine phosphate	Firdapse	8HF8FIN815
+technetium Tc 99m tilmanocept	Lymphoseek	8IHI69PQTC
+Thiotepa	Tepadina	905Z5W3GKH
+triptorelin pamoate	Triptodur	9081Y98W2V
+mepolizumab	Nucala	90Z2UF0E52
+mepolizumab	Nucala	90Z2UF0E52
+Pentosan polysulfate sodium	Elmiron	914032762Y
+Antivenin crotaline (pit-viper) equine immune F(ab)2)	Anavip	92VV7G83ED
+Solriamfetol	Sunosi	939U7C91AI
+Inotersen	Tegsedi	950736UC77
+Dornase alfa	Pulmozyme	953A26OA1Y
+riboflavin ophthalmic solution ultraviolet-A (UVA) irradiation	Photrexa Viscous	957E53WV42
+riboflavin ophthalmic solution & ultraviolet A	Photrexa Viscous	957E53WV42
+Teniposide	Vumon For Injection	957E6438QA
+ponatinib	Iclusig	96R6PU3D8J
+ponatinib	Iclusig	96R6PU3D8J
+Amiodarone HCl	Cordarone	976728SY6Z
+bendamustine for 50 ml admixture	Bendeka	981Y8SX18M
+bendamustine for 50ml admixture	Bendeka	981Y8SX18M
+Bendamustine hydrochloride	Treanda	981Y8SX18M
+bendamustine hydrochloride	Treanda	981Y8SX18M
+Lidocaine patch 5%	Lidoderm Patch	98PI200987
+Basiliximab	Simulect	9927MT646M
+everolimus	Afinitor	9HW64Q8G6G
+everolimus	Afinitor	9HW64Q8G6G
+everolimus	Afinitor	9HW64Q8G6G
+everolimus	Afinitor	9HW64Q8G6G
+everolimus	Afinitor	9HW64Q8G6G
+collagenase clostridium histolyticum	Xiaflex	9X7O8V25IT
+collagenase clostridium histolyticum	Xiaflex	9X7O8V25IT
+eculizumab	Soliris	A3ULP0F556
+eculizumab	Soliris	A3ULP0F556
+eculizumab	Soliris	A3ULP0F556
+eculizumab	Soliris	A3ULP0F556
+Ofloxacin	Ocuflox Ophthalmic Solution	A4P49JAZ9H
+recombinant fusion protein linking coagulation factor IX with albumin (rIX-FP)	Idelvion	A57KX1VL5P
+Bexarotene	Targretin	A61RXM4375
+pralatrexate	Folotyn	A8Q8I19Q20
+miglustat	Zavesca	ADN3S497AZ
+eribulin mesylate	Halaven	AV9U0660CW
+recombinant human antithrombin	Atryn	AWV6I5L6H2
+Levomethadyl acetate hydrochloride	Orlaam	B54CW5KG52
+dabrafenib	Tafinlar	B6DC89I63E
+Amantadine hydrochloride	Gocovri	BF4C9Z1J53
+dalfampridine	Ampyra	BH3B64OKL9
+Coagulation factor Xa (recombinant), inactivated-zhzo	Andexxa	BI009E452R
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT
+trametinib and dabrafenib	Mekinist And Tafinlar	BSB9VJ5TUT
+trametinib	Mekinist	BSB9VJ5TUT
+dabrafenib and trametinib	Mekinist	BSB9VJ5TUT
+Tiopronin	Thiola	C5W04GO61S
+Tiopronin	Thiola	C5W04GO61S
+Tiopronin	Thiola	C5W04GO61S
+migalastat hydrochloride	Galafold	CLY7M0XD20
+anti-inhibitor coagulant complex	Feiba	CS849DUN3M
+Somatrem for injection	Protropin	CU8D464EDW
+romidepsin	Istodax	CX3T89XQBK
+romidepsin	Istodax	CX3T89XQBK
+pomalidomide	Pomalyst	D2UX06XLB5
+Erwinia L-asparaginase	Erwinase	D733ET3F9O
+pirfenidone	Esbriet	D7NLD2JX7U
+Clofazimine	Lamprene	D959AE5USF
+ramucirumab	Cyramza	D99YVK4L0X
+ramucirumab	Cyramza	D99YVK4L0X
+Centruroides immune F(ab)2	Anascorp	DDA050FCEA
+tafenoquine	Krintafel	DL5J0B8VSS
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+pembrolizumab	Keytruda	DPT0O3T46P
+cabozantinib	Cabometyx	DR7ST46X58
+cabozantinib	Cometriq	DR7ST46X58
+Recombinant human acid alpha-glucosidase; alglucosidase alfa	1. Myozyme 2. Lumizyme	DTI67O9503
+Recombinant human acid alpha-glucosidase; alglucosidase alfa	1. Myozyme 2. Lumizyme	DTI67O9503
+Recombinant human acid alpha-glucosidase; alglucosidase alfa	1. Myozyme 2. Lumizyme	DTI67O9503
+Succimer	Chemet Capsules	DX1U2629QE
+Japanese encephalitis vaccine, inactivated, adsorbed	Ixiaro	DZ854I04ZE
+belatacept	Nulojix	E3B2GI648A
+mercaptopurine oral solution	Purixan	E7WED276I5
+Potassium citrate	Urocit-K	EE90ONI6FF
+Potassium citrate	Urocit-K	EE90ONI6FF
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+lenalidomide	Revlimid	F0P408N6V4
+Apomorphine HCl	Apokyn	F39049Y068
+Albendazole	Albenza	F4216019LN
+Albendazole	Albenza	F4216019LN
+Alpha1-proteinase inhibitor (human)	Prolastin	F43I396OIS
+Belinostat	Beleodaq	F4H96P17NZ
+factor XIII concentrate (human)	Corifact	F7R0FBC1XD
+factor XIII concentrate (human)	Corifact	F7R0FBC1XD
+propranolol	Hemangeol	F8A3652H1V
+tecovirimat	Tpoxx	F925RR824R
+cholic acid	Cholbam	G1JO7801AE
+Busulfan	Busulfex	G1LN9045DK
+bictegravir/emtricitabine/tenofovir disoproxil fumarate	Biktarvy	G70B4ETF4S
+peginterferon alfa-2b	Sylatron	G8RGG88B68
+Liothyronine sodium injection	Triostat	GCA9VV7D2N
+romiplostim	Nplate	GN5XU2DXKV
+romiplostim	Nplate	GN5XU2DXKV
+romiplostim	Nplate	GN5XU2DXKV
+vigabatrin	Sabril	GR120KRT6K
+Halofantrine	Halfan	H77DL0Y630
+baclofen	Ozobax	H789N3FKE8
+baclofen	Lioresal Intrathecal	H789N3FKE8
+Trientine HCl	Syprine	HC3NX54582
+Sotalol HCl	Betapace	HEC37C70XX
+Oprelvekin	Neumega	HM5641GA6F
+panobinostat	Farydak	HN0T99OO4V
+ambrisentan	Letairis	HW6NV07QEC
+brigatinib	Alunbrig	HYW8DB273J
+tocilizumab	Actemra	I031V2H011
+tocilizumab	Actemra	I031V2H011
+tocilizumab	Actemra	I031V2H011
+Calcitonin-human for injection	Cibacalcin	I0IO929019
+acalabrutinib	Calquence	I42748ELQW
+pasireotide	Signifor	I4P76SY3N4
+pasireotide	Signifor	I4P76SY3N4
+midostaurin	Rydapt	ID912S5VON
+midostaurin	Rydapt	ID912S5VON
+Lanreotide	Somatuline Depot	IEU56G3J9C
+lanreotide acetate	Somatuline Depot	IEU56G3J9C
+droxidopa	Northera	J7A92W69L7
+Iloprost inhalation solution	Ventavis	JED5K35YGL
+Betaine	Cystadane	JK8U8K4D6K
+repository corticotropin or adrenocorticotropic hormone	H.P. Acthar Gel	K0U68Q2TXA
+Tositumomab and iodine I 131 tositumomab	Bexxar	K1KT5M40JC
+ceritinib	Zykadia	K418KG2GET
+ceritinib	Zykadia	K418KG2GET
+sebelipase alfa	Kanuma	K4YTU42T8G
+Nitisinone	Orfadin	K5BN214699
+Nitisinone	Orfadin	K5BN214699
+Pulmonary surfactant replacement, porcine	Curosurf	KE3U2023NP
+deflazacort	Emflaza	KR5YZ6AE4B
+deflazacort	Emflaza	KR5YZ6AE4B
+avelumab (Recombinant human monoclonal IgG1 antibody against programmed death ligand-1)	Bavencio	KXG2PJ551I
+meclorethamine	Valchlor	L0MR697HHI
+Trimetrexate glucuronate	Neutrexin	L137U4A79K
+defibrotide	Defitelio	L7CHH2B2J0
+Gonadorelin acetate	Lutrepulse	L8CRY8PWF2
+evolocumab	Repatha	LKC0U3A8NJ
+Etidronate disodium	Didronel	M16PXG993G
+Amifostine	Ethyol	M487QF2F4V
+Amifostine	Ethyol	M487QF2F4V
+azacitidine	Vidaza	M801H13NRU
+Aldesleukin	Proleukin	M89N0Q7EQR
+Aldesleukin	Proleukin	M89N0Q7EQR
+ofatumumab	Arzerra	M95KG522R0
+ofatumumab	Arzerra	M95KG522R0
+ofatumumab	Arzerra	M95KG522R0
+ofatumumab	Arzerra	M95KG522R0
+onasemnogene abeparvovec	Zolgensma	MLU3LU3EVV
+Pentastarch	Pentaspan	MOQ3RNM0SV
+Ibuprofen lysine	Neoprofen	N01ORX9D6S
+eliglustat	Cerdelga	N0493335P3
+parathyroid hormone	Natpara	N19A0T0E5J
+venetoclax	Venclexta	N54AIC43PW
+venetoclax	Venclexta	N54AIC43PW
+venetoclax	Venclexta	N54AIC43PW
+venetoclax	Venclexta	N54AIC43PW
+liposomal amikacin	Arikayce	N6M33094FD
+Pegvisomant	Somavert	N824AOU5XV
+Somatropin for injection	Serostim	NQX9KB6PCL
+Somatropin (rDNA origin)	Saizen	NQX9KB6PCL
+Somatropin for injection	Nutropin	NQX9KB6PCL
+Somatropin	Genotropin	NQX9KB6PCL
+Somatropin for injection	Humatrope	NQX9KB6PCL
+Somatropin	Nutropin	NQX9KB6PCL
+Somatropin (rDNA origin)	Nutropin Depot	NQX9KB6PCL
+somatropin [rDNA]	Genotropin	NQX9KB6PCL
+Somatropin for injection	Nutropin	NQX9KB6PCL
+Somatropin	Humatrope	NQX9KB6PCL
+Somatropin	Norditropin	NQX9KB6PCL
+Somatropin [rDNA]	Genotropin	NQX9KB6PCL
+Somatropin (r-DNA)	Zorbtive	NQX9KB6PCL
+Somatropin (rDNA origin) injection	Norditropin	NQX9KB6PCL
+Somatropin for injection	Nutropin	NQX9KB6PCL
+Somatropin	Humatrope	NQX9KB6PCL
+Mesna	Mesnex	NR7O1405Q9
+sodium phenylbutyrate	Buphenyl	NT6K61736T
+coagulation factor XIII A-subunit (recombinant)	Tretten	NU23Q531G1
+Exemestane	Aromasin	NY22HMQ4BX
+Ritonavir powder for oral suspension	Norvir Powder For Oral Suspension	O3J8G9O825
+obinutuzumab	Gazyva	O43472U9X8
+obinutuzumab	Gazyva	O43472U9X8
+obinutuzumab	Gazyva	O43472U9X8
+plerixafor	Mozobil (R)	OD49913540
+elosulfase alfa	Vimizim	ODJ69JZG85
+Lorlatinib	Lorbrena	OSP71S83EU
+tenofovir	Viread	OTT9J7900I
+bedaquiline	Sirturo	P04QX2C1A5
+bedaquiline	Sirturo	P04QX2C1A5
+d6-tetrabenazine, deutetrabenazine	Austedo	P341G6W9NB
+Paclitaxel	Taxol	P88XT4IS4D
+Antihemophilic factor (recombinant)	Kogenate	P89DR4NY54
+Ganciclovir intravitreal implant	Vitrasert Implant	P9G3CKZ4P5
+ganciclovir	Zirgan	P9G3CKZ4P5
+alectinib	Alecensa	P9YY73LO6J
+alectinib	Alecensa	P9YY73LO6J
+ascorbic acid	Ascor	PQ6CK8PD0R
+cetuximab	Erbitux	PQX0D8J21J
+ivosidenib	Tibsovo	Q2PCN8MAM6
+ivosidenib	Tibsovo	Q2PCN8MAM6
+Cromolyn sodium	Gastrocrom	Q2WXR1I0PK
+Cromolyn sodium 4% ophthalmic solution	Opticrom 4% Ophthalmic Solution	Q2WXR1I0PK
+bosentan	Tracleer	Q326023R30
+bosentan	Tracleer	Q326023R30
+Diazepam viscous solution for rectal administration	Diastat	Q3JTX2Q7TU
+Hydroxocobalamin	Cyanokit	Q40X8H422O
+Melphalan	Alkeran For Injection	Q41OR9510P
+Iobenguane I 131	Azedra Ultratrace	Q461L7AK4R
+calfactant	Infasurf	Q4K217VGA9
+(tisagenlecleucel) Autologous T Cells transduced with lentiviral vector containing a chimeric antigen receptor directed against CD19	Kymriah (Tisagenlecleucel)	Q6C9WHR03O
+tisagenlecleucel-T	Kymriah	Q6C9WHR03O
+Imiglucerase	Cerezyme	Q6U6J48BWY
+Altretamine	Hexalen	Q8BIH59O7H
+Histrelin	Supprelin La	QMG7HLD1ZE
+Histrelin acetate	Supprelin Injection	QMG7HLD1ZE
+cysteamine enteric coated	Procysbi	QO84GZ3TST
+cysteamine enteric coated	Procysbi	QO84GZ3TST
+cysteamine enteric coated	Procysbi	QO84GZ3TST
+Cysteamine	Cystagon	QO84GZ3TST
+stiripentol	Diacomit	R02XOT8V8I
+Synthetic porcine secretin	Secreflo	R0R146K62L
+Synthetic porcine secretin	Secreflo	R0R146K62L
+Synthetic porcine secretin	Secreflo	R0R146K62L
+Modafinil	Provigil	R3UK8X3U3D
+pegloticase	Krystexxa	R581OT55EA
+midazolam	Nayzilam	R60L0SM5BC
+Dasatinib	Sprycel	RBZ1571X5H
+Dasatinib	Sprycel	RBZ1571X5H
+dasatinib	Sprycel	RBZ1571X5H
+dasatinib	Sprycel	RBZ1571X5H
+larotrectinib	Vitrakvi	RDF76R62ID
+osimertinib	Tagrisso	RDL94R2A16
+osimertinib	Tagrisso	RDL94R2A16
+sapropterin	Kuvan	RG277LF5B3
+Leucovorin	Leucovorin Calcium	RPR1R4C0P4
+Leucovorin	Leucovorin Calcium	RPR1R4C0P4
+Mafenide acetate solution	Sulfamylon Solution	RQ6LP6Z0WY
+riociguat	Adempas	RU3FE2Y4XI
+riociguat	Adempas	RU3FE2Y4XI
+amifampridine	Ruzurgi	RU4S6E2G0J
+treprostinil (inhalational)	Tyvaso	RUM6K67ESG
+capsaicin	Qutenza	S07O44R1ZM
+gefitinib	Iressa	S65743JHBS
+edaravone	Radicava	S798V6YJRP
+Arsenic trioxide	Trisenox	S7V92P67HO
+Arsenic trioxide	Trisenox	S7V92P67HO
+Beractant	Survanta Intratracheal Suspension	S866O45PIG
+Beractant	Survanta Intratracheal Suspension	S866O45PIG
+difluprednate	Durezol	S8A06QG2QE
+tasimelteon	Hetlioz	SHS4PU80D9
+colchicine	Colcrys	SML2Y3J35T
+Nitazoxanide	Alinia	SOA12P041N
+nitazoxanide	Alinia	SOA12P041N
+Antithrombin III (human)	Atnativ	T0LTO7L82X
+Antithrombin III (human)	Thrombate Iii	T0LTO7L82X
+methylene blue0.5%	Provayblue	T42P99266K
+siltuximab	Sylvant	T4H8FMA7IM
+Glasdegib	Daurismo	TH2EV99S4Z
+Megestrol acetate	Megace	TJ2M0FR8ES
+metreleptin	Myalept	TL60C27RLH
+iron(III)-hexacyanoferrate(II)	Radiogardase	TLE294X33A
+ivabradine	Corlanor	TP19837BZK
+olaratumab	Lartruvo	TT6HN20MVF
+Interferon beta-1b	Betaseron	TTD90R31WZ
+Caffeine	Cafcit	U26EO4675Q
+axicabtagene ciloleucel	Yescarta	U2I8T43Y7R
+axicabtagene ciloleucel	Yescarta	U2I8T43Y7R
+axicabtagene ciloleucel	Yescarta	U2I8T43Y7R
+gemcitabine ready-to-use	Infugem	U347PV74IL
+gemcitabine ready-to-use	Infugem	U347PV74IL
+Lamotrigine	Lamictal	U3H27498KS
+Ethanolamine oleate	Ethamolin	U4RY8MRX7C
+polifeprosan 20 with carmustine	Gliadel	U68WG3173Y
+polifeprosan 20 with carmustine	Gliadel	U68WG3173Y
+Mitoxantrone	Novantrone	U6USW86RD0
+Mitoxantrone	Novantrone	U6USW86RD0
+Mitoxantrone	Novantrone	U6USW86RD0
+Mitoxantrone HCl	Novantrone	U6USW86RD0
+enasidenib	Idhifa	UF6PC17XAV
+Fedratinib	Inrebic	UH9J2HBQWJ
+apremilast	Otezla	UP7QBP99PN
+afatinib	Gilotrif	V1T5K7RZ0B
+afatinib	Gilotrif	V1T5K7RZ0B
+afatinib	Gilotrif	V1T5K7RZ0B
+Pentamidine isethionate	Nebupent	V2P3K60DA2
+5-aminolevulinic acid	Gleolan	V35KBM8JGR
+deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9
+deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9
+Deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9
+Deferasirox	Exjade; Jadenu Sprinkles	V8G4MOF2V9
+Monooctanoin	Moctanin	VFU0OU98LO
+meloxicam	Mobic	VG2QF83CGL
+Rifampin	Rifadin I.V.	VJT6J7R4TR
+sirolimus	Rapamune	W36ZG6FT64
+copanlisib	Aliqopa	W421JK3CPA
+Clonidine	Duraclon	W76I6XXF06
+midazolam	Seizalam	W7TTW573JJ
+levoleucovorin	Fusilev	WA16A5Y52X
+Levoleucovorin	Fusilev	WA16A5Y52X
+rufinamide	Banzel	WFW942PR79
+sofosbuvir	Sovaldi	WJ6CA3ZU8B
+sofosbuvir	Sovaldi	WJ6CA3ZU8B
+sofosbuvir	Sovaldi	WJ6CA3ZU8B
+Tacrolimus	Prograf	WM0HAQ4WNM
+Tacrolimus granules for oral suspension	Prograf	WM0HAQ4WNM
+patisiran	Onpattro	WO0YM16LKG
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+olaparib	Lynparza	WOH1JD9AR8
+laronidase	Aldurazyme	WP58SVM6R4
+acetylcysteine	Acetadote	WYQ7N0BPYC
+acetylcysteine effervescent tablets for oral solution	Cetylev	WYQ7N0BPYC
+Morphine sulfate concentrate (preservative free)	Infumorph	X3P646A2J0
+hydroxycarbamide (hydroxyurea)	Siklos	X6Q56QN5QC
+Hydroxyurea	Droxia	X6Q56QN5QC
+Felbamate	Felbatol	X72RBB02N8
+cerliponase alfa	Brineura	X8R2D92QP1
+fish oil triglycerides	Omegaven	XGF7L72M0F
+Rifapentine	Priftin	XJM390A33U
+aztreonam	Cayston	XNM7LT65NP
+Interferon beta-1a	Avonex	XRO4566Q4R
+porfimer	Photofrin	Y3834SIK5F
+Porfimer sodium	Photofrin	Y3834SIK5F
+Gallium [Ga-68]-N-[(4,7,10-Tricarboxymethyl-1,4,7,10-tetraazacyclododec-1-yl)acetyl]-D-phenylalanyl-L-cysteinyl-L-tyrosyl-D-tryptophanyl-L-lysyl-L-threoninyl-L-cysteinyl-L-threonine-cyclic(2-7)disulfide	Netspot	Y68179SY2L
+Atovaquone	Mepron	Y883P1Z2LT
+Atovaquone	Mepron	Y883P1Z2LT
+temozolomide	Temodar	YF1K15M17Y
+temozolomide	Temodar	YF1K15M17Y
+idelalisib	Zydelig	YG57I8T5M0
+idelalisib	Zydelig	YG57I8T5M0
+methotrexate oral solution	Xatmep	YL5FZ2Y5U1
+methotrexate oral solution	Xatmep	YL5FZ2Y5U1
+pexidartinib	Turalio	YS6WAI3XN7
+Anagrelide	Agrylin	YTM763Y5C8
+fidaxomicin	Dificid	Z5N076G8YQ
+Asfotase alfa	Strensiq	Z633861EIM
+Naltrexone HCl	Trexan	Z6375YW9SF
+macitentan	Opsumit	Z9K9Y9WMVL
+Tetrabenazine	Xenazine	Z9O08YRN8O
+glycerol phenylbutyrate	Ravicti	ZH6F1VCV7B
+glycerol phenylbutyrate	Ravicti	ZH6F1VCV7B
+tafamidis meglumine	Vyndaqel; Vyndamax	ZU7CF08A1A
+phoxillum	n/a	
+burosumab	Crysvita	G9WJT6RD29
+burosumab	Crysvita	G9WJT6RD29
+Emapalumab	Gamifant	3S252O2Z4X
+emicizumab	Hemlibra	7NL2E3F6K3
+emicizumab	Hemlibra	7NL2E3F6K3
+cenegermin	Oxervate	B6E7K36KT8
+pegvaliase	Palynziq	N6UAH27EUV
+Tagraxofusp	Elzonris	8ZHS5657EH
+Ravulizumab	Ultomiris	C3VX249T6L
+Luspatercept	Reblozyl	AQK7UBA1LS
+elapegademase	Revcovi	9R3D3Y0UHS
+lumacaftor/ivacaftor	Orkambi	EGP8L81APK
+lumacaftor/ivacaftor	Orkambi	EGP8L81APK
+lumacaftor/ivacaftor	Orkambi	1Y740ILL1Z
+ledipasvir/sofosbuvir	Harvoni	013TE6E4WV
+ledipasvir/sofosbuvir	Harvoni	013TE6E4WV
+ledipasvir/sofosbuvir	Harvoni	WJ6CA3ZU8B
+biocarbonate infusate	Normocarb Hf	
+vestronidase alfa	Mepsevii	7XZ4062R17
+trifluridine/tipiracil	Lonsurf	RMW9V5RW38
+benzoate/phenylacetate	Ammonul	48N6U1781G
+Immune Globulin (Human)	Gamunex(R)-C	66Y330CJHS
+Botulism immune globulin	Babybig	X641Y30OA7
+polatuzumab vedotin	Polivy	KG6VO684Z6
+moxetumomab pasudotox	Lumoxiti	2NDX4B6N8F
+voretigene neparvovec	Luxturna	2SPI046IKD
+elexacaftor/tezacaftor/ivacaftor	Trikafta	RRN67GMB0V
+immune globulin infusion (human)	Gammagard Liquid	66Y330CJHS
+Immune globulin intravenous, human	Gamimune N	66Y330CJHS
+immune globulin intraveous (human)	Gammaplex	66Y330CJHS
+hepatitis B immune globulin (human)	Hepagam	XII270YC6M
+Cytarabine:daunorubicin liposome injection	Vyxeos	ZS7284E0ZP
+Ceramide trihexosidase/alpha-galactosidase A	Fabrazyme	RZD65TSM9U
+Immune Globulin Subcutaneous (Human), 20% Liquid	Hizentra	66Y330CJHS
+Buffered intrathecal electrolyte/dextrose injection	Elliotts B Solution	
+botulism antitoxin heptavalent (A, B, C, D, E, F, G) (Equine)	n/a	LE3J6I6DXP
+Hemin	Panhematin	743LRP9S7N
+clobazam	Onfi	2MRO291B4U
+Ursodiol	Urso 250	724L30Y2QR
+anakinra	Kineret	9013DUQ28K
+selinexor	n/a	31TZ62FO8F
+Voxelotor	Oxbryta	3ZO554A4Q8
+rituximab	Rituxan(R); Mabthera(R)	4F4X42SYQ6
+tadalafil	Adcirca	742SXX0ICT
+rifaximin	Normix	L36O5T016N
+givosiran	Givlaari	ROV204583W
+acyclovir	n/a	X4HES1O11F
+Lepirudin	Refluden	Y43GF64R34
+golodirsen	Vyondys 53	033072U4MZ
+Pitolisant	n/a	4BC83L4PIY
+Fomepizole	Antizole	83LCM6L2BY
+Fomepizole	Antizole	83LCM6L2BY
+Rilonacept	Arcalyst	8K80YB5GMG
+eteplirsen	Exondys 51	AIW6036FAS
+infliximab	Remicade	B72HH48FLU
+Infliximab	Remicade	B72HH48FLU
+infliximab	Remicade	B72HH48FLU
+Daclizumab	Zenapax	CUJ2MVI71Y
+adalimumab	Humira	FYS6T7F842
+adalimumab	Humira	FYS6T7F842
+adalimumab	Humira	FYS6T7F842
+adalimumab	Humira	FYS6T7F842
+adalimumab	Humira	FYS6T7F842
+adalimumab	Humira	FYS6T7F842
+adalimumab	Humira	FYS6T7F842
+nintedanib	Ofev	G6HRD2P839
+nintedanib	Ofev	G6HRD2P839
+ibalizumab	Trogarzo	LT369U66CE
+cobicistat	Tybost	LW2E03M5PG
+cobicistat	Tybost	LW2E03M5PG
+moxidectin	n/a	NGU5H31YO9
+etanercept	Enbrel	OP401G7OJC
+Filgrastim	Neupogen	PVI5M0M1GW
+filgrastim	Neupogen	PVI5M0M1GW
+Filgrastim	Neupogen	PVI5M0M1GW
+Filgrastim	Neupogen	PVI5M0M1GW
+Filgrastim	Neupogen	PVI5M0M1GW
+Ifosfamide	Ifex	UM20QQM95Y
+tacrolimus	Envarsus Xr	WM0HAQ4WNM
+tacrolimus	Envarsus Xr	WM0HAQ4WNM
+vandetanib	Caprelsa(R)	YO460OQ37K
+dexrazoxane	Totect(R)	048L81261F
+rasburicase	Elitek	08GY9K1EUO
+necitumumab	n/a	2BT4C47RUI
+deferiprone	Ferriprox	2BTY8KH53L
+alemtuzumab	Campath	3A189DH42V
+avapritinib	Ayvakit	513P80B4YJ
+ecallantide	Kalbitor	5Q6TZN2HNM
+ecallantide	Kalbitor	5Q6TZN2HNM
+raxibacumab	Abthraxtm	794PGL549S
+pasireotide	n/a	98H1T17066
+ramucirumab	n/a	D99YVK4L0X
+cobimetinib	n/a	ER29L26N1X
+Trypan blue	Membraneblue	I2ZWO3LS3M
+trabectedin	Yondelis	ID0YZQ2TCP
+entrectinib	n/a	L5ORF0AN1I
+entrectinib	n/a	L5ORF0AN1I
+trastuzumab	Herceptin	P188ANX8CK
+Sulfadiazine	n/a	0N7609K889
+Teriparatide	Parathar	10T9CSU89I
+Caplacizumab	Cablivi	2R27AB6766
+nitric oxide	n/a	31C4KY9ESH
+sargramostim	Leukine	5TAA004E22
+Sargramostim	Leukine	5TAA004E22
+sargramostim	Leukine	5TAA004E22
+Epoetin alfa	Epogen	64FS3BFH5W
+Epoetin alfa	Epogen	64FS3BFH5W
+idarucizumab	n/a	97RWB5S1U6
+sotalol (IV)	So-Aqueous	A6D97U294I
+zanubrutinib	Brukinsa	AG9MHG098Z
+Zinc acetate	Galzin	FM5526K07A
+tazemetostat	n/a	Q40W93WPE1
+treprostinil	Remodulin;Orenitram	RUM6K67ESG
+treprostinil	Remodulin;Orenitram	RUM6K67ESG
+teprotumumab	n/a	Y64GQ0KC0A
+benznidazole	n/a	YC42NRJ1ZD
+Pegfilgrastim	Neulasta	3A58010674
+dexamethasone	n/a	7S5I7G3JQL
+acalabrutinib	n/a	I42748ELQW
+crizanlizumab	Adakveo	L7451S9126
+mogamulizumab	Poteligeo	YI437801BE
+glycopyrrolate	Cuvposa	V92SO9WP2I
+Urofollitropin	Metrodin	W9BB98U6HP
+quinine Sulfate	n/a	KF7Z0E0Q2B
+Calcium acetate	Phos-Lo	Y882YXF34X
+Thyrotropin alfa	Thyrogen	AVX3D5A4LM
+Iobenguane I 123	Adreview	P2TH1XYZ84
+Iobenguane I 123	Adreview	P2TH1XYZ84
+dichlorphenamide	n/a	VVJ6673MHY
+Thyrotropin alpha	Thyrogen	AVX3D5A4LM
+Pegademase bovine	Adagen	HW3H7D91F6
+uridine triacetate	n/a	2WP61F175M
+uridine triacetate	n/a	2WP61F175M
+riluzole oral film	Exservan	7LJ087RS6F
+lanreotide acetate	n/a	IEU56G3J9C
+Methotrexate sodium	Methotrexate	3IG1E710ZN
+macimorelin acetate	Macrelin	AQZ1003RMG
+avatrombopag maleate	n/a	GDW7M2P1IS
+mecasermin rinfabate	Iplex	NZ8M50KKRG
+Desmopressin acetate	n/a	XB13HYU18U
+Protein C concentrate	Ceprotin	3Z6S89TXPW
+inotuzumab ozogamicin	n/a	P93RUU11P7
+diazepam (intranasal)	Valtoco	Q3JTX2Q7TU
+levodopa and carbidopa	Duopa	46627O600J
+Botulinum toxin type A	Botox	E211KPY694
+Botulinum toxin type A	Botox	E211KPY694
+botulinum toxin type A	Botox	E211KPY694
+Botulinum toxin type A	Dysport	E211KPY694
+Botulinum toxin type A	Botox	E211KPY694
+talimogene laherparepvec	Imlygic	07730V90L6
+Anthrax Vaccine Adsorbed	Biothrax	873OI62848
+Synthetic human secretin	Chirostim	A0426J905J
+lutetium Lu 177 dotatate	n/a	AE221IM3BB
+Cysteamine hydrochloride	Cystaran	IF1B771SVB
+ethiodized oil injection	Lipiodol	KZW0R0686Q
+encorafenib + binimetinib	n/a	181R97MR71
+encorafenib + binimetinib	n/a	181R97MR71
+omacetaxine mepesuccinate	Synribo	6FG8041S5B
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B
+dabrafenib and trametinib	Tafinlar(R) Capsules A Nd Mekinist(R) Tablets	QGP4HA4G1B
+Tobramycin for inhalation	Tobi	VZ8RRZ51VK
+Benzoate and phenylacetate	Ucephan	8SKN0B0MIM
+Digoxin immune FAB (Ovine)	Digibind	YB12NQZ1YN
+Coagulation factor X (human)	Coagadex	0P94UQE6SY
+Coagulation factor X (human)	Coagadex	0P94UQE6SY
+glecaprevir and pibrentasvir	Mavyret	K6BUU8J72P
+Follitropin alfa, recombinant	Gonal-F	076WHW89TW
+C1 esterase inhibitor (human)	Cinryze(R)	6KIC4BB60G
+C1 esterase inhibitor (human)	Cinryze(R)	6KIC4BB60G
+Coagulation Factor IX (human)	Alphanine	6U90Y1795T
+irinotecan liposome injection	n/a	7673326042
+Antihemophilic factor (human)	Alphanate	839MOZ74GK
+anthrax immune globulin (human)	n/a	VKZ83S945Z
+Interferon alfa-2b (recombinant)	Intron A	43K1W2T1M6
+fostamatinib disodium hexahydrate	n/a	86EEZ49YVB
+Rifampin, isoniazid, pyrazinamide	Rifater	VJT6J7R4TR
+coccidioidin SD Skin Test Antigen	n/a	ZP77O7YY70
+Fludarabine phosphate oral tablets	n/a	1X9VK9O1SC
+paclitaxel protein-bound particles	Abraxane	P88XT4IS4D
+Antihemophilic factor (recombinant)	Refacto, Xyntha	P89DR4NY54
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV
+Coagulation factor VIIa (recombinant)	Novoseven	AC71R787OV
+Coagulation Factor VIIa (Recombinant)	Novoseven	AC71R787OV
+coagulation factor VIIa (recombinant)	Novoseven Rt	AC71R787OV
+sodium nitrite and sodium thiosulfate	Nithiodote	M0KG633D4F
+Gallium-68 (DOTA0-Phel-Tyr3)octreotide	n/a	98B30EPP5S
+vinCRIStine sulfate LIPOSOME injection	Marqibo	T5IRO3534A
+Combination of nivolumab and ipilimumab	n/a	31YO63LBSN
+prothrombin complex concentrate (human)	Kcentra	8FB1K07F16
+prothrombin complex concentrate (human)	Kcentra	8FB1K07F16
+multi-vitamin infusion without vitamin K	M.V.I.-12	A034SE7857
+C1-esterase-inhibitor, human, pasteurized	Haegarda	6KIC4BB60G
+C1-esterase-inhibitor, human, pasteurized	Haegarda	6KIC4BB60G
+Diethylenetriaminepentaacetic acid (DTPA)	n/a	7A314HQM0I
+human fibrinogen concentrate, pasteurized	Riastap	N94833051K
+recombinant von Willebrand factor (rhVWF)	n/a	ZE22NE22F1
+recombinant von Willebrand factor (rhVWF)	n/a	ZE22NE22F1
+Brilliant Blue G Ophthalmic Solution 0.025%	Dorc Ilm-Blue	M1ZRX790SI
+Vaccinia Immune Globulin (Human) Intravenous	Cnj-016	7UB4J759TD
+Vaccinia Immune Globulin (Human) Intravenous	n/a	7UB4J759TD
+Tezacaftor and Ivacaftor combination therapy	Symdeko	8RW88Y506K
+Tezacaftor and Ivacaftor combination therapy	Symdeko	8RW88Y506K
+rituximab and recombinant human hyaluronidase	Rituxin Sc	4F4X42SYQ6
+Colfosceril palmitate, cetyl alcohol, tyloxapol	Exosurf Neonatal For Intratracheal Suspension	Y27PUL9H56
+Antivenin, crotalidae polyvalent immune Fab (ovine)	Crofab	92VV7G83ED
+emtricitabine and tenofovir alafenamide combination	Descovy(R)	EL9943AG5J
+Citric acid, glucono-delta-lactone and magnesium carbonate	Renacidin Irrigation	WQ29KQ9POT
+Human plasma coagulation Factor VIII and human plasma von Willebrand Factor	Wilate	ZE22NE22F1

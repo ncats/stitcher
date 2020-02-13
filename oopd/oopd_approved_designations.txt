@@ -1,0 +1,854 @@
+"1. Long-term treatment of children who have growth failure due to a lack of adequate endogenous growth hormone secretion (prevalence 15,000) 2. Treatment of short stature associated with Turner's syndrome (prevalence 8000)."
+"1. Prevention of hyaline membrane disease, also known as respiratory distress syndrome, in infants born at 32 weeks gestation or less 2. prevention of hyaline membrane disease (HMD), also known as respiratory distress syndrome (RDS), in infants born at 32 weeks gestation or less and in the treatment of established HMO at all gestational ages."
+"Amelioration of recurrent attacks of acute intermittent porphyria (AIP) temporarily related to the menstrual cycle in susceptible women and similar symptoms which occur in other patients with AIP, porphyria variegata and hereditary coproporphyria."
+"As an adjuvant to levodopa and carbidopa treatment of idiopathic Parkinson's disease (paralysis agitans), postencephalitic Parkinsonism, and symptomatic Parkinsonism."
+"Delaying time to disease progression in patients with severe, malignant osteopetrosis."
+"For adjunctive therapy in the prevention and treatment of hyperammonemia in patients with urea cycle enzymopathy due to carbamylphosphate synthetase, ornithine, transcarbamylase, or argininosuccinate synthetase deficiency."
+"For continous epidural administration as adjunctive therapy with intraspinal opiates for the treatment of pain in cancer patients tolerant to, or unresponsive to, intraspinal opiates."
+"For patients with radiolucent stones in well opacifying gallbladders, in whom elective surgery would be undertaken except for the presence of increased surgical risk due to systemic disease or age"
+"For prophylactic use to reduce perioperative blood loss and the homologous blood transfusion requirement in patients undergoing cardiopulmonary bypass surgery in the course of repeat coronary artery bypass graft surgery, and in selected cases of primary coronary artery bypass graft surgery where the risk of bleeding is especially high (impaired hemostasis) or where transfusion is unavailable or unacceptable."
+"For relief of allodynia (painful hypersensitivity), and chronic pain in postherpetic neuralgia."
+"For replacement therapy in congenital protein C deficiency for the prevention and treatment of thrombosis, pulmonary emboli, and purpura fulminans."
+"For the initiation and re-initiation of spermatogenesis in adult males with reproductive failure due to hypothalamic or pituitary dysfunction, hypogonadotropic hypogonadism. AMENDED indication 6/27/00: For the induction of spermatogenesis in men with primary and secondary hypogonadotropic hypogonadism in whom the cause of infertility is not due to primary testicular failure."
+"For the management of selected, refractory, patients with epilepsy, on stable regimens of antiepileptic drugs (AEDs), who require intermittent use of diazepam to control bouts of increased seizure activity."
+"For use as replacement therapy in patients with hemophilia B for the prevention and control of bleeding episodes, and during surgery to correct defective hemostasis."
+"For use in conjunction with diagnostic, therapeutic, or combined diagnostic/therapeutic procedures for pancreatic disorders to increase pancreatic fluid secretion."
+"For use in patients with congenital coagulopathies undergoing surgical procedures, e.g. dental extractions"
+"For use in the treatment of acute malaria due to Plasmodium falciparum and Plasmodium vivax, and for the prophylaxis of Plasmodium falciparum malaria which is resistant to other available drugs"
+"For use in the treatment of acute malaria due to Plasmodium falciparum and Plasmodium vivax, and for the prophylaxis of Plasmodium falciparum malaria which is resistant to other available drugs"
+"For ventricular tachycardia, ventricular fibrillation, or the maintenance of sinus rhythm in patients converted from atrial fibrillation or atrial flutter when oral administration is not possible."
+"Management of patients with leukemia, lymphoma, and solid tumor malignancies who are receiving cancer therapy which causes elevations of serum and urinary uric acid levels and who cannot tolerate oral therapy."
+"Passive immunization for the treatment of exposed, susceptible individuals who are at risk of complications from varicella"
+"Prevention of Pneumocystis carinii pneumonia (PCP) in high-risk, HIV-infected patients defined by a history of one or more episodes of PCP and/or a peripheral CD4+ (T4 helper/inducer) lymphocyte count less than or equal to 200/mm3."
+"Prevention of bleeding episodes in patients with hemophilia A or B, with or without inhibitors"
+"Prevention of rejection in kidney, liver or heart transplant in pediatric patients."
+"Reduction in the duration of neutropenia, fever, antibiotic use, and hospitalization, following induction and consolidation treatment for acute myeloid leukemia."
+"Replacement therapy in patients with types I, II, and III Gaucher's disease."
+"Rescue treatment of seizures in patients who require control of intermittent bouts of increased seizure activity (e.g. acute repetitive seizures, seizure clusters)"
+"Treatment of ALK-positive, MET-positive, or ROS-positive non-small cell lung cancer"
+"Treatment of ALK-positive, MET-positive, or ROS-positive non-small cell lung cancer"
+"Treatment of Follicular Lymphoma, Small Lymphocytic Lymphoma, Lymphoplasmacytic Lymphoma, Splenic Marginal Zone Lymphoma, Extranodal Marginal Zone B-cell Lymphoma of Mucosa-Associated Lymphoma Tissue (MALT), and Nodal Marginal Zone Lymphoma (Collectively Indolent B-cell Non-Hodgkin's Lymphoma)"
+"Treatment of Follicular Lymphoma, Small Lymphocytic Lymphoma, Lymphoplasmacytic Lymphoma, Splenic Marginal Zone Lymphoma, Extranodal Marginal Zone B-cell Lymphoma of Mucosa-Associated Lymphoma Tissue (MALT), and Nodal Marginal Zone Lymphoma (Collectively Indolent B-cell Non-Hodgkin's Lymphoma)"
+"Treatment of HER2-overexpressing advanced adenocarcinoma of the stomach, including gastroesophageal junction"
+"Treatment of TrkA-positive, TrkB-positive, TrkC-positive ROS1-positive or ALK-positive non-small cell lung cancer"
+"Treatment of acute myelogenous leukemia, also referred to as acute nonlymphocytic leukemia."
+"Treatment of acute myelogenous leukemia, also referred to as acute nonlymphocytic leukemia."
+"Treatment of anaplastic lymphoma kinase-positive (ALK+), c-ros 1 oncogene positive (ROS1+), or epidermal growth factor receptor positive (EGFR+) non-small cell lung cancer (NSCLC)."
+"Treatment of chronic lymphocytic leukemia (CLL), including refractory CLL."
+"Treatment of congenital antithrombin deficiency to prevent the occurrence of serious, potentially life-threatening venous thromboembolisms which may develop as a result of surgical or obstetrical procedures"
+"Treatment of follicular, medullary and anaplastic thyroid carcinoma and metastatic or locally advanced papillary thyroid cancer."
+"Treatment of follicullar, medullary, anaplastic, and metastatic or locally advanced papillary thyroid cancer"
+"Treatment of gastric cancer, including gastroesophageal junction adenocarcinoma"
+"Treatment of high risk Stage II, Stage III, and Stage IV melanoma"
+"Treatment of high risk Stage II, Stage III, and Stage IV melanoma"
+"Treatment of high risk Stage II, Stage III, and Stage IV melanoma"
+"Treatment of hypercalcemia in patients with primary hyperparathyroidism for whom parathyroidectomy would be indicated on the basis of serum calcium levels, but who are unable to undergo surgery"
+"Treatment of hypercalcemia in patients with primary hyperparathyroidism for whom parathyroidectomy would be indicated on the basis of serum calcium levels, but who are unable to undergo surgery"
+"Treatment of intractable spasticity caused by spinal cord injury, multiple sclerosis, and other spinal diseases (including spinal ischemia, spinal tumor, transverse myelitis, cervical spondylosis, and degenerative myelopathy)."
+"Treatment of lepromatous leprosy, including dapsone-resistant lepromatous leprosy and lepromatous leprosy complicated by erythema nodosum leprosum."
+"Treatment of medullary thyroid cancer, anaplastic thyroid cancer, and recurrent or metastatic follicular or papillary thyroid cancer"
+"Treatment of mucopolysaccharidosis VII (MPS VII, Sly Syndrome)"
+"Treatment of neurocysticercosis due to Taenia solium as: 1) chemotherapy of parenchymal, subarachnoidal and racemose (cysts in spinal fluid) neurocysticercosis in symptomatic cases and 2) prophylaxis of epilepsy and other sequelae in asymptomatic neurocysticercosis."
+"Treatment of neurogenic symptomatic orthostatic hypotension in patients with primary autonomic failure, dopamine-beta-hydroxylase deficiency, and nondiabetic autonomic neuropathy."
+"Treatment of neutropenia associated with bone marrow transplant, for the treatment of graft failure and delay of engraftment, and for the promotion of early engraftment."
+"Treatment of non-infectious intermediate, posterior, or panuveitis, or chronic non-infectious anterior uveitis"
+"Treatment of non-infectious intermediate, posterior, or panuveitis, or chronic non-infectious anterior uveitis"
+"Treatment of non-infectious ocular inflammation of the posterior segment in patients with intermediate, posterior, and panuveitis"
+"Treatment of non-small cell lung cancer with EGFR, HER2, HER4, or DDR2 mutations."
+"Treatment of patients with Wilson's disease who are intolerant, or inadequately responsive to penicillamine."
+"Treatment of patients with anorexia, cachexia, or significant weight loss (=/>10% of baseline body weight) and confirmed diagnosis of AIDS."
+"Treatment of patients with anti-neutrophil cytoplasmic antibody-associated vasculitis (Wegener's Granulomatosis, Microscopic Polyangiitis, and Churg-Strauss Syndrome)"
+"Treatment of patients with anti-neutrophil cytoplasmic antibody-associated vasculitis (Wegener's Granulomatosis, Microscopic Polyangiitis, and Churg-Strauss Syndrome)"
+"Treatment of patients with esophageal varices that have recently bled, to prevent rebleeding."
+"Treatment of patients with follicular thyroid carcinoma, medullary thyroid carcinoma, anaplastic thyroid carcinoma, and locally advanced and metastatic papillary thyroid carcinoma"
+"Treatment of patients with known or suspected internal contamination with plutonium, americium, or curium to increase the rates of elimination."
+"Treatment of peripheral T-cell lymphoma, including anaplastic large cell lymphoma, peripheral T-cell lymphoma not otherwise specified, angioimmunoblastic T-cell lymphoma, adult T-cell leukemia/lymphoma, enteropathy-associated T-cell lymphoma, and extranodal NK/T-cell lymphoma."
+"Treatment of peripheral T-cell lymphoma, including anaplastic large cell lymphoma, peripheral T-cell lymphoma not otherwise specified, angioimmunoblastic T-cell lymphoma, adult T-cell leukemia/lymphoma, enteropathy-associated T-cell lymphoma, and extranodal NK/T-cell lymphoma."
+"Treatment of single or mixed gastrointestinal infestations by Trichuris trichiura (whipworm), Ascaris lumbricoides (large roundworm), and Ancylostoma duodenale and Nectar americanus (hookworm)."
+"Treatment of stage IIb, IIc, III, and IV melanoma with BRAFV600 mutation"
+"Treatment of tuberous sclerosis complex including TSC-associated subependymal giant cell astrocytoma (SEGA), TSC-associated angiomyolipoma and TSC-associated lymphangioleiomyomatosis (LAM)"
+"Treatment of tuberous sclerosis complex including TSC-associated subependymal giant cell astrocytoma (SEGA), TSC-associated angiomyolipoma and TSC-associated lymphangioleiomyomatosis (LAM)"
+"Treatment of tuberous sclerosis complex including TSC-associated subependymal giant cell astrocytoma (SEGA), TSC-associated angiomyolipoma and TSC-associated lymphangioleiomyomatosis (LAM)"
+"Treatment of urea cycle disorders: carbamylphosphate synthetase deficiency, ornithine transcarbamylase deficiency, and arginiosuccinic acid synthetase deficiency."
+"Treatment of well-differentiated papillary, follicular or combined papillary/follicular carcinomas of the thyroid"
+"Use in sentinel lymph node detection (SLN) with a hand-held gamma-counter, with scintigraphic imaging, in patients with cancer of the head and neck"
+1. Prevention of calcium renal stones in patients with hypocitraturia 2. For avoidance of the complication of calcium stone formation in patients with uric lithiasis.
+1. Treatment of growth failure in children due to inadequate growth hormone secretion 2. Treatment of short stature associated with Turner's syndrome
+1. Treatment of life-threatening ventricular tachyarrhythmias 2. Prevention of life treatening ventricular tachyarrhythmias
+An antidote in the treatment of 5-fluorouracil or capecitabine poisoning
+As an adjunct in leukapheresis to improve the harvesting and increase the yield of leukocytes by centrifugal means.
+As an adjunct in the diagnosis of thyroid cancer.
+As preparative therapy in the treatment of malignancies with bone marrow transplantation.
+As replacement therapy for growth hormone deficiency in adults after epiphyseal closure.
+Conditioning treatment prior to hematopoietic stem cell transplantation
+Control and prevention of hemorrhagic episodes in patients with hemophilia B (congenital factor IX deficiency or Christmas disease)
+Designation
+Detection of ovarian carcinoma.
+Diagnosis of growth hormone deficiency
+Diagnostic agent to assist in establishing the diagnosis in patients presenting with clinical and laboratory evidence of hypocalcemia due to either hypoparathyroidism or pseudohypoparathyroidism.
+Diagnostic for the clinical management of neuroendocrine tumors
+For antituberculosis treatment where use of the oral form of the drug is not feasible.
+For blockade of the pharmacological effects of exogenously administered opioids as an adjunct to the maintenance of the opioid-free state in detoxified formerly opioid-dependent individuals.
+For dissolution of cholesterol gallstones retained in the common bile duct.
+For enzyme replacement therapy for ADA deficiency in patients with severe combined immunodeficiency.
+For induction of ovulation in patients with polycystic ovarian disease who have an elevated LH/FSH ratio and who have failed to respond to adequate clomiphene citrate therapy.
+For induction of ovulation in women with hypothalamic amenorrhea due to a deficiency or absence in the quantity or pulse pattern of endogenous GnRH secretion.
+For localization of sentinel lymph nodes in patients with melanoma
+For post-exposure prophylaxis of anthrax disease resulting from suspected or confirmed Bacillus anthracis exposure
+For replacement therapy in congenital deficiency of AT-III for prevention and treatment of thrombosis and pulmonary emboli.
+For replacement therapy in patients with Gaucher's disease type I.
+For replacement therapy in the alpha-1-proteinase inhibitor congenital deficiency state.
+For rescue use after high dose methotrexate therapy in the treatment of osteosarcoma.
+For reversing the anticoagulant effect of direct or indirect factor Xa inhibitors in patients experiencing a serious uncontrolled bleeding event or who require urgent or emergent surgery
+For the ablation of High-Grade Dysplasia in Barrett's Esophagus in patients who are not considered to be candidates for esophagectomy
+For the acute treatment and prophylaxis of life-threatening ventricular tachycardia or ventricular fibrillation.
+For the acute treatment of patients with status epilepticus of the grand mal type.
+For the control and prevention of hemorrhagic episodes and for surgical prophylaxis in patients with hemophilia A (congenital factor VIII deficiency or classic hemophilia).
+For the diagnosis of Coccidioidomycosis
+For the diagnosis of neuroblastomas
+For the diagnosis of pheochromocytomas
+For the intravenous treatment of moderate to severe acetaminophen overdose
+For the long-term treatment of children who have growth failure due to inadequate secretion of normal endogenous growth hormone.
+For the photodynamic therapy of patients with primary or recurrent obstructing (either partially or completely) esophageal carcinoma.
+For the prevention of cardiomyopathy associated with doxorubicin administration.
+For the short-course treatment of tuberculosis.
+For the stimulation of appetite and prevention of weight loss in patients with a confirmed diagnosis of AIDS.
+For the treatment and prevention of respiratory distress syndrome in premature infants.
+For the treatment of Acute Lymphoblastic Leukemia
+For the treatment of hepatic veno-occlusive disease
+For the treatment of infections due to Plasmodium falciparum or mixed infections including P. falciparum.
+For the treatment of patients with hereditary antithrombin III deficiency in connection with surgical or obstetrical procedures or when they suffer from thromboembolism.
+For the treatment of pediatric homozygous familial hypercholesterolemia
+For use alone or in combination with glutamine in the treatment of short bowel syndrome.
+For use as a chemoprotective agent for cisplatin in the treatment of advanced ovarian carcinoma.
+For use as a diagnostic adjunct in patients with pheochromocytoma.
+For use as a diluent in the intrathecal administration of methotrexate and cytarabine for the prevention or treatment meningeal leukemia and lymphocytic lymphoma
+For use as a prophylactic agent in reducing the incidence of ifosfamide-induced hemorrhagic cystitis.
+For use as a replacement solution in patients undergoing continuous renal replacement therapy
+For use as a thyroid blocking agent in pediatric patients exposed to radiactive iodine
+For use as an adjunctive topical antimicrobial agent to control bacterial infection when used under moist dressings over meshed autografts on excised burn wounds.
+For use as an aid in ophthalmic surgery by selectively staining the internal limiting membrane
+For use in association with recombinant human follicle stimulating hormone for the treatment of women with chronic anovulation due to hypogonadotropic hypogonadism.
+For use in combination chemotherapy with the approved agent 5-fluorouracil in the palliative treatment of metastatic adenocarcinoma of the colon and rectum
+For use in combination with 5-fluorouracil for the treatment of metastatic colorectal cancer.
+For use in combination with pyrimethamine for the treatment of Toxoplasma gondii encephalitis in patients with and without AIDS.
+For use in conjunction with high-dose methotrexate in the treatment of osteosarcoma.
+For use in differentiating pituitary and ectopic production of ACTH in patients with ACTH-dependent Cushings syndrome.
+For use in microinfusion devices for intraspinal administration in the treatment of intractable chronic pain.
+For use in the diagnosis of gastrinoma associated with Zollinger-Ellison syndrome.
+For use in the diagnosis of gastrinoma associated with Zollinger-Ellison syndrome.
+For use in the evaluation of exocrine pancreas function.
+For use in the long-term treatment of children who have growth failure due to a lack of adequate endogenous growth hormone secretion.
+For use in the mobilization of peripheral blood progenitor cells for collection in patients who will receive myeloablative or myelosuppressive chemotherapy.
+For use to improve the yield of progentor cells in the apheresis product for subsequest stem cell transplantation following myelosuppressive or myeloablative chemotherapy
+For use with human growth hormone in the treatment of short bowel syndrome (nutrient malabsorption from the gastrointestinal tract resulting from an inadequate absorptive surface).
+High dose conditioning treatment prior to hematopoietic progenitor (stem) cell transplantation
+Hormonal therapy of metastatic carcinoma of the breast.
+Infection prophylaxis in pediatric patients affected with the human immunodeficiency virus.
+Inhalation therapy for control of gram-negative bacteria in the respiratory tract of patients with cystic fibrosis
+Long term enzyme replacement therapy for patients with mucopolysaccharidosis II (Hunter Syndrome)
+Long-term treatment of children who have growth failure due to a lack of adequate endogenous growth hormone secretion.
+Maintenance treatment of patients with deficiencies in enzymes of the urea cycle
+Maintenance treatment of patients with deficiencies in enzymes of the urea cycle
+Management of acute repetitive seizures
+Management of neuropathic pain in patients with postherpetic neuralgia
+Management of patients with known hepatocellular carcinoma (HCC)
+Management of pediatric patients with active polyarticular juvenile idiopathic arthritis (pJIA) who are intolerant of or had an inadequate response to first-line therapy.
+Management of postherpetic neuralgia
+Non-24-hour sleepwake disorder in blind individuals without light perception
+Preventing hepatic injury from acetaminophin overdose
+Prevention and/or treatment of acute attacks of hereditary angioedema.
+Prevention and/or treatment of acute attacks of hereditary angioedema.
+Prevention of Japanese encephalitis virus in pediatric patients.
+Prevention of Pneumocystis carinii pneumonia in patients at high risk of developing this disease.
+Prevention of acute renal allograft rejection.
+Prevention of bleeding episodes in patients with acquired inhibitors to Factor VIII or Factor IX
+Prevention of bleeding episodes in patients with congenital Factor VII deficiency
+Prevention of cystine nephrolithiasis in patients with homozygous cystinuria.
+Prevention of cystine nephrolithiasis in patients with homozygous cystinuria.
+Prevention of cystine nephrolithiasis in patients with homozygous cystinuria.
+Prevention of disseminated Mycobacterium avium complex disease in patients with advanced HIV infection.
+Prevention of hepatitis B recurrence following orthotopic liver transplant
+Prevention of human cytomegalovirus viremia and disease in at risk populations
+Prevention of preterm birth in singleton pregnancies
+Prevention of preterm birth in singleton pregnancies
+Prevention of severe chemotherapy-induced thrombocytopenia.
+Prevention of uric acid nephrolithiasis.
+Prevention of vitamin deficiency and thromboembolic complications in people receiving home parenteral nutrition and warfarin-type anticoagulant therapy
+Prevention or attenuation of primary cytomegalovirus disease in immunosuppressed recipients of organ transplants.
+Prophylactic use to prevent or reduce the frequency of bleeding episodes in patients with hemophilia B (routine prophylaxis in patients where there is no evidence or suspicion of bleeding)
+Prophylaxis and treatment of bleeding in individuals with hemophilia A or for prophylaxis when surgery is required in individuals with hemophilia A.
+Prophylaxis of bleeding associated with congential factor XIII deficiency
+Prophylaxis of organ rejection in patients receiving allogeneic kidney transplant
+Prophylaxis of organ rejection in patients receiving allogeneic kidney transplant
+Prophylaxis of organ rejection in patients receiving heart transplants.
+Prophylaxis of organ rejection in renal allograft recipients
+Prophylaxis of respiratory syncytial virus lower respiratory tract infections in infants and young children at high risk of RSV disease.
+Prophylaxis of solid organ rejection.
+Reduction in signs and symptoms of moderately to severely active polyarticular-course juvenile rheumatoid arthritis in patients who have had an inadequate response to one or more disease-modifying anti-rheumatic drugs.
+Reduction of the incidence of moderate to severe xerostomia in patients undergoing post-operative radiation treatment for head and neck cancer.
+Reduction of the risk of breast cancer in postmenopausal women
+Relief of symptoms of multiple sclerosis
+Replacement treatment and prophylaxis of the hemorrhagic complications of hemophilia B.
+Routine prophylaxis to prevent or reduce the frequency of bleeding episodes in hemophilia A and B patients with inhibitors
+Selectively staining epiretinal membranes during ophthalmic surgical vitrectomy procedures
+The management of neuroendocrine tumors
+Therapeutic treatment of patients with ovarian cancer
+Therapeutic treatment of patients with ovarian cancer
+Therapeutic treatment of patients with ovarian cancer
+To control the clinical consequences of hyperuricemia in patients with severe gout in whom conventional therapy is contraindicated or has been ineffective.
+To reduce mucous viscosity and enable the clearance of airway secretions in patients with cystic fibrosis.
+To reduce neutropenia and leukopenia and decrease the incidence of death due to infection in patients with acute myelogenous leukemia.
+To reverse the anticoagulant effect of dabigatran due to uncontrolled life-threatening bleeding requiring urgent intervention or a need to undergo an emergency surgery/urgent invasive procedure
+Treatament of myelodysplastic syndromes
+Treatment BRAF V600 mutation positive Stage IIB through IV melanoma
+Treatment and prevention of episodic bleeding in patients with inhibitor antibodies to human coagulation factor VIII
+Treatment and prevention of respiratory failure due to pulmonary surfactant deficiency in preterm infants.
+Treatment for acromegly
+Treatment gastrointestinal stromal tumors
+Treatment of (acute attacks of) angioedema caused by hereditary or acquired C1-esterase inhibitor deficiency.
+Treatment of AIDS
+Treatment of AIDS associated Pneumocystis Carinii Pneumonia.
+Treatment of AIDS related Kaposi's sarcoma.
+Treatment of AIDS-associated catabolism/weight loss.
+Treatment of AIDS-related Kaposi's sarcoma.
+Treatment of AIDS-related Kaposi's sarcoma.
+Treatment of AIDS-related Kaposi's sarcoma.
+Treatment of AIDS.
+Treatment of ALK-positive non-small cell lung cancer
+Treatment of ALK-positive non-small cell lung cancer
+Treatment of B-cell acute lymphoblastic leukemia
+Treatment of B-cell chronic lymphocytic leukemia
+Treatment of B-cell non-Hodgkin's lymphoma.
+Treatment of B-thalassemia
+Treatment of Behcet's disease
+Treatment of CIAS1-Associated Periodic Syndromes
+Treatment of Castleman's disease
+Treatment of Chagas disease
+Treatment of Churg-Strauss Syndrome
+Treatment of Churg-Strauss Syndrome
+Treatment of Crohn's disease
+Treatment of Cushing's disease
+Treatment of Cushing's disease
+Treatment of Cystic Fibrosis
+Treatment of Dravet syndrome
+Treatment of Dravet syndrome
+Treatment of Duchenne Muscular Dystrophy.
+Treatment of Duchenne muscular dystrophy
+Treatment of Duchenne muscular dystrophy
+Treatment of Duchenne muscular dystrophy (DMD)
+Treatment of Erdheim-Chester Disease
+Treatment of Fabry Disease
+Treatment of Fabry's disease.
+Treatment of Fallopian Tube Cancer
+Treatment of Fallopian Tube Cancer
+Treatment of Gaucher disease
+Treatment of Gaucher disease.
+Treatment of Gaucher's disease
+Treatment of HIV-1 infection in pediatric patients under 12 years of age
+Treatment of HIV-1 infection in treatment experienced adult patients with documented multi-antiretroviral class resistance and evidence of HIV-1 replication despite ongoing antiretroviral therapy
+Treatment of Hodgkin lymphoma
+Treatment of Hodgkin lymphoma
+Treatment of Hodgkin lymphoma.
+Treatment of Hodgkin's lymphoma
+Treatment of Hodgkin's lymphoma
+Treatment of Hodgkin's lymphoma
+Treatment of Human Immunodeficiency Virus type 1 infection in pediatric patients
+Treatment of Huntington's Disease
+Treatment of Huntington's disease
+Treatment of Lambert-Eaton Myasthenic Syndrome
+Treatment of Lambert-Eaton myasthenic syndrome.
+Treatment of Lennox-Gastaut Syndrome
+Treatment of Lennox-Gastaut Syndrome.
+Treatment of Lennox-Gastaut syndrome
+Treatment of Lennox-Gastaut syndrome.
+Treatment of Lennox-Gastaut syndrome.
+Treatment of Lennox-Gastaut syndrome.
+Treatment of Merkel cell carcinoma
+Treatment of Myasthenia Gravis
+Treatment of N-acetylglutamate synthetase deficiency.
+Treatment of NTRK fusion-positive solid tumors
+Treatment of Peyronie's disease.
+Treatment of Philadelphia chromosome-positive acute lymphoblastic leukemia (Ph+ALL)
+Treatment of Philadelphia-positive acute lymphoblastic leukemia
+Treatment of Philadelphia-positive acute lymphoblastic leukemia
+Treatment of Philadelphia-positive acute lymphoblastic leukemia
+Treatment of Philadelphia-positive acute lymphoblastic leukemia
+Treatment of Pneumocystis carinii pneumonia in AIDS patients.
+Treatment of Pneumocystis carinii pneumonia.
+Treatment of Small Cell Lung Cancer
+Treatment of Stage IIB through IV malignant melanoma
+Treatment of Stage IIB through IV malignant melanoma
+Treatment of Stage IIB through IV malignant melanoma
+Treatment of Stage IIB-IV melanoma positive for the BRAF mutation.
+Treatment of Stage IIB-IV melanoma positive for the BRAF mutation.
+Treatment of Stage IIb through IV melanoma.
+Treatment of Stage IIb through IV melanoma.
+Treatment of Stage IIb through IV melanoma.
+Treatment of Stage IIb through IV melanoma.
+Treatment of Stage IIb through Stage IV melanoma
+Treatment of Stage IIb to IV melanoma
+Treatment of Stage IIb to IV melanoma
+Treatment of Stage IIb to Stage IV melanoma
+Treatment of T-cell lymphoma
+Treatment of T-cell non-Hodgkin's lymphoma
+Treatment of TNF-receptor associated periodic syndrome (TRAPS)
+Treatment of Tourette's syndrome
+Treatment of Trypanosoma brucei gambiense infection (sleeping sickness).
+Treatment of Type I Gaucher disease
+Treatment of Waldenstrom's macroglobulinemia
+Treatment of Wilson's disease.
+Treatment of X-linked hypophosphatemia (formerly known as vitamin D-resistant rickets)
+Treatment of X-linked hypophosphatemia (formerly known as vitamin D-resistant rickets)
+Treatment of acne rosacea.
+Treatment of acromegaly
+Treatment of acromegaly.
+Treatment of acromegaly.
+Treatment of active thyroid eye disease
+Treatment of active tuberculosis
+Treatment of active tuberculosis
+Treatment of acute cyanide poisoning
+Treatment of acute hepatic porphyria
+Treatment of acute herpetic keratitis (dendritic and geographic ulcers)
+Treatment of acute herpetic keratitis caused by Herpes Simplex Virus type 1 and 2
+Treatment of acute hyperammonemia and associated encephalopathy in patients with deficiencies in enzymes of the urea cycle.
+Treatment of acute lymphoblastic leukemia
+Treatment of acute lymphoblastic leukemia
+Treatment of acute lymphoblastic leukemia and lymphoblastic lymphoma
+Treatment of acute lymphoblastic leukemia in pediatric patients
+Treatment of acute lymphoblastic leukemia in pediatric patients (0 through 16 years of age)
+Treatment of acute lymphocytic leukemia
+Treatment of acute lymphocytic leukemia
+Treatment of acute lymphocytic leukemia.
+Treatment of acute lymphocytic leukemia.
+Treatment of acute lymphocytic leukemia.
+Treatment of acute myelogenous leukemia
+Treatment of acute myeloid leukemia
+Treatment of acute myeloid leukemia
+Treatment of acute myeloid leukemia
+Treatment of acute myeloid leukemia
+Treatment of acute myeloid leukemia (AML)
+Treatment of acute myeloid leukemia (AML)
+Treatment of acute myeloid leukemia (AML)
+Treatment of acute myeloid leukemia (AML)
+Treatment of acute myeloid leukemia.
+Treatment of acute promyelocytic leukemia.
+Treatment of acute promyelocytic leukemia.
+Treatment of acute promyelocytic leukemia.
+Treatment of adenosine deaminase deficiency in patients with severe combined immunodeficiency.
+Treatment of adults with growth hormone deficiency.
+Treatment of advanced (involutional or residual stage) Dupuytren's disease
+Treatment of advanced adenocarcinoma of the ovary.
+Treatment of advanced breast cancer in postmenopausal women whose disease has progressed following tamoxifen therapy.
+Treatment of amebiasis
+Treatment of amyotrophic lateral sclerosis
+Treatment of amyotrophic lateral sclerosis (ALS)
+Treatment of amyotrophic lateral sclerosis (ALS).
+Treatment of amyotrophic lateral sclerosis (ALS).
+Treatment of amyotrophic lateral sclerosis.
+Treatment of anaplastic lymphoma kinase (ALK)-positive or ROS1-positive non-small cell lung cancer
+Treatment of anemia associated with HIV infection or HIV treatment.
+Treatment of anemia associated with end stage renal disease.
+Treatment of angioedema
+Treatment of angioedema
+Treatment of angioedema
+Treatment of angioedema
+Treatment of angioedema
+Treatment of angioedema
+Treatment of anthracycline extravasation during chemotherapy
+Treatment of anthrax
+Treatment of aplastic anemia
+Treatment of aplastic anemia
+Treatment of apnea of prematurity.
+Treatment of atypical hemolytic uremic syndrome
+Treatment of autosomal dominant polycystic kidney disease
+Treatment of bacterial corneal ulcers.
+Treatment of blastic plasmacytoid dendritic cell neoplasm
+Treatment of bleeding episodes in Glanzmann's thrombasthenia
+Treatment of bleeding episodes in hemophilia A or B patients with inhibitors to Factor VIII or Factor IX.
+Treatment of bleeding episodes in patients with acquired inhibitors to Factor VIII or Factor IX
+Treatment of bleeding episodes in patients with congenital factor VII deficiency
+Treatment of botulism.
+Treatment of breast cancer.
+Treatment of bronchopulmonary infections of Pseudomonas aeruginosa in cystic fibrosis patients.
+Treatment of carcinoid syndrome
+Treatment of carcinoid syndrome in patients with neuroendocrine tumors
+Treatment of carcinoma in situ of the urinary bladder.
+Treatment of central precocious puberty
+Treatment of central precocious puberty
+Treatment of central precocious puberty
+Treatment of central precocious puberty.
+Treatment of central precocious puberty.
+Treatment of cervical dystonia.
+Treatment of cervical dystonia.
+Treatment of chimeric antigen receptor (CAR) T cell-induced cytokine release syndrome
+Treatment of chronic Graft versus Host disease.
+Treatment of chronic granulomatous disease.
+Treatment of chronic hepatitis C in pediatric patients
+Treatment of chronic hepatitis C virus (HCV) infection in pediatric patients
+Treatment of chronic hepatitis C virus (HCV) infection in pediatric patients
+Treatment of chronic hepatitis C virus (HCV) infection in pediatric patients
+Treatment of chronic inflammatory demyelinating polyneuropathy
+Treatment of chronic inflammatory demyelinating polyneuropathy (CIDP)
+Treatment of chronic iron overload in alpha-thalassemia
+Treatment of chronic iron overload in alpha-thalassemia
+Treatment of chronic iron overload in patients with transfusion-dependent anemias
+Treatment of chronic iron overload in patients with transfusion-dependent anemias
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia
+Treatment of chronic lymphocytic leukemia (CLL)
+Treatment of chronic lymphocytic leukemia (CLL)
+Treatment of chronic lymphocytic leukemia (CLL)
+Treatment of chronic lymphocytic leukemia (CLL)
+Treatment of chronic lymphocytic leukemia (CLL).
+Treatment of chronic lymphocytic leukemia and small lymphocytic lymphoma
+Treatment of chronic lymphocytic leukemia and small lymphocytic lymphoma
+Treatment of chronic lymphocytic leukemia.
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia
+Treatment of chronic myelogenous leukemia.
+Treatment of chronic myeloid leukemia
+Treatment of chronic thromboembolic pulmonary hypertension
+Treatment of complications of vaccinia vaccination
+Treatment of congenital factor XIII deficiency
+Treatment of congenital factor XIII deficiency
+Treatment of congenital sucrase-isomaltase deficiency
+Treatment of corneal cystine crystal accumulation in cystinosis patients.
+Treatment of corneal ectasia following refractive surgery
+Treatment of cryopyrin-associated periodic syndromes
+Treatment of cryopyrin-associated periodic syndromes
+Treatment of cryptococcal meningitis.
+Treatment of cryptosporidiosis.
+Treatment of cutaneous T-cell lymphoma.
+Treatment of cystic fibrosis
+Treatment of cystic fibrosis
+Treatment of cystic fibrosis
+Treatment of cystic fibrosis (CF)
+Treatment of cystic fibrosis (CF)
+Treatment of cystinosis
+Treatment of cystinosis
+Treatment of cystinosis
+Treatment of cytomegalovirus retinitis in immunocompromised patients with AIDS.
+Treatment of cytomegalovirus retinitis.
+Treatment of dermatofibrosarcoma protuberans
+Treatment of diarrhea associated with vasoactive intestinal peptide tumors (VIPoma).
+Treatment of diffuse large B-cell lymphoma
+Treatment of diffuse large B-cell lymphoma
+Treatment of diffuse large B-cell lymphoma
+Treatment of diffuse large B-cell lymphoma
+Treatment of dynamic muscle contracture in pediatric cerebral palsy patients
+Treatment of dynamic muscle contractures in pediatric cerebral palsy patients.
+Treatment of endogenous and traumatic anterior uveitis and panuveitis.
+Treatment of envenomation by Crotaline snakes
+Treatment of envenomations inflicted by North American crotalid snakes.
+Treatment of epidermal growth factor receptor (EGFR) mutation-positive non-small cell lung cancer (NSCLC).
+Treatment of epidermal growth factor receptor (EGFR) mutation-positive non-small cell lung cancer (NSCLC).
+Treatment of epidermal growth factor receptor mutation-positive non-small cell lung cancer
+Treatment of epidermal growth factor receptor mutation-positive non-small cell lung cancer
+Treatment of epidermal growth factor receptor mutation-positive non-small cell lung cancer
+Treatment of epilepsy patients who cannot take anything by mouth (NPO)
+Treatment of erythema nodosum leprosum.
+Treatment of erythropoietic porphyrias
+Treatment of esophageal carcinoma
+Treatment of essential thrombocythemia.
+Treatment of excessive daytime sleepiness in narcolepsy.
+Treatment of exposure to B. anthracis spores
+Treatment of extranodal marginal zone lymphoma of mucosa-associated lymphoid tissue
+Treatment of fallopian tube carcinoma
+Treatment of fallopian tube carcinoma
+Treatment of fallopian tube carcinoma
+Treatment of familial Mediterranean fever
+Treatment of familial mediterranean fever
+Treatment of fascioliasis
+Treatment of fibrinogen deficient patients.
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma
+Treatment of follicular lymphoma.
+Treatment of gastric cancer
+Treatment of gastric cancer
+Treatment of gastric cancer including cancer of the gastroesophageal junction
+Treatment of gastro-entero-pancreatic neuroendocrine tumors
+Treatment of gastrointestinal stromal tumors
+Treatment of gastrointestinal stromal tumors
+Treatment of gastrointestinal stromal tumors
+Treatment of genetic carnitine deficiency.
+Treatment of giardiasis
+Treatment of glycogen storage disease type II.
+Treatment of glycogen storage disease type II.
+Treatment of glycogen storage disease type II.
+Treatment of graft versus host disease
+Treatment of growth failure in children who were born small for gestational age.
+Treatment of growth hormone insensitivity syndrome (GHIS)
+Treatment of growth hormone insensitivity syndrome.
+Treatment of growth retardation associated with chronic renal failure.
+Treatment of hairy cell leukemia
+Treatment of hairy cell leukemia
+Treatment of hairy cell leukemia.
+Treatment of hemophagocytic lymphohistiocytosis
+Treatment of hemophilia A
+Treatment of hemophilia A
+Treatment of hemophilia A
+Treatment of hemophilia B.
+Treatment of heparin-associated thrombocytopenia type II.
+Treatment of hepatic encephalopathy
+Treatment of hepatocellular carcinoma
+Treatment of hepatocellular carcinoma
+Treatment of hepatocellular carcinoma
+Treatment of hepatocellular carcinoma
+Treatment of hepatocellular carcinoma
+Treatment of hepatocellular carcinoma (HCC)
+Treatment of hepatocellular carcinoma.
+Treatment of hereditary and acquired methemoglobinemia
+Treatment of hereditary factor X deficiency
+Treatment of hereditary factor X deficiency
+Treatment of hereditary orotic aciduria
+Treatment of heroin addicts suitable for maintenance on opiate agonists.
+Treatment of homocystinuria.
+Treatment of homozygous familial hypercholesterolemia
+Treatment of homozygous familial hypercholesterolemia
+Treatment of homozygous familial hypercholesterolemia
+Treatment of hormone refractory prostate cancer.
+Treatment of human immunodeficiency virus type 1 (HIV-1) infection in pediatric patients
+Treatment of human immunodeficiency virus type 1 (HIV-1) infection in pediatric patients
+Treatment of hydatid disease (cystic echinococcosis due to E. granulosus larvae or alveolar echinococcosis due to E. multilocularis larvae).
+Treatment of hypercalcemia in malignancy
+Treatment of hypercalcemia in patients with parathyroid carcinoma
+Treatment of hypercalcemia of malignancy inadequately managed by dietary modification and/or oral hydration.
+Treatment of hypercalcemia of malignancy.
+Treatment of hyperimmunoglobulinemia D and periodic fever syndrome
+Treatment of hyperphenylalaninemia
+Treatment of hyperphenylalaninemia
+Treatment of hyperphosphatemia in end stage renal failure.
+Treatment of hypertrophic obstructive cardiomyopathy
+Treatment of hypoparathyroidism
+Treatment of hypophosphatasia
+Treatment of idiopathic hypereosinophilic syndrome including acute and chronic eosinophilic leukemia
+Treatment of idiopathic or organic growth hormone deficiency in children with growth failure.
+Treatment of idiopathic or organic growth hormone deficiency in children with growth failure.
+Treatment of idiopathic pulmonary fibrosis
+Treatment of idiopathic thrombocytopenia purpura
+Treatment of idiopathic thrombocytopenic purpura
+Treatment of idiopathic thrombocytopenic purpura (also known as primary immune thrombocytopenia)
+Treatment of immune thrombocytopenic purpura
+Treatment of immune thrombocytopenic purpura
+Treatment of immune thrombocytopenic purpura
+Treatment of immune thrombocytopenic purpura
+Treatment of immune thrombocytopenic purpura.
+Treatment of inborn errors of cholesterol and bile acid synthesis and metabolism
+Treatment of individuals acutely exposed to myelosuppressive doses of radiation (hematopoietic syndrome of acute radiation syndrome)
+Treatment of infant botulism.
+Treatment of infantile spasms
+Treatment of infantile spasms.
+Treatment of infections caused by non-tuberculous mycobacteria
+Treatment of inhalational anthrax
+Treatment of inherited retinal dystrophy due to biallelic RPE65 gene mutations
+Treatment of interstitial cystitis.
+Treatment of intestinal giardiasis
+Treatment of intractable spasticity due to multiple sclerosis or spinal cord injury.
+Treatment of invasive aspergillosis
+Treatment of invasive fungal infections.
+Treatment of iron overload in patients with hematologic disorders requiring chronic transfusion therapy
+Treatment of juvenile rheumatoid arthritis
+Treatment of juvenile rheumatoid arthritis
+Treatment of juvenile rheumatoid arthritis
+Treatment of keratoconus
+Treatment of known or suspected cyanide poisoning
+Treatment of late stage Parkinson's disease
+Treatment of lead poisoning in children.
+Treatment of leishmaniasis.
+Treatment of levodopa-induced dyskinesia
+Treatment of lymphangioleiomyomatosis
+Treatment of lysosomal acid lipase deficiency
+Treatment of malaria
+Treatment of malaria
+Treatment of malignancy-associated or chemotherapy-induced hyperuricemia.
+Treatment of malignant glioma
+Treatment of malignant glioma.
+Treatment of malignant glioma.
+Treatment of malignant hyperthermia syndrome
+Treatment of malignant melanoma stages IIb through IV.
+Treatment of malignant pleural effusion
+Treatment of malignant pleural effusion.
+Treatment of malignant pleural effusion.
+Treatment of malignant pleural mesothelioma
+Treatment of manifestations of carnitine deficiency in patients with end stage renal disease who require dialysis.
+Treatment of mantle cell lymphoma
+Treatment of mantle cell lymphoma
+Treatment of mantle cell lymphoma
+Treatment of mantle cell lymphoma.
+Treatment of mantle cell lymphoma.
+Treatment of mantle cell lymphoma.
+Treatment of mastocytosis
+Treatment of mastocytosis.
+Treatment of merkel cell carcinoma.
+Treatment of metabolic disorders secondary to lipodystrophy
+Treatment of metastatic melanoma.
+Treatment of metastatic renal cell carcinoma.
+Treatment of methanol or ethylene glycol poisoning.
+Treatment of methanol or ethylene glycol poisoning.
+Treatment of mild hemophilia A and von Willebrand's disease.
+Treatment of mild to moderate acute malaria caused by susceptible strains of P. falciparum and P. vivax.
+Treatment of moderate to severe hidradenitis suppurativa (Hurley stage 2 and Hurley stage 3 disease)
+Treatment of moderate to severe hidradenitis suppurativa (Hurley stage 2 and Hurley stage 3 disease)
+Treatment of mucopolysaccharidosis Type VI (Maroteaux-Lamy syndrome).
+Treatment of multifocal motor neuropathy
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma
+Treatment of multiple myeloma (MM)
+Treatment of multiple sclerosis.
+Treatment of multiple sclerosis.
+Treatment of multiple sclerosis.
+Treatment of mycosis fungoides
+Treatment of mycosis fungoides
+Treatment of myelodysplastic syndromes
+Treatment of myelodysplastic syndromes.
+Treatment of myelofibrosis
+Treatment of myeloproliferative disorders/myelodysplastic syndromes associated with platelet-derived growth factor gene re-arrangements
+Treatment of myxedema coma/precoma.
+Treatment of narcolepsy
+Treatment of narcolepsy
+Treatment of narcolepsy.
+Treatment of narcolepsy.
+Treatment of narcolepsy.
+Treatment of neonatal respiratory distress syndrome
+Treatment of neonatal respiratory distress syndrome
+Treatment of neoplastic meningitis.
+Treatment of nephropathic cystinosis.
+Treatment of neuroblastoma
+Treatment of neuroendocrine tumors
+Treatment of neuroendocrine tumors
+Treatment of neuroendocrine tumors
+Treatment of neuroendocrine tumors
+Treatment of neuromyelitis optica
+Treatment of neuronal ceroid lipofuscinosis type 2
+Treatment of neurotrophic keratitis
+Treatment of neutropenia associated with bone marrow transplants.
+Treatment of nodal marginal zone lymphoma
+Treatment of nodal marginal zone lymphoma
+Treatment of non-Hodgkin T-cell lymphomas
+Treatment of non-Hodgkin T-cell lymphomas
+Treatment of non-Hodgkin's B-cell lymphoma
+Treatment of non-Hodgkin's B-cell lymphoma.
+Treatment of non-small cell lung cancer with squamous histology.
+Treatment of onchocerciasis volvulus in children and adults
+Treatment of opiate addiction in opiate users
+Treatment of osteogenic sarcoma.
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer
+Treatment of ovarian cancer.
+Treatment of pancreatic cancer
+Treatment of pancreatic cancer
+Treatment of pancreatic cancer
+Treatment of pancreatic cancer.
+Treatment of parenteral nutrition-associated liver disease
+Treatment of paroxysmal nocturnal hemoglobinuria
+Treatment of paroxysmal nocturnal hemoglobinuria
+Treatment of patent ductus arteriosus
+Treatment of pathologic (chronic moderate to severe) drooling in pediatric patients
+Treatment of patients at risk of methotrexate toxicity
+Treatment of patients needing urgent reversal of Vitamin K antagonist therapy for treatment of major bleeding and/or surgical procedures
+Treatment of patients needing urgent reversal of Vitamin K antagonist therapy for treatment of major bleeding and/or surgical procedures
+Treatment of patients with BRAF mutation positive non-small cell lung cancer.
+Treatment of patients with IIb to Stage IV melanoma positive for the BRAF(v600) mutation
+Treatment of patients with advanced HIV-associated Kaposi's sarcoma.
+Treatment of patients with anaplastic thyroid cancer and locally advanced or metastatic papillary thyroid cancer whose tumors harbor a BRAF V600 mutation.
+Treatment of patients with anaplastic thyroid cancer and locally advanced or metastatic papillary thyroid cancer whose tumors harbor a BRAF V600 mutation.
+Treatment of patients with congenital factor IX deficiency (hemophilia B).
+Treatment of patients with cutaneous T-cell lymphoma
+Treatment of patients with cutaneous T-cell lymphoma.
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with cystic fibrosis
+Treatment of patients with extranodal marginal zone lymphoma (mucosa associated lymphoid tissue [MALT type] lymphoma)
+Treatment of patients with giant cell tumor of bone
+Treatment of patients with idiopathic pulmonary fibrosis.
+Treatment of patients with known or suspected internal contamination with radioactive or non-radioactive cesium or thallium
+Treatment of patients with mucopolysaccharidosis-I.
+Treatment of patients with multiple myeloma for whom oral therapy is inappropriate.
+Treatment of patients with non-small cell lung cancer (NSCLC) that is anaplastic lymphoma kinase(ALK)-positive
+Treatment of patients with non-small cell lung cancer (NSCLC) that is anaplastic lymphoma kinase(ALK)-positive
+Treatment of patients with primary biliary cirrhosis
+Treatment of patients with severe chronic neutropenia (absolute neutrophil count less than 500/mm3).
+Treatment of patients with sickle cell anemia as shown by the presence of hemoglobin S.
+Treatment of patients with symptomatic orthostatic hypotension.
+Treatment of patients with von Willebrand's disease
+Treatment of pediatric (0 to 16 years of age) Crohn's Disease
+Treatment of pediatric (0 to 16 years of age) ulcerative colitis
+Treatment of pediatric (age 16 and under) juvenile rheumatoid arthritis.
+Treatment of pediatric Clostridium difficile infection
+Treatment of pediatric Crohn's disease
+Treatment of pediatric HIV infection.
+Treatment of pediatric chronic hepatitis C virus infection
+Treatment of pediatric chronic hepatitis C virus infection
+Treatment of pediatric chronic hepatitis C virus infection
+Treatment of pediatric hyperparathyroidism
+Treatment of pediatric patients (0 through 16 years of age) with dilated cardiomyopathy.
+Treatment of pediatric patients (age 16 years and younger) with polyarticular-course juvenile idiopathic arthritis
+Treatment of pediatric patients (age 16 years and younger) with polyarticular-course juvenile idiopathic arthritis
+Treatment of pediatric patients with chronic hepatitis C virus infection
+Treatment of pediatric patients with ulcerative colitis
+Treatment of pemphigus vulgaris.
+Treatment of peripheral T-cell lymphoma (PTCL).
+Treatment of persistent pulmonary hypertension in newborns
+Treatment of persistent pulmonary hypertension in the newborn.
+Treatment of pigmented villonodular synovitis/giant cell tumor of the tendon sheath
+Treatment of pneumothorax
+Treatment of polycythemia vera
+Treatment of postherpetic neuralgia
+Treatment of potentially life threatening digitalis intoxication in patients who are refractory to management by conventional therapy.
+Treatment of primary and secondary carnitine deficiency of genetic origin.
+Treatment of primary biliary cirrhosis
+Treatment of primary cutaneous CD30-positive T-cell lymphoproliferative disorders
+Treatment of primary mediastinal B cell lymphoma.
+Treatment of primary mediastinal B-cell lymphoma.
+Treatment of primary periodic paralyses
+Treatment of primary peritoneal cancer
+Treatment of primary peritoneal cancer
+Treatment of primary peritoneal carcinoma.
+Treatment of primary peritoneal carcinoma.
+Treatment of primary peritoneal carcinoma.
+Treatment of primary pulmonary hypertension.
+Treatment of progressive-relapsing multiple sclerosis.
+Treatment of proliferating infantile hemangiomas requiring systemic therapy
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension
+Treatment of pulmonary arterial hypertension.
+Treatment of pulmonary arterial hypertension.
+Treatment of pulmonary arterial hypertension.
+Treatment of pulmonary tuberculosis.
+Treatment of recurrent malignant glioma.
+Treatment of recurrent malignant glioma.
+Treatment of refractory childhood acute lymphocytic leukemia.
+Treatment of refractory glaucoma as an adjunct to surgery
+Treatment of renal and bladder calculi of the apatite or struvite variety.
+Treatment of renal cell carcinoma
+Treatment of renal cell carcinoma
+Treatment of renal cell carcinoma.
+Treatment of scorpion envenomations requiring medical attention.
+Treatment of scurvy
+Treatment of secondary and primary myelofibrosis
+Treatment of secondary pulmonary hypertension due to intrinsic precapillary pulmonary vascular disease.
+Treatment of secondary-progressive multiple sclerosis.
+Treatment of severe complications from the smallpox vaccine
+Treatment of severe diarrhea and flushing associated with malignant carcinoid tumors.
+Treatment of short bowel syndrome.
+Treatment of short bowel syndrome.
+Treatment of short stature associated with Turner syndrome.
+Treatment of short stature associated with Turner's syndrome.
+Treatment of short stature in patients with Noonan syndrome
+Treatment of short stature in patients with Prader-Willi syndrome.
+Treatment of short stature in pediatric patients with short stature homeobox-containing gene (SHOX) deficiency
+Treatment of sickle cell disease
+Treatment of sickle cell disease
+Treatment of sickle cell disease (SCD).
+Treatment of sickle cell disease in patients under 18 years of age
+Treatment of small cell lung cancer (SCLC)
+Treatment of small cell lung cancer.
+Treatment of small lymphocytic lymphoma
+Treatment of smallpox
+Treatment of soft tissue sarcoma
+Treatment of soft tissue sarcoma
+Treatment of soft tissue sarcoma
+Treatment of soft tissue sarcoma
+Treatment of soft tissue sarcomas
+Treatment of solid tumors with NTRK-fusion proteins
+Treatment of spinal muscular atrophy
+Treatment of spinal muscular atrophy
+Treatment of splenic marginal zone lymphoma
+Treatment of splenic marginal zone lymphoma
+Treatment of squamous cell cancer of the head and neck in patients who express epidermal growth factor receptor
+Treatment of squamous non-small cell lung cancer
+Treatment of stage IIb-stage IV melanoma
+Treatment of status epilepticus
+Treatment of strabismus and blepharospasms
+Treatment of strabismus and blepharospasms
+Treatment of subarachnoid hemorrhage.
+Treatment of subjects at risk of developing myelosuppression after a radiological or nuclear incident
+Treatment of subjects at risk of developing myelosuppression after a radiological or nuclear incident
+Treatment of symptomatic Paget's disease (osteitis deformans).
+Treatment of symptomatic transthyretin (TTR) amyloid cardiomyopathy.
+Treatment of systemic mastocytosis without the D816V c-kit mutation
+Treatment of systemic sclerosis (including the associated interstitial lung disease).
+Treatment of testicular cancer.
+Treatment of the clinical manifestations of endogenous Cushing's syndrone
+Treatment of the on-off fluctuations associated with late-stage Parkinson's disease.
+Treatment of those patients having end stage renal disease and requiring peritoneal dialysis treatment.
+Treatment of thrombotic thrombocytopenic purpura
+Treatment of transthyretin amyloidosis (ATTR amyloidosis)
+Treatment of transthyretin-mediated amyloidosis
+Treatment of tuberculosis
+Treatment of tuberculosis infections
+Treatment of tumor induced hypercalcemia.
+Treatment of tyrosinemia type 1.
+Treatment of tyrosinemia type 1.
+Treatment of vernal keratoconjunctivitis.
+Treatment of vernal keratoconjunctivitis.
+Treatment of visceral leishmaniasis.
+Treatment of von Willebrand disease except for surgical and/or invasive procedures in patients with von Willebrand disease in whom desmopressin is either ineffective or contraindicated
+Treatment of von Willebrand disease.
+Treatment of von Willebrand disease.
+Treatment of von Willebrand's disease
+Treatment of xerostomia and keratoconjunctivitis sicca in Sjogren's syndrome patients.
+Treatment of xerostomia induced by radiation therapy for head and neck cancer.
+Treatment of zygomycosis
+Treatment uveitis involving the posterior segment of the eye.
+Use in the management of patients undergoing continuous renal replacement therapy with hemofiltration
+Use in the treatment of mucopolysaccharidosis (MPS) Type IV A (Morquio A syndrome)
+Use with other antiretroviral agents for the treatment of pediatric HIV-1 infection
+Visualization of malignant tissue during surgery for malignant glioma (WHO grades III and IV)

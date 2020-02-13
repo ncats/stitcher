@@ -30,6 +30,12 @@ import org.apache.lucene.util.QueryBuilder;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
 import org.apache.lucene.search.vectorhighlight.FieldQuery;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.shingle.ShingleFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 
 public class TextIndexer extends TransactionEventHandler.Adapter
@@ -282,8 +288,7 @@ public class TextIndexer extends TransactionEventHandler.Adapter
             query = query.substring(pos+1);
         }
         */
-        QueryParser parser = new QueryParser
-            (field, indexWriter.getAnalyzer());
+        QueryParser parser = new QueryParser (field, indexWriter.getAnalyzer());
         return search (parser.parse(queryRewrite (query)), skip, top);
     }
     
@@ -322,5 +327,33 @@ public class TextIndexer extends TransactionEventHandler.Adapter
             }
             return result;
         }
+    }
+
+    public static Set<String> ngrams (String text, int min, int max)
+        throws IOException {
+        StandardTokenizer tokenizer = new StandardTokenizer ();
+
+        tokenizer.setReader(new StringReader (text.toLowerCase()));
+        StopFilter sf = new StopFilter
+            (tokenizer, StopAnalyzer.ENGLISH_STOP_WORDS_SET);
+        CharTermAttribute token = sf.addAttribute(CharTermAttribute.class);
+        StringBuilder sb = new StringBuilder ();
+        sf.reset();
+        while (sf.incrementToken()) {
+            String t = token.toString();
+            sb.append(t+" ");
+        }
+        sf.close();
+
+        tokenizer.setReader(new StringReader (sb.toString()));
+        TokenStream ts = new ShingleFilter (tokenizer, min, max);
+        token = ts.addAttribute(CharTermAttribute.class);
+        ts.reset();
+        Set<String> ngrams = new LinkedHashSet<>();
+        while (ts.incrementToken()) {
+            ngrams.add(token.toString());
+        }
+        ts.close();
+        return ngrams;
     }
 }
