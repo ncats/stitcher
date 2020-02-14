@@ -98,6 +98,11 @@ public class EntityRegistry extends EntityFactory {
     public EntityRegistry (GraphDb graphDb) {
         super (graphDb);
         init ();
+        // setup indexes for common stitch keys...
+        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.I_CODE.name());
+        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.N_Name.name());
+        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.I_GENE.name());
+        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.I_UNII.name());
     }
 
     // to be overriden by subclass

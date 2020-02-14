@@ -170,6 +170,8 @@ public class OntEntityFactory extends EntityRegistry {
     
     public OntEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
+        graphDb.createIndex(AuxNodeType.DATA, "id");
+        graphDb.createIndex(AuxNodeType.DATA, "notation");
     }
 
     public OntEntityFactory (String dir) throws IOException {

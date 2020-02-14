@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -49,17 +50,23 @@ public class GraphDb extends TransactionEventHandler.Adapter
         this (dir, null);
     }
 
-    void createIndex (Label label, String name) {
-        IndexCreator index = gdb.schema().indexFor(label).on(name);
-        try {
+    public void createIndex (Label label, String name) {
+        createIndex(label, name, 0);
+    }
+    
+    public void createIndex (Label label, String name, int wait) {
+        try (Transaction tx = gdb.beginTx()) {
+            IndexCreator index = gdb.schema().indexFor(label).on(name);
             IndexDefinition def = index.create();
-            /*
-              gdb.schema().awaitIndexOnline
-              (def, 100, TimeUnit.SECONDS);*/
+            if (wait > 0) {
+                gdb.schema().awaitIndexOnline
+                    (def, wait, TimeUnit.SECONDS);
+            }
+            tx.success();
         }
         catch (Exception ex) {
             logger.info("Index \""+name
-                        +"\" already exists for node "+label+"!");
+                        +"\" already exists for nodes "+label+"!");
         }
     }
     
