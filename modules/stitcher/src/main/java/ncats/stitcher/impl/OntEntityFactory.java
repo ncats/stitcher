@@ -102,12 +102,19 @@ public class OntEntityFactory extends EntityRegistry {
                     links.put(pname, old != null ? Util.merge(old, r) : r);
                 }
                 else {
-                    Object v = obj.asLiteral().getValue();
-                    if (!v.getClass().isAssignableFrom(Number.class))
-                        v = v.toString();
-                    if (!"".equals(v)) {
-                        Object old = props.get(pname);
-                        props.put(pname, old != null ? Util.merge(old, v) : v);
+                    try {
+                        Object v = obj.asLiteral().getValue();
+                        if (!v.getClass().isAssignableFrom(Number.class))
+                            v = v.toString();
+                        if (!"".equals(v)) {
+                            Object old = props.get(pname);
+                            props.put(pname, old != null
+                                      ? Util.merge(old, v) : v);
+                        }
+                    }
+                    catch (Exception ex) {
+                        logger.log
+                            (Level.SEVERE, "Can't literal for "+pname, ex);
                     }
                 }
             }
@@ -403,6 +410,39 @@ public class OntEntityFactory extends EntityRegistry {
             obj = data.get("P93");
             if (obj != null)
                 xrefs.add("UNIPROTKB:"+obj);
+        }
+        else if (ontology.resource != null
+                 && "cl.owl".equals(ontology.resource.getLocalName())) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.startsWith("OBOL:")
+                    || u.startsWith("PRO:")
+                    || u.startsWith("GOC:")
+                    || u.equals("FMA:TA")
+                    || u.equals("UBERON:CJM")
+                    || u.startsWith("MGI:")
+                    || u.startsWith("PATOC:")
+                    || u.startsWith("NPX:")
+                    || u.startsWith("ISBN:")
+                    || u.equals("FB:MA")
+                    || u.startsWith("SGD:")
+                    || u.equals("AEO:JB")
+                    || u.equals("GO:TFM")
+                    || u.equals("CL:CVS")
+                    || u.equals("CL:TM")
+                    || u.equals("MA:TH")
+                    || u.equals("VSAO:NI")
+                    || u.startsWith("PHENOSCAPE:")
+                    || u.startsWith("TAIR:")
+                    || u.startsWith("WORDNET")
+                    || u.startsWith("GC_ID:")
+                    || u.startsWith("GO_REF:")) {
+                    others.add(x);
+                }
+                else {
+                    userful.add(x);
+                }
+            }            
         }
         else if (ontology.links.containsKey("versionIRI")
                  && ontology.links.get("versionIRI")
