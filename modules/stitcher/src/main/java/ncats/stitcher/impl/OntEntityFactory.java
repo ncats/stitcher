@@ -436,11 +436,27 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("TAIR:")
                     || u.startsWith("WORDNET")
                     || u.startsWith("GC_ID:")
-                    || u.startsWith("GO_REF:")) {
+                    || u.startsWith("GO_REF:")
+                    || u.equals("CHEBI")
+                    || u.startsWith("ZFIN:")
+                    || u.indexOf("IMMGEN.ORG") > 0) {
                     others.add(x);
                 }
                 else {
-                    userful.add(x);
+                    useful.add(x);
+                }
+            }  
+        }
+        else if (ontology.resource != null
+                 && "clo.owl".equals(ontology.resource.getLocalName())) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.startsWith("GC_ID:")
+                    || u.indexOf("CELLRESOURCE.CN") > 0) {
+                    others.add(x);
+                }
+                else {
+                    useful.add(x);
                 }
             }            
         }
