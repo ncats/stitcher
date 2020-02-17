@@ -37,7 +37,6 @@ owl="doid.owl.gz \
    ogms.owl \
    pato.owl.gz \
    fma.owl.gz \
-   pr.owl.gz \
    efo.owl.gz"
 owl_path="owl-202002"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`

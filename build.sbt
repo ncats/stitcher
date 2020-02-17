@@ -34,6 +34,7 @@ lazy val commonDependencies = Seq(
   "org.apache.lucene" % "lucene-queryparser" % "5.5.0",
   "org.apache.lucene" % "lucene-queries" % "5.5.0",
   "org.apache.lucene" % "lucene-highlighter" % "5.5.0",
+  "org.apache.lucene" % "lucene-suggest" % "5.5.0",  
   "org.quartz-scheduler" % "quartz" % "2.2.2",
   "org.reflections" % "reflections" % "0.9.10",// notTransitive (),
   "junit"             % "junit"           % "4.12"  % "test",
