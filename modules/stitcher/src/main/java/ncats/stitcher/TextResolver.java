@@ -254,7 +254,7 @@ public class TextResolver implements AutoCloseable {
                         Document doc = searcher.doc(docId);
                         String[] frags = fvh.getBestFragments
                             (fq, reader, docId, FIELD_TEXT,
-                             Math.max(30, len), 10);
+                             20 + len, 10);
                         Hit h = new Hit (score, doc, q.text, frags);
                         if (!bestHits.offer(h)) {
                             logger.log(Level.WARNING,
@@ -300,7 +300,7 @@ public class TextResolver implements AutoCloseable {
                 ++wt;
             }
         }
-        ps.println(wt+"\t"+node.getId());
+        ps.println(wt+"\t"+node.getId()+":"+(ntoks-1));
     }
     
     void dict (StitchKey key, ResourceIterator<Node> nodes)
@@ -342,7 +342,7 @@ public class TextResolver implements AutoCloseable {
         }
     }
     
-    void buildDict () throws Exception {
+    void testdict () throws Exception {
         try (FileInputStream fis = new FileInputStream ("N_Name.txt")) {
             FileDictionary fdict = new FileDictionary (fis);
             AnalyzingInfixSuggester lookup =
@@ -366,10 +366,17 @@ public class TextResolver implements AutoCloseable {
                 //System.err.println("***"+text);
                 int len = text.length();
                 if (len > 0) {
-                    Query query = qp.parse("\""+text+"\"~"+Math.max(1, 3));
+                    String payload = iter.payload().utf8ToString();
+                    String slop = "";
+                    int pos = payload.indexOf(':');
+                    if (pos > 0) {
+                        slop = "~"+payload.substring(pos+1);
+                        payload = payload.substring(0, pos);
+                    }
+                    
+                    Query query = qp.parse("\""+text+"\""+slop);
                     NodeQuery nq = new NodeQuery
-                        (Long.parseLong(iter.payload().utf8ToString()),
-                         N_Name, text, query);
+                        (Long.parseLong(payload), N_Name, text, query);
                     queue.put(nq);
                 }
             }
@@ -472,6 +479,7 @@ public class TextResolver implements AutoCloseable {
             try (Transaction tx = gdb.beginTx()) {
                 //resolver.resolve(gdb.findNodes(AuxNodeType.ENTITY));
                 resolver.search();
+                //resolver.dict(N_Name, gdb.findNodes(AuxNodeType.ENTITY));
                 tx.success();
             }
 

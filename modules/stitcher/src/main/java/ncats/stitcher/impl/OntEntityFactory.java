@@ -55,6 +55,7 @@ public class OntEntityFactory extends EntityRegistry {
         "inverse_isa",
         "has_dose_form",
         "has_ingredient",
+        "has_go_association",
         "form_of",
         "precise_ingredient_of",
         "constitutes",
@@ -225,9 +226,10 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_UNII, "P319")
             .add(I_GENE, "GENESYMBOL")
             .add(I_GENE, "OGG_0000000004")
+            .add(I_GENE, "IAO_0000118")
             .add(I_GENE, "P321")
-            .add(I_PMID, "OGG_0000000030")
-            .add(I_PMID, "P171")
+            //.add(I_PMID, "OGG_0000000030")
+            //.add(I_PMID, "P171")
             .add(I_CAS, "CAS")
             .add(I_CAS, "P210")
             .add(H_InChIKey, "inchikey")
@@ -460,6 +462,82 @@ public class OntEntityFactory extends EntityRegistry {
                 }
             }            
         }
+        else if (ontology.resource != null
+                 && "mp.owl".equals(ontology.resource.getLocalName())) {
+            // i hate you!
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.equals("AAO:CURATOR")
+                    || u.equals("AAO:DSM")
+                    || u.startsWith("BAMS:")
+                    || u.startsWith("GOC:")
+                    || u.equals("GO:CURATOR")
+                    || u.equals("GO:CVS")
+                    || u.equals("GO:GO")
+                    || u.equals("GO:DPH")
+                    || u.equals("GO:KMV")
+                    || u.startsWith("HPO:")
+                    || u.startsWith("HTTP://")
+                    || u.startsWith("HTTPS://")
+                    || u.startsWith("ISBN:")
+                    || u.startsWith("NCBI")
+                    || u.startsWith("PATOC")
+                    || u.startsWith("PHENOSCAPE:")
+                    || u.startsWith("PMCID:")
+                    || u.startsWith("PMID:")
+                    || u.startsWith("ANSWERS.COM")
+                    || u.startsWith("BIOLOGY-ONLINE:")
+                    || u.startsWith("BOOK:")
+                    || u.equals("CBN")
+                    || u.equals("CHEBI")
+                    || u.equals("CHEMIDPLUS")
+                    || u.equals("CL:CVS")
+                    || u.equals("CL:TM")
+                    || u.equals("CL:MAH")
+                    || u.equals("COME")
+                    || u.startsWith("DICTIONARY:")
+                    || u.equals("DRUGBANK")
+                    || u.startsWith("DOI:")
+                    || u.startsWith("FBC:")
+                    || u.equals("FB:MA")
+                    || u.equals("FEED:FEED")
+                    || u.equals("FMA:TA")
+                    || u.startsWith("GO_REF:")
+                    || u.equals("HMDB")
+                    || u.startsWith("IMPC:")
+                    || u.startsWith("INFOVISUAL:")
+                    || u.startsWith("IUPAC")
+                    || u.equals("JCBN")
+                    || u.equals("JB:JB")
+                    || u.equals("KEGG_COMPOUND")
+                    || u.equals("MA:TH") || u.equals("MA:MA")
+                    || u.startsWith("MERRIAM-WEBSTER:")
+                    || (u.startsWith("MGI:") && !Character.isDigit(u.charAt(4)))
+                    || u.equals("MIG:ANNA") || u.startsWith("MITRE:")
+                    || u.equals("MOLBASE") || u.startsWith("MONDOFACTO:")
+                    || u.equals("MP:ANNA") || u.equals("MPATH:CURATION")
+                    || u.startsWith("MPD:") || u.equals("MP:MP")
+                    || u.startsWith("NIFSTD:")
+                    || u.equals("NIST_CHEMISTRY_WEBBOOK")
+                    || u.startsWith("NPX:") || u.startsWith("OBOL:")
+                    || u.startsWith("ORCID") || u.startsWith("PATHBASE:")
+                    || u.startsWith("OXFORD:") || u.equals("PDBECHEM")
+                    || u.startsWith("PRO:") || u.startsWith("RGD:")
+                    || u.startsWith("TAO:") || u.startsWith("TAIR:")
+                    || u.equals("SUBMITTER") || u.startsWith("SANBI:")
+                    || u.startsWith("THEFREEDICTIONARY.COM")
+                    || u.equals("UBERON:CJM") || u.equals("UM-BBD")
+                    || u.equals("UNIPROT") || u.startsWith("VSAO:")
+                    || u.equals("WHO_MEDNET") || u.startsWith("WORDNET:")
+                    || u.startsWith("WTSI:") || u.startsWith("ZFIN:")
+                    ) {
+                    others.add(x);
+                }
+                else {
+                    useful.add(x);
+                }
+            }            
+        }        
         else if (ontology.links.containsKey("versionIRI")
                  && ontology.links.get("versionIRI")
                  .toString().endsWith("efo.owl")) {
@@ -847,6 +925,25 @@ public class OntEntityFactory extends EntityRegistry {
                 if (!pmids.isEmpty()) {
                     // override
                     data.put("OGG_0000000030", pmids.toArray(new Long[0]));
+                }
+            }
+            
+            obj = data.get("OGG_0000000029");
+            if (obj != null) {
+                List<String> annotations = new ArrayList<>();
+                for (String tok : obj.toString().split(";")) {
+                    String t = tok.trim();
+                    if (t.startsWith("GO_")) {
+                        int pos = t.indexOf(' ');
+                        if (pos > 0)
+                            t = t.substring(0, pos);
+                        annotations.add("GO:"+t.substring(3));
+                    }
+                }
+                
+                if (!annotations.isEmpty()) {
+                    data.put("has_go_association",
+                             annotations.toArray(new String[0]));
                 }
             }
         }
