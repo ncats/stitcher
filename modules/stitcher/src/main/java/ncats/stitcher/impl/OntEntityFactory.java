@@ -1303,10 +1303,10 @@ public class OntEntityFactory extends EntityRegistry {
                                +or.type+" not recognized:\n"+or);
                 others.add(or);
             }
-
+            /*
             if (resources.size() > 500)
                 break;
-
+            */
         }
         iter.close();
         logger.info("###### "+resources.size()+" class resources and "
