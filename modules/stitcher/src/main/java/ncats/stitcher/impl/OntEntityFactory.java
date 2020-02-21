@@ -476,6 +476,7 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.equals("GO:GO")
                     || u.equals("GO:DPH")
                     || u.equals("GO:KMV")
+                    || u.equals("GO:TFM")
                     || u.startsWith("HPO:")
                     || u.startsWith("HTTP://")
                     || u.startsWith("HTTPS://")
@@ -488,9 +489,12 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("ANSWERS.COM")
                     || u.startsWith("BIOLOGY-ONLINE:")
                     || u.startsWith("BOOK:")
+                    || u.equals("ZFA:CURATOR")
                     || u.equals("CBN")
                     || u.equals("CHEBI")
+                    || u.equals("CHEMBL")
                     || u.equals("CHEMIDPLUS")
+                    || u.equals("IUPHAR")
                     || u.equals("CL:CVS")
                     || u.equals("CL:TM")
                     || u.equals("CL:MAH")
@@ -510,6 +514,17 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.equals("JCBN")
                     || u.equals("JB:JB")
                     || u.equals("KEGG_COMPOUND")
+                    || u.equals("KEGG COMPOUND")
+                    || u.equals("KEGG_DRUG")
+                    || u.equals("DRUGCENTRAL")
+                    || u.equals("PATO:GVG")
+                    || u.equals("EUROPE PMC")
+                    || u.equals("BEILSTEIN")
+                    || u.equals("GMELIN")
+                    || u.equals("REAXYS")
+                    || u.equals("FMA:FMA")
+                    || u.equals("AEO:JB")
+                    || u.equals("SUBMITTER")
                     || u.equals("MA:TH") || u.equals("MA:MA")
                     || u.startsWith("MERRIAM-WEBSTER:")
                     || (u.startsWith("MGI:") && !Character.isDigit(u.charAt(4)))
@@ -519,6 +534,9 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("MPD:") || u.equals("MP:MP")
                     || u.startsWith("NIFSTD:")
                     || u.equals("NIST_CHEMISTRY_WEBBOOK")
+                    || u.equals("NIST CHEMISTRY WEBBOOK")
+                    || u.equals("LIPID MAPS") || u.equals("LIPID_MAPS")
+                    || u.equals("AAO:LAP") || u.equals("AAO:EJS")
                     || u.startsWith("NPX:") || u.startsWith("OBOL:")
                     || u.startsWith("ORCID") || u.startsWith("PATHBASE:")
                     || u.startsWith("OXFORD:") || u.equals("PDBECHEM")
@@ -536,7 +554,21 @@ public class OntEntityFactory extends EntityRegistry {
                 else {
                     useful.add(x);
                 }
-            }            
+            }
+            
+            Object label = data.get("label");
+            if (label != null) {
+                obj = Util.delta(label, new String[]{
+                        "Europe PMC", "ChemIDplus", "Reaxys",
+                        "KEGG COMPOUND", "DrugCentral", "Beilstein",
+                        "KEGG DRUG", "ChEMBL", "Gmelin",
+                        "NIST Chemistry WebBook", "LIPID MAPS",
+                        "ChEMBL", "ChEBI", "SUBMITTER", "DrugBank",
+                        "UM-BBD"
+                    });
+                if (obj != Util.NO_CHANGE)
+                    data.put("label", obj);
+            }
         }        
         else if (ontology.links.containsKey("versionIRI")
                  && ontology.links.get("versionIRI")
@@ -1271,10 +1303,10 @@ public class OntEntityFactory extends EntityRegistry {
                                +or.type+" not recognized:\n"+or);
                 others.add(or);
             }
-            /*
-            if (resources.size() > 5000)
+
+            if (resources.size() > 500)
                 break;
-            */
+
         }
         iter.close();
         logger.info("###### "+resources.size()+" class resources and "

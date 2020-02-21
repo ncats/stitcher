@@ -18,6 +18,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.event.*;
 
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.Config;
@@ -39,6 +40,11 @@ import static ncats.stitcher.StitchKey.*;
 public class EntityRegistry extends EntityFactory {
     static final Logger logger =
         Logger.getLogger(EntityRegistry.class.getName());
+
+    static final StitchKey[] INDEXES = new StitchKey[]{
+        I_CODE, N_Name, I_GENE, I_UNII, I_CAS,
+        H_InChIKey, H_LyChI_L4, H_LyChI_L3
+    };
 
     static class Reference {
         public DataSource ds;
@@ -66,6 +72,44 @@ public class EntityRegistry extends EntityFactory {
         public boolean isBlacklist () {
             return key != null ? EntityRegistry.this.isBlacklist(key, value)
                 : EntityRegistry.this.isBlacklist(value);
+        }
+    }
+
+    static class TxHandler extends TransactionEventHandler.Adapter {
+        @Override
+        public Object beforeCommit (TransactionData data)
+            throws Exception {
+            for (Node node : data.createdNodes()) {
+                if (node.hasLabel(AuxNodeType.ENTITY)) {
+                    for (StitchKey k : INDEXES) {
+                        if (node.hasProperty(k.name())) {
+                            Object value = node.getProperty(k.name());
+                            if (value.getClass().isArray()) {
+                                int len = Array.getLength(value);
+                                StringBuilder sb = new StringBuilder ();
+                                for (int i = 0; i < len; ++i) {
+                                    Object v = Array.get(value, i);
+                                    if (v instanceof String) {
+                                        if (i > 0) sb.append("|");
+                                        sb.append((String)v);
+                                    }
+                                    else {
+                                        sb = null;
+                                        break;
+                                    }
+                                }
+
+                                if (sb != null)
+                                    node.setProperty("_"+k, sb.toString());
+                            }
+                            else if (value instanceof String) {
+                                node.setProperty("_"+k, value);
+                            }
+                        }
+                    }
+                }
+            }
+            return data;
         }
     }
 
@@ -99,10 +143,14 @@ public class EntityRegistry extends EntityFactory {
         super (graphDb);
         init ();
         // setup indexes for common stitch keys...
-        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.I_CODE.name());
-        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.N_Name.name());
-        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.I_GENE.name());
-        graphDb.createIndex(AuxNodeType.ENTITY, StitchKey.I_UNII.name());
+        createIndexes (INDEXES);
+    }
+
+    protected void createIndexes (StitchKey... keys) {
+        for (StitchKey k : keys) {
+            graphDb.createIndex(AuxNodeType.ENTITY, "_"+k);
+        }
+        graphDb.graphDb().registerTransactionEventHandler(new TxHandler ());
     }
 
     // to be overriden by subclass
