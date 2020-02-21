@@ -310,27 +310,31 @@ public class CNode implements Props, Comparable<CNode> {
     public void set (String name, Object value) {
         set (name, value, false);
     }
-    
-    public void set (String name, Object value, boolean index) {
-        try (Transaction tx = getGraphDb().beginTx()) {
-            if (_node.hasProperty(name)) {
-                Object old = _node.getProperty(name);
-                if (!value.equals(old)) {
-                    _snapshot (name, old, value);
-                    if (index) {
-                        gdb.index().forNodes
-                            (AuxNodeType.class.getName())
-                            .add(_node, name, value);
-                    }
-                }
-            }
-            else {
-                _snapshot (name, null, value);
+
+    public void _set (String name, Object value, boolean index) {
+        if (_node.hasProperty(name)) {
+            Object old = _node.getProperty(name);
+            if (!value.equals(old)) {
+                _snapshot (name, old, value);
                 if (index) {
                     gdb.index().forNodes
-                        (AuxNodeType.class.getName()).add(_node, name, value);
+                        (AuxNodeType.class.getName())
+                        .add(_node, name, value);
                 }
             }
+        }
+        else {
+            _snapshot (name, null, value);
+            if (index) {
+                gdb.index().forNodes
+                    (AuxNodeType.class.getName()).add(_node, name, value);
+            }
+        }
+    }
+
+    public void set (String name, Object value, boolean index) {
+        try (Transaction tx = getGraphDb().beginTx()) {
+            _set (name, value, index);
             tx.success();
         }
     }
