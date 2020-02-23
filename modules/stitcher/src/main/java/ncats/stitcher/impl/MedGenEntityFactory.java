@@ -36,6 +36,7 @@ public class MedGenEntityFactory extends EntityRegistry {
         
         MedGenReader (File file) throws IOException {
             tokenizer = new LineTokenizer ('|');
+            tokenizer.setCheckQuote(false);
             tokenizer.setInputStream
                 (new GZIPInputStream (new FileInputStream (file)));
             if (tokenizer.hasNext()) {
@@ -322,6 +323,23 @@ public class MedGenEntityFactory extends EntityRegistry {
                 if (syn.getClass().isArray())
                     syn = Array.get(syn, 0);
                 r.put("NAME", syn);
+            }
+
+            if (false && "C0026251".equals(r.get("CUI"))) {
+                System.err.println("###############################\n"+r);
+                for (Map.Entry<String, Object> me : r.entrySet()) {
+                    Object value = me.getValue();
+                    if (value.getClass().isArray()) {
+                        int len = Array.getLength(value);
+                        System.err.println("["+me.getKey()+"] "+len);
+                        for (int i = 0; i < len; ++i) {
+                            System.err.println("..."+Array.get(value, i));
+                        }
+                    }
+                    else {
+                        System.err.println("["+me.getKey()+"] "+value);
+                    }
+                }
             }
 
             try {
