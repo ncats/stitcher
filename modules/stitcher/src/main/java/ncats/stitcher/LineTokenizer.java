@@ -8,6 +8,7 @@ public class LineTokenizer implements Iterator<String[]> {
     protected Reader reader;
     protected char[] buf = new char[1];
     protected String[] tokens;
+    protected boolean checkQuote = true;
     
     protected int count, lines;
     protected StringBuilder currentLine = new StringBuilder ();
@@ -17,13 +18,16 @@ public class LineTokenizer implements Iterator<String[]> {
     }
 
     public LineTokenizer (char delim) {
-        this.delim = delim;
+        setDelimiter (delim);
     }
 
     public void setDelimiter (char delim) {
         this.delim = delim;
     }
     public char getDelimiter () { return delim; }
+    public void setCheckQuote (boolean checkQuote) {
+        this.checkQuote = checkQuote;
+    }
 
     protected String[] nextLine () throws IOException {
         List<String> tokens = new ArrayList<String>();
@@ -34,7 +38,7 @@ public class LineTokenizer implements Iterator<String[]> {
         while ((nb = reader.read(buf)) != -1) {
             currentLine.append(buf[0]);
             
-            if (buf[0] == '"') {
+            if (buf[0] == '"' && checkQuote) {
                 quote = !quote;
             }
             else if (buf[0] == '\r') {
@@ -139,7 +143,8 @@ public class LineTokenizer implements Iterator<String[]> {
                             Set<String> uv = uvals.get(header[j]);
                             if (uv == null)
                                 uvals.put(header[j], uv = new TreeSet<>());
-                            uv.add(tokens[j]);
+                            if (tokens[j] != null)
+                                uv.add(tokens[j]);
                         }
                     }
                     //System.out.println("--\n");
