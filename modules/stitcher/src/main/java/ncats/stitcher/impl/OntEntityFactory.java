@@ -577,7 +577,7 @@ public class OntEntityFactory extends EntityRegistry {
 
             Object smiles = data.remove("SMILES");
             if (smiles != null) {
-                data.put("smiles", smiles.replaceAll
+                data.put("smiles", ((String)smiles).replaceAll
                          (Matcher.quoteReplacement("\\\\"),
                           Matcher.quoteReplacement("\\")));
             }
