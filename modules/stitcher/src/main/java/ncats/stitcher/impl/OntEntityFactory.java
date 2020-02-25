@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -575,8 +576,11 @@ public class OntEntityFactory extends EntityRegistry {
                  .toString().endsWith("efo.owl")) {
 
             Object smiles = data.remove("SMILES");
-            if (smiles != null)
-                data.put("smiles", smiles);
+            if (smiles != null) {
+                data.put("smiles", smiles.replaceAll
+                         (Matcher.quoteReplacement("\\\\"),
+                          Matcher.quoteReplacement("\\")));
+            }
             
             for (String x : xrefs) {
                 String u = x.toUpperCase();
