@@ -5,6 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.lang.reflect.Array;
+import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipException;
 import java.util.logging.Logger;
@@ -22,6 +26,7 @@ public class DataSource extends CNode {
     public static final String NAMEFIELD = "NameField";
     public static final String STRUCTFIELD = "StructField";
     public static final String EVENTPARSER = "EventParser";
+    public static final String FIELDNAMES = "FieldNames";
 
     public static String nodeIndexName () {
         return DataSource.class.getName()+NODE_INDEX;
@@ -43,8 +48,19 @@ public class DataSource extends CNode {
         return new DataSource (node);
     }
 
+    final Set<String> fields = new LinkedHashSet<>();
+    
     protected DataSource (Node node) {
         super (node);
+        try (Transaction tx = getGraphDb().beginTx()) {
+            if (_node.hasProperty(FIELDNAMES)) {
+                Object names = _node.getProperty(FIELDNAMES);
+                int len = Array.getLength(names);
+                for (int i = 0; i < len; ++i)
+                    fields.add((String)Array.get(names, i));
+            }
+            tx.success();
+        }
     }
 
     @Override
@@ -143,5 +159,16 @@ public class DataSource extends CNode {
                     return (String)_node.getProperty(KEY);
                 }
             });
+    }
+
+    public void addFields (Collection<String> fields) {
+        this.fields.addAll(fields);
+    }
+    public Set<String> getFields () { return this.fields; }
+    public void updateFields () {
+        try (Transaction tx = getGraphDb().beginTx()) {
+            _node.setProperty(FIELDNAMES, fields.toArray(new String[0]));
+            tx.success();
+        }
     }
 }

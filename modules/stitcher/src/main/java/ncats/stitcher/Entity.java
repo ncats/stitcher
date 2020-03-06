@@ -801,18 +801,13 @@ public class Entity extends CNode {
     public Object payloadId () {
         return get (ID);
     }
-    
-    public Map<String, Object> _payload () {
-        Map<String, Object> payload = new TreeMap<String, Object>();
-        
+
+    protected Node _latestPayload () {
         final List<Node> nodes = new ArrayList<Node>();
         for (Relationship rel : _node.getRelationships
                  (Direction.BOTH, AuxRelType.PAYLOAD)) {
             nodes.add(rel.getOtherNode(_node));
         }
-
-        if (nodes.isEmpty())
-            return payload;
 
         if (nodes.size() > 1) {
             Collections.sort(nodes, new Comparator<Node>() {
@@ -824,7 +819,26 @@ public class Entity extends CNode {
                 });
         }
         
-        Node latest = nodes.iterator().next();
+        return nodes.isEmpty() ? null : nodes.iterator().next();
+    }
+    
+    public void _payload (String field, Object value) {
+        Node latest = _latestPayload ();
+        if (latest != null) {
+            latest.setProperty(field, value);
+        }
+    }
+
+    public void payload (String field, Object value) {
+        try (Transaction tx = gdb.beginTx()) {
+            _payload (field, value);
+            tx.success();
+        }
+    }
+    
+    public Map<String, Object> _payload () {
+        Map<String, Object> payload = new TreeMap<String, Object>();
+        Node latest = _latestPayload ();
         for (String key : latest.getPropertyKeys()) {
             payload.put(key, latest.getProperty(key));
         }

@@ -539,6 +539,7 @@ public class EntityRegistry extends EntityFactory {
             }
         }
         logger.info(id+" maps to "+cnt+" entities!");
+        source.addFields(map.keySet());
         
         return ent;
     }
@@ -699,6 +700,7 @@ public class EntityRegistry extends EntityFactory {
             
             ent._add(payload);
         }
+        source.addFields(map.keySet());
         
         return ent;
     }
@@ -993,6 +995,7 @@ public class EntityRegistry extends EntityFactory {
             ds.set(DataSource.STRUCTFIELD, strucField);
         if (parserField != null)
             ds.set(DataSource.EVENTPARSER, parserField);
+        ds.updateFields();
     }
     
     public void updateDataSourceMetadata () {

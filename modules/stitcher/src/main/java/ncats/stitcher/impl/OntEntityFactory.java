@@ -120,7 +120,7 @@ public class OntEntityFactory extends EntityRegistry {
                     }
                 }
             }
-            
+
             this.uri = getURI (res);
             this.type = t;
             this.resource = res;
@@ -1122,6 +1122,48 @@ public class OntEntityFactory extends EntityRegistry {
         return ent;
     }
 
+    boolean _stitch (Entity ent, String name, OntologyResource or) {
+        boolean stitched = false;
+        if (or.isRestriction()) {
+            Resource res = (Resource) or.links.get("onProperty");
+            String prop = getResourceValue (res);
+            
+            String val = (String)or.props.get("hasValue");
+            if (val != null) {
+                //logger.info("####Restriction: property="+res+" value="+val);
+                ent._payload(prop, val);
+            }
+            else if (or.links.containsKey("someValuesFrom")) {
+                res = (Resource) or.links.get("someValuesFrom");
+                Map<String, Object> attr = new HashMap<>();
+                String uri = getURI (res);
+                
+                StitchKey key = R_rel;
+                switch (name) {
+                case "subClassOf":
+                    key = R_subClassOf;
+                    attr.put(Props.NAME, prop);
+                    break;
+                    
+                default:
+                    attr.put(Props.NAME, name);
+                }
+                
+                for (Iterator<Entity> iter = find (Props.URI, uri);
+                     iter.hasNext();) {
+                    Entity e = iter.next();
+                    stitched = ent._stitch(e, key, uri, attr);
+                }
+            }
+            else {
+                logger.warning("Restriction "+res+" not processed!");
+            }
+            
+            stitched = true;
+        }
+        return stitched;
+    }
+    
     boolean _stitch (Entity ent, String name, Resource res) {
         boolean stitched = false;
         String uri = getURI (res);
@@ -1152,6 +1194,9 @@ public class OntEntityFactory extends EntityRegistry {
                     }
                 }
             }
+        }
+        else {
+            stitched = _stitch (ent, name, new OntologyResource (res));
         }
         return stitched;
     }
@@ -1220,7 +1265,7 @@ public class OntEntityFactory extends EntityRegistry {
         Model model = ModelFactory.createDefaultModel();
         model.read(file);
         reset ();
-        
+
         ResIterator iter = model.listSubjects();
         while (iter.hasNext()) {
             Resource res = iter.nextResource();
@@ -1279,17 +1324,7 @@ public class OntEntityFactory extends EntityRegistry {
                     axioms.add(or);
             }
             else if (or.isRestriction()) {
-                // TODO: finish implementation here!
-                res = (Resource) or.links.get("onProperty");
-                String val = (String)or.props.get("hasValue");
-                if (val != null) {
-                }
-                else if (or.links.containsKey("someValuesFrom")) {
-                    
-                }
-                else {
-                    logger.warning("Restriction "+res+" not processed!");
-                }
+                //logger.warning("############# Restriction:\n"+or);
             }
             else if (or.isClass()) {
                 if (or.uri != null) {                    
@@ -1300,7 +1335,7 @@ public class OntEntityFactory extends EntityRegistry {
                     }
                 }
                 else
-                    logger.warning("Ignore class "+res);
+                    logger.warning("Ignore class "+res+"\n"+or);
             }
             else {
                 logger.warning("Resource type "
@@ -1308,8 +1343,13 @@ public class OntEntityFactory extends EntityRegistry {
                 others.add(or);
             }
             /*
-            if (resources.size() > 500)
+            if (false
+                || "http://www.orpha.net/ORDO/Orphanet_1000".equals(or.uri)
+                || resources.size() > 2000
+                ) {
+                //System.err.println(or);
                 break;
+            }
             */
         }
         iter.close();
