@@ -878,20 +878,20 @@ public class GARDEntityFactory extends EntityRegistry {
     public void showComponents () {
         Label T047 = Label.label("T047");
         final Label[][] LABELS = {
-            {Label.label("GHR_v1")},
-            {Label.label("DOID.owl.gz")},
-            {Label.label("GARD_v1")},
-            {Label.label("MESH.ttl.gz"), T047},
-            {Label.label("MEDLINEPLUS.ttl.gz"), T047},
-            {Label.label("MESH.ttl.gz"), T047},
-            {Label.label("ICD10CM.ttl.gz"), T047},
-            {Label.label("MONDO.owl.gz")},
-            {Label.label("OMIM.ttl.gz"), T047},
-            {Label.label("ordo.owl.gz")},
-            {Label.label("HPO.owl.gz")},
-            {Label.label("Thesaurus.owl.gz"),
+            {Label.label("S_GHR")},
+            {Label.label("S_DOID")},
+            {Label.label("S_GARD")},
+            {Label.label("S_MESH"), T047},
+            {Label.label("S_MEDLINEPLUS"), T047},
+            {Label.label("S_MESH"), T047},
+            {Label.label("S_ICD10CM"), T047},
+            {Label.label("S_MONDO")},
+            {Label.label("S_OMIM"), T047},
+            {Label.label("S_ORDO_ORPHANET")},
+            {Label.label("S_HP")},
+            {Label.label("S_THESAURUS"),
              Label.label("Disease or Syndrome")},
-            {Label.label("MEDGEN_v1"), T047}
+            {Label.label("S_MEDGEN"), T047}
         };
 
         final Label[] NOT_TYPES = {
@@ -1014,6 +1014,21 @@ public class GARDEntityFactory extends EntityRegistry {
         return keys.size();
     }
 
+    public void mapGARD2UMLS (OutputStream os) {
+        final PrintStream ps = new PrintStream (os);
+        entities ("S_GARD", e -> {
+                Map<String, Object> payload = e.payload();
+                ps.println(e.getId()+": "
+                           +payload.get("id")+"\t"+payload.get("name")+"\t");
+                //Map<StitchKey, Object> keys = e.keys();
+                //ps.println(keys);
+                for (Entity nb : e.neighbors()) {
+                    Map<StitchKey, Object> map = e.keys(nb);
+                    ps.println("..."+nb.getId()+": "+map);
+                }
+            });
+    }
+    
     public void exportJson (File file, String ref, Label... nblabels) {
         try (PrintStream ps = new PrintStream(new FileOutputStream (file))) {
             new JsonExport(ref).export(ps, nblabels);
@@ -1067,11 +1082,12 @@ public class GARDEntityFactory extends EntityRegistry {
         
         try (GARDEntityFactory gef = new GARDEntityFactory (argv[0])) {
             //gef.checkGARD(1);
-            gef.showComponents();
+            //gef.showComponents();
+            gef.mapGARD2UMLS(System.out);
             /*
             gef.exportJson(new File ("gard-export.json"),
-                           "GARD_v1", Label.label("MONDO.owl.gz"),
-                           Label.label("ordo.owl.gz"));
+                           "S_GARD", Label.label("S_MONDO"),
+                           Label.label("S_ORDO_ORPHANET"));
             */
         }
     }

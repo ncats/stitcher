@@ -167,3 +167,12 @@ match(n:`S_MEDLINEPLUS`)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distin
 match(n:`S_MONDO`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `MONDO`,count(distinct a) as `ICD10`
 
 match(n:`S_HPO`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) with n match(n)-[:N_Name|:I_CODE*1]-(a:`S_ICD10CM`) return count(distinct n) as `HPO`,count(distinct a) as `ICD10`
+
+match p=(n:`S_OMIM`)-[:R_rel{name:'has_inheritance_type'}]-(m:`S_OMIM`) where ('T033' in labels(m) or 'T045' in labels(m)) and any(x in m.I_CODE where x =~ 'MTHU.*') return distinct id(m),m.N_Name,m.I_CODE order by m.N_Name
+
+## hpo mode of inheritance hierarchy
+match p=(n:`S_HP`)-[:R_subClassOf*1..100]->(m:`S_HP`) where 'HP:0000005' in m.I_CODE return p
+
+
+## mode of inheritance for gard diseases
+match (n:`S_HP`)-[e:R_rel{value:'inheritance_type_of'}]-(m:`S_GARD`) with n,m,e match p=(n)-[]-(d:DATA), q=(m)-[]-(f:DATA) return e.MedGen_source as source,d.label as `mode of inheritance`,d.id as `HPO`,f.id as `GARD`,f.name as `GARD disease` limit 1000
