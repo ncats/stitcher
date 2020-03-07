@@ -1126,7 +1126,7 @@ public class OntEntityFactory extends EntityRegistry {
         boolean stitched = false;
         if (or.isRestriction()) {
             Resource res = (Resource) or.links.get("onProperty");
-            String prop = getResourceValue (res);
+            String prop = getURI (res); //getResourceValue (res);
             
             String val = (String)or.props.get("hasValue");
             if (val != null) {
@@ -1235,7 +1235,9 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
         else {
-            logger.warning("Unable to resolve "+or.uri);
+            //logger.warning("Unable to resolve "+or.uri);
+            Entity ent = _registerIfAbsent (or);
+            logger.info("+++++++ "+ent.getId()+" +++++++\n"+or);
         }
     }
 
@@ -1338,8 +1340,10 @@ public class OntEntityFactory extends EntityRegistry {
                     logger.warning("Ignore class "+res+"\n"+or);
             }
             else {
+                /*
                 logger.warning("Resource type "
                                +or.type+" not recognized:\n"+or);
+                */
                 others.add(or);
             }
             /*
