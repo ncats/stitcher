@@ -31,6 +31,8 @@ public class OntEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(OntEntityFactory.class.getName());
 
+    static final int DEBUG = 0;
+
     /*
      * minimum length for xref
      */
@@ -38,6 +40,7 @@ public class OntEntityFactory extends EntityRegistry {
     
     static final String[] _RELATIONS = {
         "subClassOf",
+        "intersectionOf",
         "equivalentClass",
         "exactMatch",
         "closeMatch",
@@ -84,6 +87,7 @@ public class OntEntityFactory extends EntityRegistry {
         final public Resource resource;
         public String uri;
         final public String type;
+        final public boolean anonymous;
         final public Map<String, Object> props = new TreeMap<>();
         final public Map<String, Object> links = new TreeMap<>();
         final public List<OntologyResource> axioms = new ArrayList<>();
@@ -122,6 +126,12 @@ public class OntEntityFactory extends EntityRegistry {
             }
 
             this.uri = getURI (res);
+            if (this.uri == null && "Class".equalsIgnoreCase(t)) {
+                this.uri = res.toString();
+                this.anonymous = true;
+            }
+            else
+                this.anonymous = false;
             this.type = t;
             this.resource = res;
         }
@@ -173,8 +183,8 @@ public class OntEntityFactory extends EntityRegistry {
         }
     }
 
-    Map<Resource, OntologyResource> resources = new HashMap<>();
-    List<OntologyResource> others = new ArrayList<>();
+    Map<Resource, OntologyResource> resources = new LinkedHashMap<>();
+    Map<Resource, OntologyResource> xrefs = new LinkedHashMap<>();
     OntologyResource ontology;
     
     public OntEntityFactory(GraphDb graphDb) throws IOException {
@@ -246,7 +256,7 @@ public class OntEntityFactory extends EntityRegistry {
     protected void reset () {
         ontology = null;
         resources.clear();
-        others.clear();
+        xrefs.clear();
     }
     
     static String getResourceValue (Resource r) {
@@ -263,6 +273,9 @@ public class OntEntityFactory extends EntityRegistry {
             && uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
             String[] toks = uri.split("/");
             uri = "http://purl.obolibrary.org/obo/MESH_"+toks[toks.length-1];
+        }
+        else if (uri == null) {
+            //uri = r.toString();
         }
         return uri;
     }
@@ -1071,7 +1084,7 @@ public class OntEntityFactory extends EntityRegistry {
                 data.put(me.getKey(), getResourceValue (r));
                 links.add(r);
             }
-
+            
             for (Resource r : links) {
                 String rv = r.getLocalName();
                 Object old = data.get(me.getKey());
@@ -1122,116 +1135,169 @@ public class OntEntityFactory extends EntityRegistry {
         return ent;
     }
 
-    boolean _stitch (Entity ent, String name, OntologyResource or) {
-        boolean stitched = false;
+    void _stitch (Entity ent, String name, OntologyResource or) {
         if (or.isRestriction()) {
             Resource res = (Resource) or.links.get("onProperty");
             String prop = getURI (res); //getResourceValue (res);
-            
+
+            Map<String, Object> attr = new HashMap<>();
+            attr.put(Props.NAME, name);
+            attr.put(Props.PROPERTY, prop);
+
             String val = (String)or.props.get("hasValue");
             if (val != null) {
                 //logger.info("####Restriction: property="+res+" value="+val);
-                ent._payload(prop, val);
+                //ent._payload(prop, val);
+                //attr.put(Props.VALUE, val);
             }
             else if (or.links.containsKey("someValuesFrom")) {
                 res = (Resource) or.links.get("someValuesFrom");
-                Map<String, Object> attr = new HashMap<>();
-                String uri = getURI (res);
-                
-                StitchKey key = R_rel;
-                switch (name) {
-                case "subClassOf":
-                    key = R_subClassOf;
-                    attr.put(Props.NAME, prop);
-                    break;
-                    
-                default:
-                    attr.put(Props.NAME, name);
-                }
-                
-                for (Iterator<Entity> iter = find (Props.URI, uri);
-                     iter.hasNext();) {
-                    Entity e = iter.next();
-                    stitched = ent._stitch(e, key, uri, attr);
-                }
+                val = prop = getURI (res);
             }
-            else {
-                logger.warning("Restriction "+res+" not processed!");
+                
+            StitchKey key = R_rel;
+            switch (name) {
+            case "subClassOf":
+                key = R_subClassOf;
+                break;
             }
-            
-            stitched = true;
+                
+            for (Iterator<Entity> iter = find (Props.URI, prop);
+                 iter.hasNext();) {
+                Entity e = iter.next();
+                ent._stitch(e, key, val, attr);
+            }
         }
-        return stitched;
+    }
+
+    void _stitch (Entity ent, String name, Resource res) {
+        _stitch (ent, name, res, null);
     }
     
-    boolean _stitch (Entity ent, String name, Resource res) {
-        boolean stitched = false;
+    void _stitch (Entity ent, String name,
+                  Resource res, Map<String, Object> attrs) {
         String uri = getURI (res);
-        if (uri != null) {
+        if (DEBUG > 0) {
+            logger.info("+++++ stitching resource "+res+" (uri="+uri
+                        +") to entity "+ent.getId()+" via "+name+"...");
+        }
+        
+        if (uri != null || resources.containsKey(res)) {
+            if (uri == null) {
+                uri = res.toString(); // anonymous class
+            }
+
+            if (attrs == null)
+                attrs = new LinkedHashMap<>();
+            
             for (Iterator<Entity> iter = find (Props.URI, uri);
                  iter.hasNext();) {
                 Entity e = iter.next();
                 if (!e.equals(ent)) {
                     switch (name) {
                     case "subClassOf":
-                        stitched = ent._stitch(e, R_subClassOf, uri);
+                        ent._stitch(e, R_subClassOf, uri, attrs);
                         break;
                     case "equivalentClass":
-                        stitched = ent._stitch(e, R_equivalentClass, uri);
+                        ent._stitch(e, R_equivalentClass, uri, attrs);
                         break;
                     case "exactMatch":
-                        stitched = ent._stitch(e, R_exactMatch, uri);
+                        ent._stitch(e, R_exactMatch, uri, attrs);
                         break;
                     case "closeMatch":
-                        stitched = ent._stitch(e, R_closeMatch, uri);
+                        ent._stitch(e, R_closeMatch, uri, attrs);
                         break;
                     default:
-                        { Map<String, Object> attr = new HashMap<>();
-                            attr.put(Props.NAME, name);
-                            stitched = ent._stitch(e, R_rel, uri, attr);
-                        }
+                        attrs.put(Props.NAME, name);
+                        ent._stitch(e, R_rel, uri, attrs);
                         //logger.warning("Unknown stitch relationship: "+name);
                     }
                 }
             }
         }
-        else {
-            stitched = _stitch (ent, name, new OntologyResource (res));
+        else if (xrefs.containsKey(res)) {
+            OntologyResource or = xrefs.get(res);
+            if (DEBUG > 0) {
+                logger.info("~~~~~ resolving "+res+" to entity "
+                            +ent.getId()+" via "+name+"\n"+or);
+            }
+            
+            for (Map.Entry<String, Object> me : or.links.entrySet()) {
+                if (DEBUG > 0) {
+                    logger.info("..."+me.getKey()+": "+me.getValue().getClass()
+                                +" "+me.getValue());
+                }
+                
+                Resource r = (Resource)me.getValue();
+                if (xrefs.containsKey(r)) {
+                    OntologyResource ores = xrefs.get(r);
+                    _stitch (ent, name, ores.resource);
+                }
+                else {
+                    OntologyResource ores = new OntologyResource (r);
+                    if (DEBUG > 0) {
+                        logger.info("^^^^^"+ores);
+                    }
+                    _stitch (ent, name, ores);
+                }
+            }
         }
-        return stitched;
+        else {
+            _stitch (ent, name, new OntologyResource (res));
+        }
     }
 
     protected void _resolve (OntologyResource or) {
         List<Entity> entities = new ArrayList<>();
-        for (Iterator<Entity> iter = find (Props.URI, or.uri);
-             iter.hasNext();) {
-            Entity e = iter.next();
-            entities.add(e);
+        if (or.uri != null) {
+            for (Iterator<Entity> iter = find (Props.URI, or.uri);
+                 iter.hasNext();) {
+                Entity e = iter.next();
+                entities.add(e);
+            }
         }
-
+        
         if (!entities.isEmpty()) {
             for (Map.Entry<String, Object> me : or.links.entrySet()) {
                 if (RELATIONS.contains(me.getKey())) {
                     Object value = me.getValue();
+                    List<Resource> links = new ArrayList<>();
                     if (value.getClass().isArray()) {
                         int len = Array.getLength(value);
                         for (int i = 0; i < len; ++i) {
                             Resource res = (Resource) Array.get(value, i);
-                            for (Entity e : entities)
-                                _stitch (e, me.getKey(), res);
+                            links.add(res);
                         }
                     }
                     else {
                         Resource res = (Resource) value;
-                        for (Entity e : entities)
+                        links.add(res);
+                    }
+
+                    for (Entity e : entities) {
+                        for (Resource res : links) {
                             _stitch (e, me.getKey(), res);
+                        }
                     }
                 }
                 /*
-                else if (getStitchKey (me.getKey()) == null) {
-                    logger.warning("Unknown link resource: "+me.getKey());
-                }
+                  else if (getStitchKey (me.getKey()) == null) {
+                  logger.warning("Unknown link resource: "+me.getKey());
+                  }
                 */
+            }
+            
+            // now axioms
+            for (OntologyResource ox : or.axioms) {
+                Resource r = (Resource)ox.links.get("annotatedProperty");
+                String rn = r.getLocalName();
+                if (isDeferred (rn)) {
+                    r = (Resource)ox.links.get("annotatedTarget");
+                    if (r != null) {
+                        for (Entity e : entities)
+                            _stitch (e, rn, r, ox.props);
+                    }
+                }
             }
         }
         else {
@@ -1327,24 +1393,21 @@ public class OntEntityFactory extends EntityRegistry {
             }
             else if (or.isRestriction()) {
                 //logger.warning("############# Restriction:\n"+or);
+                //resources.put(res, or);
             }
             else if (or.isClass()) {
-                if (or.uri != null) {                    
-                    OntologyResource old = resources.put(res, or);
-                    if (old != null) {
-                        logger.warning
-                            ("Class "+res+" already mapped to\n"+old);
-                    }
-                }
-                else
-                    logger.warning("Ignore class "+res+"\n"+or);
+                OntologyResource old = resources.put(res, or);
+                if (old != null) {
+                    logger.warning
+                        ("Class "+res+" already mapped to\n"+old);
+                }                
             }
             else {
                 /*
                 logger.warning("Resource type "
                                +or.type+" not recognized:\n"+or);
                 */
-                others.add(or);
+                xrefs.put(res, or);
             }
             /*
             if (false
@@ -1380,21 +1443,24 @@ public class OntEntityFactory extends EntityRegistry {
         */
         
         // register entities
+        logger.info("####### registering entities...");
         for (Map.Entry<Resource, OntologyResource> me : resources.entrySet()) {
             Entity ent = registerIfAbsent (me.getValue());
             logger.info("+++++++ "+ent.getId()+" +++++++\n"
                         +me.getKey()+"\n"+me.getValue());
         }
-        
-        // resolve entities
-        for (OntologyResource or : resources.values()) {
-            resolve (or);
-        }
 
         // resolve other references (if any)
-        for (OntologyResource or : others) {
+        logger.info("####### resolving other entities...");
+        for (OntologyResource or : xrefs.values()) {
             if (or.uri != null)
                 resolve (or);
+        }
+        
+        // resolve entities
+        logger.info("####### resolving class entities...");
+        for (OntologyResource or : resources.values()) {
+            resolve (or);
         }
         
         if (!unresolved.isEmpty()) {

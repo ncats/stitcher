@@ -1,0 +1,340 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY terms "http://purl.org/dc/terms/" >
+    <!ENTITY efo "http://www.ebi.ac.uk/efo/" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY obo "http://purl.obolibrary.org/obo/" >
+    <!ENTITY dc "http://purl.org/dc/elements/1.1/" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY Orphanet_ "http://www.orpha.net/ORDO/Orphanet_#" >
+    <!ENTITY skos "http://www.w3.org/2004/02/skos/core#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY licenses "https://creativecommons.org/licenses/" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY oboInOwl "http://www.geneontology.org/formats/oboInOwl#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.orpha.net/ontology/ORDO_en_2.9.owl#"
+     xml:base="http://www.orpha.net/ontology/ORDO_en_2.9.owl"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:oboInOwl="http://www.geneontology.org/formats/oboInOwl#"
+     xmlns:Orphanet_="http://www.orpha.net/ORDO/Orphanet_#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:efo="http://www.ebi.ac.uk/efo/"
+     xmlns:licenses="https://creativecommons.org/licenses/"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:terms="http://purl.org/dc/terms/"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:obo="http://purl.obolibrary.org/obo/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <owl:Ontology rdf:about="http://www.orpha.net/ontology/ORDO_en_2.9.owl">
+        <owl:versionIRI rdf:resource="http://www.orpha.net/version2.9"/>
+        <owl:versionInfo rdf:datatype="&xsd;string">2.9</owl:versionInfo>
+        <dc:creator rdf:datatype="&xsd;string">David Lagorce</dc:creator>
+        <dc:creator rdf:datatype="&xsd;string">James Malone</dc:creator>
+        <terms:license rdf:resource="&licenses;by/4.0/"/>
+        <dc:creator rdf:datatype="&xsd;string">Céline Rousselot</dc:creator>
+        <terms:created rdf:datatype="&xsd;dateTime">2013-06-20T12:00:00</terms:created>
+        <dc:creator rdf:datatype="&xsd;string">Ana Rath</dc:creator>
+        <dc:creator rdf:datatype="&xsd;string">Samuel Demarest</dc:creator>
+        <dc:creator rdf:datatype="&xsd;string">Annie Olry</dc:creator>
+        <dc:creator rdf:datatype="&xsd;string">Marc Hanauer</dc:creator>
+        <dc:creator rdf:datatype="&xsd;string">Valérie Lanneau</dc:creator>
+        <terms:modified rdf:datatype="&xsd;dateTime">2019-12-03T16:33:37</terms:modified>
+        <dc:creator rdf:datatype="&xsd;string">Drashtti Vasant</dc:creator>
+    </owl:Ontology>
+   <!-- http://purl.obolibrary.org/obo/ECO_0000205 -->
+
+    <owl:AnnotationProperty rdf:about="&obo;ECO_0000205">
+        <rdfs:label xml:lang="en">curator_inference</rdfs:label>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://purl.obolibrary.org/obo/ECO_0000218 -->
+
+    <owl:AnnotationProperty rdf:about="&obo;ECO_0000218">
+        <rdfs:label xml:lang="en">manual_assertion</rdfs:label>
+    </owl:AnnotationProperty>
+    
+
+
+    <!-- http://www.ebi.ac.uk/efo/alternative_term -->
+
+    <owl:AnnotationProperty rdf:about="&efo;alternative_term"/>
+    
+
+
+    <!-- http://www.ebi.ac.uk/efo/definition -->
+
+    <owl:AnnotationProperty rdf:about="&efo;definition"/>
+    
+
+
+    <!-- http://www.ebi.ac.uk/efo/definition_citation -->
+
+    <owl:AnnotationProperty rdf:about="&efo;definition_citation"/>
+    
+
+
+    <!-- http://www.ebi.ac.uk/efo/reason_for_obsolescence -->
+
+    <owl:AnnotationProperty rdf:about="&efo;reason_for_obsolescence"/>
+    
+
+
+    <!-- http://www.geneontology.org/formats/oboInOwl#hasDbXref -->
+
+    <owl:AnnotationProperty rdf:about="&oboInOwl;hasDbXref"/>
+
+    <!-- http://purl.obolibrary.org/obo/BFO_0000050 -->
+
+    <rdf:Description rdf:about="&obo;BFO_0000050">
+        <rdfs:label xml:lang="en">part_of</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_317343 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_317343">
+        <efo:definition xml:lang="en">A mutation of a gene in a germ cell that is sufficient to cause the disorder and can be transmitted to the offspring.</efo:definition>
+        <rdfs:label xml:lang="en">disease-causing germline mutation(s) in</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_317344 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_317344">
+        <efo:definition xml:lang="en">A mutation of a gene in a somatic cell that is sufficient to cause the disorder but can not be transmitted to the offspring.</efo:definition>
+        <rdfs:label xml:lang="en">disease-causing somatic mutation(s) in</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_317345 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_317345">
+        <efo:definition xml:lang="en">A gene mutation in a germ cell that predisposes to the development of a disorder, and that is necessary but not sufficient to develop the disorder.</efo:definition>
+        <rdfs:label xml:lang="en">major susceptibility factor in</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_317346 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_317346">
+        <efo:definition xml:lang="en">A gene mutation in a germ cell that modifies the clinical presentation of the disorder and that can be passed on to offspring.</efo:definition>
+        <rdfs:label xml:lang="en">modifying germline mutation in</rdfs:label>
+    </rdf:Description>
+    
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_410295 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_410295">
+        <efo:definition xml:lang="en">A mutation of a gene in a germ cell that alters the function of the corresponding protein is sufficient to cause the disorder and can be transmitted to the offspring.</efo:definition>
+        <rdfs:label xml:lang="en">disease-causing germline mutation(s) (loss of function) in</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_410296 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_410296">
+        <efo:definition xml:lang="en">A mutation of a gene in a germ cell that results in a new function of the corresponding protein is sufficient to cause the disorder and can be transmitted to the offspring.</efo:definition>
+        <rdfs:label xml:lang="en">disease-causing germline mutation(s) (gain of function) in</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_465410 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_465410">
+        <efo:definition xml:lang="en">A gene in which a variation is used to monitor disorder activity and/or patient outcome.</efo:definition>
+        <rdfs:label xml:lang="en">biomarker tested in</rdfs:label>
+    </rdf:Description>
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_10 -->
+
+    <owl:Class rdf:about="http://www.orpha.net/ORDO/Orphanet_10">
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_377789"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C022"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409984"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C026"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409977"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C029"/>
+                        <owl:hasValue rdf:datatype="&xsd;float">1.9</owl:hasValue>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C022"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409991"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C025"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409981"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C017"/>
+                <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409976"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.orpha.net/ORDO/Orphanet_10"/>
+        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
+        <owl:annotatedTarget>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C022"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409991"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C025"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409981"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:annotatedTarget>
+        <obo:ECO_0000205 xml:lang="en">Not yet validated</obo:ECO_0000205>
+    </owl:Axiom>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://www.orpha.net/ORDO/Orphanet_10"/>
+        <owl:annotatedProperty rdf:resource="&rdfs;subClassOf"/>
+        <owl:annotatedTarget>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C022"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409984"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C026"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409977"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C029"/>
+                        <owl:hasValue rdf:datatype="&xsd;float">1.9</owl:hasValue>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:annotatedTarget>
+        <obo:ECO_0000205 xml:lang="en">Validated</obo:ECO_0000205>
+    </owl:Axiom>
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_409976 -->
+
+    <owl:Class rdf:about="http://www.orpha.net/ORDO/Orphanet_409976">
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409966"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409967"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409968"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409969"/>
+        <efo:definition xml:lang="en">Interval of prevalence or annual incidence of between 1 and 9 cases per 1,000,000
+ in the population.</efo:definition>
+        <rdfs:label xml:lang="en">1-9 / 1 000 000</rdfs:label>
+    </owl:Class>
+    
+    <!-- http://www.orpha.net/ORDO/Orphanet_409977 -->
+
+    <owl:Class rdf:about="http://www.orpha.net/ORDO/Orphanet_409977">
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409966"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409967"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409968"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409969"/>
+        <efo:definition xml:lang="en">Interval of prevalence or annual incidence of between 1 and 9 cases per 100,000 i
+n the population.</efo:definition>
+        <rdfs:label xml:lang="en">1-9 / 100 000</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://www.orpha.net/ORDO/Orphanet_409981">
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409966"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409967"/>
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_409968"/>
+        <efo:definition xml:lang="en">No information is available in the scientific literature to inform prevalence or annual incidence.</efo:definition>
+        <rdfs:label xml:lang="en">Unknown_epidemiological_range</rdfs:label>
+    </owl:Class>
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_C024 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_C024">
+        <efo:definition xml:lang="en">Relationship between clinical entity and number of cases/families.</efo:definition>
+        <rdfs:label xml:lang="en">has_cases/families_number</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_C028 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_C028">
+        <efo:definition xml:lang="en">Relationship between the clinical entity and the mean value of its point prevalen
+ce.</efo:definition>
+        <rdfs:label xml:lang="en">has_point_prevalence_average_value</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_C029 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_C029">
+        <efo:definition xml:lang="en">Relationship between the clinical entity and the mean value of its birth prevalence.</efo:definition>
+        <rdfs:label xml:lang="en">has_birth_prevalence_average_value</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.orpha.net/ORDO/Orphanet_C030 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_C030">
+        <efo:definition xml:lang="en">Relationship between the clinical entity and the mean value of its lifetime prevalence.</efo:definition>
+        <rdfs:label xml:lang="en">has_lifetime_prevalence_average_value</rdfs:label>
+    </rdf:Description>
+    
+    <!-- http://www.orpha.net/ORDO/Orphanet_C032 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_C032">
+        <efo:definition xml:lang="en">Relationship between the clinical entity and the mean value of its annual incidence.</efo:definition>
+        <rdfs:label xml:lang="en">has_annual_incidence_average_value</rdfs:label>
+    </rdf:Description>
+
+   <!-- http://www.orpha.net/ORDO/Orphanet_C040 -->
+
+    <rdf:Description rdf:about="http://www.orpha.net/ORDO/Orphanet_C040">
+        <efo:definition xml:lang="en">Relation between a gene with protein product, non-coding RNA or disease-associated locus and its cytogenetic location on the chromosome.</efo:definition>
+        <rdfs:label xml:lang="en">has_chromosomal location</rdfs:label>
+        <rdfs:label xml:lang="en">has_chromosomal_location</rdfs:label>
+    </rdf:Description>
+
+    <owl:Class rdf:about="http://www.orpha.net/ORDO/Orphanet_409984">
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_C009"/>
+        <rdfs:label xml:lang="en">Europe</rdfs:label>
+    </owl:Class>
+    <owl:Class rdf:about="http://www.orpha.net/ORDO/Orphanet_409991">
+        <rdfs:subClassOf rdf:resource="http://www.orpha.net/ORDO/Orphanet_C009"/>
+        <rdfs:label xml:lang="en">Worldwide</rdfs:label>
+    </owl:Class>    
+</rdf:RDF>
