@@ -1140,9 +1140,9 @@ public class OntEntityFactory extends EntityRegistry {
             Resource res = (Resource) or.links.get("onProperty");
             String prop = getURI (res); //getResourceValue (res);
 
-            Map<String, Object> attr = new HashMap<>();
-            attr.put(Props.NAME, name);
-            attr.put(Props.PROPERTY, prop);
+            Map<String, Object> attrs = new LinkedHashMap<>();
+            attrs.put(Props.NAME, name);
+            attrs.put(Props.PROPERTY, prop);
 
             String val = (String)or.props.get("hasValue");
             if (val != null) {
@@ -1152,7 +1152,14 @@ public class OntEntityFactory extends EntityRegistry {
             }
             else if (or.links.containsKey("someValuesFrom")) {
                 res = (Resource) or.links.get("someValuesFrom");
-                val = prop = getURI (res);
+                prop = getURI (res);
+                if (prop != null) {
+                    val = prop;
+                }
+                else {
+                    _stitch (ent, name, res, attrs);
+                    return;
+                }
             }
                 
             StitchKey key = R_rel;
@@ -1162,15 +1169,15 @@ public class OntEntityFactory extends EntityRegistry {
                 break;
             }
 
-            if (prop != null) {
+            if (val != null) {
                 for (Iterator<Entity> iter = find (Props.URI, prop);
                      iter.hasNext();) {
                     Entity e = iter.next();
-                    ent._stitch(e, key, val, attr);
+                    ent._stitch(e, key, val, attrs);
                 }
             }
             else {
-                logger.warning("***** Unable to process Restriction\n"+or);
+                logger.warning("***** UNKNOWN RESOURCE...\n"+or);
             }
         }
     }
@@ -1192,8 +1199,10 @@ public class OntEntityFactory extends EntityRegistry {
                 uri = res.toString(); // anonymous class
             }
 
-            if (attrs == null)
+            if (attrs == null) {
                 attrs = new LinkedHashMap<>();
+                attrs.put(Props.NAME, name);
+            }
             
             for (Iterator<Entity> iter = find (Props.URI, uri);
                  iter.hasNext();) {
@@ -1213,7 +1222,6 @@ public class OntEntityFactory extends EntityRegistry {
                         ent._stitch(e, R_closeMatch, uri, attrs);
                         break;
                     default:
-                        attrs.put(Props.NAME, name);
                         ent._stitch(e, R_rel, uri, attrs);
                         //logger.warning("Unknown stitch relationship: "+name);
                     }
