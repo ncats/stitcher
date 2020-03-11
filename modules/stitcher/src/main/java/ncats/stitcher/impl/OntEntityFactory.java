@@ -1161,11 +1161,16 @@ public class OntEntityFactory extends EntityRegistry {
                 key = R_subClassOf;
                 break;
             }
-                
-            for (Iterator<Entity> iter = find (Props.URI, prop);
-                 iter.hasNext();) {
-                Entity e = iter.next();
-                ent._stitch(e, key, val, attr);
+
+            if (prop != null) {
+                for (Iterator<Entity> iter = find (Props.URI, prop);
+                     iter.hasNext();) {
+                    Entity e = iter.next();
+                    ent._stitch(e, key, val, attr);
+                }
+            }
+            else {
+                logger.warning("***** Unable to process Restriction\n"+or);
             }
         }
     }
