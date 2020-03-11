@@ -203,6 +203,25 @@
                 <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_409976"/>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C017"/>
+                <owl:someValuesFrom>
+                  <owl:Class>
+                    <owl:intersectionOf rdf:parseType="Collection">
+                      <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C024"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_410295"/>
+                      </owl:Restriction>
+                      <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.orpha.net/ORDO/Orphanet_C028"/>
+                        <owl:someValuesFrom rdf:resource="http://www.orpha.net/ORDO/Orphanet_410296"/>
+                      </owl:Restriction>
+                    </owl:intersectionOf>
+                  </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     <owl:Axiom>
         <owl:annotatedSource rdf:resource="http://www.orpha.net/ORDO/Orphanet_10"/>
