@@ -1,0 +1,425 @@
+Received: from DM6PR09MB4256.namprd09.prod.outlook.com (2603:10b6:3:12b::16)
+ by DM5PR09MB3814.namprd09.prod.outlook.com with HTTPS via
+ DM5PR04CA0030.NAMPRD04.PROD.OUTLOOK.COM; Fri, 13 Mar 2020 22:45:34 +0000
+Received: from MWHPR09CA0028.namprd09.prod.outlook.com (2603:10b6:300:6d::14)
+ by DM6PR09MB4256.namprd09.prod.outlook.com (2603:10b6:5:209::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.13; Fri, 13 Mar
+ 2020 22:45:33 +0000
+Received: from DM2GCC01FT010.eop-gcc01.prod.protection.outlook.com
+ (2a01:111:f400:7d01::200) by MWHPR09CA0028.outlook.office365.com
+ (2603:10b6:300:6d::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14 via Frontend
+ Transport; Fri, 13 Mar 2020 22:45:33 +0000
+Authentication-Results: spf=softfail (sender IP is 156.40.79.154)
+ smtp.mailfrom=easychair.org; nih.mail.onmicrosoft.com; dkim=fail (body hash
+ did not verify) header.d=easychair.org;nih.mail.onmicrosoft.com; dmarc=fail
+ action=none header.from=easychair.org;
+Received-SPF: SoftFail (protection.outlook.com: domain of transitioning
+ easychair.org discourages use of 156.40.79.154 as permitted sender)
+Received: from mail.nih.gov (156.40.79.154) by
+ DM2GCC01FT010.mail.protection.outlook.com (10.97.3.132) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2814.13 via Frontend Transport; Fri, 13 Mar 2020 22:45:32 +0000
+Received: from uccbX03.nih.gov (156.40.79.153) by uccbx04.nih.gov
+ (156.40.79.154) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 13 Mar
+ 2020 18:45:28 -0400
+Received: from nihxwaye3as02.hub.nih.gov (165.112.13.27) by uccbX03.nih.gov
+ (156.40.79.153) with Microsoft SMTP Server (TLS) id 15.0.1497.2 via Frontend
+ Transport; Fri, 13 Mar 2020 18:45:28 -0400
+IronPort-SDR: 1AQNTkYy707MA5Nwp//aHx9Ri5b/nLpK+BtsC0IRrhkYBr769QpKqBDDfDA9fKjDU1RbJWYtxb
+ Fk4h0zzUkpvAe6Ns6SsWfwVNaeX6xndJ7nx0zjuJiJzU8zO2FkJe4sG3wkzHjSeJoXbeHevbqw
+ rkqQZrb7LBygxQwaf87UP0L8jf8YY+9skD4qrztl/PWi5M50/e+SD+Z31HnsNFj2paV4vO4lkT
+ LrMgVnBl5qVcJXORwLfCPfnKQ1JpOOkpy+zs6u+fcbk+3huXJeVLLpxrv9dbK+pvfU+m01PNfq
+ VXA=
+X-SBRS-Extended: Low
+X-IronPortListener: from-e3a
+Received: from ipss1-host175.is1e1.is.centurylink.net ([65.153.203.175])
+  by nihxwaye3as02.hub.nih.gov with ESMTP; 13 Mar 2020 18:45:29 -0400
+Received: from nihxwaye3as03.hub.nih.gov (unknown [165.112.13.37])
+	by ipss1-host175.is1e1.is.centurylink.net (Postfix) with ESMTP id D3A6B9980004
+	for <nguyenda@mail.nih.gov>; Fri, 13 Mar 2020 22:45:27 +0000 (GMT)
+Authentication-Results-Original: nihcesxwayst03.hub.nih.gov; spf=None
+ smtp.pra=ismb2020@easychair.org; spf=Pass
+ smtp.mailfrom=ismb2020@easychair.org; spf=Pass
+ smtp.helo=postmaster@easychair.org; dmarc=pass (p=none dis=none)
+ d=easychair.org
+IronPort-SDR: xHe2R50PEkmMtlLHjT0tJ65r6oLhHGyA1pHAZZYN0MON7XmLg8LNOdgqslS+WLkGEJgR4NESAR
+ W+Tq9skFDY7KV7gvjBdEy3W+Zi2IaXBrw=
+X-Ironport-IP: 4
+X-Ironport-IP: 6
+X-IronPortListener: CES-Inbound
+X-SBRS: 3.5
+IronPort-PHdr: =?us-ascii?q?9a23=3A8nNDqhzCsZF7N8zXCy+O+j09IxM/srCxBDY+r6?=
+ =?us-ascii?q?Qd2+gWIJqq85mqBkHD//Il1AaPAdyHrase26GO6ujJYi8p39WoiDg6aptCVh?=
+ =?us-ascii?q?sI2409vjcLJ4q7M3D9N+PgdCcgHc5PBxdP9nC/NlVJSo6lPwWB6nK94iQPFR?=
+ =?us-ascii?q?rhKAF7Ovr6GpLIj8Swyuu+54Dfbx9HiTagbr5+Ngi6oRvSu8UZnYduN7s6xw?=
+ =?us-ascii?q?fUrHdPZ+lZymRkKE6JkR3h/Mmw5plj8ypRu/Il6cFNVLjxcro7Q7JFEjkoKn?=
+ =?us-ascii?q?g568L3uxbNSwuP/WYcXX4NkhVUGQjF7Qr1UYn3vyDnq+dywiiaPcnxTbApRT?=
+ =?us-ascii?q?Sv6rpgRRH0hCsbMTMy7XragdJsgq1FvB2hpgR/w4/Kb4GTKPp+Zb7WcdcDSW?=
+ =?us-ascii?q?ZcQspdSylND4W7YIUXCOoPPuhWpJT5q1cTsReyAA+hD/7txDBVnH/7xaI03P?=
+ =?us-ascii?q?guHg/B0gIuH8wAvmnPrNjuKKcSUPy5wLXHzTnfbf5b3yr25ojSchAmpPGBRb?=
+ =?us-ascii?q?x8f8nMx0coCg7Ok0ucpZD7Mz+J2OgGrm+W7+t7VeKqkGErtR19riazyso3lI?=
+ =?us-ascii?q?bGnJkVy1DY+iV52ok1JMe4RFR8Yd6+H5tdrieXPJZ4TMMlRmFnoic6yrsetJ?=
+ =?us-ascii?q?66ZygF1I8oywTYa/ydfIiF5A/oWuWJITpgmn5pZbyyiwyv/UWuy+DwTMu53V?=
+ =?us-ascii?q?dQoiZbnNTBtnYA3AHJ5MedUPty5EKh1C6P1w/N7uFEJlg5mrTBJJ46wr8/ip?=
+ =?us-ascii?q?oTvl7CHi/sgkn2i7WWdko89uip7eTofKnmq4eCO4NphAzyKLkil8K+DOgiMA?=
+ =?us-ascii?q?UDXnKX9fqy2bDj5UH5Ra9FjvwykqnXqpDaIsEbq7a4Aw9O14Ys8AizAyu43N?=
+ =?us-ascii?q?gEhnQIMkhKeAmHjof1O1HBOvH4De2lj1SrijdryOjKPqf9DZXVMnjDjLDhcK?=
+ =?us-ascii?q?57605T1Qoyzc5Q55RJBb4bO//zX1X+tN3cDhMjNQy0wubnBM9y1oMZR2LcSp?=
+ =?us-ascii?q?OeZY/buhq0/P8pLKGqa5IEtTC1f/4q+u/ji3MwsVoUfK3v25oXLn+/AKI1DV?=
+ =?us-ascii?q?+eZC+mo+wkOy9Q5lBmBqS+iUaHW2QLPS6aUqsn9zo7AYO8S4DZSdb+0/S6wC?=
+ =?us-ascii?q?6nE8gONSh9AVeWHCKtJt3dBqUgSwO3Z+J/mzgZXKSgTIl8hUv8qlqjmPJue/?=
+ =?us-ascii?q?DP82gDtZu5iYYmr+aGjxw2/Cx5A4OH3mWEX2x4zSsEEjI/x7F0oUV80BGEy6?=
+ =?us-ascii?q?cr5p45Dolf6v1ATwMmZtbAmrUnW4yrAVOcJIvaLTTHSNXzMG1hR8N2nOIiUV?=
+ =?us-ascii?q?4sFpbh1FPD+xOBBpkUnZiHCLAx6qjg0UbAOsxd9mjq0/xyx11zEpsTaj7D5M?=
+ =?us-ascii?q?9/oiPUAZLElVncq7eyePYw1TLApkmZym/ch1xSUgN7Tff+UHYTa1GEg87+4x?=
+ =?us-ascii?q?CnLd6kXLs8LTUblOeEcrsSWvnlsgt6RvrdNffUYVy7yk6oLhmPlr2mRtrQam?=
+ =?us-ascii?q?Y3+yXaUWUhkjhL5yeBbSwGPRX4rzz0AzpjcDCOK0O36rgkrWOqY28YjF+AdF?=
+ =?us-ascii?q?0wzKetvScn2KeXQf4XwKA94Tsl8Sp3RRHhhvuLNuSvtSZOfvVGWO0dsHJr7j?=
+ =?us-ascii?q?LktSlfJ/nCTuhpr18DV0N+rnut8Sd9N4xyrckShSwXlCVccouC3kERdQ668c?=
+ =?us-ascii?q?63BbfyBkDK4y+da/Tn3ErlgM6W8b8hsttjm3LksgjMdCtq0nVV6vR2zXGepc?=
+ =?us-ascii?q?2SECssD6DuFX865jNE4LH8aSIQx8T/5UZACYevjh391fIiJMoZzgeCQP16Mp?=
+ =?us-ascii?q?+eGVTDNNYdQJmUTY5L01auaBILM89Q6LMpM/uiTPKJxPaaYspbnSmY03933K?=
+ =?us-ascii?q?wk11++9wRsRu/oxYgJ6q3FhAKVbGzMjVKGqf/3w7B1Jmw7Dg/dqGDFH9JOSP?=
+ =?us-ascii?q?BjVqAnOF2XdpjkjsU7hoTqXWZf7kLmHV4dxcu1LAKbdEeugF988G0tiiX+xX?=
+ =?us-ascii?q?ngixBxmisilKeU2zbCkaz6IRwAPGMPDHFpkQK1edDwx8sCCVG1ZhIgkgek40?=
+ =?us-ascii?q?u+j6FXp6V6enKXCU5TZyajNCUqSLa544nCLMJK4Ykj931HC7ztSV2TUa/2ox?=
+ =?us-ascii?q?IbyWXkBWQRgHhiL23658qnx11PzGSaKnsp9ijwZN1wyBHD5dfVWf9W2H88ST?=
+ =?us-ascii?q?JljSXMXADibd+o/d6ZjIfcu/GlSzr6EJ1Oe2/tzIPGuyyltiVxGRPqufe1l5?=
+ =?us-ascii?q?X8FBQilzfh3oxrTiDC9k6mOqHm3r+rOuJuf1MuA0XzuIJhAo8rqoIrn9kL3G?=
+ =?us-ascii?q?QCwJCc/H4Ji2D2ZNRA3KikNCBVbTMC2M/e4AHkwgtkNH3aj5nhWCCly9B6L8?=
+ =?us-ascii?q?K/fntQ2i856JVSD7yI6bVfgSZvilexthPaYfF8hHEa0/R9oHIfivsC7RIk1T?=
+ =?us-ascii?q?7VQqhHG05eMGTglg/d6de4oeQfaDOieKOh30p3nMrnC6uN+1sOYnvyd5Y8EC?=
+ =?us-ascii?q?M11f1RawiUglv07IysON/RbdkerQ2Lmgbbk7AObpIsnLwMhCohNmXj7zUjzK?=
+ =?us-ascii?q?YggBpi0Ivf3sDPInhx/K+/Hh9TNyHkL8IV9Db3iK9Cn8GQl4mxF5RlEz8PUd?=
+ =?us-ascii?q?PmV/WtWD4VsP3mMU6JHlhe4j+aAr/VR1fFsG9rpmneGJCiNmvRI2MWjJ1jSB?=
+ =?us-ascii?q?SbOE1DkVUMRjxp+/xxXguuxcHnbAJ4/mVLvwW+80ASjL02cUOkDzS6xk/gcD?=
+ =?us-ascii?q?o/RZmBIQAD6ABC7ErOIdOX//lvR3oe/oCr6gqMKiqUYBobaANBEkGCGV3nOa?=
+ =?us-ascii?q?GjoNfa9O3NTOulKvGUOe/WgeFXTOaDxZuuyM1h5TnGZaDtdjFySuY23EZORy?=
+ =?us-ascii?q?UzGt/ckW9XEXQ/mivWfsWbrRamvCptoYrslZajEBKq7oyJBbxINNxp8B3jmq?=
+ =?us-ascii?q?aPOdmbgyNhICpZ3JcBnCWa8rUU0V8Mhi0rTAGDSuVd5xbEV7mY2qlWDxUWcD?=
+ =?us-ascii?q?NsPdpT8/pnmAlQM4jdi9Oz2blm3LY5DFJMVFqpnc/MB4RCInq4PgmfXh6jOb?=
+ =?us-ascii?q?2dNDbLysDtJ6SmRvVcgf5VuBu5pTuAWxW6ZXLazGevCE7pa7oRxCiAdARToo?=
+ =?us-ascii?q?S8bgpgBQ2BBJr9Zxu3PcU2xTw6zLsoh2/bYGsVMDxyaURI/fWb6SJVhOk6Gn?=
+ =?us-ascii?q?QUtCM+a7DfxWDGsa+CcctF1JkjSj55nO9b/nkgnr1U7CpJX+xqkTrJsoY15V?=
+ =?us-ascii?q?G7mK+JyzohXx1Q+VMpzMqGu1tvPaLB+9xOQ3HBqVgM9mCaUUxQ//NoA8b+sK?=
+ =?us-ascii?q?BZy8KJk7j8YmQnkZqc7Y4HCs7YJdjSens6NBCzQGSMJAYMVi+gNWjenQpaiv?=
+ =?us-ascii?q?7YpRj35tAq75PrnpQJULpSUlc4Q+gbBkpSF9sHOJ5rXzkgnO3TnIsS6HG5th?=
+ =?us-ascii?q?WUWNRCs8WNSKeJGfu2YmX87/EMd14SzLj/N4hWKoDrxxkodAxhhIqTU0OCWN?=
+ =?us-ascii?q?lMpmtsZxQlq0VE8WI4SXc8k1TsbgfnuSVBL/O/kx8ohwc7WtwDr2axsW8+PU?=
+ =?us-ascii?q?GC5C0xkEI8gsX6iCGKbGaqaqetV8dQCiqyuE8vYNv3RAN8bAv6mkIBVn+MX7?=
+ =?us-ascii?q?VKk75pbnxmkifRsIBeEv5VTLcCZwUfjf2afPQn111Apz7vnxYco7KeV909yk?=
+ =?us-ascii?q?1wKsPkpmkluUordNMvIK3MOKdFhkNdgK6DpG7g1+w8xhMfO1dY8G6Wf31As0?=
+ =?us-ascii?q?gJO786Yiuwq7Y1skrbwGUFJzZKDaF38ZcIvgsnNu+NzjztyetFK0C6OvePMK?=
+ =?us-ascii?q?qIoHSYzoiIX1l20EII0UZC4+sTs49rfkyKWkQo1LbUGQ4OMJ+IKBpQZZAKri?=
+ =?us-ascii?q?D7cC+VoO7NyJNveYKnGaq7KI3G/LZRmU+iEAszSs4U6d8dG5C3zEzCBcruN6?=
+ =?us-ascii?q?8OyRws/kLsPlrPX5ErMFqb1TwApc+41pp+24JQcyocDWtKOiKy/r/LpwUuja?=
+ =?us-ascii?q?nLTJIsb3wdRIdBKmMuVZjwhXtCp3oZRmrSsKpR2E2Y4jT7vCiVEDTsc48peq?=
+ =?us-ascii?q?KPfR01QNjk/Dw+9+67gEXG+ZXXJnu8Ms5t8snG7edQ/sfVO7ZvVbB49nzktc?=
+ =?us-ascii?q?xdTn2uXXTIFIfodZX5cJgnbdX1EDC9SFPt0mtpHfe0B86kK+2zuS+tXZxd6d?=
+ =?us-ascii?q?TJ0Tk4JMS9HzAEXRBqqLNbvf8uVUg4e5M+JCXQmUE+Oqi4eVrK39y1Um2tID?=
+ =?us-ascii?q?pMCf5Fwrfjag=3D=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: =?us-ascii?q?A0FnAgDCC2xeh+tMiNVcCh4BCxyDcwU?=
+ =?us-ascii?q?ncVUjBwgqhBWDSIU6hzOCCZg1gWcJBA0TEAkBAgQBAQKGYR0GAQQ0EwIBAgE?=
+ =?us-ascii?q?BCwEBAQQBAQECAQIDBAEBAhABAQEKCwkIKYVdDII7KW9wAQEBAQEBAQEBAQE?=
+ =?us-ascii?q?BAQEBAQEBAQEBAQEBAQEBDwINJS8lJDgRHQEBJAIKAQQDECQCBSECES4gNYM?=
+ =?us-ascii?q?EASoBglQLo1eIbHWBMoJ/AQEFd4FOgyuBagMGgQ4qjC6BWz+BEYRWgw0NBIM?=
+ =?us-ascii?q?6gl6BQwEBAYwgDgSJEYlyjkx1AQYCAh6CBxeJN41VgkqMdowBpnc1g1mBaWe?=
+ =?us-ascii?q?BFH0igT+BTlAYDY4dGAKIbYVCQDMPdQGLCgImB4E1XwEB?=
+X-IPAS-Result: =?us-ascii?q?A0FnAgDCC2xeh+tMiNVcCh4BCxyDcwUncVUjBwgqhBWDS?=
+ =?us-ascii?q?IU6hzOCCZg1gWcJBA0TEAkBAgQBAQKGYR0GAQQ0EwIBAgEBCwEBAQQBAQECA?=
+ =?us-ascii?q?QIDBAEBAhABAQEKCwkIKYVdDII7KW9wAQEBAQEBAQEBAQEBAQEBAQEBAQEBA?=
+ =?us-ascii?q?QEBAQEBDwINJS8lJDgRHQEBJAIKAQQDECQCBSECES4gNYMEASoBglQLo1eIb?=
+ =?us-ascii?q?HWBMoJ/AQEFd4FOgyuBagMGgQ4qjC6BWz+BEYRWgw0NBIM6gl6BQwEBAYwgD?=
+ =?us-ascii?q?gSJEYlyjkx1AQYCAh6CBxeJN41VgkqMdowBpnc1g1mBaWeBFH0igT+BTlAYD?=
+ =?us-ascii?q?Y4dGAKIbYVCQDMPdQGLCgImB4E1XwEB?=
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from easychair.org ([213.136.76.235])
+  by nihcesxwayst03.hub.nih.gov with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2020 18:45:26 -0400
+Received: from easychair.org (m2635.contabo.net [213.136.76.235])
+	by easychair.org (8.14.4/8.14.4/Debian-4.1ubuntu1.1) with ESMTP id 02DMjO78013578
+	for <nguyenda@mail.nih.gov>; Fri, 13 Mar 2020 23:45:24 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=easychair.org;
+	s=default; t=1584139524;
+	bh=Y48ay/7UDZp9e++2+hLQCmNibLddDmpbTfVYubHUvDo=; l=8847;
+	h=Content-Type:Date:From:Subject:Sender:From;
+	b=gswV25An0x0XLdW6TjeVeKbjVb9ApCgo8fBB8RykBOho1EMiP0r9o0LPSZ1d6Bgne
+	 h3s92mxyEHD+6bsx9sup/QZ53cbelvzQ1tl2wk1/41A5UVGzDGj8rQVH8MDS8UjMJq
+	 cAiuL/ayP+NZbUaZTiPA7U0GF3Arfz8jUJD6/WbMDAPwWZh2YnsS8phcpF2G3XOofa
+	 IhZQEKvbj+00tIV6Zw/QeyCV/hNccEH/CXSDPFsTJWfHcHITlyJWBMjTre3YOso/9R
+	 fonhggGjtuudPlSagt0Y6DSisV6sXTD1muZhFxdiHrvdA452azS3XimOsWh2XY+5Ax
+	 Is4wF5yCNDYRQ==
+Message-ID: <202003132245.02DMjO78013578@easychair.org>
+MIME-Version: 1.0
+X-Mailer: MIME::Lite 3.030 (F2.84; A2.21; B3.15; Q3.13)
+Date: Fri, 13 Mar 2020 23:45:24 +0100
+From: "ISMB 2020" <ismb2020@easychair.org>
+To: Dac-Trung Nguyen <nguyenda@mail.nih.gov>
+Subject: ISMB 2020 notification for paper 252
+Sender: ismb2020@easychair.org
+X-Qwest-Proxy-Host: ipss1-host175.is1e1.is.centurylink.net
+X-Qwest-Process-Uuid: c1af508c-8658-4d2f-9a91-51c15b25f997-2929197440570110
+X-Qwest-Status: hEUBLG9ErOsrnKeZ
+Return-Path: ismb2020@easychair.org
+X-InternalExchange: ExInternal
+X-SCL-By-Transport-Rule: ironport-filtered in EXO
+X-OrganizationHeadersPreserved: uccbx04.nih.gov
+X-MS-Exchange-Organization-ExpirationStartTime: 13 Mar 2020 22:45:32.9602
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ 380feb90-8991-4794-927e-08d7c7a03d13
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Organization-MessageDirectionality: Originating
+X-MS-Exchange-SkipListedInternetSender:
+ ip=[65.153.203.175];domain=ipss1-host175.is1e1.is.centurylink.net
+X-MS-Exchange-Organization-SCL: 1
+X-MS-Exchange-Organization-Antispam-Report: DV:3.3.5705.600;OrigIP:165.112.13.27
+X-CrossPremisesHeadersPromoted:
+ DM2GCC01FT010.eop-gcc01.prod.protection.outlook.com
+X-CrossPremisesHeadersFiltered:
+ DM2GCC01FT010.eop-gcc01.prod.protection.outlook.com
+X-Forefront-Antispam-Report:
+ CIP:156.40.79.154;IPV:CAL;SCL:-1;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10001)(199004)(86362001)(356004)(156005)(5660300002)(6916009)(81156014)(7846003)(26826003)(26005)(36756003)(966005)(2616005)(1076003)(15650500001)(1096003)(7696005)(8676002)(426003)(55016002)(336012)(8936002)(81166006)(956004);DIR:INB;SFP:;SCL:1;SRVR:DM6PR09MB4256;H:mail.nih.gov;FPR:;SPF:SoftFail;LANG:en;PTR:InfoDomainNonexistent;A:1;
+X-MS-Exchange-Organization-AuthSource: uccbX03.nih.gov
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-OriginatorOrg: mail.nih.gov
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 380feb90-8991-4794-927e-08d7c7a03d13
+X-MS-TrafficTypeDiagnostic: DM6PR09MB4256:
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam: BCL:0;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2020 22:45:32.8371
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 380feb90-8991-4794-927e-08d7c7a03d13
+X-MS-Exchange-CrossTenant-Id: 14b77578-9773-42d5-8507-251ca2dc2b06
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=14b77578-9773-42d5-8507-251ca2dc2b06;Ip=[156.40.79.154];Helo=[mail.nih.gov]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR09MB4256
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:01.5442828
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.2814.018
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(20160514016)(750127)(520011016)(944506383)(944626516);
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xwkyeGEJBtpQEOJ6nmr74FJFf37pgOtrKZg5YnvMG5wxeyJ0W8rv9BpTp4i+?=
+ =?us-ascii?Q?xJ77tGHQA5wI/REC2z1dkTkSUqOtfVOMwLyn4Cd53GIOE7sm39L+gGIwRe9W?=
+ =?us-ascii?Q?Iy7zL9h9txUVDh1DxEyGKOOXUzyHwtAy550FbfWR2N+LksXbv4o3cMbPYYq4?=
+ =?us-ascii?Q?/VSnM1NCLKJOzhtTqJ6jAcr5rw8dpNLcSoyBdSHhLKmZdU6gaZQnHSCOTc2X?=
+ =?us-ascii?Q?2wqEkqcj1R62FP9yGFQr6Po0WpmzI+IHKUV5d9joonL7q0CheR7kK+65V5jy?=
+ =?us-ascii?Q?v6W8chy9wyxKJwXlJMl5aHzK8hj6WnYES3bVlWQJX1frSiAU5pDri4sT1//k?=
+ =?us-ascii?Q?H38j5U6FGfb42TEZzFEDVwrbQXOx+JNzuvrwRipopF7+GPhnhzckLKWYVnz4?=
+ =?us-ascii?Q?+4QHmaw1+GvfQp5L2kewYsF4DidiULUFTaJzT+NjyYnGZX0fBvw1jtHFv7BL?=
+ =?us-ascii?Q?mLSkULEM9Qx7cUWg2rmFp5nkNwrJ/XXq4oLMZXsK8C4gbxdAcC0gnmHkIO9W?=
+ =?us-ascii?Q?3F0MYpFIH3yD/CGhH0/vNUL0SS+MVC2xLM1nTT6Af0pIJnAqX9Apftcw8Px3?=
+ =?us-ascii?Q?dVae+8LIWZcasXebgUidJJFJkSwfP6sR7DOJnUDnkLU1fBUKYt6kWsdJXpNp?=
+ =?us-ascii?Q?cBAeiwVgwP/kAELOF7x54UBPtRR+LI50BpJKTm/WkZE78OOMb51QNr40bQk2?=
+ =?us-ascii?Q?dRkeKdUXnDrCmPcG70h58C5/HL11uTrPK/+qRT2XdZVu2LyprowaO1/jyy3j?=
+ =?us-ascii?Q?mn6SZoTzh6LHZeCCtghmYJUkMX4elWtPY8EdFjVTwFhiWLqNjHWY329fs/iK?=
+ =?us-ascii?Q?BAVE6LpscbIuCeZdid4A80NcV+Eb5dGhQbF/3c88sb1Sm6fLEo7zYX3HUfOr?=
+ =?us-ascii?Q?mshjm1kXmVnLG5eO33gvSm5z5lYRYvycBTFUj1qgxTs11fqm/IjEUQD7+Wnw?=
+ =?us-ascii?Q?5Stw/m8vnwSQYA5FY+Z/AsXpBJrZF6hNkFTimfGV7K5+e2318UN5E649b1gI?=
+ =?us-ascii?Q?j00iYZZ62jeN39Kq+rjItRWRIZSWEObqiUMsOmvUkoc8KY/GHKSHbV7VNhb/?=
+ =?us-ascii?Q?ETumKMYqbn3Z2gn3CyUSYMVRXaCSLQ=3D=3D?=
+Content-type: text/plain;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+
+Dear Dac-Trung,
+
+Thank you for your submission to the ISMB/ECCB 2020 Proceedings Track. We r=
+egret to inform you that we are unable to accept your paper for publication.=
+ There were many strong submissions this year and only a small fraction coul=
+d be accepted.
+
+A total of 329 papers were submitted.  Of these, 64 manuscripts have been c=
+onditionally accepted, giving the final acceptance rate of 19.4%. Each paper=
+ was reviewed by several members of the Program Committee, overseen by the S=
+enior Program Committee.  Papers were individually reviewed and subsequently=
+ discussed by their reviewers to encourage a robust debate and possible reso=
+lution of discrepancies between reviewers. Based on the reviews and the outc=
+omes of these discussions, papers were nominated for acceptance into the pro=
+gram. A discussion of the Area Chairs, moderated by the Proceedings Chairs, =
+brought us to a final selection of papers for continued consideration.
+
+We hope you will be able to participate at ISMB 2020 in Montreal, Canada, J=
+uly 12-16. You may wish to consider submitting to the Abstract Track which i=
+ncludes talks and posters. Submission details are available at:=20
+
+https://www.iscb.org/ismb2020-submit/abstracts.
+
+We understand that the current public health situation is leaving summer tr=
+avel plans uncertain at this time, but we are considering virtual options fo=
+r those who may not be able to attend in person.
+
+Conference registration is open at:
+
+https://www.iscb.org/ismb2020-registration
+
+Sincerely,
+
+Nadia El-Mabrouk and Donna Slonim
+ISMB 2020 Proceedings Chairs
+
+SUBMISSION: 252
+TITLE: Stitcher: An entity resolution framework for comprehensive data inte=
+gration of approved drugs
+
+
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 252
+TITLE: Stitcher: An entity resolution framework for comprehensive data inte=
+gration of approved drugs
+AUTHORS: Dac-Trung Nguyen, Ivan Grishagin, Daniel Katzel, Tyler Peryea, Aji=
+t Jadhav and Noel Southall
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+The authors build a comprehensive data integration pipeline for approved dr=
+ug data, including ingestion, stitching, entity resolution and normalization=
+. This is a well-motivated study and the manuscript is well written. InXight=
+ Drugs is also the most comprehensive resource of its kind. While I apprecia=
+te the authors efforts in proposing such pipeline and building the drug data=
+base, the current manuscript is limited by the lack of evaluation and weak d=
+iscussion.
+
+The authors proposed deterministic approaches including a set of rules for =
+drug integration. It=E2=80=99s unclear how accurate these rules work. For example,=
+ how many sgroup nodes are unique entities? How many erroneous nodes or link=
+age can be generated through the algorithms? There is a lack of error analys=
+is as well.
+
+There is very limited discussion on related work. For example, how the prop=
+osed approach differs from other deterministic, probabilistic or graph-based=
+ approaches? What are the pros and cons of proposed approaches?=20
+
+There is no discussion section.
+
+
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 252
+TITLE: Stitcher: An entity resolution framework for comprehensive data inte=
+gration of approved drugs
+AUTHORS: Dac-Trung Nguyen, Ivan Grishagin, Daniel Katzel, Tyler Peryea, Aji=
+t Jadhav and Noel Southall
+
+----------- Overall evaluation -----------
+SCORE: 1 (weak accept)
+----- TEXT:
+Stitcher is a framework for constructing a graph representation for drugs t=
+hat utilizes the molecular structure of the drug. By disentangling clusters,=
+ stitcher yields connected components that can be interpreted. It can serve =
+as a valuable source for data mining tasks on drugs.=20
+
+The approach is reasonable and three examples are illustrative and well-cho=
+sen. The paper, however, is dense and very difficult to digest.
+
+To me, it is unclear how the R_activeMoiety key is extracted from the data.
+
+Instead of showing the top stich value for each stitch key, a distribution =
+of stich values would be more insightful.=20
+
+To my understanding, InXight is a directory for drugs. It is unclear which =
+data sources of Stitcher are a subset of those of InXight. Is it possible to=
+ include data sources to Stitcher that InXight cannot handle and vice versa?=
+ If that is the case, why?
+
+Quantitative evaluation and qualitative interpretation of the multigraph ar=
+e missing: How many clusters are found and what is the difference/similarity=
+ to the three definitions of a drug?
+
+
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 252
+TITLE: Stitcher: An entity resolution framework for comprehensive data inte=
+gration of approved drugs
+AUTHORS: Dac-Trung Nguyen, Ivan Grishagin, Daniel Katzel, Tyler Peryea, Aji=
+t Jadhav and Noel Southall
+
+----------- Overall evaluation -----------
+SCORE: 1 (weak accept)
+----- TEXT:
+This work presents Stitcher, a resource to integrate and homogenize drug na=
+mes from a variety of sources. The method uses a multigraph where nodes repr=
+esent entities (compounds) and edges describe annotations and semantic relat=
+ionships.=20
+
+This is an interesting development that serves to the purpose of data integ=
+ration across multiple drug databases. The stitching process makes a good jo=
+b in creating connected components where unique entities can be resolved thr=
+ough the application of several rules based on the relationships gathered fo=
+r the connected nodes. =20
+
+A number of minor points can be considered to improve the manuscript and us=
+e of this resource
+
+1.	Figure 1 needs much more explanation. Labels within nodes are truncated =
+or missing and therefore it is hard to understand how nodes are different. S=
+ome edges are directed, but it is not clear how directions are established o=
+r what their color indicates. Finally, the resolved entity appears as a numb=
+er. Is there any standardized name assigned to this number?
+2.	It is unclear what is the level of data compression achieved by Stitcher=
+, i.e. how many different entities are resolved from the current number of s=
+titch nodes.  This will be an idea of how much redundancy have been resolved=
+ by the methodology
+3.	It is also unclear how Stitcher is actually used and if all entities are=
+ resolved automatically creating some kind of standardized database, or, on =
+the contrary, multigraphs are maintained and need to be curated manually in =
+each case. The manuscript presents some examples of drug graphs but not a cl=
+ear description of the usage of the resource.
+
+
+
+----------------------- REVIEW 4 ---------------------
+SUBMISSION: 252
+TITLE: Stitcher: An entity resolution framework for comprehensive data inte=
+gration of approved drugs
+AUTHORS: Dac-Trung Nguyen, Ivan Grishagin, Daniel Katzel, Tyler Peryea, Aji=
+t Jadhav and Noel Southall
+
+----------- Overall evaluation -----------
+SCORE: -2 (reject)
+----- TEXT:
+The goal of Nguyen et al. paper is to build a framework for data integratio=
+n of approved drugs.  The authors start from the comment that it is not clea=
+r what the definition of drug is which makes such integration more difficult=
+.  Therefore they focus on entity resolution. They identify entity as a cliq=
+ue in their multigraph called Stitcher.   Then give a pseudocode   of an alg=
+orithm to find unique entities.=20
+
+While integration of diverse data sets of approved drugs can be valuable an=
+d the Stitcher multigraph appears to be a reasonable way to represent the in=
+formation, however the manuscript is  far from being ready for a prime time.=
+ The algorithmic approach reduces to clique finding   and there is no compar=
+ison with other entity resolution strategies.
+
+1.	The main concepts are vaguely defined. =20
+2.	The algorithm is not clearly described or validated. There is no compari=
+son with other entity resolution strategies.
+3.	The definition of =E2=80=9Cstitch node=E2=80=9D is not clear. What is the relation b=
+etween the stitch key and the stitch node?  Even the definition of  =E2=80=9Cdata =
+node=E2=80=9D as =E2=80=9Craw  entity as ingested from data source=E2=80=9D is not optimal. =20
+4.	It is not clear how connection between group nodes and data nodes are es=
+tablished.
+6.	Are the entities  defined as maximum cliques of any cliques? =E2=80=93 I am gu=
+essing maximum  but, if so, how the overlaps between cliques are interpreted=
+?.  How the correctness of the maximality assumption for definition of entit=
+y is justified? This appears to build on the assumption that there are no mi=
+ssing edges.
+7.	The concept of  sgroup nodes is not clear enough  =E2=80=93 they correspond to=
+ cliques of stitch nodes  but the authors also state that there might be man=
+y sgroup nodes for any given set of stitch nodes.=20
+8.	In the definition of a clique in the multigraph , do the labels of edges=
+ used in the clique  definition matter?
+9.	The description of the method is not clear  enough and the document is o=
+verall hard to read.
+
+
+
