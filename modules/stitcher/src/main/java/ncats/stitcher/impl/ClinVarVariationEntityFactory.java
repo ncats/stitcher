@@ -107,8 +107,8 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("name", vcv.getAttribute("VariationName"));
         data.put("type", type);
         data.put("version", Integer.parseInt(vcv.getAttribute("Version")));
-        data.put("status", xpath.evaluate("//RecordStatus", vcv));
-        data.put("species", xpath.evaluate("//Species", vcv));
+        data.put("status", xpath.evaluate("./RecordStatus", vcv));
+        data.put("species", xpath.evaluate("./Species", vcv));
                  
         String value = vcv.getAttribute("DateCreated");
         if (value != null) {
@@ -123,14 +123,14 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         }
         
         NodeList values = (NodeList)xpath.evaluate
-            ("//InterpretedRecord/"
+            ("./InterpretedRecord/"
              +(type.equalsIgnoreCase("haplotype") ? "Haplotype/":"")
              +"SimpleAllele/GeneList/Gene", vcv, XPathConstants.NODESET);
         Set<String> genes = new TreeSet<>();
         Set<String> generefs = new TreeSet<>();
         for (int i = 0; i < values.getLength(); ++i) {
             Element gene = (Element)values.item(i);
-            String loc = xpath.evaluate("//Location/CytogeneticLocation", gene);
+            String loc = xpath.evaluate("./Location/CytogeneticLocation", gene);
             String sym = gene.getAttribute("Symbol");
             genes.add(sym);
             generefs.add(sym);
@@ -140,7 +140,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             id = gene.getAttribute("HGNC_ID");
             if (id.length() > 0)
                 generefs.add(id);
-            id = xpath.evaluate("//OMIM", gene).trim();
+            id = xpath.evaluate("./OMIM", gene).trim();
             if (id.length() > 0)
                 generefs.add("OMIM:"+id);
         }
@@ -148,50 +148,70 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("gene_count", genes.size());
 
         List<String> rcv = new ArrayList<>();
-        values = (NodeList)xpath.evaluate("//RCVList/RCVAccession/@Accession",
+        values = (NodeList)xpath.evaluate("./RCVList/RCVAccession/@Accession",
                                           vcv, XPathConstants.NODESET);
         for (int i = 0; i < values.getLength(); ++i) {
             rcv.add(((Attr)values.item(i)).getValue());
         }
         data.put("RCV", rcv.toArray(new String[0]));
 
-        values = (NodeList)xpath.evaluate("//Interpretations/Interpretation",
-                                          vcv, XPathConstants.NODESET);
+        values = (NodeList)xpath.evaluate
+            ("./InterpretedRecord/Interpretations/Interpretation",
+             vcv, XPathConstants.NODESET);
         List<Map> interps = new ArrayList<>();
         Set<String> conditions = new TreeSet<>();
+        int conditionCount = 0;
         for (int i = 0; i < values.getLength(); ++i) {
             Element elm = (Element)values.item(i);
             NodeList cites = (NodeList)xpath.evaluate
-                ("//Citation/ID[@Source=\"PubMed\"]",
+                ("./Citation/ID[@Source=\"PubMed\"]",
                  elm, XPathConstants.NODESET);
             List<String> pmids = new ArrayList<>();
             for (int j = 0; j < cites.getLength(); ++j)
                 pmids.add("PMID:"+((Element)cites.item(j)).getTextContent());
-            NodeList refs = (NodeList)xpath.evaluate
-                ("//ConditionList/TraitSet/Trait/XRef", elm,
+            NodeList traits = (NodeList)xpath.evaluate
+                ("./ConditionList/TraitSet/Trait", elm,
                  XPathConstants.NODESET);
             Set<String> xrefs = new TreeSet<>();
-            for (int j = 0; j < refs.getLength(); ++j) {
-                Element r = (Element)refs.item(j);
-                String db = r.getAttribute("DB");
-                switch (db) {
-                case "Orphanet":
-                    xrefs.add("ORPHA:"+r.getAttribute("ID"));
+            for (int j = 0; j < traits.getLength(); ++j) {
+                Element trait = (Element)traits.item(j);
+                NodeList refs = (NodeList)xpath.evaluate
+                    ("./XRef", trait, XPathConstants.NODESET);
+                for (int k = 0; k < refs.getLength(); ++k) {
+                    Element r = (Element)refs.item(k);
+                    String db = r.getAttribute("DB");
+                    String id = r.getAttribute("ID");
+                    /*
+                    System.out.print("^^^ db="+db+" id="+id);
+                    for (org.w3c.dom.Node p, n = r; (p = n.getParentNode()) != null; ) {
+                        System.out.print(" "+n.getNodeName());
+                        n = p;
+                    }
+                    System.out.println();
+                    */
+                    switch (db) {
+                    case "Orphanet":
+                        xrefs.add("ORPHA:"+id);
+                        break;
+                    case "MedGen":
+                        xrefs.add("UMLS:"+id);
+                        break;
+                    case "OMIM":
+                        xrefs.add("OMIM:"+id);
+                        break;
+                    case "HP":
+                    case "Human Phenotype Ontology":
+                        xrefs.add(id);
                     break;
-                case "MedGen":
-                    xrefs.add("UMLS:"+r.getAttribute("ID"));
-                    break;
-                case "OMIM":
-                    xrefs.add("OMIM:"+r.getAttribute("ID"));
-                    break;
-                case "HP":
-                    xrefs.add(r.getAttribute("ID"));
-                    break;
-                case "Office of Rare Diseases":
-                    xrefs.add(String.format
-                              ("GARD:%1$07d",
-                               Integer.parseInt(r.getAttribute("ID"))));
-                    break;
+                    case "Office of Rare Diseases":
+                        xrefs.add(String.format
+                                  ("GARD:%1$07d", Integer.parseInt(id)));
+                        break;
+                    }
+                }
+                
+                if ("Disease".equals(trait.getAttribute("Type"))) {
+                    ++conditionCount;
                 }
             }
             conditions.addAll(xrefs);
@@ -208,13 +228,14 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             .collect(Collectors.toSet());
         data.put("interpretations", interpretations.toArray(new String[0]));
         data.put("conditions", conditions.toArray(new String[0]));
+        data.put("condition_count", conditionCount);
 
         Entity ent = register (data);
         if (ent != null) {
             logger.info("++++++ "+String.format("%1$6d ", xs.getCount())
                         +data.get("accession")+": genes="+genes
                         +" interps="+interps.size()
-                        +" conditions="+conditions.size()
+                        +" conditions="+conditionCount
                         +" "+data.get("name"));
             for (Map interp : interps) {
                 Map attrs = new LinkedHashMap ();
