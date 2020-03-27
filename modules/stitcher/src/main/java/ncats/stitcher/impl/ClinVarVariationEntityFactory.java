@@ -148,8 +148,9 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("gene_count", genes.size());
 
         List<String> rcv = new ArrayList<>();
-        values = (NodeList)xpath.evaluate("./RCVList/RCVAccession/@Accession",
-                                          vcv, XPathConstants.NODESET);
+        values = (NodeList)xpath.evaluate
+            ("./InterpretedRecord/RCVList/RCVAccession/@Accession",
+             vcv, XPathConstants.NODESET);
         for (int i = 0; i < values.getLength(); ++i) {
             rcv.add(((Attr)values.item(i)).getValue());
         }
