@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.lang.reflect.Array;
 
 import javax.xml.parsers.*;
@@ -153,14 +154,24 @@ public class OMIMUpdateEntityFactory extends EntityRegistry {
     public int update (String apiKey) throws Exception {
         count = 0;
         final String base = OMIM_API + "&"+apiKey;
+        final Random rand = new Random ();
+        final AtomicInteger errors = new AtomicInteger ();
         entities ("S_OMIM", e -> {
                 try {
-                    if (update (base, e))
-                        ++count;
+                    if (update (base, e)) {
+                        if (++count % 20 == 0) {
+                            Thread.currentThread().sleep
+                                (1000 + rand.nextInt(5000));
+                        }
+                    }
                 }
                 catch (Exception ex) {
                     logger.log(Level.SEVERE, "Can't update entity "
                                +e.payload("notation")+"!", ex);
+                    if (errors.incrementAndGet() >= 5)
+                        throw new RuntimeException
+                            ("Bailing out after "+errors.get()
+                             +" failed attempts!");
                 }
             });
         return count;

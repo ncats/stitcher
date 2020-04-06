@@ -1578,7 +1578,7 @@ public class OntEntityFactory extends EntityRegistry {
                 xrefs.put(res, or);
             }
 
-            if (true
+            if (false
                 && ("http://www.orpha.net/ORDO/Orphanet_1000".equals(or.uri)
                     || resources.size() > 2000)
                 ) {
