@@ -372,32 +372,34 @@ public class MedGenEntityFactory extends EntityRegistry {
             String cui1 = (String)r.get("CUI1");
             String cui2 = (String)r.get("CUI2");
             if (!cui1.equals(cui2)) {
-                String rel = (String) r.get("REL");
-                String rela = (String) r.get("RELA");
-                List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui1);
-                List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui2);
-                for (Entity s : sources) {
-                    for (Entity t : targets) {
-                        if (!s.equals(t)) {
-                            try {
-                                if ("isa".equals(rela))
-                                    s.stitch(t, R_subClassOf, r);
-                                else
-                                    s.stitch(t, R_rel,
-                                             rela != null ? rela : rel, r);
-                            }
-                            catch (Exception ex) {
-                                logger.log(Level.SEVERE,
-                                           "Can't create relationship between "
-                                           +cui1+" and "+cui2+"\n>>> "
-                                           +mapper.valueToTree(r), ex);
-                                return count;
+                String rel = (String) r.get("RELA");
+                if (rel != null) {
+                    List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui1);
+                    List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui2);
+                    for (Entity s : sources) {
+                        for (Entity t : targets) {
+                            if (!s.equals(t)) {
+                                try {
+                                    if ("isa".equals(rel))
+                                        s.stitch(t, R_subClassOf, r);
+                                    else {
+                                        r.put(NAME, rel);
+                                        s.stitch(t, R_rel,"UMLS:"+cui2, r);
+                                    }
+                                }
+                                catch (Exception ex) {
+                                    logger.log
+                                        (Level.SEVERE,
+                                         "Can't create relationship between "
+                                         +cui1+" and "+cui2+"\n>>> "
+                                         +mapper.valueToTree(r), ex);
+                                    return count;
+                                }
                             }
                         }
                     }
+                    ++count;
                 }
-                
-                ++count;
             }
         }
         return count;
@@ -417,12 +419,18 @@ public class MedGenEntityFactory extends EntityRegistry {
             String tar = (String) r.get("HPO_CUI");
             String rel = (String) r.get("relationship");
             if (rel != null && !src.equals(tar)) {
-                List<Entity> targets = getEntities (I_CODE, "UMLS:"+src);
-                List<Entity> sources = getEntities (I_CODE, "UMLS:"+tar);
+                List<Entity> sources = getEntities (I_CODE, "UMLS:"+src);
+                List<Entity> targets = getEntities (I_CODE, "UMLS:"+tar);
                 for (Entity s : sources) {
                     for (Entity t : targets) {
-                        if (!s.equals(t))
-                            s.stitch(t, R_rel, rel, r);
+                        if (!s.equals(t)) {
+                            if ("isa".equals(rel))
+                                s.stitch(t, R_subClassOf, r);
+                            else {
+                                r.put(NAME, rel);
+                                s.stitch(t, R_rel, "UMLS:"+tar, r);
+                            }
+                        }
                     }
                 }
                 ++count;

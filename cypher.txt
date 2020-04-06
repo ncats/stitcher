@@ -176,3 +176,11 @@ match p=(n:`S_HP`)-[:R_subClassOf*1..100]->(m:`S_HP`) where 'HP:0000005' in m.I_
 
 ## mode of inheritance for gard diseases
 match (n:`S_HP`)-[e:R_rel{value:'inheritance_type_of'}]-(m:`S_GARD`) with n,m,e match p=(n)-[]-(d:DATA), q=(m)-[]-(f:DATA) return e.MedGen_source as source,d.label as `mode of inheritance`,d.id as `HPO`,f.id as `GARD`,f.name as `GARD disease` limit 1000
+
+match (n:S_ORDO_ORPHANET)-[]-(d:DATA) where n._N_Name contains 'CYSTIC FIBROSIS' with n,d match p=(n)-[:R_subClassOf{property:'http://www.orpha.net/ORDO/Orphanet_C016'}]-()-[]-(:`S_HP`) return p,d
+
+match (n:`S_OMIM`)-[:R_rel{name:'has_inheritance_type'}]-(m:`S_OMIM`)-[:N_Name|:I_CODE]-(z:`S_HP`) where ('T033' in labels(m) or 'T045' in labels(m)) and any(x in m.I_CODE where x =~ 'MTHU.*') and n._N_Name contains 'CYSTIC FIBROSIS' with n,m,z match p=(n)-[]-(:DATA), q=(m)-[]-(:DATA) return p,q,z
+
+match (n:S_MEDGEN)--(d:DATA) with n,d match p=(n)--(v:S_CLINVAR)--(z:S_OGG)--(x:DATA) with count(distinct v) as variantCount, d.id as CUI,d.NAME as Disease,x.label as Gene where Gene="PCSK9" return distinct(CUI),Disease,Gene,variantCount order by variantCount desc, CUI limit 20
+
+match (n:`S_GARD`)-[]-(d:DATA) where n._N_Name contains toUpper('charge syndrome')  with n,d match p=(n)-[e:N_Name|:I_CODE]-(o:S_OMIM:T047)-[:R_rel{name:'has_inheritance_type'}]-(m:S_OMIM)--(z:DATA), q=(o)--(x:DATA) return d.gard_id as GARD_ID,d.name as GARD,e.value as MATCHED,x.notation as OMIM,z.label as Inheritance

@@ -1,10 +1,14 @@
 #!/bin/sh
 
-version="v202002"
+version="v20200405"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
+# medgen if available
 medgen="medgen"
+#clinvar if available
+clinvar="clinvar/ClinVarVariationRelease_00-latest.xml.gz"
+#this might be too much right now
 ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 
 ###########################
@@ -61,6 +65,12 @@ for f in $owl_files; do
     sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $f"
 done
 
+# hit omim api to get additional data not in ontology
+if test -f "omim-credentials.txt"; then
+    omim_credentials=`cat omim-credentials.txt`
+    sbt stitcher/"runMain ncats.stitcher.impl.OMIMUpdateEntityFactory $out $omim_credentials"
+fi
+
 #load ChEBI
 sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.xrdf.gz"
 
@@ -81,6 +91,11 @@ fi
 #load MedGen if available
 if test -d $medgen; then
     sbt stitcher/"runMain ncats.stitcher.impl.MedGenEntityFactory $out $medgen"
+fi
+
+#load clinvar if avaiable
+if test -f $clinvar; then
+    sbt stitcher/"runMain ncats.stitcher.impl.ClinVarVariationEntityFactory $out $clinvar"
 fi
 
 #load PPI if available
