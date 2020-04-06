@@ -61,10 +61,11 @@ public class HPOEntityFactory extends EntityRegistry {
                 attr.clear();
                 for (int i = 0; i < header.length; ++i)
                     attr.put(header[i], toks[i]);
+                attr.put(NAME, "has_phenotype");
                 for (Entity p : phenotypes) {
                     for (Entity d : diseases) {
                         if (!p.equals(d)) {
-                            d.stitch(p, R_rel, "has_phenotype", attr);
+                            d.stitch(p, R_rel, toks[3], attr);
                             d.addLabel(source.getLabel());
                         }
                     }

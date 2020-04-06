@@ -44,7 +44,8 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
 
     class ClinVarVariationParser implements BiConsumer<XmlStream, byte[]> {
         final DocumentBuilder builder;
-        
+
+        public int count;
         ClinVarVariationParser () throws Exception {
             builder = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder();
@@ -54,7 +55,9 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             //logger.info("### processing record "+xs.getCount()+"...");
             try {
                 Document doc = builder.parse(new ByteArrayInputStream (xml));
-                register (xs, doc, xml);
+                Entity ent = register (xs, doc, xml);
+                if (ent != null)
+                    ++count;
             }
             catch (Exception ex) {
                 logger.log(Level.SEVERE,
@@ -81,7 +84,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
     @Override
     protected void init () {
         super.init();
-        setIdField ("accession");
+        setIdField ("id");
         setNameField ("name");
         add (I_GENE, "genes")
             .add(T_Keyword, "type")
@@ -103,6 +106,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
 
         Map<String, Object> data = new LinkedHashMap<>();
         String type = vcv.getAttribute("VariationType");
+        data.put("id", Long.parseLong(vcv.getAttribute("VariationID")));
         data.put("accession", vcv.getAttribute("Accession"));
         data.put("name", vcv.getAttribute("VariationName"));
         data.put("type", type);
@@ -128,6 +132,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
              +"SimpleAllele/GeneList/Gene", vcv, XPathConstants.NODESET);
         Set<String> genes = new TreeSet<>();
         Set<String> generefs = new TreeSet<>();
+        Set<Integer> alleles = new TreeSet<>();
         for (int i = 0; i < values.getLength(); ++i) {
             Element gene = (Element)values.item(i);
             String loc = xpath.evaluate("./Location/CytogeneticLocation", gene);
@@ -143,9 +148,16 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             id = xpath.evaluate("./OMIM", gene).trim();
             if (id.length() > 0)
                 generefs.add("OMIM:"+id);
+
+            String allele = xpath.evaluate("../../@AlleleID", gene);
+            if (!"".equals(allele)) {
+                alleles.add(Integer.parseInt(allele));
+            }
         }
         data.put("genes", generefs.toArray(new String[0]));
         data.put("gene_count", genes.size());
+        data.put("genesymbols", genes.toArray(new String[0]));
+        data.put("alleles", alleles.toArray(new Integer[0]));
 
         List<String> rcv = new ArrayList<>();
         values = (NodeList)xpath.evaluate
@@ -271,12 +283,17 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         ds.set(Props.URI, file.toURI().toString());
 
         logger.info("############## registering entities for "+file);
-        try (XmlStream xs = new XmlStream
-             (new GZIPInputStream (new FileInputStream (file)),
-              "VariationArchive", new ClinVarVariationParser ())) {
-            int count = xs.start();
-            ds.set(INSTANCES, count);
-            updateMeta (ds);
+        try {
+            ClinVarVariationParser varp = new ClinVarVariationParser ();
+            try (XmlStream xs = new XmlStream
+                 (new GZIPInputStream (new FileInputStream (file)),
+                  "VariationArchive", varp)) {
+                int total = xs.start();
+                ds.set(INSTANCES, varp.count);
+                updateMeta (ds);
+                logger.info("############### "+varp.count+"/"
+                            +total+" entities registered!");
+            }
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't parse file: "+file, ex);

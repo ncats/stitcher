@@ -1266,8 +1266,11 @@ public class Entity extends CNode {
                     for (Map.Entry<String, Object> me : attrs.entrySet()) {
                         if (rel.hasProperty(me.getKey())) {
                             Object old = rel.getProperty(me.getKey());
-                            rel.setProperty
-                                (me.getKey(), Util.merge(old, me.getValue()));
+                            if (!me.getValue().equals(old)) {
+                                rel.setProperty
+                                    (me.getKey(), Util.merge
+                                     (old, me.getValue()));
+                            }
                         }
                         else {
                             rel.setProperty(me.getKey(), me.getValue());

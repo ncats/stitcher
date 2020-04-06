@@ -21,7 +21,7 @@ public class NORDEntityFactory extends EntityRegistry {
     static final String NORD_URL =
         "https://rarediseases.org/for-patients-and-families/information-resources/rare-disease-information/page/";
     static final String USER_AGENT =
-	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
     static final Logger logger =
         Logger.getLogger(NORDEntityFactory.class.getName());
 
@@ -211,12 +211,12 @@ public class NORDEntityFactory extends EntityRegistry {
         do {
             URL url = new URL(NORD_URL+page);
             logger.info("#### processing "+url);
-	    URLConnection con = url.openConnection();
-	    con.setRequestProperty("User-Agent", USER_AGENT);
+            URLConnection con = url.openConnection();
+            con.setRequestProperty("User-Agent", USER_AGENT);
             
             NORDPagingCallback nord = new NORDPagingCallback ();
             parser.parse(new InputStreamReader (con.getInputStream()),
-			 nord, true);
+             nord, true);
             if (nord.pages.isEmpty())
                 break;
             
@@ -225,15 +225,15 @@ public class NORDEntityFactory extends EntityRegistry {
                 disease.put("name", me.getKey());
                 disease.put("url", me.getValue());
                 NORDDiseaseCallback cb = new NORDDiseaseCallback ();
-		URLConnection con2 = new URL(me.getValue()).openConnection();
-		con2.setRequestProperty("User-Agent", USER_AGENT);
+                URLConnection con2 = new URL(me.getValue()).openConnection();
+                con2.setRequestProperty("User-Agent", USER_AGENT);
                 parser.parse(new InputStreamReader
                              (con2.getInputStream()), cb, true);
                 disease.put("synonyms", cb.synonyms.toArray(new String[0]));
                 for (Map.Entry<String, StringBuilder> e : cb.texts.entrySet()) {
                     disease.put(e.getKey(), e.getValue().toString());
                 }
-
+                
                 ncats.stitcher.Entity e = register (disease);
                 ++count;
                 logger.info("+++++++++ "+count+": "+me.getKey()+" "+e.getId());
@@ -241,7 +241,7 @@ public class NORDEntityFactory extends EntityRegistry {
             ++page;
         }
         while (true);
-
+        
         logger.info(count+" entities registered!");
         ds.set(INSTANCES, count);
         updateMeta (ds);
