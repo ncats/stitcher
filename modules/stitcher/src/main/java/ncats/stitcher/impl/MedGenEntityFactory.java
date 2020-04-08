@@ -380,8 +380,10 @@ public class MedGenEntityFactory extends EntityRegistry {
                         for (Entity t : targets) {
                             if (!s.equals(t)) {
                                 try {
-                                    if ("isa".equals(rel))
-                                        s.stitch(t, R_subClassOf, r);
+                                    if ("isa".equals(rel)) {
+                                        s.stitch(t, R_subClassOf,
+                                                 "UMLS:"+cui2, r);
+                                    }
                                     else {
                                         r.put(NAME, rel);
                                         s.stitch(t, R_rel,"UMLS:"+cui2, r);
@@ -424,8 +426,9 @@ public class MedGenEntityFactory extends EntityRegistry {
                 for (Entity s : sources) {
                     for (Entity t : targets) {
                         if (!s.equals(t)) {
-                            if ("isa".equals(rel))
-                                s.stitch(t, R_subClassOf, r);
+                            if ("isa".equals(rel)) {
+                                s.stitch(t, R_subClassOf, "UMLS:"+tar, r);
+                            }
                             else {
                                 r.put(NAME, rel);
                                 s.stitch(t, R_rel, "UMLS:"+tar, r);

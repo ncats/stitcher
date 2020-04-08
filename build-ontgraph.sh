@@ -84,9 +84,9 @@ sbt stitcher/"runMain ncats.stitcher.impl.FDAOrphanDesignationEntityFactory $out
 sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt"
 
 #load additional orphanet relationships if available
-if test -d $orphclass; then
-    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetClassificationEntityFactory $out $orphclass"
-fi
+#if test -d $orphclass; then
+#    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetClassificationEntityFactory $out $orphclass"
+#fi
 
 #load MedGen if available
 if test -d $medgen; then
