@@ -182,7 +182,15 @@ public class MedGenEntityFactory extends EntityRegistry {
             String sab = row.get("SAB");
             String code = row.get("SDUI");
             if ("MSH".equals(sab)) code = "MESH:"+code;
-            else if ("NCI".equals(sab)) code = "NCI:"+row.get("CODE");
+            else if ("NCI".equals(sab)) {
+                code = row.get("CODE");
+                if (code != null &&
+                    code.charAt(0) == 'C' &&
+                    Character.isDigit(code.charAt(1)))
+                    code = "NCI:"+code;
+                else
+                    code = null;
+            }
             else if ("OMIM".equals(sab)) {
                 code = row.get("CODE");
                 if (!code.startsWith("MTH"))
@@ -219,9 +227,12 @@ public class MedGenEntityFactory extends EntityRegistry {
                     rec.put("SYNONYMS",
                             Util.merge(rec.get("SYNONYMS"), syn));
                 }
-                rec.put("XREFS", Util.merge
-                        (rec.get("XREFS"), code, cui.startsWith("CN") ?
-                         "MEDGEN:"+cui : "UMLS:"+cui));
+                
+                if (code != null) {
+                    rec.put("XREFS", Util.merge
+                            (rec.get("XREFS"), code, cui.startsWith("CN") ?
+                             "MEDGEN:"+cui : "UMLS:"+cui));
+                }
                 rec.put("SOURCES", Util.merge(rec.get("SOURCES"), sab));
             }
             return rec;

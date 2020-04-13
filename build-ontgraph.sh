@@ -66,10 +66,10 @@ for f in $owl_files; do
 done
 
 # hit omim api to get additional data not in ontology
-if test -f "omim-credentials.txt"; then
-    omim_credentials=`cat omim-credentials.txt`
-    sbt stitcher/"runMain ncats.stitcher.impl.OMIMUpdateEntityFactory $out $omim_credentials"
-fi
+#if test -f "omim-credentials.txt"; then
+#    omim_credentials=`cat omim-credentials.txt`
+#    sbt stitcher/"runMain ncats.stitcher.impl.OMIMUpdateEntityFactory $out $omim_credentials"
+#fi
 
 #load ChEBI
 sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.xrdf.gz"
