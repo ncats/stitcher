@@ -25,7 +25,7 @@ import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
 /**
- * sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory ordo.owl"
+ * sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory ordo.db ordo.owl"
  */
 public class OntEntityFactory extends EntityRegistry {
     static final Logger logger =
@@ -39,6 +39,7 @@ public class OntEntityFactory extends EntityRegistry {
     static final int MIN_XREF_LENGTH = 5;
     
     static final String[] _RELATIONS = {
+        "subPropertyOf",
         "subClassOf",
         "intersectionOf",
         "equivalentClass",
@@ -157,8 +158,8 @@ public class OntEntityFactory extends EntityRegistry {
             StringBuilder sb = new StringBuilder ();
             sb.append("> ");
             if (isClass()) sb.append(resource.getLocalName()+" "+uri);
-            else if (isAxiom()) sb.append(resource.getId());
-            else sb.append(resource.toString());
+            else if (isAxiom()) sb.append("Axiom "+resource.getId());
+            else sb.append(type+" "+resource.toString());
             sb.append("\n...properties\n");
             toString (sb, props);
             sb.append("...links\n");
@@ -172,11 +173,13 @@ public class OntEntityFactory extends EntityRegistry {
                 Object value = me.getValue();
                 if (value.getClass().isArray()) {
                     for (int i = 0; i < Array.getLength(value); ++i) {
-                        sb.append(" ["+Array.get(value, i)+"]");
+                        Object v = Array.get(value, i);
+                        sb.append(" "+v+"["+v.getClass().getSimpleName()+"]");
                     }
                 }
                 else {
-                    sb.append(" ["+value+"]");
+                    sb.append(" "+value+"["
+                              +value.getClass().getSimpleName()+"]");
                 }
                 sb.append("\n");
             }
@@ -1305,15 +1308,24 @@ public class OntEntityFactory extends EntityRegistry {
                 //ent._payload(prop, val);
                 //attr.put(Props.VALUE, val);
             }
-            else if (or.links.containsKey("someValuesFrom")) {
-                res = (Resource) or.links.get("someValuesFrom");
-                prop = getURI (res);
-                if (prop != null) {
-                    val = prop;
-                }
-                else {
-                    _stitch (ent, name, res, attrs);
-                    return;
+            else {
+                for (Map.Entry<String, Object> me : or.links.entrySet()) {
+                    switch (me.getKey()) {
+                    case "someValuesFrom":
+                    case "allValuesFrom":
+                    case "onDataRange":
+                        {
+                            res = (Resource) me.getValue();
+                            prop = getURI (res);
+                            if (prop != null) {
+                                val = prop;
+                            }
+                            else {
+                                _stitch (ent, name, res, attrs);
+                                return;
+                            }
+                        }
+                    }
                 }
             }
                 
@@ -1328,7 +1340,8 @@ public class OntEntityFactory extends EntityRegistry {
                 for (Iterator<Entity> iter = find (Props.URI, prop);
                      iter.hasNext();) {
                     Entity e = iter.next();
-                    ent._stitch(e, key, val, attrs);
+                    if (!ent.equals(e)) 
+                        ent._stitch(e, key, val, attrs);
                 }
             }
             else {
@@ -1426,6 +1439,11 @@ public class OntEntityFactory extends EntityRegistry {
         }
         
         if (!entities.isEmpty()) {
+            if (DEBUG > 0) {
+                logger.info
+                    ("~~~~ "+or.uri+" => "+entities.size()+" "+or.links.keySet());
+            }
+            
             for (Map.Entry<String, Object> me : or.links.entrySet()) {
                 if (RELATIONS.contains(me.getKey())) {
                     Object value = me.getValue();
@@ -1563,12 +1581,13 @@ public class OntEntityFactory extends EntityRegistry {
                 //logger.warning("############# Restriction:\n"+or);
                 //resources.put(res, or);
             }
-            else if (or.isClass()) {
+            else if (or.isClass() || "ObjectProperty".equals(or.type)
+                     || "AnnotationProperty".equals(or.type)) {
                 OntologyResource old = resources.put(res, or);
                 if (old != null) {
                     logger.warning
                         ("Class "+res+" already mapped to\n"+old);
-                }                
+                }
             }
             else {
                 /*
