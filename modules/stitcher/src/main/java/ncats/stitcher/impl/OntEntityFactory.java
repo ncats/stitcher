@@ -1084,8 +1084,10 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
         else if (ontology.props.get("title") != null
-                 && ((String)ontology.props.get("title"))
-                 .startsWith("MONDO")) {
+                 && (((String)ontology.props.get("title"))
+                     .startsWith("MONDO")
+                     || ((String)ontology.props.get("title"))
+                     .startsWith("Mondo"))) {
             for (String x : xrefs) {
                 String u = x.toUpperCase();
                 // these are not stitch identifiers
