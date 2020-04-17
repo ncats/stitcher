@@ -75,12 +75,14 @@ public class GraphDb extends TransactionEventHandler.Adapter
             GraphDatabaseSettings.boltConnector("0");
         gdb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dir)
             .setConfig(GraphDatabaseSettings.dump_configuration, "true")
+            /*
             .setConfig(bolt.type, "BOLT" )
             .setConfig(bolt.enabled, "true" )
             .setConfig(bolt.address, "0.0.0.0:7687" )
             .setConfig("dbms.connector.http.address", "0.0.0.0:7474")
             .setConfig("dbms.connector.http.enabled", "true")
             .setConfig("dbms.connector.http.type", "HTTP")
+            */
             .newGraphDatabase();
 
         /*
