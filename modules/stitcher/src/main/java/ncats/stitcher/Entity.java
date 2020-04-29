@@ -1291,6 +1291,13 @@ public class Entity extends CNode {
                 rel.setProperty(a.getKey(), a.getValue());
         }
         
+        Object source = _node.getProperty(SOURCE);
+        if (source.equals(target._node.getProperty(SOURCE, null))) {
+            // if both nodes come from the same source, then we make sure
+            // this is indicated
+            rel.setProperty(SOURCE, source);
+        }
+        
         RelationshipIndex relindx = _relationshipIndex (_node);
         relindx.add(rel, key.name(), value);
         union (target._node, key, value);
@@ -1388,6 +1395,7 @@ public class Entity extends CNode {
             long size = hits.size();
             if (size > 0) {
                 RelationshipIndex relindx = _relationshipIndex (node);
+                Object source = node.getProperty(SOURCE);
                 for (Node n : hits) {
                     // can't have self-link
                     if (!node.equals(n)) {
@@ -1400,6 +1408,11 @@ public class Entity extends CNode {
                                 rel.setProperty(a.getKey(), a.getValue());
                             }
                         }
+                        
+                        if (source.equals(n.getProperty(SOURCE, null))) {
+                            rel.setProperty(SOURCE, source);
+                        }
+
                         relindx.add(rel, key.name(), value);
                         union (n, node, key, value);
 
