@@ -45,6 +45,8 @@ MATCH (n:`Designated`)-[e*1..2]-(m:`human_phenotype`)-[]-(d:DATA) unwind e as g 
 
 match(n)-[]-(d:DATA) where d.id='MONDO:0019035' with n,d match(n)-[:R_subClassOf*1..9]->(m)-[]-(a:DATA) return n,d,m,a
 
+match(n)--(d:DATA) where d.id='MONDO:0019035' with n,d match p=(n:S_MONDO)-[e:R_subClassOf*1..6]->(m:S_MONDO)--(:DATA) where all(x in e where x.value =~ 'http://purl.obolibrary.org/obo/MONDO.*') return p
+
 match(n:`S_MONDO`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() return count(n)
 
 # all leaf nodes descendants of rare disease
@@ -184,3 +186,9 @@ match (n:`S_OMIM`)-[:R_rel{name:'has_inheritance_type'}]-(m:`S_OMIM`)-[:N_Name|:
 match (n:S_MEDGEN)--(d:DATA) with n,d match p=(n)--(v:S_CLINVAR)--(z:S_OGG)--(x:DATA) with count(distinct v) as variantCount, d.id as CUI,d.NAME as Disease,x.label as Gene where Gene="PCSK9" return distinct(CUI),Disease,Gene,variantCount order by variantCount desc, CUI limit 20
 
 match (n:`S_GARD`)-[]-(d:DATA) where n._N_Name contains toUpper('charge syndrome')  with n,d match p=(n)-[e:N_Name|:I_CODE]-(o:S_OMIM:T047)-[:R_rel{name:'has_inheritance_type'}]-(m:S_OMIM)--(z:DATA), q=(o)--(x:DATA) return d.gard_id as GARD_ID,d.name as GARD,e.value as MATCHED,x.notation as OMIM,z.label as Inheritance
+
+match (n:S_MONDO) with n.N_Name as syn, count(n) as cnt unwind syn as synonym return count(synonym)
+
+match (n:S_GARD) with n.N_Name as syn, count(n) as cnt unwind syn as synonym return synonym,sum(cnt) as Count order by Count desc
+
+match p=(n:ENTITY)--(:DATA) where n._N_Name contains toUpper('Lucey-Driscoll syndrome') return p
