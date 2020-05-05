@@ -387,6 +387,7 @@ public class MedGenEntityFactory extends EntityRegistry {
                 if (rel != null) {
                     List<Entity> targets = getEntities (I_CODE, "UMLS:"+cui1);
                     List<Entity> sources = getEntities (I_CODE, "UMLS:"+cui2);
+                    r.put(SOURCE, source.getKey());
                     for (Entity s : sources) {
                         for (Entity t : targets) {
                             if (!s.equals(t)) {
@@ -434,6 +435,7 @@ public class MedGenEntityFactory extends EntityRegistry {
             if (rel != null && !src.equals(tar)) {
                 List<Entity> sources = getEntities (I_CODE, "UMLS:"+src);
                 List<Entity> targets = getEntities (I_CODE, "UMLS:"+tar);
+                r.put(SOURCE, source.getKey());
                 for (Entity s : sources) {
                     for (Entity t : targets) {
                         if (!s.equals(t)) {
@@ -474,6 +476,8 @@ public class MedGenEntityFactory extends EntityRegistry {
             
             Map<String, Object> row = new LinkedHashMap<>();
             int count = 0;
+            Map<String, Object> attr = new TreeMap<>();
+            attr.put(SOURCE, source.getKey());
             while (tokenizer.hasNext()) {
                 String[] toks = tokenizer.next();
                 if (!"-".equals(toks[1]) && toks[4].startsWith("C")) {
@@ -481,7 +485,7 @@ public class MedGenEntityFactory extends EntityRegistry {
                     for (int i = 0; i < header.length; ++i)
                         row.put(header[i], toks[i].trim());
                     //logger.info(">> "+row);
-                    
+                    row.put(SOURCE, source.getKey());
                     String gid = "GENE:"+ toks[1];
                     List<Entity> omim = getEntities (I_CODE, "OMIM:"+toks[0]);
                     List<Entity> gene = getEntities (I_CODE, gid);
@@ -490,8 +494,8 @@ public class MedGenEntityFactory extends EntityRegistry {
                         for (Entity b : cui) {
                             if (!a.equals(b)) {
                                 for (Entity c : gene) {
-                                    a.stitch(c, I_GENE, gid);
-                                    b.stitch(c, I_GENE, gid);
+                                    a.stitch(c, I_GENE, gid, attr);
+                                    b.stitch(c, I_GENE, gid, attr);
                                 }
                                 a.stitch(b, I_GENE, gid, row);
                             }

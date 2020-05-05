@@ -1286,16 +1286,17 @@ public class Entity extends CNode {
         Relationship rel = _node.createRelationshipTo(target._node, key);
         rel.setProperty(CREATED, System.currentTimeMillis());
         rel.setProperty(VALUE, value);
-        if (attrs != null) {
-            for (Map.Entry<String, Object> a : attrs.entrySet())
-                rel.setProperty(a.getKey(), a.getValue());
-        }
         
         Object source = _node.getProperty(SOURCE);
         if (source.equals(target._node.getProperty(SOURCE, null))) {
             // if both nodes come from the same source, then we make sure
             // this is indicated
             rel.setProperty(SOURCE, source);
+        }
+        
+        if (attrs != null) {
+            for (Map.Entry<String, Object> a : attrs.entrySet())
+                rel.setProperty(a.getKey(), a.getValue());
         }
         
         RelationshipIndex relindx = _relationshipIndex (_node);
@@ -1402,15 +1403,15 @@ public class Entity extends CNode {
                         Relationship rel = node.createRelationshipTo(n, key);
                         rel.setProperty(CREATED, System.currentTimeMillis());
                         rel.setProperty(VALUE, value);
+                        if (source.equals(n.getProperty(SOURCE, null))) {
+                            rel.setProperty(SOURCE, source);
+                        }
+                        
                         if (attrs != null) {
                             for (Map.Entry<String, Object> a
                                      : attrs.entrySet()) {
                                 rel.setProperty(a.getKey(), a.getValue());
                             }
-                        }
-                        
-                        if (source.equals(n.getProperty(SOURCE, null))) {
-                            rel.setProperty(SOURCE, source);
                         }
 
                         relindx.add(rel, key.name(), value);

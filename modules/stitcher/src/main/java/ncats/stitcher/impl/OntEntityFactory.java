@@ -41,6 +41,7 @@ public class OntEntityFactory extends EntityRegistry {
     static final String[] _RELATIONS = {
         "subPropertyOf",
         "subClassOf",
+        "excluded_subClassOf",
         "intersectionOf",
         "equivalentClass",
         "exactMatch",
@@ -192,8 +193,6 @@ public class OntEntityFactory extends EntityRegistry {
     
     public OntEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
-        graphDb.createIndex(AuxNodeType.DATA, "id");
-        graphDb.createIndex(AuxNodeType.DATA, "notation");
     }
 
     public OntEntityFactory (String dir) throws IOException {
@@ -207,7 +206,7 @@ public class OntEntityFactory extends EntityRegistry {
     static boolean isDeferred (String field) {
         return RELATIONS.contains(field);
     }
-    
+
     @Override
     protected void init () {
         super.init();
@@ -254,6 +253,8 @@ public class OntEntityFactory extends EntityRegistry {
             .add(T_Keyword, "P106") // nci thesaurus
             .add(T_Keyword, "P386") // source name
             ;
+        graphDb.createIndex(AuxNodeType.DATA, "id");
+        graphDb.createIndex(AuxNodeType.DATA, "notation");
     }
 
     protected void reset () {
@@ -1084,10 +1085,7 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
         else if (ontology.props.get("title") != null
-                 && (((String)ontology.props.get("title"))
-                     .startsWith("MONDO")
-                     || ((String)ontology.props.get("title"))
-                     .startsWith("Mondo"))) {
+                 && "mondo.owl".equals(ontology.resource.getLocalName())) {
             for (String x : xrefs) {
                 String u = x.toUpperCase();
                 // these are not stitch identifiers
@@ -1303,6 +1301,7 @@ public class OntEntityFactory extends EntityRegistry {
             Map<String, Object> attrs = new LinkedHashMap<>();
             attrs.put(Props.NAME, name);
             attrs.put(Props.PROPERTY, prop);
+            attrs.put(Props.SOURCE, source.getKey());
 
             String val = (String)or.props.get("hasValue");
             if (val != null) {
@@ -1334,6 +1333,7 @@ public class OntEntityFactory extends EntityRegistry {
             StitchKey key = R_rel;
             switch (name) {
             case "subClassOf":
+            case "excluded_subClassOf": // mondo
                 key = R_subClassOf;
                 break;
             }
@@ -1372,6 +1372,7 @@ public class OntEntityFactory extends EntityRegistry {
             if (attrs == null) {
                 attrs = new LinkedHashMap<>();
                 attrs.put(Props.NAME, name);
+                attrs.put(Props.SOURCE, source.getKey());
             }
             
             for (Iterator<Entity> iter = find (Props.URI, uri);
@@ -1380,6 +1381,7 @@ public class OntEntityFactory extends EntityRegistry {
                 if (!e.equals(ent)) {
                     switch (name) {
                     case "subClassOf":
+                    case "excluded_subClassOf": // mondo
                         ent._stitch(e, R_subClassOf, uri, attrs);
                         break;
                     case "equivalentClass":
