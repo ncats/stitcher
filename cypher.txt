@@ -192,3 +192,52 @@ match (n:S_MONDO) with n.N_Name as syn, count(n) as cnt unwind syn as synonym re
 match (n:S_GARD) with n.N_Name as syn, count(n) as cnt unwind syn as synonym return synonym,sum(cnt) as Count order by Count desc
 
 match p=(n:ENTITY)--(:DATA) where n._N_Name contains toUpper('Lucey-Driscoll syndrome') return p
+
+# monogenic diseases as leaf nodes.. remove 
+match(n:S_MONDO)--(d:DATA) where d.id='MONDO:0000275'
+with n,d match (n)<-[e:R_subClassOf*1..10]-(m:S_MONDO)--(z:DATA)
+where all(x in e where n.source=x.source or n.source in x.source)
+#and not (m)<-[:R_subClassOf]-()
+with m,z match(m)-[e:R_exactMatch|:R_equivalentClass]-(o:S_ORDO_ORPHANET)--(g:DATA)
+where not exists(g.reason_for_obsolescence) with z,o,g optional
+match(o)<-[:R_subClassOf]-(:S_ORDO_ORPHANET)--(d:DATA)
+where exists(d.symbol) with z,g,collect(distinct d.symbol) as genes
+where size(genes) < 2
+return  z.id,z.label,g.notation,g.label,genes limit 100
+
+match (n:S_ORDO_ORPHANET)--(d:DATA) where d.notation='ORPHA:100021'
+with n,d match p=(n)-[:R_subClassOf]->(:S_ORDO_ORPHANET)-[:R_rel{name:'intersectionOf'}]->(:S_ORDO_ORPHANET)--(z:DATA)
+with collect(distinct z.label) as props return props
+
+match (n:S_GARD)-[e:I_CODE|:N_Name]-(m:S_ORDO_ORPHANET)--(d:DATA) 
+where not exists(d.reason_for_obsolescence) with count(e) as s, n,m,d 
+where s > 3 match(m)<-[e:R_subClassOf]-(:S_ORDO_ORPHANET)--(z:DATA) 
+where exists(z.symbol) and e.property in
+['http://www.orpha.net/ORDO/Orphanet_317343',
+'http://www.orpha.net/ORDO/Orphanet_317344',
+'http://www.orpha.net/ORDO/Orphanet_410295',
+'http://www.orpha.net/ORDO/Orphanet_410296'] 
+with n,d,z match(n)--(g:DATA) 
+with g.id as `GARD_ID`,g.name as `GARD_Disease`,
+d.notation as `Orphanet_ID`,d.label as `Orphanet_Disease`, 
+collect(z.symbol) as `Genes` where size(Genes) < 2
+return GARD_ID,GARD_Disease,Orphanet_ID,Orphanet_Disease,Genes order by GARD_ID
+
+
+match (n:S_GARD)-[e:I_CODE|:N_Name]-(m:S_ORDO_ORPHANET)--(d:DATA) 
+where not exists(d.reason_for_obsolescence) with count(e) as s, n,m,d 
+where s > 2 match(m)<-[e:R_subClassOf]-(:S_ORDO_ORPHANET)--(z:DATA) 
+where exists(z.symbol) and e.property in
+['http://www.orpha.net/ORDO/Orphanet_317343',
+'http://www.orpha.net/ORDO/Orphanet_317344',
+'http://www.orpha.net/ORDO/Orphanet_410295',
+'http://www.orpha.net/ORDO/Orphanet_410296'] 
+with n,m,d,z match(n)--(g:DATA) 
+with n,m,d,z,g optional match(m)-[:R_exactMatch|:R_equivalentClass]-(x:S_MONDO)-[e:R_subClassOf*1..5]->(:S_MONDO)--(:DATA{id:'MONDO:0000275'})
+where all(y in e where x.source=y.source or x.source in y.source)
+with g.id as `GARD_ID`,g.name as `GARD_Disease`,
+d.notation as `Orphanet_ID`,d.label as `Orphanet_Disease`, 
+collect(z.symbol) as genes,x is not null as `MONDO_monogenic`
+where size(genes) < 2
+return GARD_ID,GARD_Disease,Orphanet_ID,Orphanet_Disease,
+MONDO_monogenic, genes[0] as Gene limit 100
