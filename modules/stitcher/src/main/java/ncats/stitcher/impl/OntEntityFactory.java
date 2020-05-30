@@ -1333,7 +1333,6 @@ public class OntEntityFactory extends EntityRegistry {
             StitchKey key = R_rel;
             switch (name) {
             case "subClassOf":
-            case "excluded_subClassOf": // mondo
                 key = R_subClassOf;
                 break;
             }
@@ -1381,7 +1380,6 @@ public class OntEntityFactory extends EntityRegistry {
                 if (!e.equals(ent)) {
                     switch (name) {
                     case "subClassOf":
-                    case "excluded_subClassOf": // mondo
                         ent._stitch(e, R_subClassOf, uri, attrs);
                         break;
                     case "equivalentClass":
