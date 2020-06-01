@@ -87,7 +87,8 @@ public class EntityRegistry extends EntityFactory {
                             if (value.getClass().isArray()) {
                                 int len = Array.getLength(value);
                                 StringBuilder sb = new StringBuilder ();
-                                for (int i = 0; i < len; ++i) {
+                                for (int i = 0; i < len
+                                         && sb.length() < 32766; ++i) {
                                     Object v = Array.get(value, i);
                                     if (v instanceof String) {
                                         if (i > 0) sb.append("|");
