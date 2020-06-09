@@ -116,7 +116,7 @@ public class OntEntityFactory extends EntityRegistry {
                             for (String tok : obj.toString().split(";")) {
                                 String go = tok.trim();
                                 if (go.startsWith("GO_")) {
-                                    int pos = t.indexOf(' ');
+                                    int pos = go.indexOf(' ');
                                     if (pos > 0)
                                         go = go.substring(0, pos);
                                     gores.add
