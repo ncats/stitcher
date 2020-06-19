@@ -40,7 +40,7 @@ public class ExportGraph {
     
     public void export (OutputStream os) throws Exception {
         final PrintStream ps = new PrintStream (os);
-        ps.println("<?xml version=\"1.0\" encoding=\"UTF−8\"?>");
+        ps.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         ps.println("<gexf xmlns=\"http://www.gexf.net/1.2draft\"");
         ps.println("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema−instance\"");
         ps.println("  xsi:schemaLocation=\"http://www.gexf.net/1.2draft "
@@ -98,33 +98,56 @@ public class ExportGraph {
             ps.println
                 ("    <attribute id=\"0\" title=\"type\" type=\"string\"/>");
         }
+
+        static boolean checkGARD (Entity e) {
+            final Set<Long> nb = new HashSet<>();
+            e.neighbors((id, other, key, rev, props) -> {
+                    if (key == R_subClassOf
+                        || "has_phenotype".equals(props.get("name"))) {
+                        nb.add(other.getId());
+                        return false;
+                    }
+                    return true;
+                }, R_subClassOf, R_rel);
+            return !nb.isEmpty();
+        }
+
+        static boolean checkHP (Entity e) {
+            final Set<Long> nb = new HashSet<>();
+            e.neighbors((id, other, key, rev, props) -> {
+                    if ((key == R_subClassOf && other.is("S_HP"))
+                        || ("has_phenotype".equals(props.get("name"))
+                            && other.is("S_GARD"))) {
+                        nb.add(other.getId());
+                        return false;
+                    }
+                    return true;
+                }, R_subClassOf, R_rel);
+            return !nb.isEmpty();
+        }
         
         @Override
         protected void nodes (PrintStream ps) {
+            AtomicInteger count = new AtomicInteger ();
             ef.entities("S_GARD", e -> {
-                    Map<String, Object> data = e.payload();
-                    ps.println("     <node id=\""+e.getId()+"\" label=\""
-                               +data.get("gard_id")+"\">");
-                    ps.println("       <attvalues>");
-                    ps.println("         <attvalue for=\"0\" value=\""
-                               +escape(data.get("name"))+"\"/>");
-                    ps.println("       </attvalues>");
-                    ps.println("     </node>");
+                    if (checkGARD (e)) {
+                        Map<String, Object> data = e.payload();
+                        ps.println("     <node id=\""+e.getId()+"\" label=\""
+                                   +data.get("gard_id")+"\">");
+                        ps.println("       <attvalues>");
+                        ps.println("         <attvalue for=\"0\" value=\""
+                                   +escape(data.get("name"))+"\"/>");
+                        ps.println("       </attvalues>");
+                        ps.println("     </node>");
+                        count.getAndIncrement();
+                    }
                 });
             
             ef.entities("S_HP", e -> {
-                    boolean add = false;
-                    for (Entity xe : e.neighbors(R_rel)) {
-                        if (xe.is("S_GARD")) {
-                            add = true;
-                            break;
-                        }
-                    }
-                    
-                    if (add) {
+                    if (checkHP (e)) {
                         Map<String, Object> data = e.payload();
                         String notation = (String)data.get("notation");
-                        if (notation != null && notation.startsWith("HP:")) {
+                        if (notation != null) {
                             ps.println
                                 ("     <node id=\""+e.getId()+"\" label=\""
                                  +notation+"\">");
@@ -133,9 +156,27 @@ public class ExportGraph {
                                        +escape(data.get("label"))+"\"/>");
                             ps.println("       </attvalues>");
                             ps.println("     </node>");
+                            count.getAndIncrement();
                         }
                     }
                 });
+            logger.info("#### "+count+" nodes!");
+        }
+
+        void edge (PrintStream ps, long id, Entity source, Entity target,
+                   boolean rev, String type) {
+            ps.print("    <edge id=\""+id+"\"");
+            if (rev)
+                ps.print(" source=\""+target.getId()
+                         +"\" target=\""+source.getId()+"\"");
+            else
+                ps.print(" source=\""+source.getId()
+                         +"\" target=\""+target.getId()+"\"");
+            ps.println(">");
+            ps.println("      <attvalues>");
+            ps.println("        <attvalue for=\"0\" value=\""+type+"\"/>");
+            ps.println("      </attvalues>");
+            ps.println("    </edge>");
         }
 
         void edges (PrintStream ps, Set<Long> edges, Entity e) {
@@ -150,25 +191,13 @@ public class ExportGraph {
                                 && "has_phenotype".equals(props.get("name"))) {
                                 type = (String) props.get("name");
                             }
-                            else if (key == R_subClassOf && other.is("S_GARD")) {
+                            else if (key == R_subClassOf
+                                     && other.is("S_GARD")) {
                                 type = "isa";
                             }
                             
                             if (type != null) {
-                                ps.print("    <edge id=\""+id+"\"");
-                                if (reverse)
-                                    ps.print(" source=\""+other.getId()
-                                             +"\" target=\""+e.getId()+"\"");
-                                else
-                                    ps.print(" source=\""+e.getId()
-                                             +"\" target=\""+other.getId()+"\"");
-                                ps.println(">");
-                                ps.println("      <attvalues>");
-                                ps.println
-                                    ("        <attvalue for=\"0\" value=\""
-                                     +type+"\"/>");
-                                ps.println("      </attvalues>");
-                                ps.println("    </edge>");
+                                edge (ps, id, e, other, reverse, type);
                                 seen.add(other.getId());
                             }
                         }
@@ -184,6 +213,18 @@ public class ExportGraph {
             ef.entities("S_GARD", e -> {
                     edges (ps, edges, e);
                 });
+            ef.entities("S_HP", e -> {
+                    e.neighbors((id, other, key, rev, props) -> {
+                            if (edges.contains(id)) {
+                            }
+                            else if (other.is("S_HP")) {
+                                edge (ps, id, e, other, rev, "isa");
+                                edges.add(id);
+                            }
+                            return true;
+                        }, R_subClassOf);
+                });
+            logger.info("#### "+edges.size()+" edges!");
         }
     }
 
