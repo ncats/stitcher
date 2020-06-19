@@ -504,6 +504,24 @@ public class Entity extends CNode {
         return neighbors.toArray(new Entity[0]);
     }
 
+    public void _neighbors (NeighborVisitor visitor, StitchKey... keys) {
+        for (Relationship rel : _node.getRelationships(Direction.BOTH, keys)) {
+            Node n = rel.getOtherNode(_node);
+            boolean reverse = rel.getStartNode().equals(n);
+            if (!visitor.visit(rel.getId(), Entity._getEntity(n),
+                               StitchKey.valueOf(rel.getType().name()),
+                               reverse, rel.getAllProperties()))
+                break;
+        }
+    }
+
+    public void neighbors (NeighborVisitor visitor, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            _neighbors (visitor, keys);
+            tx.success();
+        }
+    }
+
     public double similarity (Entity other, StitchKey... keys) {
         Map<StitchKey, Object> values = keys (other);
         if (values.containsKey(R_exactMatch)

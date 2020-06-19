@@ -1041,8 +1041,18 @@ public class OntEntityFactory extends EntityRegistry {
                     || (u.startsWith("HP:")
                         && !u.equals("HP:PROBINSON"))
                     || u.startsWith("SNOMEDCT")
+                    || (u.startsWith("FMA:")
+                        && Character.isDigit(u.charAt(4)))
+                    || (u.startsWith("AAO:")
+                        && Character.isDigit(u.charAt(4)))
+                    || (u.startsWith("BTO:")
+                        && Character.isDigit(u.charAt(4)))
                     ) {
                     useful.add(x);
+                }
+                else if (u.charAt(0) == 'C'
+                         && Character.isDigit(u.charAt(1))) {
+                    useful.add("UMLS:"+u);
                 }
                 else if (u.startsWith("MSH")) {
                     useful.add(x.replaceAll("MSH", "MESH"));
