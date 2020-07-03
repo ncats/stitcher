@@ -73,6 +73,11 @@ public enum StitchKey implements RelationshipType {
     R_rel,
 
     /*
+     * has phenotype relationship
+     */
+    R_hasPhenotype,
+
+    /*
      * Biology relationships
      */
     R_activeMoiety(5, true), // active moiety relationship (directed)

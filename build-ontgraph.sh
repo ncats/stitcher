@@ -1,9 +1,11 @@
 #!/bin/sh
 
-version="v20200601"
+version="v20200704"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
+orpha="orpha"
+hpo="hpo"
 # medgen if available
 medgen="medgen"
 #clinvar if available
@@ -23,6 +25,7 @@ owl="doid.owl.gz \
    OMIM.ttl.gz \
    ICD10CM.ttl.gz \
    ordo_orphanet.owl.gz \
+   ORDO_es_2.9.owl.gz \
    Thesaurus.owl.gz \
    VANDF.ttl.gz \
    bto.owl.gz \
@@ -81,12 +84,22 @@ sbt stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/
 sbt stitcher/"runMain ncats.stitcher.impl.FDAOrphanDesignationEntityFactory $out data/FDAOrphanGARD_20190216.txt"
 
 #load hpo annotations
-sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out data/HPO_annotation_100918.txt"
+if test -e $hpo/phenotype.hpoa; then
+    sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out $hpo/phenotype.hpoa"
+fi
 
 #load additional orphanet relationships if available
 #if test -d $orphclass; then
 #    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetClassificationEntityFactory $out $orphclass"
 #fi
+
+if test -e $orpha/en_product9_prev.xml; then
+    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetPrevalenceEntityFactory $out $orpha/en_product9_prev.xml"
+fi
+
+if test -e $orpha/en_product4_HPO.xml; then
+    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4_HPO.xml"
+fi
 
 #load MedGen if available
 if test -d $medgen; then

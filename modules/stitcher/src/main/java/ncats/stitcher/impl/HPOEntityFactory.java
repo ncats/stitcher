@@ -41,38 +41,66 @@ public class HPOEntityFactory extends EntityRegistry {
         int count = 0, lines = 0;
         Map<String, Object> attr = new HashMap<>();
         for (; tokenizer.hasNext(); ++lines) {
-            String[] toks = tokenizer.next();
-            if (header == null) {
-                header = toks;
+            String line = tokenizer.getCurrentLine();
+            if (line.startsWith("#description:")
+                || line.startsWith("#date:")
+                || line.startsWith("#tracker:")
+                || line.startsWith("#HPO-version:")) {
+                int pos = line.indexOf(':');
+                source.set(line.substring(1, pos),
+                           line.substring(pos+1).trim());
             }
-            /*
-            else if (toks.length != header.length) {
-                logger.warning(lines+": expecting "+header.length
-                               +" columns but instead found "+toks.length+"!");
-            }
-            */
             else {
-                // diseaseId gene-symbol gene-id(entrez)HPO-ID HPO-term-name
-                List<Entity> diseases = getEntities (I_CODE, toks[0]);
-                //List<Entity> genes = getEntities (I_GENE, toks[1]);
-                List<Entity> phenotypes = getEntities (I_CODE, toks[3]);
-                logger.info(toks[0]+"="+diseases.size()+" "
-                            +toks[3]+"="+phenotypes.size());
-                attr.clear();
-                for (int i = 0; i < header.length; ++i)
-                    attr.put(header[i], toks[i]);
-                attr.put(NAME, "has_phenotype");
-                attr.put(SOURCE, source.getKey());
-                for (Entity p : phenotypes) {
-                    for (Entity d : diseases) {
-                        if (!p.equals(d)) {
-                            d.stitch(p, R_rel, toks[3], attr);
-                            d.addLabel(source.getLabel());
-                        }
-                    }
-                    p.addLabel(source.getLabel());
+                /*
+                 * 0 #DatabaseID     
+                 * 1 DiseaseName     
+                 * 2 Qualifier
+                 * 3 HPO_ID
+                 * 4 Reference
+                 * 5 Evidence
+                 * 6 Onset
+                 * 7 Frequency
+                 * 8 Sex
+                 * 9 Modifier
+                 * 10 Aspect
+                 * 11 Biocuration
+                 */
+                String[] toks = tokenizer.next();
+                if (header == null) {
+                    header = toks;
                 }
-                ++count;
+                /*
+                  else if (toks.length != header.length) {
+                  logger.warning(lines+": expecting "+header.length
+                  +" columns but instead found "+toks.length+"!");
+                  }
+                */
+                else {
+                    // diseaseId gene-symbol gene-id(entrez)HPO-ID HPO-term-name
+                    List<Entity> diseases = getEntities (I_CODE, toks[0]);
+                    List<Entity> phenotypes = getEntities (I_CODE, toks[3]);
+                    logger.info(toks[0]+"="+diseases.size()+" "
+                                +toks[3]+"="+phenotypes.size());
+                    attr.clear();
+                    for (int i = 0; i < header.length; ++i) {
+                        if (i == 0)
+                            // skip # char
+                            attr.put(header[i].substring(1), toks[i]);
+                        else
+                            attr.put(header[i], toks[i]);
+                    }
+                    attr.put(SOURCE, source.getKey());
+                    for (Entity p : phenotypes) {
+                        for (Entity d : diseases) {
+                            if (!p.equals(d)) {
+                                d.stitch(p, R_hasPhenotype, toks[3], attr);
+                                d.addLabel(source.getLabel());
+                            }
+                        }
+                        p.addLabel(source.getLabel());
+                    }
+                    ++count;
+                }
             }
         }
         return count;
@@ -105,7 +133,7 @@ public class HPOEntityFactory extends EntityRegistry {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 2) {
             logger.info("Usage: "+HPOEntityFactory.class.getName()
-                        +" DBDIR HPO-Annotations");
+                        +" DBDIR phenotype.hpoa");
             System.exit(1);
         }
         
