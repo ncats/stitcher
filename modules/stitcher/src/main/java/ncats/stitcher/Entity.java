@@ -733,7 +733,12 @@ public class Entity extends CNode {
         Node node = gdb.createNode(AuxNodeType.DATA);
         node.setProperty(CREATED, System.currentTimeMillis());
         for (Map.Entry<String, Object> me : data.entrySet()) {
-            node.setProperty(me.getKey(), me.getValue());
+            Object value = me.getValue();
+            if (value == null)
+                logger.warning("*** Entity "+getId()
+                               +": ignoring null value for "+me.getKey());
+            else
+                node.setProperty(me.getKey(), me.getValue());
         }
         Relationship rel = node.createRelationshipTo(_node, reltype);
         rel.setProperty(SOURCE, source);

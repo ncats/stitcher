@@ -30,6 +30,93 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
     HikariDataSource dsource = new HikariDataSource ();
     int count;
     int maxrows;
+
+    class SampleRegistration implements AutoCloseable {
+        PreparedStatement pstm;
+        PreparedStatement pstm2;
+        InputStream is;
+        int count;
+
+        SampleRegistration (Connection con, int maxrows) throws Exception {
+            pstm = con.prepareStatement
+                ("select sample_id,smiles_iso,sample_name,supplier,supplier_id,"
+                 +"pubchem_sid,pubchem_cid,cas,primary_moa,approval_status,"
+                 +"tox21_id,sample_name2 "
+                 +"from ncgc_sample "
+                 +"where smiles_iso is not null "
+                 +(maxrows > 0 ? "order by sample_id fetch first "
+                   +maxrows+" rows only":""));
+            pstm2 = con.prepareStatement
+                ("select key,value from sample_annotation where sample_id = ?");
+        }
+
+        SampleRegistration (Connection con, InputStream is) throws Exception {
+            pstm = con.prepareStatement
+                ("select sample_id,smiles_iso,sample_name,supplier,supplier_id,"
+                 +"pubchem_sid,pubchem_cid,cas,primary_moa,approval_status,"
+                 +"tox21_id,sample_name2 "
+                 +"from ncgc_sample "
+                 +"where smiles_iso is not null and sample_id = ?");
+            pstm2 = con.prepareStatement
+                ("select key,value from sample_annotation where sample_id = ?");
+            this.is = is;
+        }
+
+        int register () throws Exception {
+            if (is != null) {
+                try (BufferedReader br = new BufferedReader
+                     (new InputStreamReader (is))) {
+                    for (String line; (line = br.readLine()) !=  null; ) {
+                        pstm.setString(1, line.trim());
+                        register (pstm.executeQuery());
+                    }
+                }
+            }
+            else {
+                register (pstm.executeQuery());
+            }
+            return count;
+        }
+
+        void register (ResultSet rset) throws Exception {
+            Map<String, Object> row = new TreeMap<>();      
+            while (rset.next()) {
+                String sampleId = instrument (rset, row);
+            
+                System.out.println("+++++ "+sampleId+" "+(count+1)+" +++++");
+                pstm2.setString(1, sampleId);
+                ResultSet rs = pstm2.executeQuery();
+                while (rs.next()) {
+                    String key = rs.getString(1);
+                    String val = rs.getString(2);
+                    switch (key) {
+                    case "library":
+                        row.put("Library", Util.merge(row.get("Library"), val));
+                        break;
+                        
+                    case "compound.name.primary":
+                        row.put("SampleName",
+                                Util.merge(row.get("SampleName"), val));
+                        break;
+                        
+                    default:
+                        logger.warning("Unknown sample annotation: "+key);
+                    }
+                }
+                rs.close();
+                
+                ncats.stitcher.Entity e = registerIfAbsent (row);
+                if (e != null)
+                    ++count;
+            }
+            rset.close();
+        }
+
+        public void close () throws Exception {
+            pstm.close();
+            pstm2.close();
+        }
+    }
     
     public NCGCEntityFactory (String dir) throws IOException {
         super (dir);
@@ -91,51 +178,20 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
         return sampleId;
     }
     
-    void register (Connection con) throws SQLException {
-        PreparedStatement pstm = con.prepareStatement
-            ("select sample_id,smiles_iso,sample_name,supplier,supplier_id,"
-             +"pubchem_sid,pubchem_cid,cas,primary_moa,approval_status,"
-             +"tox21_id,sample_name2 "
-             +"from ncgc_sample "
-             +"where smiles_iso is not null "
-             +(maxrows > 0 ? "order by sample_id fetch first "
-               +maxrows+" rows only":""));
-        PreparedStatement pstm2 = con.prepareStatement
-            ("select key,value from sample_annotation where sample_id = ?");
-        ResultSet rset = pstm.executeQuery();
-        Map<String, Object> row = new TreeMap<>();      
-        while (rset.next()) {
-            String sampleId = instrument (rset, row);
-            
-            System.out.println("+++++ "+sampleId+" "+(count+1)+" +++++");
-            pstm2.setString(1, sampleId);
-            ResultSet rs = pstm2.executeQuery();
-            while (rs.next()) {
-                String key = rs.getString(1);
-                String val = rs.getString(2);
-                switch (key) {
-                case "library":
-                    row.put("Library", Util.merge(row.get("Library"), val));
-                    break;
-                    
-                case "compound.name.primary":
-                    row.put("SampleName",
-                            Util.merge(row.get("SampleName"), val));
-                    break;
-                    
-                default:
-                    logger.warning("Unknown sample annotation: "+key);
-                }
-            }
-            rs.close();
-            
-            ncats.stitcher.Entity e = registerIfAbsent (row);
-            if (e != null)
-                ++count;
+    int register (Connection con) throws Exception {
+        int cnt;
+        try (SampleRegistration reg = new SampleRegistration (con, maxrows)) {
+            cnt = reg.register();
         }
-        rset.close();
-        pstm.close();
-        pstm2.close();
+        return cnt;
+    }
+
+    int register (Connection con, InputStream is) throws Exception {
+        int cnt;
+        try (SampleRegistration reg = new SampleRegistration (con, is)) {
+            cnt = reg.register();
+        }
+        return cnt;
     }
     
     public int register (String config, String username, String password)
@@ -164,7 +220,16 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
                 ("Configuration contains no \"source.url\" definition!");
         }
 
-        if (source.hasPath("rows")) {
+        File file = null;
+        if (source.hasPath("file")) {
+            file = new File (source.getString("file"));
+            if (!file.exists()) {
+                logger.warning("File '"+file+"' doesn't exist!");
+                return -1;
+            }
+            logger.info("### loading file..."+file);
+        }
+        else if (source.hasPath("rows")) {
             maxrows = source.getInt("rows");
         }
                 
@@ -175,7 +240,7 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
         count = 0;
         try (Connection con = dsource.getConnection()) {
             DataSource ds = getDataSourceFactory()
-                .register(source.getString("name"));
+                    .register(source.getString("name"));
             Integer instances = (Integer)ds.get(INSTANCES);
             if (instances != null && instances > 0) {
                 logger.info("### Data source "+ds.getName()
@@ -183,8 +248,14 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
                             +" entities!");
             }
             setDataSource (ds);
+
+            if (file != null) {
+                count = register (con, new FileInputStream (file));
+            }
+            else {
+                count = register (con);
+            }
             
-            register (con);
             if (count > 0) {
                 if (instances == null) {
                     instances = 0;
