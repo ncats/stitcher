@@ -1,7 +1,7 @@
 #!/bin/sh
 
 opts='-mem 16384'
-version="v20200417"
+version="v20200601"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -25,7 +25,6 @@ owl="doid.owl.gz \
    ICD10CM.ttl.gz \
    ordo_orphanet.owl.gz \
    Thesaurus.owl.gz \
-   mondo.owl.gz \
    VANDF.ttl.gz \
    bto.owl.gz \
    clo.owl.gz \
@@ -42,7 +41,8 @@ owl="doid.owl.gz \
    ogms.owl \
    pato.owl.gz \
    fma.owl.gz \
-   efo.owl.gz"
+   efo.owl.gz \
+   mondo.owl.gz"
 owl_path="owl-202002"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
@@ -51,8 +51,8 @@ owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 gard_credentials=
 if test -f "gard-credentials.txt"; then
     gard_credentials=`cat gard-credentials.txt`
+    sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory\$Register $out $gard_credentials"
 fi
-#sbt stitcher/"runMain ncats.stitcher.impl.GARDEntityFactory\$Register $out $gard_credentials"
 
 #load GHR
 sbt $opts stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
