@@ -110,19 +110,40 @@ public class OntEntityFactory extends EntityRegistry {
                     links.put(pname, old != null ? Util.merge(old, r) : r);
                 }
                 else {
-                    try {
-                        Object v = obj.asLiteral().getValue();
-                        if (!v.getClass().isAssignableFrom(Number.class))
-                            v = v.toString();
-                        if (!"".equals(v)) {
-                            Object old = props.get(pname);
-                            props.put(pname, old != null
-                                      ? Util.merge(old, v) : v);
+                    switch (pname) {
+                    case "OGG_0000000029": // sigh
+                        { List<Resource> gores = new ArrayList<>();
+                            for (String tok : obj.toString().split(";")) {
+                                String go = tok.trim();
+                                if (go.startsWith("GO_")) {
+                                    int pos = go.indexOf(' ');
+                                    if (pos > 0)
+                                        go = go.substring(0, pos);
+                                    gores.add
+                                        (res.getModel().createResource
+                                         ("http://purl.obolibrary.org/obo/"+go));
+                                }
+                            }
+                            links.put("has_go_association",
+                                      gores.toArray(new Resource[0]));
                         }
-                    }
-                    catch (Exception ex) {
-                        logger.log
-                            (Level.SEVERE, "Can't literal for "+pname, ex);
+                        break;
+                        
+                    default: 
+                        try {
+                            Object v = obj.asLiteral().getValue();
+                            if (!v.getClass().isAssignableFrom(Number.class))
+                                v = v.toString();
+                            if (!"".equals(v)) {
+                                Object old = props.get(pname);
+                                props.put(pname, old != null
+                                          ? Util.merge(old, v) : v);
+                            }
+                        }
+                        catch (Exception ex) {
+                            logger.log
+                                (Level.SEVERE, "Can't literal for "+pname, ex);
+                        }
                     }
                 }
             }
@@ -255,6 +276,7 @@ public class OntEntityFactory extends EntityRegistry {
             ;
         graphDb.createIndex(AuxNodeType.DATA, "id");
         graphDb.createIndex(AuxNodeType.DATA, "notation");
+        graphDb.createIndex(AuxNodeType.DATA, "uri");
     }
 
     protected void reset () {
@@ -829,6 +851,7 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("ISBN")
                     || u.startsWith("HTTP")
                     || u.startsWith("GO_REF")
+                    || u.startsWith("WIKIPEDIA")
                     || (u.startsWith("GO:")
                         && !Character.isDigit(u.charAt(3)))
                     )
@@ -1134,7 +1157,8 @@ public class OntEntityFactory extends EntityRegistry {
                     data.put("OGG_0000000030", pmids.toArray(new Long[0]));
                 }
             }
-            
+
+            /*
             obj = data.get("OGG_0000000029");
             if (obj != null) {
                 List<String> annotations = new ArrayList<>();
@@ -1153,6 +1177,7 @@ public class OntEntityFactory extends EntityRegistry {
                              annotations.toArray(new String[0]));
                 }
             }
+            */
         }
         else if ("MEDLINEPLUS".equals(ontology.props.get("label"))) {
             obj = data.remove("notation");
@@ -1220,6 +1245,11 @@ public class OntEntityFactory extends EntityRegistry {
         Map<String, Object> data = new TreeMap<>();
         data.put(Props.URI, or.uri);
         data.putAll(or.props);
+        if (!data.containsKey("notation")) {
+            String not = or.resource.getLocalName();
+            if (not != null)
+                data.put("notation", not.replaceAll("_", ":"));
+        }
 
         for (Map.Entry<String, Object> me : or.links.entrySet()) {
             if (isDeferred (me.getKey()))
