@@ -42,6 +42,7 @@ public class HPOEntityFactory extends EntityRegistry {
         Map<String, Object> attr = new HashMap<>();
         for (; tokenizer.hasNext(); ++lines) {
             String line = tokenizer.getCurrentLine();
+            String[] toks = tokenizer.next();
             if (line.startsWith("#description:")
                 || line.startsWith("#date:")
                 || line.startsWith("#tracker:")
@@ -65,7 +66,6 @@ public class HPOEntityFactory extends EntityRegistry {
                  * 10 Aspect
                  * 11 Biocuration
                  */
-                String[] toks = tokenizer.next();
                 if (header == null) {
                     header = toks;
                 }
