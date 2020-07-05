@@ -66,9 +66,36 @@ public class CNode implements Props, Comparable<CNode> {
         timeline = new LuceneTimeline (gdb, index);
         
         if (node.hasProperty(CREATED)) {
-            created = (Long)node.getProperty(CREATED);
-            lastUpdated = node.hasProperty(UPDATED)
-                ? (Long)node.getProperty(UPDATED) : created;
+            Object data = node.getProperty(CREATED);
+            if (data instanceof Long) {
+                created = (Long)data;
+            }
+            else { // this is a field collision
+                logger.warning("Node "+node.getId()
+                               +" has unexpected "+CREATED+" value: "+data);
+            }
+
+            if (node.hasProperty(UPDATED)) {
+                data = node.getProperty(UPDATED);
+                if (data instanceof Long) {
+                    lastUpdated = (Long)data;
+                }
+                else {
+                    logger.warning("Node "+node.getId()
+                                   +" has unexpected "+UPDATED
+                                   +" value: "+data); 
+                }
+            }
+
+            if (created == null && lastUpdated == null) {
+                created = lastUpdated = System.currentTimeMillis();
+            }
+            else if (created == null) {
+                created = lastUpdated;
+            }
+            else if (lastUpdated == null) {
+                lastUpdated = created;
+            }
         }
         else {
             // new node..
