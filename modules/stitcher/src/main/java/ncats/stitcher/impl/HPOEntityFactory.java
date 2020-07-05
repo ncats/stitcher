@@ -48,8 +48,13 @@ public class HPOEntityFactory extends EntityRegistry {
                 || line.startsWith("#tracker:")
                 || line.startsWith("#HPO-version:")) {
                 int pos = line.indexOf(':');
-                source.set(line.substring(1, pos),
-                           line.substring(pos+1).trim());
+                String field = line.substring(1, pos);
+                String value = line.substring(pos+1).trim();
+                source.set(field, value);
+                logger.info(source.getKey()+": "+field+"="+value);
+            }
+            else if (header == null) {
+                header = toks;
             }
             else {
                 /*
@@ -66,41 +71,35 @@ public class HPOEntityFactory extends EntityRegistry {
                  * 10 Aspect
                  * 11 Biocuration
                  */
-                if (header == null) {
-                    header = toks;
-                }
                 /*
                   else if (toks.length != header.length) {
                   logger.warning(lines+": expecting "+header.length
                   +" columns but instead found "+toks.length+"!");
                   }
                 */
-                else {
-                    // diseaseId gene-symbol gene-id(entrez)HPO-ID HPO-term-name
-                    List<Entity> diseases = getEntities (I_CODE, toks[0]);
-                    List<Entity> phenotypes = getEntities (I_CODE, toks[3]);
-                    logger.info(toks[0]+"="+diseases.size()+" "
-                                +toks[3]+"="+phenotypes.size());
-                    attr.clear();
-                    for (int i = 0; i < header.length; ++i) {
-                        if (i == 0)
-                            // skip # char
-                            attr.put(header[i].substring(1), toks[i]);
-                        else
-                            attr.put(header[i], toks[i]);
-                    }
-                    attr.put(SOURCE, source.getKey());
-                    for (Entity p : phenotypes) {
-                        for (Entity d : diseases) {
-                            if (!p.equals(d)) {
-                                d.stitch(p, R_hasPhenotype, toks[3], attr);
-                                d.addLabel(source.getLabel());
-                            }
-                        }
-                        p.addLabel(source.getLabel());
-                    }
-                    ++count;
+                List<Entity> diseases = getEntities (I_CODE, toks[0]);
+                List<Entity> phenotypes = getEntities (I_CODE, toks[3]);
+                logger.info(toks[0]+"="+diseases.size()+" "
+                            +toks[3]+"="+phenotypes.size());
+                attr.clear();
+                for (int i = 0; i < header.length; ++i) {
+                    if (i == 0)
+                        // skip # char
+                        attr.put(header[i].substring(1), toks[i]);
+                    else
+                        attr.put(header[i], toks[i]);
                 }
+                attr.put(SOURCE, source.getKey());
+                for (Entity p : phenotypes) {
+                    for (Entity d : diseases) {
+                        if (!p.equals(d)) {
+                            d.stitch(p, R_hasPhenotype, toks[3], attr);
+                            d.addLabel(source.getLabel());
+                        }
+                    }
+                    p.addLabel(source.getLabel());
+                }
+                ++count;
             }
         }
         return count;

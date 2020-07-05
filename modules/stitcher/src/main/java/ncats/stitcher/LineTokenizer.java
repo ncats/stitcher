@@ -34,7 +34,8 @@ public class LineTokenizer implements Iterator<String[]> {
         int i = 0, nb;
 
         boolean quote = false;
-        StringBuilder tok = new StringBuilder ();       
+        StringBuilder tok = new StringBuilder ();
+        currentLine.setLength(0);
         while ((nb = reader.read(buf)) != -1) {
             currentLine.append(buf[0]);
             
