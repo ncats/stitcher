@@ -83,11 +83,13 @@ public class HPOEntityFactory extends EntityRegistry {
                             +toks[3]+"="+phenotypes.size());
                 attr.clear();
                 for (int i = 0; i < header.length; ++i) {
-                    if (i == 0)
-                        // skip # char
-                        attr.put(header[i].substring(1), toks[i]);
-                    else
-                        attr.put(header[i], toks[i]);
+                    if (toks[i] != null) {
+                        if (i == 0)
+                            // skip # char
+                            attr.put(header[i].substring(1), toks[i]);
+                        else
+                            attr.put(header[i], toks[i]);
+                    }
                 }
                 attr.put(SOURCE, source.getKey());
                 for (Entity p : phenotypes) {
