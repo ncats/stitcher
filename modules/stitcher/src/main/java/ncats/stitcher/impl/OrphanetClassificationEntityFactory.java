@@ -26,34 +26,16 @@ import static ncats.stitcher.StitchKey.*;
  *   via OntEntityFactory
  * https://github.com/Orphanet/Orphadata.org.git
  */ 
-public class OrphanetClassificationEntityFactory extends EntityRegistry {
+public class OrphanetClassificationEntityFactory extends OrphanetEntityFactory {
     static final Logger logger =
         Logger.getLogger(OrphanetClassificationEntityFactory.class.getName());
 
-    static final String NS = "";
-    static final QName DisorderList = new QName (NS, "DisorderList");
-    static final QName Disorder = new QName (NS, "Disorder");
-    static final QName OrphaNumber = new QName (NS, "OrphaNumber");
     static final QName ClassificationNodeList =
         new QName (NS, "ClassificationNodeList");
     static final QName ClassificationNode =
         new QName (NS, "ClassificationNode");
     static final QName ClassificationNodeChildList =
         new QName (NS, "ClassificationNodeChildList");
-    static final QName Name = new QName (NS, "Name");
-
-    static class Disorder {
-        Disorder parent;
-        Integer orphaNumber;
-        String name;
-        Entity entity;
-        List<Disorder> children = new ArrayList<>();
-
-        void add (Disorder d) {
-            d.parent = this;
-            children.add(d);
-        }
-    }
 
     public OrphanetClassificationEntityFactory (GraphDb graphDb)
         throws IOException {
@@ -68,65 +50,13 @@ public class OrphanetClassificationEntityFactory extends EntityRegistry {
         super (dir);
     }
         
-    @Override
-    public DataSource register (File file) throws IOException {
-        DataSource ds = super.register(file);
-        Integer count = (Integer)ds.get(INSTANCES);
-        if (count == null || count == 0) {
-            setDataSource (ds);
-            try (InputStream is = new FileInputStream (file)) {
-                count = register (is);
-                ds.set(INSTANCES, count);
-                updateMeta (ds);
-            }
-            catch (Exception ex) {
-                throw new IOException (ex);
-            }
-        }
-        else {
-            logger.info("### Data source "+ds.getName()+" ("+ds.getKey()+") "
-                        +"is already registered with "+count+" entities!");
-        }
-        return ds;        
-    }
-
-    Entity instrument (Disorder d) {
-        if (d.entity == null) {
-            Iterator<Entity> iter = find ("notation", "ORPHA:"+d.orphaNumber);
-            if (iter.hasNext()) {
-                d.entity = iter.next();
-                if (d.parent != null) {
-                    Entity p = instrument (d.parent);
-                    if (p != null) {
-                        Map<String, Object> r = new LinkedHashMap<>();
-                        if (source != null)
-                            r.put(SOURCE, source.getName());
-                        
-                        d.entity.stitch(p, R_subClassOf,
-                                        "ORPHA:"+d.parent.orphaNumber, r);
-                        //System.out.println(d.entity.getId()+" -> "+p.getId());
-                    }
-                }
-            }
-            else {
-                logger.warning("Unable to find entity for ORPHA:"+d.orphaNumber
-                               +" "+d.name);
-            }
-        }
-        return d.entity;
-    }
-    
     void register (Disorder d) {
-        for (Disorder p = d.parent; p != null; p = p.parent) {
-            System.out.print("..");
-        }
-        System.out.println(d.orphaNumber+" "+d.name);
-
-        instrument (d);
+        getEntities (d);
         for (Disorder c : d.children)
             register (c);
     }
 
+    @Override
     protected int register (InputStream is) throws Exception {
         XMLEventReader events =
             XMLInputFactory.newInstance().createXMLEventReader(is);

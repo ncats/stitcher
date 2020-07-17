@@ -752,10 +752,10 @@ public class GARDEntityFactory extends EntityRegistry {
             Map<Long, Entity> entities = new HashMap<>();
             Map<Long, Object> parents = new HashMap<>();
             
-            File file = new File ("gard-diseases.json");
-            PrintStream ps = new PrintStream (new FileOutputStream (file));
+            //File file = new File ("gard-diseases.json");
+            //PrintStream ps = new PrintStream (new FileOutputStream (file));
             ObjectMapper mapper = new ObjectMapper ();
-            ps.println("[");
+            //ps.println("[");
 
             for (; rset.next(); ++count) {
                 long id = rset.getLong("DiseaseID");
@@ -764,11 +764,24 @@ public class GARDEntityFactory extends EntityRegistry {
                 Map<String, Object> data = gard.instrument(id);
                 data.put("name", name);
                 data.put("is_rare", rset.getInt("isRare") == 1);
-                Object orgs = data.remove("organizations");
-
+                
+                List orgs = (List)data.remove("organizations");
+                data.put("organizations", mapper.writeValueAsString(orgs));
+                
                 Entity ent = register (data);
                 logger.info
                     ("+++++ "+data.get("id")+": "+name+" ("+ent.getId()+")");
+                if (!orgs.isEmpty()) {
+                    Map<String, Object> props = new HashMap<>();
+                    props.put(SOURCE, ds.getKey());
+                    for (int i = 0; i < orgs.size(); ++i) {
+                        props.put(ID, "org-"+(i+1));
+                        Map<String, Object> org =
+                            (Map<String, Object>)orgs.get(i);
+                        ent.addIfAbsent("ORGANIZATION", props, org);
+                    }
+                }
+                
                 if (data.containsKey("parents")) {
                     parents.put(id, data.get("parents"));
                 }
@@ -776,11 +789,11 @@ public class GARDEntityFactory extends EntityRegistry {
 
                 data.remove("uri");
                 data.put("organizations", orgs);
-                if (count > 0) ps.print(",");
-                ps.print(mapper.writeValueAsString(data));
+                //if (count > 0) ps.print(",");
+                //ps.print(mapper.writeValueAsString(data));
             }
-            ps.println("]");
-            ps.close();
+            //ps.println("]");
+            //ps.close();
             
             // now setup relationships
             for (Map.Entry<Long, Object> me : parents.entrySet()) {
