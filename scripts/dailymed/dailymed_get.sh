@@ -14,15 +14,10 @@ pushd $save_to
 
 #declare all files to be downloaded
 files=(
-		dm_spl_release_human_rx_part1.zip 
-		dm_spl_release_human_rx_part2.zip 
-		dm_spl_release_human_rx_part3.zip
-		dm_spl_release_human_otc_part1.zip 
-		dm_spl_release_human_otc_part2.zip 
-		dm_spl_release_human_otc_part3.zip 
-		dm_spl_release_human_otc_part4.zip 
-		dm_spl_release_human_otc_part5.zip
-		dm_spl_release_remainder.zip)
+		dm_spl_release_human_rx.zip 
+		dm_spl_release_human_otc.zip
+		dm_spl_release_remainder.zip
+		)
 
 missing_files=()
 
