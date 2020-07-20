@@ -398,8 +398,15 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 //Entity[] out = source.outNeighbors(R_activeMoiety);
                 Object moietyKeys = source.keys().get(R_activeMoiety);
                 int keyCount = 0;
-                if (moietyKeys.getClass().isArray())
+                if (moietyKeys.getClass().isArray()) {
                     keyCount = Array.getLength(moietyKeys);
+                    String unii = (String)source.get(I_UNII);
+                    for (int i=0; i<keyCount; i++)
+                        if (unii.equals(Array.get(moietyKeys, i)))
+                            keyCount--;
+                }
+                else if (moietyKeys != null && ((String)moietyKeys).length() == 10) // activeMoiety is a UNII
+                    keyCount = 1;
                 Entity[] in = target.inNeighbors(R_activeMoiety);
                 //logger.info(" ("+out.length+") "+source.getId()
                 logger.info(" ("+keyCount+") "+source.getId()

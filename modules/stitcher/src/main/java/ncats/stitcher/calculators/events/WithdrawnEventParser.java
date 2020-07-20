@@ -119,6 +119,9 @@ public class WithdrawnEventParser extends EventParser{
             //e.active;
             if (payload.containsKey("URL") && !"NA".equals(payload.get("URL")))
                 e.URL = (String)payload.get("URL");
+            else if (payload.containsKey("source") && !"NA".equals(payload.get("source")) &&
+                    ((String)payload.get("source")).startsWith("http"))
+                e.URL = (String)payload.get("source");
             //e.approvalAppId;
             if (payload.containsKey("brand_name") && !"NA".equals(payload.get("brand_name")))
                 e.product = (String)payload.get("brand_name");
