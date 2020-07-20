@@ -400,7 +400,11 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 int keyCount = 0;
                 if (moietyKeys.getClass().isArray()) {
                     keyCount = Array.getLength(moietyKeys);
-                    String unii = (String)source.get(I_UNII);
+                    Object unii = source.get(I_UNII);
+                    if (unii.getClass().isArray() && Array.getLength(unii) == 1)
+                        unii = Array.get(unii, 0);
+                    else if (unii.getClass().isArray())
+                        unii = "unknown";
                     for (int i=0; i<keyCount; i++)
                         if (unii.equals(Array.get(moietyKeys, i)))
                             keyCount--;
