@@ -22,12 +22,13 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static {
         mappedRels.put("ACTIVE MOIETY", R_activeMoiety);
         // TODO These other relationships cause OutOfMemory ... and excessive traverses
+        //mappedRels.put("PARENT->SALT/SOLVATE", R_rel); // QO84GZ3TST has two such relationships, enabling this causes it not to get linked to 5UX2SD1KE2
         //mappedRels.put("SALT/SOLVATE->PARENT", R_rel);
-        //mappedRels.put("PARENT->SALT/SOLVATE", R_rel);
-        //mappedRels.put("METABOLITE ACTIVE->PARENT", R_rel);
+        //mappedRels.put("METABOLITE ACTIVE->PARENT", R_activeMoiety);
         //mappedRels.put("PARENT->METABOLITE ACTIVE", R_rel);
-        //mappedRels.put("METABOLITE ACTIVE->PRODRUG", R_rel);
+        //mappedRels.put("METABOLITE ACTIVE->PRODRUG", R_activeMoiety);
         //mappedRels.put("PRODRUG->METABOLITE ACTIVE", R_rel);
+        //mappedRels.put("RACEMATE->ENANTIOMER", R_activeMoiety);
     }
     Map<String, Entity> activeMoieties = new HashMap<>();
     Map<String, Set<Entity>> unresolved = new HashMap<>();
