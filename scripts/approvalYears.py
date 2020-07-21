@@ -918,6 +918,11 @@ if __name__=="__main__":
                     if entry[-2] != '' and entry[-2] < earlyDate and entry[-2] > "1938-08-01":
                         earlyDate = entry[-2]
 
+                    # later products might still be marketed, copy status into early record, e.g. I-131 021305 HICON
+                    if early[akey][-5] != "Prescription" and early[akey][-5] != "Over-the-counter" and (entry[-5] == "Prescription" or entry[-5] == "Over-the-counter"):
+                        early[akey][-5] = entry[-5]
+
+
         for key in early.keys():
             myunii = unii
             for otherunii in activeMoiety[unii]:
