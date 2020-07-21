@@ -185,20 +185,22 @@
     need to provide an integrated biomedical knowledgebase for drug
     discovery remains a major challenge. One of the limiting factors
     in any data integration effort is \emph{entity resolution} (ER),
-    the ability to determine entities from different data sources
-    with shared partial (and perhaps even inconsistent) identities are 
-    equivalent. For many entity types with well-defined nomenclature
-    (e.g., gene, protein, cell line, etc.), ER amounts to a simple
-    lookup of identifiers. For drug entity type, however, ER is rather
-    challenging due to ambiguities in how it is defined and
+    i.e., the ability to determine which entities from different
+    data sources with shared partial (and perhaps even inconsistent)
+    identities are equivalent. For many entity types with well-defined
+    nomenclature (e.g., gene, protein, cell line, etc.), ER amounts to
+    simple identifier lookups. For drug entity type, however, ER
+    is rather challenging due to ambiguities in how it is defined and
     represented. Herein we report on our recent effort to develop an
     ER framework, \st, for drug data integration. Using \emph{active
-      moiety} as the defining concept for drug entity, we 
+      moiety} as the defining semantic concept for drug entity, we 
     develop a set of equivalence relations (i.e., \emph{stitch
-      keys}) in \st\ specifically for ER of drug entities. We
+      keys}) in \st\ that specifically address ER for drug entities. We
     demonstrate the utility of our approach through the development of
-    a comprehensive resource of drugs that have either been marketed or
-    approved in the United States for human use.
+    a comprehensive resource, \ix\ (\url{https://drugs.ncats.io}), of
+    drugs that have either been marketed or approved in the United States
+    for human use. To the best of our knowledge, this resource is
+    currently the most comprehensive of its kind.
   \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -256,13 +258,14 @@
 %%
 \section*{Introduction}
 As the volume of biological data continues to grow at an unprecedented
-rate, data de-duplication---also commonly known as record linkage
-or \emph{entity resolution}---is proportionally playing a prominent
-role in data integration. From the construction of training data for
-machine learning to building knowledge graphs as epistemological
-frameworks for artificial intelligence, proper entity resolution (ER) is
-essential in creating ground-truth data and turning data into
-knowledge. The core challenge of ER is in establishing
+rate \cite{Searls2005}, data de-duplication---also commonly known as
+\emph{record linkage} \cite{Fellegi1969} or \emph{entity
+  resolution}---is proportionally playing a prominent role in data
+integration. From the construction of training data for machine
+learning to building knowledge graphs as 
+epistemological frameworks for artificial intelligence, proper entity
+resolution (ER) is essential in creating ground-truth data and turning
+data into knowledge. The core challenge of ER is in establishing
 \emph{equivalence} between entities. For
 well-defined entity types (e.g., gene, tissue, cell line), this
 is often determined solely based on established identifiers and
@@ -271,7 +274,7 @@ however, equivalence is not as well-established due to conceptual
 ambiguities in how entities are defined and represented. Take disease
 as an example; the discrepancy between the 
 theoretical concept of ``disease entity'' from its clinical
-nosology \cite{Hucklenbroich14} is what makes disease ER extremely
+nosology \cite{Hucklenbroich2014} is what makes disease ER extremely
 challenging.
 
 Drug is another entity type that is also challenging for ER due to
@@ -333,18 +336,31 @@ the FDA and with other national authorities, the task still remains to
 be able to map other, external data sources into this
 rigorously-defined scheme using whatever names and data are at hand. 
 
-Herein we report on our recent data integration effort to build a
-comprehensive resource of drugs that have either been marketed or
-approved in the United States for human use. Such a resource is not
-only instrumental for drug repurposing but also serves as a valuable
-tool to further our understanding of the mechanistic properties of
-molecular targets \cite{Huang2011,Huang2019}. To the best of our
-knowledge, \ix{} is currently the most comprehensive resource of its
-kind. In the remainder of this paper, we discuss the development of
-\st, an ER framework that we have developed to address the challenges
-of drug data integration.
+Entity resolution (also known as \emph{record linkage} in the
+literature) is the problem of determining which entities with
+partially shared attributes are equivalent across data sources. This
+is a fundamental challenge in data integration, and one that has been
+an active area of research since the early days of computing
+\cite{Newcombe1959}. Within the biomedical community, ER has been
+particularly instrumental in the analysis of electronic health records
+(EHRs) \cite{Karr2019}. In the context of drug discovery, however, ER
+has received little attention; to our knowledge, the work by Croset
+et al. toward a drug product terminology \cite{Croset2015} is the only
+recent effort that directly addressed ER. [TODO: limitations of
+  traditional approaches.]
 
-\section*{Overview}
+Herein we report on our effort to develop a robust ER framework, \st,
+for drug data integration. By leveraging the semantic concept of
+\emph{active moiety} and other well-defined attributes (e.g.,
+molecular hash keys), we reduce the ER problem to that of establishing
+equivalence relations over a prioritized set of attributes (i.e.,
+\emph{stitch keys}). We demonstrate the utility of \st\ toward a
+comprehensive data integration effort of drugs that have either
+been marketed or approved in the United States for human use. The
+\ix\ (\url{https://drugs.ncats.io}) resource, to the best of our
+knowledge, is currently the most comprehensive of its kind.
+
+\section*{Preliminaries}
 As a motivating example, consider the data shown in
 Table~\ref{tab:data-integration-example}, which illustrates a
 common scenario where we would like to integrate data from multiple
@@ -388,7 +404,7 @@ priorities to the attributes. And finally equivalence classes are
 efficiently derived through standard  union-find algorithm
 \cite{Cormen2001}. This is the essence of \st.
 
-\subsection*{Preliminary concepts}
+\subsection*{Core concepts}
 The conceptual data model underlying \st{} is a \emph{multigraph}.
 Within this multigraph, a node can either be a \emph{stitch node}
 or \emph{data node}. Each data node represents the ``raw'' entity as
@@ -472,7 +488,7 @@ wide range of entity types.
 formats. Semantic formats such as OWL, RDF, and Turtle are supported
 as are JSON, delimiter separated text, and custom formats. For
 non-semantic format, a separate configuration file is required to map
-properties to stitch keys. 
+attributes to stitch keys. 
 
 An important step in data ingestion is the standardization and
 validation of stitch values. For \texttt{N\_Name} stitch key, the
@@ -500,7 +516,9 @@ moiety \textsc{Imatinib} between the two entities. This trivial example
 might suggest that, instead of comparing names exactly, we find the
 longest common substring of the names. The approach would certainly
 work in this example, but to make it work in general would require
-very specialized parsing rules and dictionaries. 
+very specialized parsing rules and dictionaries, e.g.,
+\textsc{Oseltamivir Acid} is active moiety of the prodrug
+\textsc{Oseltamivir}.
 
 For data sources with chemical structures, the most computationally
 demanding step in data ingestion is the generation of molecular hash
@@ -562,33 +580,36 @@ outline of the untangling process.
 
 At the core of the algorithm is the implied priorities associated with
 the stitch keys. The relation \texttt{R\_activeMoiety} has the highest
-priority as it is manually generated and is a special relation
-that only available to the G-SRS data source. As an
-example, consider the entities \emph{acetylsalicylic acid}
-(or also commonly known as \emph{aspirin}) and \emph{ethyl acetylsalicylate}
-shown in Figure~\ref{fig:aspirin}. While the two entities have nothing
-in common, in G-SRS 
-\emph{acetylsalicylic acid} is annotated as being an \emph{active
-moiety} of \emph{ethyl acetylsalicylate}. Further examination of the
-structural differences shows that only an \emph{ester} separates the
-two entities; this falls well within what the FDA considers as
-equivalent drugs. This example also highlights a quagmire:
-Computationally, there is nothing to prevent us from
-imputing \emph{active moiety} relationships through efficient (sub-)
-graph isomorphisms. This, however, is a very tempted trap that we have
-thus far resisted due to other forms of \emph{active moiety}
+priority due to its implied equivalence relation. While it is possible
+for this relationship to be automatically inferred for specific cases
+(e.g., salt form and freebase), we currently rely on the data source
+to provide this semantic annotation. As an example, consider the
+entities \emph{acetylsalicylic acid} (or also commonly known as
+\emph{aspirin}) and \emph{ethyl acetylsalicylate} shown in
+Figure~\ref{fig:aspirin}. While the two entities have no attributes in
+common, we know for a fact that \emph{acetylsalicylic
+  acid} is an \emph{active moiety} of \emph{ethyl
+  acetylsalicylate}. Further examination of the structural differences
+shows that only an \emph{ester} separates the two entities; per our
+definition, this falls well within what the FDA considers as
+equivalent drugs. This example also highlights a predicament:
+Computationally, there is nothing to prevent us from imputing
+\emph{active moiety} relationships through efficient (sub-) graph
+isomorphisms. This, however, is a very tempted trap that we have thus
+far resisted due to other forms of \emph{active moiety}
 relationships---e.g., metabolites and metals---that would require
-considerable investment of effort. 
+considerable investment of effort.
 
 The next priority is the stitch key \texttt{I\_UNII}. As UNII is
-the primary identifier for the G-SRS data source, any data source that
-provides mapping based on this identifier implies that the data source has
-sufficient knowledge of G-SRS (i.e., guilt by association). For
-entities that can be represented by chemical structures, the stitch
+the primary identifier issued by the FDA substance registrar, any data
+source that provides mapping based on this identifier implies that the
+data source has sufficient knowledge of the FDA's rigorous substance
+model (i.e., guilt by association). For entities that can be
+represented by chemical structures, the stitch 
 key \texttt{H\_LyChI\_L4} has the next level of priority. The
-complexity required for two entities to have the same stitch values
-means that the entities are less likely to match by errors. The rest
-of the stitch keys
+complexity required for two entities to have the same
+\texttt{H\_LyChI\_L4} stitch values means that the entities are
+less likely to match by errors. The rest of the stitch keys
 (i.e., \texttt{N\_Name}, \texttt{I\_CAS}, \texttt{I\_CID}) all have the
 lowest priority.
 
@@ -601,37 +622,47 @@ multigraph. The sgroup nodes are the \emph{resolved entities}.
 The last step in the data integration pipeline is to decide how the
 resolved entities are defined. This step is referred to as \emph{entity
 normalization} and its goals are to have (i) clear and consistent
-strategies for merging properties and (ii) conflict resolution
+strategies for merging attributes and (ii) conflict resolution
 (semantic as well as self consistency). While this step can be quite
-trivial if the properties are mutually exclusive across all data
+trivial if the attributes are mutually exclusive across all data
 sources, to address this in a general setting will require considerable
-efforts in terms of understanding the data source and its metadata. Within the
-context of the current work, we resort to a simple strategy: When
-merging properties, we preferentially use those that come from G-SRS
-with a basic consistency constraint that a synonym is never associated
-with more than one resolved entity. It also helps that many of the
-data sources in Table~\ref{tab:data-sources} have mutually exclusive
-properties; e.g., the property ``drug approval year'' in the Drugs@FDA
-data source is not a property of G-SRS.
+efforts in terms of understanding the data sources and their metadata.
+Here, a common strategy is to preferentially choose attributes based
+on the (perceived) quality of the data sources. For example,
+considering the example in Table~\ref{tab:data-integration-example}.
+The attributes for the \emph{normalized} entity that corresponds to
+the equivalence class $\left\{\textrm{A}_1, \textrm{A}_2, \textrm{B}_1,
+\textrm{C}_3, \textrm{D}_1, \textrm{D}_3\right\}$ can simply be the
+same as those of $\textrm{A}_2$ because we have reasons to believe
+data source A is higher quality than other data sources.
 
 \section*{Results}
 With \st\ serving as the data integration framework, we set out to
 build a comprehensive resource, \ix, on drugs that
 have either been marketed or approved for human use in the United
-States. Our starting point is the public G-SRS data source from the
-FDA \cite{GSRSData}. This data source is well-curated and contains
-over 100K substances across six different classes: chemical,
-structurally diverse, protein, mixture, polymer, and nucleic acid. As
+States. Such a resource is not only instrumental for drug repurposing
+but also serves as a valuable tool to further our understanding of the
+mechanistic properties of molecular targets
+\cite{Huang2011,Huang2019}. To the best of our knowledge, \ix{} is
+currently the most comprehensive resource of its kind.
+
+Our starting point is the public G-SRS data source from the FDA
+\cite{GSRSData}. This data source is well-curated and contains over
+100K substances across six different classes: chemical, structurally
+diverse, protein, mixture, polymer, and nucleic acid. As 
 a data source derived from the FDA's internal substance registry
 system \cite{GSRS}, the G-SRS data source naturally forms the basis of
 our data integration effort. Using this data source as the ``seed''
 from which other data sources can map onto has the following benefits:
 \begin{itemize}
 \item Since the G-SRS data source implements the ISO 11238
-standard \cite{ISO11238} for defining medicinal substances, it serves
-as an ideal starting point for what constitutes a ``drug.''
+  standard \cite{ISO11238} for defining medicinal substances, it serves
+  as an ideal starting point for what constitutes a ``drug.''
 \item The data is a public version of the internal substance registry
-within the FDA; as such, it is well-curated and up-to-date.
+  within the FDA; as such, it is well-curated and up-to-date.
+\item While not complete, the G-SRS data source provides a rich set of
+  \emph{active moiety} relationships that span salt forms,
+  prodrugs, and metal complexes.
 \end{itemize}
 Furthermore, by establishing a reference data source
 for data integration, we have finer control over the following: 
@@ -668,8 +699,11 @@ at \url{https://stitcher.ncats.io/browser}. This database currently
 contains 192,413 stitch nodes and 11,948,470 edges (relationships and stitch
 keys). Tables~\ref{tab:stitch-keys} and \ref{tab:stitch-values} give a
 breakdown of the stitch keys and values, respectively, in the stitch
-multigraph. All figures and examples used throughout this paper have
-been generated directly from this database. 
+multigraph. The complete list of sgroup nodes (i.e., equivalence classes) is
+available for browsing at
+\url{https://stitcher.ncats.io/app/stitches/latest}. All figures and
+examples used throughout this paper have been generated directly from
+this database.
 
 \subsection*{Case studies}
 \textsc{Aspirin} is a versatile drug that can be used alone or in
@@ -698,6 +732,9 @@ connected component into three distinct entities that represent the
 mixture, \emph{R-}, and \emph{S-}isomer.
 
 \section*{Discussion}
+Data integration remains a major challenge for drug discovery as
+biomedical research continues to generate data at an unprecedented
+rate. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%

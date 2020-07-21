@@ -52,7 +52,9 @@ public class OrphanetPrevalenceEntityFactory extends OrphanetEntityFactory {
 
         Map<String, Object> toMap () {
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("Source", pmids.toArray(new Long[0]));
+            if (!pmids.isEmpty())
+                data.put("Source", pmids.stream().map(p -> "PMID:"+p)
+                         .toArray(String[]::new));
             if (type != null)
                 data.put("PrevalenceType", type);
             if (qualification != null)

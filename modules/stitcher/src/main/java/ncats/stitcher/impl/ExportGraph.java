@@ -27,15 +27,35 @@ public class ExportGraph {
     }
 
     protected void nodeAttrs (PrintStream ps) {
+        ps.println
+            ("    <attribute id=\"0\" title=\"name\" type=\"string\"/>");
     }
 
     protected void edgeAttrs (PrintStream ps) {
+        ps.println
+            ("    <attribute id=\"0\" title=\"type\" type=\"string\"/>");
     }
     
     protected void nodes (PrintStream ps) {
     }
 
     protected void edges (PrintStream ps) {
+    }
+
+    protected void edge (PrintStream ps, long id, Entity source, Entity target,
+                         boolean rev, String type) {
+        ps.print("    <edge id=\""+id+"\"");
+        if (rev)
+            ps.print(" source=\""+target.getId()
+                     +"\" target=\""+source.getId()+"\"");
+        else
+            ps.print(" source=\""+source.getId()
+                     +"\" target=\""+target.getId()+"\"");
+        ps.println(">");
+        ps.println("      <attvalues>");
+        ps.println("        <attvalue for=\"0\" value=\""+type+"\"/>");
+        ps.println("      </attvalues>");
+        ps.println("    </edge>");
     }
     
     public void export (OutputStream os) throws Exception {
@@ -85,18 +105,6 @@ public class ExportGraph {
     public static class ExportGraphGARD_HP extends ExportGraph {
         public ExportGraphGARD_HP (EntityFactory ef) {
             super (ef);
-        }
-
-        @Override
-        protected void nodeAttrs (PrintStream ps) {
-            ps.println
-                ("    <attribute id=\"0\" title=\"name\" type=\"string\"/>");
-        }
-
-        @Override
-        protected void edgeAttrs (PrintStream ps) {
-            ps.println
-                ("    <attribute id=\"0\" title=\"type\" type=\"string\"/>");
         }
 
         static boolean checkGARD (Entity e) {
@@ -163,21 +171,6 @@ public class ExportGraph {
             logger.info("#### "+count+" nodes!");
         }
 
-        void edge (PrintStream ps, long id, Entity source, Entity target,
-                   boolean rev, String type) {
-            ps.print("    <edge id=\""+id+"\"");
-            if (rev)
-                ps.print(" source=\""+target.getId()
-                         +"\" target=\""+source.getId()+"\"");
-            else
-                ps.print(" source=\""+source.getId()
-                         +"\" target=\""+target.getId()+"\"");
-            ps.println(">");
-            ps.println("      <attvalues>");
-            ps.println("        <attvalue for=\"0\" value=\""+type+"\"/>");
-            ps.println("      </attvalues>");
-            ps.println("    </edge>");
-        }
 
         void edges (PrintStream ps, Set<Long> edges, Entity e) {
             Set<Long> seen = new HashSet<>();
@@ -226,6 +219,14 @@ public class ExportGraph {
                 });
             logger.info("#### "+edges.size()+" edges!");
         }
+    }
+
+    public static class ExportGraphOrphanet_HP extends ExportGraph {
+        public ExportGraphOrphanet_HP (EntityFactory ef) {
+            super (ef);
+        }
+
+        
     }
 
     public static void main (String[] argv) throws Exception {
