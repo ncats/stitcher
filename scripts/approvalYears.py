@@ -335,7 +335,7 @@ def readUniiFile(maindir):
     fp = zfp.open(names[-1], 'r')
     line = fp.readline()
 
-    if line[:-2].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME":
+    if line[:-2].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME" and line[:-2].upper() != "NAME\tTYPE\tUNII\tPT":
         raise ValueError('Problem reading UNII file:'+line)
 
     line = fp.readline()

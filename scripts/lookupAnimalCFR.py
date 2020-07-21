@@ -605,6 +605,7 @@ def defaultNames():
     names['MANGANOUS OXIDE']='64J2OA7MH3'
     names['MILBEMYCIN OXIME']='0502PUN0GT'
     names['MILBEMYCIN']='0502PUN0GT'
+    names['METHIONINE HYDROXY ANALOG']='Z94465H1Y7'
     names['ACID']=''
     names['OXIDE']=''
     names['IN']=''
