@@ -28,6 +28,7 @@ files=(
 		dm_spl_release_human_rx.zip 
 		dm_spl_release_human_otc.zip
 		dm_spl_release_remainder.zip
+		dm_spl_release_animal.zip
 		)
 		
 # append full paths to file names
@@ -52,7 +53,8 @@ fi
 types=(
 		_rem
 		_rx
-		_otc)
+		_otc
+                _ani)
 
 for type in ${types[@]}; do
 	# select necessary files

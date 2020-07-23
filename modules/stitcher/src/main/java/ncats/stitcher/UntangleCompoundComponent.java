@@ -395,17 +395,36 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         // collapse based on single/terminal active moieties
         Set<Entity> unsure = new TreeSet<>();
         component.stitches((source, target) -> {
-                Entity[] out = source.outNeighbors(R_activeMoiety);
+                //Entity[] out = source.outNeighbors(R_activeMoiety);
+                Object moietyKeys = source.keys().get(R_activeMoiety);
+                int keyCount = 0;
+                if (moietyKeys.getClass().isArray()) {
+                    keyCount = Array.getLength(moietyKeys);
+                    // prodrugs sometimes has 2 active moieties, ignore self one e.g. 54K37P50KH
+                    Object unii = source.get(I_UNII);
+                    if (unii.getClass().isArray() && Array.getLength(unii) == 1)
+                        unii = Array.get(unii, 0);
+                    else if (unii.getClass().isArray())
+                        unii = "unknown";
+                    for (int i=0; i<keyCount; i++)
+                        if (unii.equals(Array.get(moietyKeys, i)))
+                            keyCount--;
+                }
+                else if (moietyKeys != null && ((String)moietyKeys).length() == 10) // activeMoiety is a UNII
+                    keyCount = 1;
                 Entity[] in = target.inNeighbors(R_activeMoiety);
-                logger.info(" ("+out.length+") "+source.getId()
+                //logger.info(" ("+out.length+") "+source.getId()
+                logger.info(" ("+keyCount+") "+source.getId()
                             +" -> "+target.getId()+" ["
                             +isRoot (target)+"] ("+in.length+")");
                 
-                if (out.length == 1) {
+                //if (out.length == 1) {
+                if (keyCount == 1) {
                     // first collapse single/terminal active moieties
                     uf.union(target.getId(), source.getId());
                 }
-                else if (out.length > 1) {
+                //else if (out.length > 1) {
+                else if (keyCount > 1) {
                     unsure.add(source);
                 }
 

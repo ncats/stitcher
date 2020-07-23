@@ -1718,7 +1718,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1997	Skelid	Tiludronate Disodium	BH6M93CIA0	03-07-97	NDA	20-707		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20707		
 1997	Fareston	Toremifene Citrate	2498Y783QT	05-29-97	NDA	20-497		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20497		
 1997	Rezulin	Troglitazone	I66ZZ0ZN0E	01-29-97	NDA	20-720		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20720		
-1997	Trovan	Trovafloxacin Mesylate	0P1LKO80WN	12-18-97	NDA	20-759		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=2059 		
+1997	Trovan	Trovafloxacin Mesylate	0P1LKO80WN	12-18-97	NDA	20-759		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20759		
 1997	Zomig	Zolmitriptan	2FS66TH3YW	11-25-97	NDA	20-768		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20768		
 1998	Ziagen	Abacavir Sulfate	J220T4J9Q2	12-17-98	NDA	20-977		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=20977		
 1998	Simulect	Basiliximab	9927MT646M	05-12-98	BLA	103-764		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=103764		

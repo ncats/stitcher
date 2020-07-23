@@ -21,7 +21,8 @@ opener.addheaders = [
                     'Windows NT 5.2; .NET CLR 1.1.4322)'))
 ]
 
-site = 'https://stitcher.ncats.io/'
+#site = 'https://stitcher.ncats.io/'
+#site = 'https://stitcher-dev.ncats.io/'
 site = 'http://localhost:8080/'
 
 def requestJson(uri):
@@ -54,11 +55,13 @@ def uniiClashes(unii2stitch, stitch):
 
 def approvedStitches(approved, stitch):
     appr = ''
+    apprType = ''
     if stitch.has_key('highestPhase'):
         for event in stitch['events']:
             if event['id'] == stitch['highestPhase']:
                 if event['kind'] in ['USApprovalRx', 'USPreviouslyMarketed']:
                     appr = stitch['highestPhase']
+                    apprType = event['kind']
     if appr != '':
         if stitch.has_key('initiallyMarketedUS') and stitch['initiallyMarketedUS'] != "null":
             appr = stitch['initiallyMarketedUS']
@@ -76,11 +79,9 @@ def approvedStitches(approved, stitch):
                     unii = node['id']
 
         apprDate = ''
-        apprType = ''
         apprUnii = unii
         for event in stitch['events']:
             if event['id'] == appr:
-                apprType = event['kind']
                 apprDate = 'unknown'
                 if 'startDate' in event:
                     apprDate = event['startDate']
@@ -108,13 +109,21 @@ def approvedStitches(approved, stitch):
         #sys.exit()
     return approved
 
-def highestStatus(approved, stitch):
+def highestStatus(approved, stitch, full=False):
     status = 'Other'
+    url = ''
+    startDate = ''
+    prod = ''
     if stitch.has_key('highestPhase'):
         status = stitch['highestPhase']
         for event in stitch['events']:
             if event['id'] == status:
                 status = event['kind']
+                if 'URL' in event:
+                    url = event['URL']
+                if 'startDate' in event:
+                    startDate = event['startDate']
+                prod = event['id']
     parent = stitch['sgroup']['parent']
     rank = stitch['rank']
     unii = ''
@@ -129,15 +138,20 @@ def highestStatus(approved, stitch):
                 sys.stderr.write("failed parent node: "+str(parent)+"\n")
                 sys.stderr.flush()
             name = getName(stitch)
+    entry = [name, status, stitch['id'], rank]
+    if full:
+        entry.append(prod)
+        entry.append(startDate)
+        entry.append(url)
     if status != 'Other':
-        approved[unii] = [name, status, stitch['id'], rank]
+        approved[unii] = entry
     return approved
 
 def nmeStitches(stitch2nmes, stitch, nmelist):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, Oct 2019':
+        if node['source'] == 'G-SRS, Apr 2020':
             if node['id'] in nmelist:
                 entries.append(node['id'])
     if len(entries) > 1:
@@ -171,17 +185,11 @@ def activemoietyClashes(stitch2ams, stitch):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, Oct 2019':
-            if node['stitches'].has_key('T_ActiveMoiety'):
-                if len(node['stitches']['T_ActiveMoiety']) > 1 and len(node['stitches']['T_ActiveMoiety'][0]) > 1:
-                    #print key, node['stitches']['T_ActiveMoiety']
-                    #sys.exit()
-                    sys.stderr.write("ignoring multiple active moieties for GSRS entry\n")
-                elif len(node['stitches']['T_ActiveMoiety']) > 1:
-                    item = node['stitches']['T_ActiveMoiety']
-                    node['stitches']['T_ActiveMoiety'] = [item]
-                if node['stitches']['T_ActiveMoiety'][0] not in entries:
-                    entries.append(node['stitches']['T_ActiveMoiety'][0])
+        if node['source'] == 'G-SRS, Apr 2020':
+            if node['stitches'].has_key('R_activeMoiety'):
+                if isinstance(node['stitches']['R_activeMoiety'], list) and len(node['stitches']['R_activeMoiety']) > 1 and node['id'] in node['stitches']['R_activeMoiety']:
+                    for item in node['stitches']['R_activeMoiety']:
+                        entries.append(item)
     if len(entries) > 1:
         entries.sort()
         entries.insert(1, key)
@@ -376,6 +384,21 @@ def probeUniiClash():
 
 
 if __name__=="__main__":
+    #test
+    #lines = open("unappr-list.txt", "r").readlines()
+    #output = dict()
+    #for line in lines:
+    #    uri = site+'api/stitches/v1/'+line[0:-1]
+    #    obj = requestJson(uri)
+    #    output = highestStatus(output, obj, True)
+    #for key in output:
+    #    line = key
+    #    for item in output[key]:
+    #        line = line + "\t" + str(item)
+    #    print line
+    #sys.exit()
+
+    
     #!!!TODO compare Broad node clinical_phase entries with highest phase
     
     # list of tests to perform
@@ -387,8 +410,8 @@ if __name__=="__main__":
     #findOrphans: Some resource entries were supposed to be stitched, but are orphaned
     #approvedStitches: Report on all the approved stitches from API
 
-    #tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
-    tests = [approvedStitches]
+    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
+    #tests = [activemoietyClashes]
     testHeaders = dict()
     testHeaders['nmeClashes'] = 'nmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['nmeClashes2'] = '\nnmeClashes2\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
@@ -396,8 +419,8 @@ if __name__=="__main__":
     testHeaders['activemoietyClashes'] = '\nactivemoietyClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['uniiClashes'] = '\nuniiClashes\tUNII\tPN\tStitch Node 1\tStitch Node 2\tetc.'
     testHeaders['findOrphans'] = '\nfindOrphans\tSource|Status\tIngredient\tSource\tStatus'
-    testHeaders['approvedStitches'] = '\napprovedStitches\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
-    testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tYear\tStitch\tStitch Rank'
+    testHeaders['approvedStitches'] = '\napprovedStitches\tUNII\tUNII PN\tYear\tStitch\tStitch Rank\tNode PN\tNode UNII\tUNII PN\tStatus'
+    testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tNode PN\tStatus\tStitch\tStitch Rank'
 
     # initialize list of NMEs
     nmeList = open("../../data/approvalYears-2019-10-24.txt", "r").readlines()
