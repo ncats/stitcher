@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class GSRSEventParser extends EventParser {
     public GSRSEventParser() {
-        super ("G-SRS, Oct 2019");
+        super ("G-SRS, Apr 2020");
     }
 
     public void produceEvents(Map<String, Object> payload) {

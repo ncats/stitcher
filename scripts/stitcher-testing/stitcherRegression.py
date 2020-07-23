@@ -151,7 +151,7 @@ def nmeStitches(stitch2nmes, stitch, nmelist):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, Oct 2019':
+        if node['source'] == 'G-SRS, Apr 2020':
             if node['id'] in nmelist:
                 entries.append(node['id'])
     if len(entries) > 1:
@@ -185,7 +185,7 @@ def activemoietyClashes(stitch2ams, stitch):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, Oct 2019':
+        if node['source'] == 'G-SRS, Apr 2020':
             if node['stitches'].has_key('R_activeMoiety'):
                 if isinstance(node['stitches']['R_activeMoiety'], list) and len(node['stitches']['R_activeMoiety']) > 1 and node['id'] in node['stitches']['R_activeMoiety']:
                     for item in node['stitches']['R_activeMoiety']:
