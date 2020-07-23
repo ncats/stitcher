@@ -501,7 +501,7 @@ if __name__=="__main__":
     if not os.path.exists(appYrsfile):
         raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
 
-    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2019-10-11.gsrs'
+    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
