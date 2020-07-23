@@ -335,7 +335,7 @@ def readUniiFile(maindir):
     fp = zfp.open(names[-1], 'r')
     line = fp.readline()
 
-    if line[:-2].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME":
+    if line[:-2].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME" and line[:-2].upper() != "NAME\tTYPE\tUNII\tPT":
         raise ValueError('Problem reading UNII file:'+line)
 
     line = fp.readline()
@@ -501,7 +501,7 @@ if __name__=="__main__":
     if not os.path.exists(appYrsfile):
         raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
 
-    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2019-10-11.gsrs'
+    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
@@ -917,6 +917,11 @@ if __name__=="__main__":
 
                     if entry[-2] != '' and entry[-2] < earlyDate and entry[-2] > "1938-08-01":
                         earlyDate = entry[-2]
+
+                    # later products might still be marketed, copy status into early record, e.g. I-131 021305 HICON
+                    if early[akey][-5] != "Prescription" and early[akey][-5] != "Over-the-counter" and (entry[-5] == "Prescription" or entry[-5] == "Over-the-counter"):
+                        early[akey][-5] = entry[-5]
+
 
         for key in early.keys():
             myunii = unii
