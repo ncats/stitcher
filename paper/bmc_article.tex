@@ -346,8 +346,11 @@ particularly instrumental in the analysis of electronic health records
 (EHRs) \cite{Karr2019}. In the context of drug discovery, however, ER
 has received little attention; to our knowledge, the work by Croset
 et al. toward a drug product terminology \cite{Croset2015} is the only
-recent effort that directly addressed ER. [TODO: limitations of
-  traditional approaches.]
+recent effort that directly addressed ER. Here, the authors utilized
+graph density and betweeness centrality metrics to merge and identify 
+problematic entities for each connected component within the link
+graph. Due to the lack of available data and code, we were unable to
+comparatively evaluate their approach.
 
 Herein we report on our effort to develop a robust ER framework, \st,
 for drug data integration. By leveraging the semantic concept of
@@ -357,12 +360,12 @@ equivalence relations over a prioritized set of attributes (i.e.,
 \emph{stitch keys}). We demonstrate the utility of \st\ toward a
 comprehensive data integration effort of drugs that have either
 been marketed or approved in the United States for human use. The
-\ix\ (\url{https://drugs.ncats.io}) resource, to the best of our
+\ix\ resource \url{https://drugs.ncats.io}, to the best of our
 knowledge, is currently the most comprehensive of its kind.
 
 \section*{Preliminaries}
 As a motivating example, consider the data shown in
-Table~\ref{tab:data-integration-example}, which illustrates a
+Table~\ref{tab:data-integration-example}. This table illustrates a
 common scenario where we would like to integrate data from multiple
 sources such that each data source might contain only partial (and
 possibly conflicting) information regarding the identities of the
@@ -461,8 +464,8 @@ keys over generic ones ultimately rests on the strategies used for ER.
 For the small molecule class of drugs, perhaps more important than any
 identifiers is the underlying chemical structure definition. These
 stitch keys are hash values derived from the molecular structure at
-different resolutions \cite{lychi}. Section~\ref{sec:methods-ingest}
-discusses in detail how these derived stitch values are generated. 
+different resolutions \cite{lychi}. We discuss in detail how these
+derived stitch values are generated in the next section.
 \item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the
 active moiety relationship between two drugs provides a strong
 evidence of equivalence. While this relationship can be inferred
@@ -477,7 +480,7 @@ freebase form (\textsc{Imatinib}) of \textsc{Imatinib Mesylate}.
 
 \section*{Methods}\label{sec:methods}
 In general, data integration with \st{} consists of four basic
-steps executed in order: \emph{ingestion}, \emph{stitching},
+steps applied in order: \emph{ingestion}, \emph{stitching},
 \emph{entity resolution}, and \emph{entity normalization}. With
 the exception of \emph{entity resolution}, all other steps---as they
 are currently implemented in \st---are generic and can be applied to a
@@ -488,7 +491,7 @@ wide range of entity types.
 formats. Semantic formats such as OWL, RDF, and Turtle are supported
 as are JSON, delimiter separated text, and custom formats. For
 non-semantic format, a separate configuration file is required to map
-attributes to stitch keys. 
+data attributes to stitch keys. 
 
 An important step in data ingestion is the standardization and
 validation of stitch values. For \texttt{N\_Name} stitch key, the
@@ -516,9 +519,9 @@ moiety \textsc{Imatinib} between the two entities. This trivial example
 might suggest that, instead of comparing names exactly, we find the
 longest common substring of the names. The approach would certainly
 work in this example, but to make it work in general would require
-very specialized parsing rules and dictionaries, e.g.,
-\textsc{Oseltamivir Acid} is active moiety of the prodrug
-\textsc{Oseltamivir}.
+very specialized parsing rules and dictionaries, e.g., consider an
+example here where \textsc{Oseltamivir Acid} is an active moiety of
+the prodrug \textsc{Oseltamivir}.
 
 For data sources with chemical structures, the most computationally
 demanding step in data ingestion is the generation of molecular hash
@@ -535,7 +538,7 @@ the structure after normalization and standardization per the LyChI
 software package \cite{lychi}. A match at this level implies that two
 structures are equivalent 
 %insofar as \textcolor{red}{the valence bond theory is valid}
-in terms of stereochemistry, resonance, and tautomerism. And the last
+in terms of stereochemistry, resonance, and tautomer. And the last
 level \texttt{L3} is the same as \texttt{L4} but without
 stereochemistry. A match at this level is considered weak and does not
 constitute equivalence without other significant supporting evidence.
