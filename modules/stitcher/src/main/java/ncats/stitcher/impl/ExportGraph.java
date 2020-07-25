@@ -226,8 +226,130 @@ public class ExportGraph {
             super (ef);
         }
 
+        static boolean checkORDO (Entity e) {
+            // only consider node with subClassOf and hasPhenotype
+            final Set<Long> nb = new HashSet<>();
+            e.neighbors((id, other, key, rev, props) -> {
+                    if (key == R_subClassOf
+                        || props.containsKey("frequency")) {
+                        nb.add(other.getId());
+                        return false;
+                    }
+                    return true;
+                }, R_subClassOf, R_hasPhenotype);
+            return !nb.isEmpty();
+        }
+
+        static boolean checkHP (Entity e) {
+            final Set<Long> nb = new HashSet<>();
+            e.neighbors((id, other, key, rev, props) -> {
+                    if ((key == R_subClassOf && other.is("S_HP"))
+                        || (props.containsKey("frequency")
+                            && other.is("S_ORDO_ORPHANET"))) {
+                        nb.add(other.getId());
+                        return false;
+                    }
+                    return true;
+                }, R_subClassOf, R_hasPhenotype);
+            return !nb.isEmpty();
+        }
         
-    }
+        
+        @Override
+        protected void nodes (PrintStream ps) {
+            AtomicInteger count = new AtomicInteger ();
+            ef.entities("S_ORDO_ORPHANET", e -> {
+                    Map<String, Object> data = e.payload();
+                    String id = (String)data.get("notation");
+                    if (!e.is("TRANSIENT")
+                        && id.startsWith("ORPHA:") && checkORDO (e)) {
+                        ps.println("     <node id=\""+e.getId()+"\" label=\""
+                                   +data.get("notation")+"\">");
+                        ps.println("       <attvalues>");
+                        ps.println("         <attvalue for=\"0\" value=\""
+                                   +escape(data.get("label"))+"\"/>");
+                        ps.println("       </attvalues>");
+                        ps.println("     </node>");
+                        count.getAndIncrement();
+                    }
+                });
+            
+            ef.entities("S_HP", e -> {
+                    if (checkHP (e)) {
+                        Map<String, Object> data = e.payload();
+                        String notation = (String)data.get("notation");
+                        if (notation != null) {
+                            ps.println
+                                ("     <node id=\""+e.getId()+"\" label=\""
+                                 +notation+"\">");
+                            ps.println("       <attvalues>");
+                            ps.println("         <attvalue for=\"0\" value=\""
+                                       +escape(data.get("label"))+"\"/>");
+                            ps.println("       </attvalues>");
+                            ps.println("     </node>");
+                            count.getAndIncrement();
+                        }
+                    }
+                });
+            logger.info("#### "+count+" nodes!");
+        }
+
+        void edges (PrintStream ps, Set<Long> edges, Entity e) {
+            Set<Long> seen = new HashSet<>();
+            e.neighbors((id, other, key, reverse, props) -> {
+                    if (edges.contains(id)) {
+                    }
+                    else {
+                        if (!seen.contains(other.getId())) {
+                            boolean check = 
+                                (key == R_hasPhenotype
+                                 && other.is("S_HP") && checkHP(other));
+                            if (!check && key == R_subClassOf
+                                && other.is("S_ORDO_ORPHANET")
+                                && !other.is("TRANSIENT")) {
+                                String orpha = (String)other.payload("notation");
+                                check = orpha.startsWith("ORPHA:");
+                            }
+
+                            if (check) {
+                                String type = key.toString();
+                                edge (ps, id, e, other, reverse, type);
+                                seen.add(other.getId());
+                            }
+                        }
+                        edges.add(id);
+                    }
+                    return true;
+                }, R_subClassOf, R_hasPhenotype);
+        }
+        
+        @Override
+        protected void edges (PrintStream ps) {
+            Set<Long> edges = new HashSet<>();
+            ef.entities("S_ORDO_ORPHANET", e -> {
+                    Map<String, Object> data = e.payload();
+                    String id = (String)data.get("notation");
+                    if (!e.is("TRANSIENT")
+                        && id.startsWith("ORPHA:") && checkORDO (e)) {
+                        edges (ps, edges, e);
+                    }
+                });
+            ef.entities("S_HP", e -> {
+                    if (checkHP (e)) {
+                        e.neighbors((id, other, key, rev, props) -> {
+                                if (edges.contains(id)) {
+                                }
+                                else if (other.is("S_HP")) {
+                                    edge (ps, id, e, other, rev, key.toString());
+                                    edges.add(id);
+                                }
+                                return true;
+                            }, R_subClassOf);
+                    }
+                });
+            logger.info("#### "+edges.size()+" edges!");
+        }        
+    } // ExportGraphOrphanet_HP
 
     public static void main (String[] argv) throws Exception {
         if (argv.length == 0) {
@@ -237,7 +359,7 @@ public class ExportGraph {
         }
 
         try (EntityFactory ef = new EntityFactory (argv[0])) {
-            ExportGraph eg = new ExportGraphGARD_HP (ef);
+            ExportGraph eg = new ExportGraphOrphanet_HP (ef);
             OutputStream os = System.out;
             if (argv.length > 1) {
                 os = new FileOutputStream (argv[1]);
