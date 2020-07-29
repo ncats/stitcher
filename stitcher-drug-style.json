@@ -29,10 +29,10 @@
         "color": "#ef7d73",
         "text-color-internal": "#000000"
     },
-    "node.S_DrugBank, July 2020": {
+    "node.S_DRUGBANK, JULY 2020": {
         "color": "#e05f0f"
     },
-    "node.S_G-SRS, APRIL 2019": {
+    "node.S_G-SRS, APRIL 2020": {
         "color": "#7bbdf1",
         "text-color-internal": "#000000"
     },
@@ -43,7 +43,7 @@
     "node.S_PHARMACEUTICAL MANUFACTURING ENCYCLOPEDIA (THIRD EDITION)": {
         "color": "#00a000"
     },
-    "node.S_RANCHO BIOSCIENCES, MARCH 2019": {
+    "node.S_RANCHO BIOSCIENCES, JULY 2020": {
         "color": "#d4a0f4",
         "text-color-internal": "#000000"
     },
