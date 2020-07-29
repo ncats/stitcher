@@ -33,7 +33,7 @@ echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" ../stitcher-rawinputs/files/PharmManuEncycl3rdEd.json"
 echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, December 2018\" cache=data/hash.db ../stitcher-rawinputs/files/drugbank_all_full_database.xml.zip"
+sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, July 2020\" cache=data/hash.db ../stitcher-rawinputs/files/drugbank_all_full_database.xml.zip"
 echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 
