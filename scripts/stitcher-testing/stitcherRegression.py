@@ -5,16 +5,21 @@ import urllib
 import urllib2
 import json
 import time
+import ssl
 
 # NOTE: TO RUN you will need to download UNII names file from FDA SRS webpage into temp folder
 # See --- open('../temp/UNIIs-2018-09-07/UNII Names 31Aug2018.txt', 'r') below
 
 cookies = cookielib.CookieJar()
 
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
 opener = urllib2.build_opener(
     urllib2.HTTPRedirectHandler(),
     urllib2.HTTPHandler(debuglevel=0),
-    urllib2.HTTPSHandler(debuglevel=0),
+    urllib2.HTTPSHandler(debuglevel=0,context=ctx),
     urllib2.HTTPCookieProcessor(cookies))
 opener.addheaders = [
     ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
@@ -23,7 +28,8 @@ opener.addheaders = [
 
 #site = 'https://stitcher.ncats.io/'
 #site = 'https://stitcher-dev.ncats.io/'
-site = 'http://localhost:8080/'
+site = 'https://stitcher-test.ncats.io/'
+#site = 'http://localhost:8080/'
 
 def requestJson(uri):
     try:
@@ -173,6 +179,19 @@ def PMEClashes(stitch2pmes, stitch):
     entries = []
     for node in stitch['sgroup']['members']:
         if node['source'] == 'Pharmaceutical Manufacturing Encyclopedia (Third Edition)':
+            entries.append(node['name'])
+    if len(entries) > 1:
+        entries.sort()
+        entries.insert(1, key)
+        entries.insert(2, stitch['rank'])
+        stitch2pmes[entries[0]] = entries[1:]
+    return stitch2pmes
+
+def DrugBankClashes(stitch2pmes, stitch):
+    key = stitch['id']
+    entries = []
+    for node in stitch['sgroup']['members']:
+        if node['source'] == 'DrugBank, December 2018':
             entries.append(node['name'])
     if len(entries) > 1:
         entries.sort()
@@ -411,11 +430,12 @@ if __name__=="__main__":
     #approvedStitches: Report on all the approved stitches from API
 
     tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
-    #tests = [activemoietyClashes]
+    #tests = [DrugBankClashes]
     testHeaders = dict()
     testHeaders['nmeClashes'] = 'nmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['nmeClashes2'] = '\nnmeClashes2\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['PMEClashes'] = '\nPMEClashes\tIngredient\t[Blank]\tStitch Node\tStitch Rank\tClash Ingredient 1\tClash Ingredient 2\tetc.'
+    testHeaders['DrugBankClashes'] = '\nDrugBankClashes\tIngredient\t[Blank]\tStitch Node\tStitch Rank\tClash Ingredient 1\tClash Ingredient 2\tetc.'
     testHeaders['activemoietyClashes'] = '\nactivemoietyClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['uniiClashes'] = '\nuniiClashes\tUNII\tPN\tStitch Node 1\tStitch Node 2\tetc.'
     testHeaders['findOrphans'] = '\nfindOrphans\tSource|Status\tIngredient\tSource\tStatus'
