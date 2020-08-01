@@ -28,18 +28,22 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
         Logger.getLogger(OrphanetDiseaseGeneAssociationEntityFactory.class.getName());
 
     static final QName Id = new QName (NS, "id");
-    static final QName DiseaseGeneAssociationList = new QName (NS, "DiseaseGeneAssociationList");
-    static final QName DiseaseGeneAssociation = new QName (NS, "DiseaseGeneAssociation");
+    static final QName DisorderGeneAssociationList =
+        new QName (NS, "DisorderGeneAssociationList");
+    static final QName DisorderGeneAssociation =
+        new QName (NS, "DisorderGeneAssociation");
     static final QName SourceOfValidation = new QName (NS, "SourceOfValidation");
     static final QName Gene = new QName (NS, "Gene");
     static final QName Symbol = new QName (NS, "Symbol");
-    static final QName DiseaseGeneAssociationType =
-        new QName (NS, "DiseaseGeneAssociationType");
-    static final QName DiseaseGeneAssociationStatus =
-        new QName (NS, "DiseaseGeneAssociationStatus");
+    static final QName DisorderGeneAssociationType =
+        new QName (NS, "DisorderGeneAssociationType");
+    static final QName DisorderGeneAssociationStatus =
+        new QName (NS, "DisorderGeneAssociationStatus");
 
-    static class DiseaseGeneAssociation {
+    static class DisorderGeneAssociation {
         public Set<Long> pmids = new TreeSet<>();
+        public Integer orphaNumber;
+        public String name;
         public String symbol;
         public String type;
         public String status;
@@ -50,15 +54,15 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                 data.put("SourceOfValidation", pmids.stream().map(p -> "PMID:"+p)
                          .toArray(String[]::new));
             if (type != null)
-                data.put("DiseaseGeneAssociationType", type);
+                data.put("DisorderGeneAssociationType", type);
             if (status != null)
-                data.put("DiseaseGeneAssociationValidationStatus", status);
+                data.put("DisorderGeneAssociationValidationStatus", status);
             return data;
         }
     }
     
-    static class DiseaseGeneAssociationDisorder extends Disorder {
-        public LinkedList<DiseaseGeneAssociation> associations = new LinkedList<>();
+    static class DisorderGeneAssociationDisorder extends Disorder {
+        public LinkedList<DisorderGeneAssociation> associations = new LinkedList<>();
     }
     
     public OrphanetDiseaseGeneAssociationEntityFactory (GraphDb graphDb)
@@ -88,6 +92,16 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
         return genes.toArray(new Entity[0]);
     }
 
+    Entity getOrphanetGene (Integer orphaNumber) {
+        List<Entity> genes = new ArrayList<>();
+        for (Iterator<Entity> iter = find ("notation", "Orphanet:"+orphaNumber);
+             iter.hasNext(); ) {
+            Entity e = iter.next();
+            genes.add(e);
+        }
+        return genes.isEmpty() ? null : genes.get(0);
+    }
+
     @Override
     protected int register (InputStream is) throws Exception {
         XMLEventReader events =
@@ -99,7 +113,7 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
         ObjectMapper mapper = new ObjectMapper ();
         LinkedList<XMLEvent> stack = new LinkedList<>();        
         StringBuilder buf = new StringBuilder ();
-        LinkedList<DiseaseGeneAssociationDisorder> dstack = new LinkedList<>();
+        LinkedList<DisorderGeneAssociationDisorder> dstack = new LinkedList<>();
 
         for (XMLEvent ev; events.hasNext(); ) {
             ev = events.nextEvent();
@@ -110,14 +124,14 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                 StartElement se = ev.asStartElement();                
                 QName qn = se.getName();
                 if (Disorder.equals(qn)) {
-                    DiseaseGeneAssociationDisorder d =
-                        new DiseaseGeneAssociationDisorder ();
+                    DisorderGeneAssociationDisorder d =
+                        new DisorderGeneAssociationDisorder ();
                     dstack.push(d);
                 }
-                else if (DiseaseGeneAssociationList.equals(qn)) {
+                else if (DisorderGeneAssociationList.equals(qn)) {
                 }
-                else if (DiseaseGeneAssociation.equals(qn)) {
-                    DiseaseGeneAssociation ass = new DiseaseGeneAssociation ();
+                else if (DisorderGeneAssociation.equals(qn)) {
+                    DisorderGeneAssociation ass = new DisorderGeneAssociation ();
                     dstack.peek().associations.push(ass);
                 }
             }
@@ -126,7 +140,7 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                 StartElement parent = (StartElement) stack.peek();
                 String value = buf.toString();
 
-                DiseaseGeneAssociationDisorder pd = dstack.peek();
+                DisorderGeneAssociationDisorder pd = dstack.peek();
                 QName qn = se.getName();
                 QName pn = null;
                 if (parent != null)
@@ -141,7 +155,7 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                     */
                     Entity[] ents = getEntities (pd);
                     if (ents.length > 0) {
-                        for (DiseaseGeneAssociation ass : pd.associations) {
+                        for (DisorderGeneAssociation ass : pd.associations) {
                             Entity[] genes = getGenes (ass.symbol);
                             if (genes.length == 0) {
                                 logger.warning("** Gene "+ass.symbol
@@ -156,8 +170,29 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                                         g.stitch(e, R_rel,
                                                  "gene_associated_with_disease",
                                                  props);
+                                        e.stitch(g, R_rel,
+                                                 "disease_associated_with_gene",
+                                                 props);
                                     }
                                 }
+                            }
+
+                            Entity orphaGene = getOrphanetGene (ass.orphaNumber);
+                            if (orphaGene != null) {
+                                props.clear();
+                                props.putAll(ass.toMap());
+                                props.put(SOURCE, source.getKey());
+                                for (Entity e : ents) {
+                                    orphaGene.stitch(e, R_rel,
+                                                     "gene_associated_with_disease",
+                                                     props);
+                                    e.stitch(orphaGene, R_rel,
+                                             "disease_associated_with_gene", props);
+                                }
+                            }
+                            else {
+                                logger.warning("** Can't find orphanet gene "
+                                               +ass.orphaNumber);
                             }
                         }
                         ++count;
@@ -167,21 +202,27 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                              +pd.associations.size()+" disease-gene association(s)");
                     }
                 }
+                else if (Symbol.equals(qn)) {
+                    pd.associations.peek().symbol = value;
+                }
                 else if (OrphaNumber.equals(qn)) {
                     if (Disorder.equals(pn))
                         pd.orphaNumber = Integer.parseInt(value);
+                    else if (Gene.equals(pn)) {
+                        pd.associations.peek().orphaNumber = Integer.parseInt(value);
+                    }
                 }
                 else if (Name.equals(qn)) {
                     if (Disorder.equals(pn)) {
                         pd.name = value;
                     }
-                    else if (DisorderType.equals(pn)) {
-                        pd.type = value;
+                    else if (Gene.equals(pn)) {
+                        pd.associations.peek().name = value;
                     }
-                    else if (DiseaseGeneAssociationType.equals(pn)) {
+                    else if (DisorderGeneAssociationType.equals(pn)) {
                         pd.associations.peek().type = value;
                     }
-                    else if (DiseaseGeneAssociationStatus.equals(pn)) {
+                    else if (DisorderGeneAssociationStatus.equals(pn)) {
                         pd.associations.peek().status = value;
                     }
                 }

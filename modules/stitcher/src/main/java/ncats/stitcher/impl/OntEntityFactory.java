@@ -262,6 +262,7 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_GENE, "OGG_0000000004")
             .add(I_GENE, "IAO_0000118")
             .add(I_GENE, "P321")
+            .add(I_GENE, "GENES")
             //.add(I_PMID, "OGG_0000000030")
             //.add(I_PMID, "P171")
             .add(I_CAS, "CAS")
@@ -428,6 +429,16 @@ public class OntEntityFactory extends EntityRegistry {
         }
 
         if (ontology == null) {
+        }
+        else if (ontology.resource != null
+                 && ontology.resource.getLocalName().indexOf("ORDO") >= 0) {
+            if (data.containsKey("symbol")) {
+                // this is a gene
+                Object symbol = data.get("symbol");
+                Object genes = data.get("hasDbXref");
+                data.put("GENES", genes != null
+                         ? Util.merge(genes, symbol) : symbol);
+            }
         }
         else if (ontology.resource != null
                  && "Thesaurus.owl".equals(ontology.resource.getLocalName())) {
