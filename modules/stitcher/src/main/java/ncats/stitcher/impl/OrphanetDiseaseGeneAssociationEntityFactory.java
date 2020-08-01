@@ -80,8 +80,9 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
         super (dir);
     }
 
-    Entity[] getGenes (String symbol) {
-        List<Entity> genes = new ArrayList<>();
+    List<Entity> getGenes (List<Entity> genes, String symbol) {
+        if (genes == null)
+            genes = new ArrayList<>();
         for (Iterator<Entity> iter = find ("label", symbol);
              iter.hasNext(); ) {
             Entity e = iter.next();
@@ -89,17 +90,18 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                 genes.add(e);
             }
         }
-        return genes.toArray(new Entity[0]);
+        return genes;
     }
 
-    Entity getOrphanetGene (Integer orphaNumber) {
-        List<Entity> genes = new ArrayList<>();
+    List<Entity> getOrphanetGenes (List<Entity> genes, Integer orphaNumber) {
+        if (genes == null)
+            genes = new ArrayList<>();
         for (Iterator<Entity> iter = find ("notation", "Orphanet:"+orphaNumber);
              iter.hasNext(); ) {
             Entity e = iter.next();
             genes.add(e);
         }
-        return genes.isEmpty() ? null : genes.get(0);
+        return genes;
     }
 
     @Override
@@ -155,51 +157,34 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
                     */
                     Entity[] ents = getEntities (pd);
                     if (ents.length > 0) {
+                        int asscnt = 0;
                         for (DisorderGeneAssociation ass : pd.associations) {
-                            Entity[] genes = getGenes (ass.symbol);
-                            if (genes.length == 0) {
+                            List<Entity> genes = getOrphanetGenes
+                                (getGenes (null, ass.symbol), ass.orphaNumber);
+                            
+                            if (genes.isEmpty()) {
                                 logger.warning("** Gene "+ass.symbol
                                                +" has not matching entities!");
                             }
                             else {
                                 props.clear();
                                 props.putAll(ass.toMap());
+                                props.put(NAME, "disease_associated_with_gene");
                                 props.put(SOURCE, source.getKey());
                                 for (Entity g : genes) {
                                     for (Entity e : ents) {
-                                        g.stitch(e, R_rel,
-                                                 "gene_associated_with_disease",
-                                                 props);
-                                        e.stitch(g, R_rel,
-                                                 "disease_associated_with_gene",
-                                                 props);
+                                        e.stitch(g, R_rel, ass.symbol, props);
+                                        ++asscnt;
                                     }
                                 }
-                            }
-
-                            Entity orphaGene = getOrphanetGene (ass.orphaNumber);
-                            if (orphaGene != null) {
-                                props.clear();
-                                props.putAll(ass.toMap());
-                                props.put(SOURCE, source.getKey());
-                                for (Entity e : ents) {
-                                    orphaGene.stitch(e, R_rel,
-                                                     "gene_associated_with_disease",
-                                                     props);
-                                    e.stitch(orphaGene, R_rel,
-                                             "disease_associated_with_gene", props);
-                                }
-                            }
-                            else {
-                                logger.warning("** Can't find orphanet gene "
-                                               +ass.orphaNumber);
                             }
                         }
                         ++count;
                         logger.info
                             ("+++++ "+String.format("%1$5d: ", count)
                              +pd.orphaNumber+": "+pd.name+"..."
-                             +pd.associations.size()+" disease-gene association(s)");
+                             +pd.associations.size()+"->"+asscnt
+                             +" disease-gene association(s)");
                     }
                 }
                 else if (Symbol.equals(qn)) {
