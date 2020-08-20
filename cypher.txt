@@ -241,3 +241,22 @@ collect(z.symbol) as genes,x is not null as `MONDO_monogenic`
 where size(genes) < 2
 return GARD_ID,GARD_Disease,Orphanet_ID,Orphanet_Disease,
 MONDO_monogenic, genes[0] as Gene limit 100
+
+
+match p=(a:DATA)-->(n:S_MONDO)-[:R_exactMatch|:R_equivalentClass]-(m)<-[:PAYLOAD]-()
+where not (n)-[:R_exactMatch|:R_equivalentClass]-(:S_GARD)
+and not n:TRANSIENT
+and not m:S_MONDO
+and not exists(a.deprecated)
+and not (n)<-[:R_subClassOf]-(:S_MONDO)
+return count(distinct n)
+
+
+match p=(a:DATA)-->(n:S_MONDO)-[:R_exactMatch|:R_equivalentClass]-(m)<-[:PAYLOAD]-()
+where not (n)-[:R_exactMatch|:R_equivalentClass]-(:S_GARD)
+and not n:TRANSIENT
+and not m:S_MONDO
+and not exists(a.deprecated)
+and not (n)<-[:R_subClassOf]-(:S_MONDO)
+with distinct labels(m) as t, count(distinct n) as cnt unwind t as Label
+return Label, sum(cnt) as Count order by Label

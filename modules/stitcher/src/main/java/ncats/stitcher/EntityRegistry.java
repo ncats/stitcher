@@ -714,12 +714,12 @@ public class EntityRegistry extends EntityFactory {
             if (value.getClass().isArray()) {
                 if (key.type.isAssignableFrom(String.class)) {
                     int len = Array.getLength(value);
-                    String[] vals = new String[len];
+                    Set<String> vals = new TreeSet<>();
                     for (int i = 0; i < len; ++i) {
                         Object v = Array.get(value, i);
-                        vals[i] = v.toString().toUpperCase();
+                        vals.add(v.toString().toUpperCase());
                     }
-                    value = vals;
+                    value = vals.toArray(new String[0]);
                 }
             }
             else {

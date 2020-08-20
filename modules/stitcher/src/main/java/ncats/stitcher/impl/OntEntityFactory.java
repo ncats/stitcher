@@ -297,9 +297,10 @@ public class OntEntityFactory extends EntityRegistry {
         // to http://purl.obolibrary.org/obo/MESH_D014406
         // so as to match MONDO reference
         if (uri != null
-            && uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
+            && uri.startsWith("http://purl.bioontology.org/ontology/")) {
             String[] toks = uri.split("/");
-            uri = "http://purl.obolibrary.org/obo/MESH_"+toks[toks.length-1];
+            uri = "http://purl.obolibrary.org/obo/"
+                +toks[toks.length-2]+"_"+toks[toks.length-1];
         }
         else if (uri == null) {
             //uri = r.toString();
