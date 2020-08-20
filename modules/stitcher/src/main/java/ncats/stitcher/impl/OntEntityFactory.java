@@ -296,11 +296,18 @@ public class OntEntityFactory extends EntityRegistry {
         // map http://purl.bioontology.org/ontology/MESH/D014406
         // to http://purl.obolibrary.org/obo/MESH_D014406
         // so as to match MONDO reference
-        if (uri != null
-            && uri.startsWith("http://purl.bioontology.org/ontology/")) {
+        if (uri != null) {
             String[] toks = uri.split("/");
-            uri = "http://purl.obolibrary.org/obo/"
-                +toks[toks.length-2]+"_"+toks[toks.length-1];
+            String id = toks[toks.length-1], ns = toks[toks.length-2];
+            if (uri.startsWith("http://purl.bioontology.org/ontology/")) {
+                if (ns.equals("MEDLINEPLUS")) {
+                    ns = "UMLS";
+                }
+            }
+            else if (uri.startsWith("http://linkedlifedata.com")) {
+                ns = "UMLS";
+            }
+            uri = "http://purl.obolibrary.org/obo/"+ns+"_"+id;
         }
         else if (uri == null) {
             //uri = r.toString();
