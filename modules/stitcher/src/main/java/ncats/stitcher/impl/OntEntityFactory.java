@@ -32,6 +32,7 @@ public class OntEntityFactory extends EntityRegistry {
         Logger.getLogger(OntEntityFactory.class.getName());
 
     static final int DEBUG = 0;
+    static final String OBO_URI = "http://purl.obolibrary.org/obo/";
 
     /*
      * minimum length for xref
@@ -296,7 +297,7 @@ public class OntEntityFactory extends EntityRegistry {
         // map http://purl.bioontology.org/ontology/MESH/D014406
         // to http://purl.obolibrary.org/obo/MESH_D014406
         // so as to match MONDO reference
-        if (uri != null) {
+        if (uri != null && !uri.startsWith(OBO_URI)) {
             String[] toks = uri.split("/");
             String id = toks[toks.length-1], ns = toks[toks.length-2];
             if (uri.startsWith("http://purl.bioontology.org/ontology/")) {
@@ -307,7 +308,7 @@ public class OntEntityFactory extends EntityRegistry {
             else if (uri.startsWith("http://linkedlifedata.com")) {
                 ns = "UMLS";
             }
-            uri = "http://purl.obolibrary.org/obo/"+ns+"_"+id;
+            uri = OBO_URI+ns+"_"+id;
         }
         else if (uri == null) {
             //uri = r.toString();
