@@ -36,6 +36,8 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.index.lucene.LuceneTimeline;
 import org.neo4j.index.lucene.TimelineIndex;
+import org.neo4j.graphdb.traversal.TraversalDescription;
+import org.neo4j.graphdb.traversal.Traverser;
 
 import ncats.stitcher.graph.UnionFind;
 
@@ -754,11 +756,7 @@ public class EntityFactory implements Props, AutoCloseable {
                                 StitchKey key =
                                     StitchKey.valueOf(r.getType().name());
                                 if (r.getOtherNode(m).equals(n)) {
-                                    Object v = r.getProperty(VALUE);
-                                    Object val = values.get(key);
-                                    if (v == null);
-                                    else if (val == null) values.put(key, v);
-                                    else values.put(key, Util.merge(val, v));
+                                    getStitchValues (values, r);
                                 }
                             }
                             visitor.visit(entities[i], e, values);
@@ -1564,6 +1562,47 @@ public class EntityFactory implements Props, AutoCloseable {
         return count;
     }
 
+    static void getStitchValues (Map<StitchKey, Object> values,
+                                 Relationship r) {
+        StitchKey key = StitchKey.valueOf(r.getType().name());
+        Object v = r.getProperty(VALUE);
+        Object val = values.get(key);
+        if (v == null);
+        else if (val == null) values.put(key, v);
+        else values.put(key, Util.merge(val, v));
+    }
+
+    public void stitches (StitchVisitor visitor, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
+                    Integer rank = (Integer)node.getProperty("rank", 1);
+                    if (rank > 1) {
+                        TraversalDescription td =
+                            gdb.traversalDescription().depthFirst();
+                        //logger.info("** starting node "+node.getId());
+                        td.traverse(node).relationships().forEach(rel -> {
+                                Map<StitchKey, Object> values = new TreeMap<>();
+                                for (Relationship r : rel.getStartNode()
+                                         .getRelationships(keys)) {
+                                    if (r.getOtherNode(rel.getStartNode())
+                                        .equals(rel.getEndNode())) {
+                                        getStitchValues (values, r);
+                                    }
+                                }
+                                
+                                if (!values.isEmpty()) {
+                                    visitor.visit
+                                        (Entity._getEntity(rel.getStartNode()),
+                                         Entity._getEntity(rel.getEndNode()),
+                                         values);
+                                }
+                            });
+                    }
+                });
+            tx.success();
+        }
+    }
+    
     public Iterator<Component> connectedComponents (Predication predication) {
         return connectedComponents (1, predication);
     }
