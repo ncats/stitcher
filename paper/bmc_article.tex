@@ -60,6 +60,10 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 
+\usepackage[notmath]{sansmathfonts} %add sans serif caps
+\usepackage{fix-cm} %adds font sizes
+\usepackage{hyperref}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                             %%
 %%  If you wish to display your graphics for   %%
@@ -85,6 +89,14 @@
 \startlocaldefs
 \newcommand\st{\textsc{Stitcher}}
 \newcommand\ix{\textsc{InXight Drugs}}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+\renewcommand{\textdagger}{\ensuremath{\dagger}} %fixes dagger missing from main font
+\renewcommand{\thefootnote}{\roman{footnote}} %footnote in roman numbers
 \endlocaldefs
 
 
@@ -185,7 +197,7 @@
     need to provide an integrated biomedical knowledgebase for drug
     discovery remains a major challenge. One of the limiting factors
     in any data integration effort is \emph{entity resolution} (ER),
-    i.e., the ability to determine which entities from different
+    the ability to determine which entities from different
     data sources with shared partial (and perhaps even inconsistent)
     identities are equivalent. For many entity types with well-defined
     nomenclature (e.g., gene, protein, cell line, etc.), ER amounts to
@@ -193,13 +205,13 @@
     is rather challenging due to ambiguities in how it is defined and
     represented. Herein we report on our recent effort to develop an
     ER framework, \st, for drug data integration. Using \emph{active
-      moiety} as the defining semantic concept for drug entity, we 
-    develop a set of equivalence relations (i.e., \emph{stitch
-      keys}) in \st\ that specifically address ER for drug entities. We
+    moiety} as the defining semantic concept for drug entity, we 
+    develop a set of equivalence relations we call \emph{stitch
+    keys} specifically for the ER of drug entities. We
     demonstrate the utility of our approach through the development of
-    a comprehensive resource, \ix\ (\url{https://drugs.ncats.io}), of
-    drugs that have either been marketed or approved in the United States
-    for human use. To the best of our knowledge, this resource is
+    \ix\ (\url{https://drugs.ncats.io}), a new online resource that %replaced w/ description from news brief
+    aggregates curated, reliable drug development data from multiple 
+    public sources, all in one place. To the best of our knowledge, this resource is
     currently the most comprehensive of its kind. The source code for
     \st\ is available at \url{https://github.com/ncats/stitcher}.
   \end{abstract}
@@ -259,58 +271,56 @@
 %%
 \section*{Introduction}
 As the volume of biological data continues to grow at an unprecedented
-rate \cite{Searls2005}, data de-duplication---also commonly known as
-\emph{record linkage} \cite{Fellegi1969} or \emph{entity
-  resolution}---is proportionally playing a prominent role in data
+rate \cite{Searls2005}, \emph{entity
+resolution} (ER)---also commonly known as \emph{data de-duplication} or
+\emph{record linkage} \cite{Fellegi1969}---is proportionally playing a prominent role in data
 integration. From the construction of training data for machine
 learning to building knowledge graphs as 
-epistemological frameworks for artificial intelligence, proper entity
-resolution (ER) is essential in creating ground-truth data and turning
+epistemological frameworks for artificial intelligence, proper ER 
+is essential in creating ground-truth data and turning
 data into knowledge. The core challenge of ER is in establishing
 \emph{equivalence} between entities. For
 well-defined entity types (e.g., gene, tissue, cell line), this
 is often determined solely based on established identifiers and
 nomenclature; for other entity types (e.g., drug, disease, phenotype),
 however, equivalence is not as well-established due to conceptual
-ambiguities in how entities are defined and represented. Take disease
-as an example; the discrepancy between the 
-theoretical concept of ``disease entity'' from its clinical
-nosology \cite{Hucklenbroich2014} is what makes disease ER extremely
+ambiguities in how entities are defined and represented. Take ``disease''
+as an example: the discrepancy between the 
+theoretical concept of a ``disease entity'' and its nosological classification 
+\cite{Hucklenbroich2014} is what makes disease ER extremely
 challenging.
 
 Drug is another entity type that is also challenging for ER due to
-ambiguities in its definitions and representations. While the word is
-included within the name of the organization, the 
+ambiguities in its definitions and representations. Ironically, even the 
 U.S. Food and Drug Administration (FDA) does not have a
-straightforward definition of the word ``drug.'' The Federal Food Drug
-and Cosmetic Act (FD\&C Act) and FDA regulations define the term drug,
-in part, by reference to its intended use, as ``articles intended for
+straightforward definition of the term ``drug.'' The Federal Food Drug
+and Cosmetic Act (FD\&C Act) and the FDA regulations define ``drugs,''
+in part, by reference to the intended use, as ``articles intended for
 use in the diagnosis, cure, mitigation, treatment, or prevention of
-disease” and “articles (other than food) intended to affect the
+disease'' and ``articles (other than food) intended to affect the
 structure or any function of the body of man or other
 animals'' \cite{FDADrug}. More practically, the agency defines ``drug
-substance'' and ``drug product,'' respectively, as the physical
-ingredients found in marketed products. Others use the word ``drug''
-to sometimes refer to ``drug substances'' and sometimes to ``drug
-products'' as convenient, and this causes a great deal of semantic
-confusion within drug data found on the internet. The National Library of
-Medicine produces a semantic product, RxNorm, that provides a variety
-of precise semantic types for ingredients, tradenames, dose forms,
+substance'' and ``drug product,'' respectively, as a physical
+ingredient and a marketed product that contains said ingredient. 
+Others use the word ``drug'' as a convenient shorthand to refer 
+to both a ``drug substance'' and a ``drug product'', and this causes 
+a great deal of semantic confusion within drug data found on the internet. 
+The National Library of Medicine produces a semantic product, RxNorm, 
+that provides a variety of precise semantic types for ingredients, tradenames, dose forms,
 semantic clinical drug components, semantic clinical drug forms, and
-semantic clinical drugs which facilitate working with drug data, but
-its terminology is unfortunately limited to commonly used prescription
+semantic clinical drugs, which facilitate working with drug data, but
+its terminology is unfortunately limited to commonly used prescription 
 drugs, ``clinically significant ingredients,'' and adoption of this
 complex semantic scheme is limited \cite{RxNorm}. 
 
-There is a third definition of the word ``drug'' that is commonly used in
-the literature and used by the FDA when it refers to an active moiety
+The third definition of the word ``drug'' is commonly used in
+the literature and by the FDA when it refers to an active moiety
 and a new molecular entity. In this case, ingredients whose
 pharmacological effect occurs through the same molecular entity are
-considered the same drug. This holds for different salt forms such as
-\textsc{Sumatriptan Succinate} and \textsc{Sumatriptan Hemisulfate},
-but it also holds for prodrugs and their metabolized active forms such
-as \textsc{Brincidofovir} and \textsc{Cidofovir} \cite{NME}. The FDA
-defines \emph{active moiety} as follows:
+considered to be the same drug: different salt forms (e.g., 
+\textsc{Sumatriptan Succinate} and \textsc{Sumatriptan Hemisulfate}), 
+prodrugs and their metabolized active forms (e.g., \textsc{Brincidofovir} 
+and \textsc{Cidofovir}), etc. \cite{NME}. The FDA defines \emph{active moiety} as follows:
 \begin{quote}An active moiety is a molecule or
 ion, excluding those appended portions of the molecule that cause the
 drug to be an ester, salt (including a salt with hydrogen or
@@ -319,23 +329,23 @@ complex, chelate, or clathrate) of the molecule, responsible for the
 physiological or pharmacological action of the drug
 substance \cite{CFR2012}.
 \end{quote}
-Under the Food and Drug Administration
-Amendments Act of 2007, all newly introduced active moieties must
-first be reviewed by an advisory committee before the FDA can approve
-these products. We adopt this defintion throughout the paper.
+Under the Food and Drug Administration Amendments Act of 2007, 
+all newly introduced active moieties must first be reviewed by 
+an advisory committee before the FDA can approve these products. 
+We adopt this definition throughout the paper.
 
 As in other information domains, the names used to refer to drug
 substances and products are particularly problematic because their
-definitions change as a function of location or jurisdiction, time and
-context. FDA and other national regulators of medicines have
-collaborated to produce ISO 11238 \cite{ISO11238} which endeavors to
+definitions change as a function of location or jurisdiction, time, and
+context. The FDA and other national regulators of medicines have
+collaborated to produce the ISO 11238 standard \cite{ISO11238} which endeavors to
 define an information scheme for the unambiguous identification of all
-ingredients found in medicinal products, and FDA uses an
-implementation of ISO 11238 as the backbone of its information systems
-within the agency \cite{GSRS}. While this facilitates data exchange within
-the FDA and with other national authorities, the task still remains to
-be able to map other, external data sources into this
-rigorously-defined scheme using whatever names and data are at hand. 
+ingredients found in medicinal products, and the FDA uses an
+implementation of the ISO 11238 as the backbone of its information systems
+within the agency \cite{GSRS}. This facilitates data exchange within
+the FDA and with other national authorities. Nevertheless, the ability to map other, 
+external data sources into this rigorously-defined scheme using 
+whatever names and data are at hand remains a largely unresolved challenge. 
 
 Entity resolution (also known as \emph{record linkage} in the
 literature) is the problem of determining which entities with
@@ -347,48 +357,52 @@ particularly instrumental in the analysis of electronic health records
 (EHRs) \cite{Karr2019}. In the context of drug discovery, however, ER
 has received little attention; to our knowledge, the work by Croset
 et al. toward a drug product terminology \cite{Croset2015} is the only
-recent effort that directly addressed ER. Here, the authors utilized
-graph density and betweeness centrality metrics to merge and identify 
+recent effort directly addressing ER. The authors utilized
+graph density and betweenness centrality metrics to merge and identify 
 problematic entities for each connected component within the link
 graph. However, due to the lack of available data and code, we were
 unable to comparatively evaluate their approach.
 
-Herein we report on our effort to develop a robust ER framework, \st,
+Herein we report on our effort to develop \st, a robust ER framework
 for drug data integration. By leveraging the semantic concept of
 \emph{active moiety} and other well-defined attributes (e.g.,
 molecular hash keys), we reduce the ER problem to that of establishing
-equivalence relations over a prioritized set of attributes (i.e.,
-\emph{stitch keys}). We demonstrate the utility of \st\ toward a
-comprehensive data integration effort of drugs that have either
-been marketed or approved in the United States for human use. The
-\ix\ resource \url{https://drugs.ncats.io}, to the best of our
-knowledge, is currently the most comprehensive of its kind.
+equivalence relations over a prioritized set of attributes we call
+\emph{stitch keys}. We demonstrate the utility of \st\ by having built 
+a new online resource, \ix\ (\url{https://drugs.ncats.io}), that aggregates curated, reliable 
+drug development data from multiple public sources, all in one place. 
+This open-access and easy-to-use online portal lists, as accurately as possible, 
+all prescription and over-the-counter drug substances approved in the U.S. 
+as well as those withdrawn from the U.S. market, drugs marketed globally, 
+and investigational interventions. \ix\ is designed to help researchers 
+obtain the data needed to repurpose or advance drugs to address unmet medical needs.
+To the best of our knowledge, \ix\ currently is the most comprehensive resource of its kind.
 
 \section*{Preliminaries}
 As a motivating example, consider the data shown in
-Table~\ref{tab:data-integration-example}. This table illustrates a
-common scenario where we would like to integrate data from multiple
-sources such that each data source might contain only partial (and
-possibly conflicting) information regarding the identities of the
+Table~\ref{tab:data-integration-example}. In this scenario, we would like 
+to integrate data from multiple sources such that each data source 
+might contain only partial (and possibly conflicting) information about the identities of the
 entities. There are four possible attributes that can be used to assert
-equivalence for the entities in this table, with the attribute
-\verb|Structure| indicates whether the entity is associated with a
-chemical structure and that it possibly contains errors (e.g., missing
-or incorrect stereo assignments). Based on the definition of
-``drug'' as defined above, we would like to determine the number of
-unique drugs that are there in the table. Examining the table, we can
-immediately make the case for three equivalence classes $\left\{\textrm{A}_4,
-\textrm{B}_2\right\}$, $\left\{\textrm{A}_3, \textrm{C}_2\right\}$,
-and $\left\{\textrm{A}_2, \textrm{C}_3\right\}$. We also know that
-$\textrm{A}_3$ is an active moiety of $\textrm{A}_4$ per our
-definition; through transitive closure, we now have the following
-equivalence classes: $\left\{\textrm{A}_4, 
-\textrm{B}_2, \textrm{A}_3, \textrm{C}_2\right\}$ and
-$\left\{\textrm{A}_2,  \textrm{C}_3\right\}$. (We should note here
+equivalence between the entities in this table. The \verb|Structure| attribute 
+indicates whether the entity is associated with a chemical structure 
+and if it contains errors (e.g., missing or incorrect stereo assignments). 
+Based on the definition of ``drug'' as \emph{active moiety}, we would like to determine the number of
+unique drugs in the table 
+\footnote{\footnotesize{We should note here
 this active moiety relationship is rather trivial in that it can
 be inferred algorithmically, whereas active moiety relationships that
 involve metal complexes and non-trivial metabolites are likely to
-require manual curations.) Continue to perform transitive closure on
+require manual curations.}}.
+Upon initial examination, we can
+immediately make the case for three equivalence classes $\left\{\textrm{A}_4,
+\textrm{B}_2\right\}$, $\left\{\textrm{A}_3, \textrm{C}_2\right\}$,
+and $\left\{\textrm{A}_2, \textrm{C}_3\right\}$. Further, we also know that
+$\textrm{A}_3$ is an active moiety of $\textrm{A}_4$ per our
+definition. Through a transitive closure, we now have the following
+equivalence classes: $\left\{\textrm{A}_4, 
+\textrm{B}_2, \textrm{A}_3, \textrm{C}_2\right\}$ and
+$\left\{\textrm{A}_2,  \textrm{C}_3\right\}$. Having performed all transitive closures on
 the shared attributes in order, we eventually arrive at the final three
 equivalence classes $\left\{\textrm{A}_1, \textrm{A}_2, \textrm{B}_1,
 \textrm{C}_3, \textrm{D}_1, \textrm{D}_3\right\}$,
@@ -398,35 +412,36 @@ correspond to three distinct isomers ($S$-, $R$-, and racemic,
 respectively) of the drug \textsc{Omeprazole}. (Note that the
 $R$-isomer is not an approved drug.)
 
-The goal of ER, as shown by the above example, is to partition
+The goal of ER, as illustrated by this example, is to partition
 entities within a given dataset into disjoint sets such that those
-within the same set are considered equivalent. To achive this,
+within the same set are considered equivalent. To achieve this,
 \st\ first ``stitches'' together entities with shared identity
-attributes (i.e., \emph{stitch keys}). Next, transitive closure is
+attributes (\emph{stitch keys}). Next, a transitive closure is
 performed based on heuristics that we have developed in assigning
-priorities to the attributes. And finally equivalence classes are
+priorities to the attributes. Finally, the equivalence classes are
 efficiently derived through standard  union-find algorithm
 \cite{Cormen2001}. This is the essence of \st.
 
 \subsection*{Core concepts}
-The conceptual data model underlying \st{} is a \emph{multigraph}.
-Within this multigraph, a node can either be a \emph{stitch node}
-or \emph{data node}. Each data node represents the ``raw'' entity as
-ingested from the data source; its corresponding stitch node is
+The conceptual data model underlying \st\ is a \emph{multigraph}.
+Within this multigraph, a node can either be a \emph{data node} or a \emph{stitch node}. 
+Each data node represents a ``raw'' entity as ingested from the data source. 
+A data node is connected to a corresponding stitch node, which contains its 
 a \emph{standardized} representation that is used
 for \emph{stitching}. An edge between two stitch nodes can either be
-a \emph{stitch key} (undirected) or \emph{relationship} (directed). A
-unique \emph{stitch value} is associated with each stitch key such
-that it forms a clique. Figure~\ref{fig:graph1} shows an instance of a
+a \emph{stitch key} (undirected) or \emph{relationship} (directed). 
+A unique \emph{stitch value} is associated with each stitch key.  
+A set of nodes connected via stitch keys with the same stitch value forms a clique. 
+Figure~\ref{fig:graph1} shows an instance of a
 connected component of a stitch multigraph with overlapping cliques. 
 
 A connected component in the stitch multigraph represents the basic
-unit of work for ER. While the majority of connected
-components are of reasonable sizes (e.g., 20 to 50 stitch nodes), the
-real challenges center around effective strategies for handling very
-large connected components---or also commonly known
+unit of work for ER. The majority of connected components the ER produces 
+are of reasonable sizes (e.g., 10 to 50 stitch nodes), and the
+real challenges center around effective strategies for the handling of very
+large connected components commonly known
 as \emph{hairballs} \cite{Croset2015}. For example, the current
-version of the \ix{} resource has a hairball close to 30,000 stitch
+version of the \ix\ resource has a hairball containing nearly 30,000 stitch
 nodes spanning across 15 data sources. Developing strategies to
 untangle large hairballs is the primary challenge for \st.
 
@@ -434,65 +449,64 @@ Equivalence classes in a connected component are explicitly
 represented as \emph{sgroup nodes} in the stitch multigraph. Entities
 that share a common \emph{sgroup} node are considered equivalent.
 There can be multiple instances of sgroup nodes for a given stitch
-node, with each instance perhaps reflects a specific algorithmic 
-strategy or version. Figure~\ref{fig:graph1} shows that there is only
-one equivalence class as determined by the underlying ER algorithm for
-the given connected component. 
+node, where each instance perhaps reflects a specific algorithmic 
+strategy or version. Figure~\ref{fig:graph1} shows an example of 
+a connected component with only one equivalence class (sgroup) as determined 
+by the underlying ER algorithm. 
 
 \subsection*{Stitch keys}\label{sec:stitch-keys}
 \emph{Stitch key} is a core concept in \st. It defines how entities are
 matched, which, in turn, determines how cliques and connected
-components are formed. By virtue of its importance, the stitch key
-should reflect the true identity of the entity as much as possible.
-Depending on the entity type, the stitch key can be generic (e.g.,
-synonym) or very specific (e.g., molecular hash key). For drug entity
+components are formed. By virtue of its importance, a stitch key
+should reflect the true identity of the corresponding entity as specifically as possible.
+Depending on the entity type, its stitch key can be generic (e.g., 
+synonym) or very specific (e.g., molecular hash key). For the ``drug'' entity
 type, \st\ relies on the following stitch keys for each entity: 
 \begin{description}
 \item{\texttt{N\_Name}.} This is the most generic stitch key
 available. Stitch values associated with this stitch key can be any
-established names or nomenclature; e.g., tradenames, INN
+established names or nomenclature: tradenames, INN
 (International Nonproprietary Names), USAN (United States Adopted
-Names), IUPAC (International Union of Pure and Applied Chemistry). 
+Names), IUPAC (International Union of Pure and Applied Chemistry), etc. 
 \item{\texttt{I\_UNII}, \texttt{I\_CAS}, \texttt{I\_CID}, \texttt{I\_CODE}.}
 These stitch keys represent (i) unique identifiers assigned to the entity by
 a well-known registrar (e.g., the U.S. Food and Drug Administration in
-the case of UNII) or (ii) internal company code. \texttt{I\_UNII},
+the case of UNII) or (ii) internal company codes. \texttt{I\_UNII},
 \texttt{I\_CAS}, and \texttt{I\_CID} are specific to drug (or
 substance in general) entity type, whereas \texttt{I\_CODE} can be
 used for any type of identifiers. The decision to use specific stitch
 keys over generic ones ultimately rests on the strategies used for ER.
 \item{\texttt{H\_LyChI\_L5}, \texttt{H\_LyChI\_L4}, \texttt{H\_LyChI\_L3}.}
-For the small molecule class of drugs, perhaps more important than any
-identifiers is the underlying chemical structure definition. These
-stitch keys are hash values derived from the molecular structure at
-different resolutions \cite{lychi}. We discuss in detail how these
+For small molecules, their underlying chemical structure is, 
+perhaps, more important than any other identifier. These
+stitch keys are hash values derived from the structure of a small molecule at
+different levels of detail \cite{lychi}. We discuss the specifics of how these
 derived stitch values are generated in the next section.
-\item{\texttt{R\_activeMoiety}.} Technically not a stitch key, the
+\item{\texttt{R\_activeMoiety}.} While technically not a stitch key, the
 active moiety relationship between two drugs provides a strong
-evidence of equivalence. While this relationship can be inferred
+evidence of equivalence. Usually, this relationship can be inferred
 directly from the chemical structures (e.g., freebase and salt forms,
-with and without esters), there is some level of curation needed to
-handle structures with metal complexes and metabolites. 
+esters, etc.). Structures with metal complexes and metabolites are a noteworthy exception, 
+as in most such cases active moieties have to be assigned manually.
 \end{description}
 Table~\ref{tab:imatinib} shows examples of stitch keys and stitch values for
 the drug entity \textsc{Imatinib Mesylate}. In this example,
-the \texttt{R\_activeMoiety} relationship specifies the UNII of the
-freebase form (\textsc{Imatinib}) of \textsc{Imatinib Mesylate}.
+the value listed for the \texttt{R\_activeMoiety} stitch key is the UNII of 
+\textsc{Imatinib}, the freebase form of \textsc{Imatinib Mesylate}.
 
 \section*{Methods}\label{sec:methods}
-In general, data integration with \st{} consists of four basic
+In general, data integration with \st\ consists of four basic
 steps applied in order: \emph{ingestion}, \emph{stitching},
 \emph{entity resolution}, and \emph{entity normalization}. With
-the exception of \emph{entity resolution}, all other steps---as they
-are currently implemented in \st---are generic and can be applied to a
+the exception of \emph{entity resolution}, all other steps---as 
+currently implemented in \st---are generic and can be applied to a
 wide range of entity types.
 
 \subsection*{Data ingestion}\label{sec:methods-ingest}
-\st{} is capable of ingesting data in a wide variety of sources and
-formats. Semantic formats such as OWL, RDF, and Turtle are supported
-as are JSON, delimiter separated text, and custom formats. For
-non-semantic format, a separate configuration file is required to map
-data attributes to stitch keys. 
+\st\ is capable of ingesting data from a wide variety of sources and
+in multiple formats, such as JSON, semantic formats (OWL, RDF, and Turtle), 
+delimiter separated text, and even custom formats. For non-semantic formats, 
+a separate configuration file is required to map data attributes to stitch keys. 
 
 An important step in data ingestion is the standardization and
 validation of stitch values. For \texttt{N\_Name} stitch key, the
@@ -501,52 +515,48 @@ uppercase; no validation is performed. For \texttt{I\_UNII}
 and \texttt{I\_CAS} stitch keys, no standardization is required, and
 validation is a simple checksum calculation to ensure the stitch value
 is proper. Depending on the input format, \st\ also provides basic
-utilities (e.g., regular expression) to help with data transformation
+utilities (e.g., support for regular expressions) to help with data transformation
 during ingestion. 
 
 Perhaps the most unique feature of \st\ is its ability to incorporate
-knowledge of chemical structures into ER. Whereas
+chemical structures into the ER process. Whereas
 traditional approaches rely on names and identifiers to determine
 equivalence substances, \st\ goes a step further and utilizes the
 underlying chemical structures to infer equivalence. This 
-is particularly relevant when the drug is a mixture, prodrug, or
-active moiety with complex excipient (or derivative thereof). As an
+is particularly relevant when a ``drug'' is a mixture, prodrug, or
+active moiety with complex excipient (or derivative thereof). For
 example, consider the drug entity \textsc{Imatinib Mesylate} and its
-active ingredient \textsc{Imatinib}. Here, it is obvious that the two
-entities cannot be matched by name alone. Instead, having structural
+active ingredient \textsc{Imatinib}. It is obvious that the two
+entities cannot be matched by the name alone. Instead, having structural
 information by way of molecular hash keys for each molecular component
 allows us to determine equivalence from the common active
-moiety \textsc{Imatinib} between the two entities. This trivial example
-might suggest that, instead of comparing names exactly, we find the
+moiety \textsc{Imatinib} between the two entities. Notably, this trivial example
+might suggest that, instead of comparing names, one could find the
 longest common substring of the names. The approach would certainly
-work in this example, but to make it work in general would require
-very specialized parsing rules and dictionaries, e.g., consider an
-example here where \textsc{Oseltamivir Acid} is an active moiety of
-the prodrug \textsc{Oseltamivir}.
+work in this specific case, but consider a counter-example: \textsc{Oseltamivir Acid} 
+is an active moiety of the prodrug \textsc{Oseltamivir}. 
+Thus substring comparison makes for a viable general-purpose approach only 
+upon implementation of highly specialized parsing rules and rich manually curated dictionaries.
 
 For data sources with chemical structures, the most computationally
-demanding step in data ingestion is the generation of molecular hash
+demanding step in the data ingestion is the generation of molecular hash
 keys. Hash keys are generated for each component of a chemical
-structure in three different structural
-levels: \texttt{L5}, \texttt{L4}, and \texttt{L3}, which correspond to
+structure at three different structural levels: 
+\texttt{L5}, \texttt{L4}, and \texttt{L3}, which correspond to
 stitch keys \texttt{H\_LYCHI\_L5}, \texttt{H\_LYCHI\_L4},
 and \texttt{H\_LYCHI\_L3}, respectively. Level \texttt{L5} is the most
-specific; it represents the chemical structure as-is, i.e., without
+specific; it represents the chemical structure ``as is'', i.e., without
 structure normalization and standardization. With the exception of the
-relation \texttt{R\_activeMoiety}, a match at this level has higher
-priority over other stitch keys. The next level \texttt{L4} represents
-the structure after normalization and standardization per the LyChI
-software package \cite{lychi}. A match at this level implies that two
-structures are equivalent 
-%insofar as \textcolor{red}{the valence bond theory is valid}
-in terms of stereochemistry, resonance, and tautomer. And the last
-level \texttt{L3} is the same as \texttt{L4} but without
-stereochemistry. A match at this level is considered weak and does not
-constitute equivalence without other significant supporting evidence.
-The purpose for \texttt{L3} is in anticipation of incorrect or missing
-stereo information, which is one of the most common type of errors
-associated with chemical structures. For each hash key, a
-suffix \texttt{-M}, \texttt{-S}, or \texttt{-N} is also assigned to
+\texttt{R\_activeMoiety} relationship, a match at this level has the highest
+priority. The next level \texttt{L4} represents the structure after 
+normalization and standardization per the LyChI software package \cite{lychi}. 
+A match at this level implies that structures being compared are equivalent 
+in terms of stereochemistry, resonance, and tautomerism. Finally, as incorrect 
+or missing stereo information is one of the most common type of errors 
+associated with chemical structures, the last level \texttt{L3} removes 
+stereochemistry from consideration entirely. A match at this level is thus 
+considered weak and does not constitute equivalence without other supporting evidence.
+For each hash key, a suffix \texttt{-M}, \texttt{-S}, or \texttt{-N} is also assigned to
 designate the molecular component as either
 a \emph{metal}, \emph{salt}, or \emph{neither}, respectively.
 Table~\ref{tab:imatinib} illustrates all three representations for the
@@ -556,118 +566,100 @@ the cardinality is equal to the number of non-hydrate molecular
 components. (Hydrate components are removed prior to processing.) 
 
 \subsection*{Data stitching}
-\emph{Stitching} is the process by which the stitch multigraph is
-incrementally constructed as data is ingested.
-Algorithm~\ref{algo:stitching} describes the basic stitching algorithm
+\emph{Stitching} is the process by which the multigraph is incrementally constructed 
+as data are ingested. Algorithm~\ref{algo:stitching} describes the basic stitching algorithm
 of \st. This algorithm is applied to each data source, and upon its
 completion produced a stitch multigraph such that any stitch value
-that spans $N$ stitch nodes is an induced clique, i.e., a complete
+that spans $N$ stitch nodes is an induced clique---a complete
 subgraph of $N$ nodes and $\frac{N(N-1)}{2}$ edges. Overlapping
-induced cliques form the basis for the proposed ER
-approach discussed in the next section. As a side-effect, the
-stitching algorithm also utilizes the union-find
-algorithm \cite{Cormen2001} to efficiently track connected
-components. 
+induced cliques form the basis for the proposed ER approach discussed 
+in the next section. The stitching algorithm also utilizes a union-find
+algorithm \cite{Cormen2001} to efficiently track connected components. 
 
 \subsection*{Entity resolution}\label{sec:methods-er}
 After all data sources have been stitched together, the next step is
-to partition the stitch multigraph into disjoint entity sets.
-Formally, this step is known as \emph{entity resolution} (ER) and is
-the only step within \st\ that is specific to the drug entity type.
-This is to be expected: Given that ER is about adjudicating
-the splitting and merging of entities, a reasonable amount of
-knowledge of the entity type is required for the adjudication to be
-effective. For a given connected component, the iterative process of
-assigning equivalence labels to stitch nodes is known
+to partition the stitch multigraph into disjointed entity sets.
+Formally, only this step constitutes the \emph{entity resolution} (ER), and it is
+the only step within \st\ that is entity type specific.
+This is to be expected: given that ER essentially is a process of the entity
+identification, a reasonable amount of knowledge of the entity type is required
+for the adjudication to be sufficiently accurate. For a given connected component, 
+the iterative process of assigning equivalence labels to stitch nodes is known
 as \emph{untangling}. Algorithm~\ref{algo:untangle} gives a high level
 outline of the untangling process.
 
-At the core of the algorithm is the implied priorities associated with
-the stitch keys. The relation \texttt{R\_activeMoiety} has the highest
-priority due to its implied equivalence relation. While it is possible
-for this relationship to be automatically inferred for specific cases
-(e.g., salt form and freebase), we currently rely on the data source
-to provide this semantic annotation. As an example, consider the
-entities \emph{acetylsalicylic acid} (or also commonly known as
-\emph{aspirin}) and \emph{ethyl acetylsalicylate} shown in
-Figure~\ref{fig:aspirin}. While the two entities have no attributes in
-common, we know for a fact that \emph{acetylsalicylic
-  acid} is an \emph{active moiety} of \emph{ethyl
-  acetylsalicylate}. Further examination of the structural differences
-shows that only an \emph{ester} separates the two entities; per our
-definition, this falls well within what the FDA considers as
-equivalent drugs. This example also highlights a predicament:
-Computationally, there is nothing to prevent us from imputing
-\emph{active moiety} relationships through efficient (sub-) graph
-isomorphisms. This, however, is a very tempted trap that we have thus
-far resisted due to other forms of \emph{active moiety}
-relationships---e.g., metabolites and metals---that would require
-considerable investment of effort.
+The aforementioned implied priorities associated with the stitch keys are 
+at the core of the algorithm. The \texttt{R\_activeMoiety} key has the highest
+priority as it is a unique manually generated relationship that is only available from G-SRS, 
+, an FDA resource derived from their Substance Registration System.
+While it is possible for this relationship to be automatically inferred for specific cases
+(e.g., salt form and freebase), we currently rely on G-SRS to provide this specific 
+semantic annotation. As an example, consider the entities \emph{acetylsalicylic acid} 
+(or also commonly known as \emph{aspirin}) and \emph{ethyl acetylsalicylate} shown in 
+Figure~\ref{fig:aspirin}. While the two entities have no attributes in common, 
+we know for a fact that \emph{acetylsalicylic acid} 
+is an \emph{active moiety} of \emph{ethyl acetylsalicylate}. Further examination 
+of the structural differences shows that only an \emph{ester} separates the two entities, 
+and this falls well within the FDA definition of equivalent drugs that we adopted. 
+This example also highlights a predicament: computationally, there is nothing 
+to prevent us from attempting to impute \emph{active moiety} relationships through efficient (sub-) graph
+isomorphisms. This very tempting proposition, however, is a trap (that we have thus
+far avoided), as other forms of \emph{active moiety} relationships---e.g., metabolites, 
+metals---are not amenable to such imputation, and attempting it would require considerable effort.
 
-The next priority is the stitch key \texttt{I\_UNII}. As UNII is
-the primary identifier issued by the FDA substance registrar, any data
-source that provides mapping based on this identifier implies that the
-data source has sufficient knowledge of the FDA's rigorous substance
-model (i.e., guilt by association). For entities that can be
-represented by chemical structures, the stitch 
-key \texttt{H\_LyChI\_L4} has the next level of priority. The
-complexity required for two entities to have the same
-\texttt{H\_LyChI\_L4} stitch values means that the entities are
-less likely to match by errors. The rest of the stitch keys
-(i.e., \texttt{N\_Name}, \texttt{I\_CAS}, \texttt{I\_CID}) all have the
+The next most important stitch key is \texttt{I\_UNII}. UNII, Unique Ingredient Identifier, 
+is the primary identifier developed and issued by the FDA. UNII is used as the primary
+identifier in the aforementioned G-SRS data source. Thus any other data source that provides
+mapping based on a UNII is likely to have ``sufficient'' knowledge of G-SRS 
+(``guilt by association'').   
+
+For entities that can be represented by chemical structures, the stitch 
+key \texttt{H\_LyChI\_L4} has the next level of priority. We postulate that the \texttt{L4} 
+hash describes a structure in a sufficiently detailed manner, entities with the same \texttt{L4} 
+stitch value are not likely to match if the source data contains errors.  
+
+All other stitch keys (\texttt{N\_Name}, \texttt{I\_CAS}, \texttt{I\_CID}, etc.) have the
 lowest priority.
 
-At the completion of Algorithm~\ref{algo:untangle}, the disjoint set
-data structure $U$ contains all equivalence entity classes such that
-each class is represented by an \emph{sgroup} node in the stitch
-multigraph. The sgroup nodes are the \emph{resolved entities}.
+At the completion of Algorithm~\ref{algo:untangle}, the disjointed set
+data structure $U$ contains all equivalence entity classes, where each class 
+is represented by an \emph{sgroup} node in the stitch multigraph. 
+The sgroup nodes are the \emph{resolved entities}---in the context of this work, individual drugs.
 
 \subsection*{Entity normalization}
 The last step in the data integration pipeline is to decide how the
 resolved entities are defined. This step is referred to as \emph{entity
 normalization} and its goals are to have (i) clear and consistent
 strategies for merging attributes and (ii) conflict resolution
-(semantic as well as self consistency). While this step can be quite
+(semantic as well as self-consistency). While this step can be quite
 trivial if the attributes are mutually exclusive across all data
-sources, to address this in a general setting will require considerable
-efforts in terms of understanding the data sources and their metadata.
+sources, addressing this in a general setting will require considerable
+effort in terms of understanding of the data sources and the concomitant metadata.
 Here, a common strategy is to preferentially choose attributes based
-on the (perceived) quality of the data sources. For example,
-considering the example in Table~\ref{tab:data-integration-example}.
+on the perceived quality of the data sources. Revisit an example provided in 
+Table~\ref{tab:data-integration-example}.
 The attributes for the \emph{normalized} entity that corresponds to
 the equivalence class $\left\{\textrm{A}_1, \textrm{A}_2, \textrm{B}_1,
 \textrm{C}_3, \textrm{D}_1, \textrm{D}_3\right\}$ can simply be the
 same as those of $\textrm{A}_2$ because we have reasons to believe
-data source A is higher quality than other data sources.
+that data source A is of higher quality than other data sources.
 
 \section*{Results}
 With \st\ serving as the data integration framework, we set out to
-build a comprehensive resource, \ix, on drugs that
-have either been marketed or approved for human use in the United
-States. Such a resource is not only instrumental for drug repurposing
-but also serves as a valuable tool to further our understanding of the
-mechanistic properties of molecular targets
-\cite{Huang2011,Huang2019}. To the best of our knowledge, \ix{} is
+build a comprehensive resource, \ix, listing, as accurately as possible, 
+all prescription and over-the-counter drugs approved for marketing in the U.S.,
+withdrawn from the U.S. market, marketed globally, and even investigational interventions.
+Such a resource is not only instrumental for drug repurposing but also serves 
+as a valuable tool to further our understanding of the mechanistic properties of molecular targets
+\cite{Huang2011,Huang2019}. To the best of our knowledge, \ix\ is
 currently the most comprehensive resource of its kind.
 
-Our starting point is the public G-SRS data source from the FDA
-\cite{GSRSData}. This data source is well-curated and contains over
-100K substances across six different classes: chemical, structurally
-diverse, protein, mixture, polymer, and nucleic acid. As 
-a data source derived from the FDA's internal substance registry
-system \cite{GSRS}, the G-SRS data source naturally forms the basis of
-our data integration effort. Using this data source as the ``seed''
-from which other data sources can map onto has the following benefits:
-\begin{itemize}
-\item Since the G-SRS data source implements the ISO 11238
-  standard \cite{ISO11238} for defining medicinal substances, it serves
-  as an ideal starting point for what constitutes a ``drug.''
-\item The data is a public version of the internal substance registry
-  within the FDA; as such, it is well-curated and up-to-date.
-\item While not complete, the G-SRS data source provides a rich set of
-  \emph{active moiety} relationships that span salt forms,
-  prodrugs, and metal complexes.
-\end{itemize}
+Our starting point and the core/reference dataset is the aforementioned G-SRS 
+data source source \cite{GSRSData}, as it is (i) well-curated, (ii) public, and (iii) naturally 
+authoritative due to having been derived from the FDA’s internal Substance Registration System \cite{GSRS}. Furthermore, G-SRS contains over
+100K substances rigorously defined according to the ISO 11238 standard and spanning 
+six different classes: chemical, polymer, protein, nucleic acid, mixture, and structurally diverse. 
+
 Furthermore, by establishing a reference data source
 for data integration, we have finer control over the following: 
 \begin{description}
@@ -677,32 +669,30 @@ other data quality constraints (e.g., no synonyms can span multiple
 entities) to guide ER. 
 \item{\emph{Data resolution}.} ER is particularly
 challenging when data integration involves ontologies. A reference
-data source can serve as the anchor ontology from which other
+data source can serve as the anchor ontology to which other
 ontologies can be mapped. As with data quality, we can also impose any
-additional semantic constraints; e.g., an equivalence class cannot
-have more than one active moiety. 
+additional semantic constraints (e.g., an equivalence class cannot
+have more than one active moiety). 
 \item{\emph{Data curation}.} Generating ground-truth data is more
 manageable with a single data source than across multiple data sources.
 This is particularly important due to the iterative feedback between
 data curation and data integration. 
 \end{description}
-While the G-SRS data provides rigous definitions for substances, it
-lacks other information such as approval status, year, and juridiction,
-indication, patent, publication, and other uses. The complete list of
-data sources currently used by \st\ is shown in 
-Table~\ref{tab:data-sources}.
+While the G-SRS data provide rigorous definitions for substances, they lack
+other information such as approval status, year, jurisdiction,
+indications, patents, publications, etc. The complete list of
+data sources currently used by \st\ is shown in Table~\ref{tab:data-sources}.
 
 \subsection*{Availability}
-The \ix\ resource is available at \url{https://drugs.ncats.io}.
 \st\ and the data integration pipeline developed for the \ix\ resource 
-are available in source form
-at \url{https://github.com/ncats/stitcher}. The stitch multigraph
-built with data sources listed in Table~\ref{tab:data-sources} is 
-available as a Neo4j database \cite{neo4j} 
-at \url{https://stitcher.ncats.io/browser}. This database currently
-contains 192,413 stitch nodes and 11,948,470 edges (relationships and stitch
-keys). Tables~\ref{tab:stitch-keys} and \ref{tab:stitch-values} give a
-breakdown of the stitch keys and values, respectively, in the stitch
+are available as a repository at \url{https://github.com/ncats/stitcher}.
+
+The \ix\ resource is available at \url{https://drugs.ncats.io}. The corresponding 
+stitch multigraph built with the data sources listed in Table~\ref{tab:data-sources} 
+is available as a Neo4j database  at \url{https://stitcher.ncats.io/browser}. 
+This database currently contains 192,413 stitch nodes and 11,948,470 edges 
+(relationships and stitch keys). Tables~\ref{tab:stitch-keys} and \ref{tab:stitch-values} 
+give a breakdown of the stitch keys and values, respectively, in the stitch
 multigraph. The complete list of sgroup nodes (i.e., equivalence classes) is
 available for browsing at
 \url{https://stitcher.ncats.io/app/stitches/latest}. All figures and
@@ -719,18 +709,18 @@ ability to tease out only the relevant stitch nodes for which
 substance. 
 
 \textsc{Levomethadyl} and its derivative \textsc{Levacetylmethadol} are
-often considered as two separate drugs. This is readily apparent in
+often considered as two separate drugs. This is apparent from
 Figure~\ref{fig:LEVOMETHADYL}, which shows that there are two distinct
 ``clusters'' in the stitch multigraph. If ER is based on
 graph metrics (e.g., betweenness centrality), it is likely that this
 connected component will yield two drugs instead of one. Here, the
 priority of the stitch key allows the two clusters to be merged to
-indicate that there is only one drug.
+indicate that there is only one drug, not two.
 
 Figure~\ref{fig:BENOXAPROFEN} shows the connected component for
 \textsc{Benoxaprofen}, a nonsteroidal antiinflammatory drug approved in
 1982. This drug is a racemic mixture. The density of this connected
-component is a reflection of the lack of specified stereocenter that
+component reflects the lack of a specified stereocenter that
 caused many spurious stitch keys. \st\ is able to disambiguate the
 connected component into three distinct entities that represent the
 mixture, \emph{R-}, and \emph{S-}isomer.
@@ -755,9 +745,9 @@ rate.
 
 
 \section*{Acknowledgements}
-We thank our colleagues, Mark Williams and Tyler Beck, for their
+We thank our colleagues, Mark Williams and Tyler Beck for their
 valuable proof-reading of early drafts of the manuscript. We also
-thank our colleague, Tongan Zhao, for his help in developing a
+thank our colleague, Tongan Zhao for his help in developing a
 prototype curation user interface for \st. We are particularly grateful
 to Alexey Zakharov and Tim Sheils for their constant encouragement and
 support.
@@ -813,8 +803,8 @@ support.
   corresponding \emph{data nodes} (small). Each stitch value forms a
   clique within this connected component. The edge labels between
   stitch nodes are the stitch keys. 
-  The large node is the derived entity (i.e., sgroup node) from entity
-  resolution that establishes equivalence between the stitch 
+  The largest node is an entity called ``sgroup node'' derived from the entity
+  resolution process that establishes equivalence between the stitch 
   nodes.}\label{fig:graph1}
 \centerline{\includegraphics[scale=0.5]{graph3}}
 \end{figure}
