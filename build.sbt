@@ -26,6 +26,7 @@ lazy val commonDependencies = Seq(
   "com.h2database" % "h2" % "1.4.193",
   "org.neo4j" % "neo4j" % "3.2.14",
   "org.neo4j" % "neo4j-bolt" % "3.2.14",
+  "org.neo4j.driver" % "neo4j-java-driver" % "4.0.1",
   //"org.neo4j.app" % "neo4j-server" % "3.2.14",
   "org.apache.commons" % "commons-text" % "1.6",  
   "org.apache.lucene" % "lucene-core" % "5.5.0",

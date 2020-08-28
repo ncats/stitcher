@@ -819,8 +819,8 @@
 \setattribute{copyrightlogo}{cmd}{}
 
 % FRONT MATTER FONTS 
-\setattribute{dochead}     {size} {\sffamily\fontsize{13pt}{13pt}\bfseries\selectfont\color{white}}
-\setattribute{title}       {size} {\sffamily\fontsize{24pt}{26pt}\selectfont\raggedright}
+\setattribute{dochead}     {size} {\sffamily\fontsize{12pt}{13pt}\bfseries\selectfont\color{white}} %changed from 13pt to 12pt (unavailable)
+\setattribute{title}       {size} {\sffamily\fontsize{24.88pt}{26pt}\selectfont\raggedright} %changed from 24pt to 24.88pt (unavailable)
 \setattribute{subtitle}    {size} {\sffamily\fontsize{20pt}{22pt}\selectfont\raggedright}
 \setattribute{author}      {size} {\sffamily\fontsize{11pt}{14pt}\selectfont\raggedright}
 \setattribute{address}     {size} {}
