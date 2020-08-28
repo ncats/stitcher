@@ -5,8 +5,8 @@ import pandas as pd
 path2spl = sys.argv[1]
 path2otc = sys.argv[2]
 
-spl = pd.read_table(path2spl,
-                    sep="\t")
+spl = pd.read_csv(path2spl,
+                  sep="\t")
 
 otc = pd.read_excel(path2otc,
                     usecols=range(0, 4))

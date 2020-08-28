@@ -21,3 +21,4 @@ libraryDependencies += "org.javassist" % "javassist" % "3.20.0-GA"
 // enablePlugins(PlayEbean). Note, uncommenting this line will automatically bring in
 // Play enhancer, regardless of whether the line above is commented out or not.
 addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "4.0.2")
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "4.0.0")

@@ -171,11 +171,23 @@ $ bash restart-stitcher.sh ncats-stitcher-master-20171110-400d1f1 stitchv1.db
 
 ## Useful links
 
-https://stitcher.ncats.io/app/stitches/latest
-https://stitcher.ncats.io/app/stitches/latest/ + UNII
-https://stitcher.ncats.io/app/stitches/latest/aspirin
+https://stitcher.ncats.io/app/stitches/latest  
+https://stitcher.ncats.io/app/stitches/latest/ + UNII  
+https://stitcher.ncats.io/app/stitches/latest/aspirin  
 https://stitcher.ncats.io/api/datasources  
 
+## Troubleshooting
+- **Problem:** 
+    ```
+    java.lang.NumberFormatException: For input string: "0x100"
+    ```
+    **Cause:**    
+    `SBT` uses `jline` for terminal output. The latter in turn uses the `infocmp` utility provided by `ncurses`, which expects only decimal values. This behaviour was fixed in a new version of `jline` and and newer version of `SBT`, however version `0.13.15` used for this project still suffers from it.  
+    **Solution:**   
+    Add the following to your `~/.bashrc`:  
+    ```
+    export TERM=xterm-color
+    ```
 
 Access to underlying Neo4j database
 ===================================
