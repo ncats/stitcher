@@ -80,7 +80,7 @@ public interface Component extends Iterable<Entity> {
 
     
     default public void cliques (CliqueVisitor visitor,
-                         StitchKey key, Object value) {
+                                 StitchKey key, Object value) {
         cliques (visitor, key, value, Stitchable.ANY);
     }
 

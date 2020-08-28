@@ -32,6 +32,7 @@ public class OntEntityFactory extends EntityRegistry {
         Logger.getLogger(OntEntityFactory.class.getName());
 
     static final int DEBUG = 0;
+    static final String OBO_URI = "http://purl.obolibrary.org/obo/";
 
     /*
      * minimum length for xref
@@ -296,10 +297,19 @@ public class OntEntityFactory extends EntityRegistry {
         // map http://purl.bioontology.org/ontology/MESH/D014406
         // to http://purl.obolibrary.org/obo/MESH_D014406
         // so as to match MONDO reference
-        if (uri != null
-            && uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
-            String[] toks = uri.split("/");
-            uri = "http://purl.obolibrary.org/obo/MESH_"+toks[toks.length-1];
+        if (uri != null) {
+            if (uri.startsWith("http://purl.bioontology.org/ontology/")) {
+                String[] toks = uri.split("/");
+                String id = toks[toks.length-1], ns = toks[toks.length-2];
+                if (ns.equals("MEDLINEPLUS")) {
+                    ns = "UMLS";
+                }
+                uri = OBO_URI+ns+"_"+id;
+            }
+            else if (uri.startsWith("http://linkedlifedata.com")) {
+                String[] toks = uri.split("/");
+                uri = OBO_URI+"UMLS_"+toks[toks.length-1];
+            }
         }
         else if (uri == null) {
             //uri = r.toString();
@@ -431,6 +441,7 @@ public class OntEntityFactory extends EntityRegistry {
         if (ontology == null) {
         }
         else if (ontology.resource != null
+                 && ontology.resource.getLocalName() != null
                  && ontology.resource.getLocalName().indexOf("ORDO") >= 0) {
             if (data.containsKey("symbol")) {
                 // this is a gene
@@ -1144,8 +1155,11 @@ public class OntEntityFactory extends EntityRegistry {
                     ) {
                     others.add(x);
                 }
-                else
+                else {
+                    if (u.startsWith("ORPHANET:"))
+                        useful.add("Orpha:"+ x.substring(x.indexOf(':')+1));
                     useful.add(x);
+                }
             }
         }
         else if (ontology.props.get("title") != null

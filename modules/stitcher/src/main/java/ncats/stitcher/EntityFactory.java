@@ -36,6 +36,8 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.index.lucene.LuceneTimeline;
 import org.neo4j.index.lucene.TimelineIndex;
+import org.neo4j.graphdb.traversal.TraversalDescription;
+import org.neo4j.graphdb.traversal.Traverser;
 
 import ncats.stitcher.graph.UnionFind;
 
@@ -551,20 +553,27 @@ public class EntityFactory implements Props, AutoCloseable {
          */
         public Map<Object, Integer> values (StitchKey key) {
             Map<Object, Integer> values = new HashMap<>();
-            for (Entity e : entities) {
-                try (Transaction tx = e._node().getGraphDatabase().beginTx()) {
-                    for (Relationship rel : e._node().getRelationships
-                             // pick either direction
-                             (key, Direction.OUTGOING)) {
-                        long xn = rel.getOtherNodeId(e._node().getId());
-                        if (rel.hasProperty(VALUE) && nodes.contains(xn)) {
-                            Object v = rel.getProperty(VALUE);
-                            Integer c = values.get(v);
-                            values.put(v, c==null ? 1 : (c+1));
+            try (Transaction tx = gdb.beginTx()) {
+                Set xv = new HashSet ();
+                Set<Long> seen = new HashSet<>();
+                for (Entity e : entities) {
+                    Node n = e._node();
+                    for (Relationship rel : n.getRelationships(key)) {
+                        long xn = rel.getOtherNodeId(n.getId());
+                        if (rel.hasProperty(VALUE)
+                            && nodes.contains(xn) && !seen.contains(xn)) {
+                            xv.add(rel.getProperty(VALUE));
                         }
                     }
-                    tx.success();
+                    seen.add(n.getId());
                 }
+                
+                for (Object v : xv) {
+                    long[] nodes = this.nodes(key, v);
+                    values.put(v, nodes.length);
+                }
+                
+                tx.success();
             }
             return values;
         }
@@ -754,11 +763,7 @@ public class EntityFactory implements Props, AutoCloseable {
                                 StitchKey key =
                                     StitchKey.valueOf(r.getType().name());
                                 if (r.getOtherNode(m).equals(n)) {
-                                    Object v = r.getProperty(VALUE);
-                                    Object val = values.get(key);
-                                    if (v == null);
-                                    else if (val == null) values.put(key, v);
-                                    else values.put(key, Util.merge(val, v));
+                                    getStitchValues (values, r);
                                 }
                             }
                             visitor.visit(entities[i], e, values);
@@ -1564,6 +1569,50 @@ public class EntityFactory implements Props, AutoCloseable {
         return count;
     }
 
+    static void getStitchValues (Map<StitchKey, Object> values,
+                                 Relationship r) {
+        StitchKey key = StitchKey.valueOf(r.getType().name());
+        Object v = r.getProperty(VALUE);
+        Object val = values.get(key);
+        if (v == null);
+        else if (val == null) values.put(key, v);
+        else values.put(key, Util.merge(val, v));
+    }
+
+    public void stitches (StitchVisitor visitor, StitchKey... keys) {
+        if (keys.length == 0)
+            return;
+        
+        try (Transaction tx = gdb.beginTx()) {
+            StringBuilder query = new StringBuilder
+                ("match (a:DATA)-[:PAYLOAD]->(n:ENTITY)-[:"+keys[0]);
+            for (int i = 1; i < keys.length; ++i)
+                query.append("|:"+keys[i]);
+            query.append("]->(m:ENTITY)<-[:PAYLOAD]-(b:DATA) "
+                         +"where not n:TRANSIENT "
+                         +"and not m:TRANSIENT "
+                         +"and not exists(a.deprecated) "
+                         +"and not exists(b.deprecated) "
+                         +"return n,m");
+            try (Result result = gdb.execute(query.toString())) {
+                while (result.hasNext()) {
+                    Map<String, Object> row = result.next();
+                    Node n = (Node) row.get("n");
+                    Node m = (Node) row.get("m");
+                    Map<StitchKey, Object> values = new TreeMap<>();
+                    for (Relationship r :  n.getRelationships()) {
+                        if (r.getOtherNode(n).equals(m)) {
+                            getStitchValues (values, r);
+                        }
+                    }
+                    visitor.visit(Entity._getEntity(n), Entity._getEntity(m),
+                                  values);
+                }
+            }
+            tx.success();
+        }
+    }
+    
     public Iterator<Component> connectedComponents (Predication predication) {
         return connectedComponents (1, predication);
     }
