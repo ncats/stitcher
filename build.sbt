@@ -111,5 +111,11 @@ lazy val dailymed = (project in file("modules/dailymed"))
     javacOptions ++= javaBuildOptions
 )
 
+lazy val disease = (project in file("modules/disease"))
+  .settings(commonSettings: _*)
+  .settings(name := "stitcher-disease",
+    javacOptions ++= javaBuildOptions
+  ).dependsOn(stitcher).aggregate(stitcher)
+
 
 fork in run := true
