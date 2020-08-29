@@ -441,6 +441,7 @@ public class OntEntityFactory extends EntityRegistry {
         if (ontology == null) {
         }
         else if (ontology.resource != null
+                 && ontology.resource.getLocalName() != null
                  && ontology.resource.getLocalName().indexOf("ORDO") >= 0) {
             if (data.containsKey("symbol")) {
                 // this is a gene

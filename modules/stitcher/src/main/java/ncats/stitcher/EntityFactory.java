@@ -553,20 +553,27 @@ public class EntityFactory implements Props, AutoCloseable {
          */
         public Map<Object, Integer> values (StitchKey key) {
             Map<Object, Integer> values = new HashMap<>();
-            for (Entity e : entities) {
-                try (Transaction tx = e._node().getGraphDatabase().beginTx()) {
-                    for (Relationship rel : e._node().getRelationships
-                             // pick either direction
-                             (key, Direction.OUTGOING)) {
-                        long xn = rel.getOtherNodeId(e._node().getId());
-                        if (rel.hasProperty(VALUE) && nodes.contains(xn)) {
-                            Object v = rel.getProperty(VALUE);
-                            Integer c = values.get(v);
-                            values.put(v, c==null ? 1 : (c+1));
+            try (Transaction tx = gdb.beginTx()) {
+                Set xv = new HashSet ();
+                Set<Long> seen = new HashSet<>();
+                for (Entity e : entities) {
+                    Node n = e._node();
+                    for (Relationship rel : n.getRelationships(key)) {
+                        long xn = rel.getOtherNodeId(n.getId());
+                        if (rel.hasProperty(VALUE)
+                            && nodes.contains(xn) && !seen.contains(xn)) {
+                            xv.add(rel.getProperty(VALUE));
                         }
                     }
-                    tx.success();
+                    seen.add(n.getId());
                 }
+                
+                for (Object v : xv) {
+                    long[] nodes = this.nodes(key, v);
+                    values.put(v, nodes.length);
+                }
+                
+                tx.success();
             }
             return values;
         }
@@ -1573,32 +1580,35 @@ public class EntityFactory implements Props, AutoCloseable {
     }
 
     public void stitches (StitchVisitor visitor, StitchKey... keys) {
+        if (keys.length == 0)
+            return;
+        
         try (Transaction tx = gdb.beginTx()) {
-            gdb.findNodes(AuxNodeType.COMPONENT).stream().forEach(node -> {
-                    Integer rank = (Integer)node.getProperty("rank", 1);
-                    if (rank > 1) {
-                        TraversalDescription td =
-                            gdb.traversalDescription().depthFirst();
-                        //logger.info("** starting node "+node.getId());
-                        td.traverse(node).relationships().forEach(rel -> {
-                                Map<StitchKey, Object> values = new TreeMap<>();
-                                for (Relationship r : rel.getStartNode()
-                                         .getRelationships(keys)) {
-                                    if (r.getOtherNode(rel.getStartNode())
-                                        .equals(rel.getEndNode())) {
-                                        getStitchValues (values, r);
-                                    }
-                                }
-                                
-                                if (!values.isEmpty()) {
-                                    visitor.visit
-                                        (Entity._getEntity(rel.getStartNode()),
-                                         Entity._getEntity(rel.getEndNode()),
-                                         values);
-                                }
-                            });
+            StringBuilder query = new StringBuilder
+                ("match (a:DATA)-[:PAYLOAD]->(n:ENTITY)-[:"+keys[0]);
+            for (int i = 1; i < keys.length; ++i)
+                query.append("|:"+keys[i]);
+            query.append("]->(m:ENTITY)<-[:PAYLOAD]-(b:DATA) "
+                         +"where not n:TRANSIENT "
+                         +"and not m:TRANSIENT "
+                         +"and not exists(a.deprecated) "
+                         +"and not exists(b.deprecated) "
+                         +"return n,m");
+            try (Result result = gdb.execute(query.toString())) {
+                while (result.hasNext()) {
+                    Map<String, Object> row = result.next();
+                    Node n = (Node) row.get("n");
+                    Node m = (Node) row.get("m");
+                    Map<StitchKey, Object> values = new TreeMap<>();
+                    for (Relationship r :  n.getRelationships()) {
+                        if (r.getOtherNode(n).equals(m)) {
+                            getStitchValues (values, r);
+                        }
                     }
-                });
+                    visitor.visit(Entity._getEntity(n), Entity._getEntity(m),
+                                  values);
+                }
+            }
             tx.success();
         }
     }

@@ -17,16 +17,17 @@ files=(
 		dm_spl_release_human_rx.zip 
 		dm_spl_release_human_otc.zip
 		dm_spl_release_remainder.zip
+		dm_spl_release_animal.zip
+		dm_spl_release_homeopathic.zip
 		)
 
 missing_files=()
 
 #now get all those files
 for f in ${files[@]}; do
-	
-	
+
 	echo "Fetching $f..."
-	wget -nc -o /dev/null ftp://public.nlm.nih.gov/nlmdata/.dailymed/$f &
+	curl -# -o $f "ftp://public.nlm.nih.gov/nlmdata/.dailymed/$f" &
 	
 	sleep 2 #sleep to allow the file to appear in the system
 	
@@ -38,6 +39,20 @@ for f in ${files[@]}; do
 done
 
 wait
+
+#check file sizes
+for f in ${files[@]}; do
+	#get file sizes
+	fileSizeOrig=`curl -sI ftp://public.nlm.nih.gov/nlmdata/.dailymed/$f | grep Content-Length | cut -d' ' -f2`
+	fileSizeCurrent=`stat --printf="%s" $f`
+
+	if [ "$fileSizeOrig" = "$fileSizeCurrent" ]; then
+		echo "WARNING: Download appears incomplete for $f"
+	fi
+
+done
+
+echo "File integrity check complete."
 
 #check if all files are there
 if [ ${#missing_files[@]} -gt 0 ]; then
