@@ -277,7 +277,7 @@ public class GeneReviewsEntityFactory extends EntityRegistry {
                     Entity e = registerChapter (file);
                     if (e != null) {
                         ++count;
-                        if (true && count > 100) break;
+                        if (false && count > 100) break;
                     }
                 }
             }
