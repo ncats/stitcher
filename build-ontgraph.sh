@@ -1,7 +1,7 @@
 #!/bin/sh
 
 opts='-mem 16384'
-version="v20200704"
+version="v`date +%Y%m%d`"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -43,9 +43,7 @@ owl="doid.owl.gz \
    rxno.owl.gz \
    ogms.owl \
    pato.owl.gz \
-   fma.owl.gz \
-   efo.owl.gz \
-   mondo.owl.gz"
+   fma.owl.gz"
 owl_path="owl-202002"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
@@ -121,3 +119,9 @@ fi
 if test -f $ppi; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $ppi"
 fi
+
+# make sure these are loaded after medgen
+owl_last="efo.owl.gz mondo.owl.gz"
+for f in `echo $owl_last | xargs printf " ${owl_path}/%s"`; do
+    sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $f"
+done
