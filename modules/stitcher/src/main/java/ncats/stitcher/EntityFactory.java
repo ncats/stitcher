@@ -1588,7 +1588,7 @@ public class EntityFactory implements Props, AutoCloseable {
                 ("match (a:DATA)-[:PAYLOAD]->(n:ENTITY)-[:"+keys[0]);
             for (int i = 1; i < keys.length; ++i)
                 query.append("|:"+keys[i]);
-            query.append("]->(m:ENTITY)<-[:PAYLOAD]-(b:DATA) "
+            query.append("]-(m:ENTITY)<-[:PAYLOAD]-(b:DATA) "
                          +"where not n:TRANSIENT "
                          +"and not m:TRANSIENT "
                          +"and not exists(a.deprecated) "

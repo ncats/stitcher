@@ -81,6 +81,7 @@ public class HoofBeats {
         ps.print(getIds (component, "S_ORDO_ORPHANET", "notation")+"\t");
         ps.print(getIds (component, "S_GARD", "gard_id")+"\t");
         ps.print(getIds (component, "S_OMIM", "notation")+"\t");
+        ps.print(getIds (component, "S_MEDGEN", "id")+"\t");
         ps.print(getIds (component, "S_MESH", "notation")+"\t");
         ps.print(getIds (component, "S_DOID", "notation")+"\t");
         ps.print(getIds (component, "S_MEDLINEPLUS", "notation")+"\t");
@@ -98,7 +99,8 @@ public class HoofBeats {
 
         File file = new File (outfile);
         PrintStream ps = new PrintStream (new FileOutputStream (file));
-        ps.println("MONDO\tOrphanet\tGARD\tOMIM\tMeSH\tDOID\tMedLinePlus\tEFO");
+        ps.println("MONDO\tOrphanet\tGARD\tOMIM\tMedGen\tMeSH\tDOID\t"
+                   +"MedLinePlus\tEFO");
         long[][] components = uf.components();
         for (long[] comp : components) {
             beats (ps, comp);

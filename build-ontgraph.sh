@@ -11,6 +11,7 @@ hpo="hpo"
 medgen="medgen"
 #clinvar if available
 clinvar="clinvar/ClinVarVariationRelease_00-latest.xml.gz"
+genereviews="gene_NBK1116"
 #this might be too much right now
 ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 
@@ -113,6 +114,11 @@ fi
 #load clinvar if avaiable
 if test -f $clinvar; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.ClinVarVariationEntityFactory $out $clinvar"
+fi
+
+#load gene reviews if avaiable
+if test -f $genereviews; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.GeneReviewsEntityFactory $out $genereviews"
 fi
 
 #load PPI if available
