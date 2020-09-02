@@ -117,13 +117,13 @@ public class TestRegistry extends EntityRegistry {
                         logger.warning("Can't lookup parent entity: "+v);
                     }
                     else if (!child.equals(parent))
-                        child.stitch(parent, R_activeMoiety, v);
+                        parent.stitch(child, R_activeMoiety, v);
                 }
             }
             else {
                 Entity parent = entities.get(am);
                 if (!child.equals(parent))
-                    child.stitch(parent, R_activeMoiety, am);
+                    parent.stitch(child, R_activeMoiety, am);
             }
         }
     }

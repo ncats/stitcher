@@ -725,20 +725,21 @@ public class EntityFactory implements Props, AutoCloseable {
                 for (int i = 0; i < entities.length; ++i) {
                     Node n = entities[i]._node();
                     for (StitchKey key : keys) {
-                        for (Relationship rel :
-                                 n.getRelationships(Direction.BOTH, key)) {
+                        Set<Long> others = new HashSet<>();
+                        for (Relationship rel : n.getRelationships(key)) {
                             Node m = rel.getOtherNode(n);
                             Entity e = seen.get(m.getId());
-                            if (e != null) {
-                                if (key.directed) {
-                                    if (rel.getStartNodeId() == n.getId())
-                                        consumer.accept(entities[i], e);
-                                    else
-                                        consumer.accept(e, entities[i]);
+                            if (e != null && !others.contains(m.getId())) {
+                                
+                                if (m.getId() == rel.getStartNodeId()) {
+                                    //logger.info("** node "+m.getId()+" -"+key+"-> "+n.getId()+" "+seen);
+                                    consumer.accept(e, entities[i]);
                                 }
                                 else {
+                                    //logger.info("** node "+n.getId()+" -"+key+"-> "+m.getId()+" "+seen);
                                     consumer.accept(entities[i], e);
                                 }
+                                others.add(m.getId());
                             }
                         }
                     }
@@ -2682,7 +2683,7 @@ public class EntityFactory implements Props, AutoCloseable {
         final String key = source.getKey()+component.getId();
          Node stitch = getNode (ID, key, () -> {
                 Node node = gdb.createNode(AuxNodeType.SGROUP,
-                                           Label.label(source.getName()));
+                                           source.getLabel());
                 node.setProperty(ID, key);
                 node.setProperty(SOURCE, source._getKey());
                 node.setProperty(RANK, component.size());
