@@ -117,16 +117,16 @@ $ sbt run
 
 3) When prompted in the console, navigate to http://localhost:9000/app/stitches/latest in your browser.
 
-!!!*Please* make sure you run the following test when you update the stitching algorithm
-```console
-sbt stitcher/"testOnly ncats.stitcher.test.TestStitcher"
-```
-to ensure all the basic stitching test cases are passed before doing a build
-
 ## Deployment  
 
 ### Build the Binary Distribution 
 ####(optional -- only do this if you have changed the stitcher code or starting anew)
+
+0) !!!*Please* make sure you run the following test when you update the stitching algorithm
+```console
+sbt stitcher/"testOnly ncats.stitcher.test.TestStitcher"
+```
+and ensure all the basic stitching test cases are passed before doing a build
 
 1) Make a distribution. In the `stitcher` directory run:
 ```
