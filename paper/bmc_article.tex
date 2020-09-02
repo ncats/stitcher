@@ -556,7 +556,7 @@ structure at three different structural levels:
 \texttt{L5}, \texttt{L4}, and \texttt{L3}, which correspond to
 stitch keys \texttt{H\_LYCHI\_L5}, \texttt{H\_LYCHI\_L4},
 and \texttt{H\_LYCHI\_L3}, respectively. Level \texttt{L5} is the most
-specific; it represents the chemical structure ``as is'', i.e., without
+specific; it represents the chemical structure ``as-is,'' i.e., without
 structure normalization and standardization. With the exception of the
 \texttt{R\_activeMoiety} relationship, a match at this level has the highest
 priority. The next level \texttt{L4} represents the structure after 
@@ -631,7 +631,7 @@ Ingredient Identifier, is the primary identifier developed and issued
 by the FDA. UNII is used as the primary identifier in the
 aforementioned G-SRS data source. Thus any other data source that
 provides mapping based on a UNII is likely to have ``sufficient''
-knowledge of G-SRS (``guilt by association'').
+knowledge of G-SRS (i.e., ``guilt by association'').
 
 For entities that can be represented by chemical structures, the
 stitch key \texttt{H\_LyChI\_L4} has the next level of priority. We
@@ -647,7 +647,7 @@ At the completion of Algorithm~\ref{algo:untangle}, the disjointed set
 data structure $U$ contains all equivalence entity classes, where each class 
 is represented by an \emph{sgroup} node in the stitch multigraph. 
 The sgroup nodes are the \emph{resolved entities}---in the context of
-this work, individual drugs.
+this work, they are the individual drugs.
 
 \subsection*{Entity normalization}
 The last step in the data integration pipeline is to decide how the
@@ -680,13 +680,13 @@ best of our knowledge, \ix\ is currently the most comprehensive
 resource of its kind. 
 
 Our starting point and the core/reference dataset is the
-aforementioned G-SRS data source source \cite{GSRSData}, as it is (i)
-well-curated, (ii) public, and (iii) naturally authoritative due to
-having been derived from the FDA’s internal Substance Registration
-System \cite{GSRS}. Furthermore, G-SRS contains over 100K substances
-rigorously defined according to the ISO 11238 standard and spanning
-six different classes: chemical, polymer, protein, nucleic acid,
-mixture, and structurally diverse.
+aforementioned G-SRS data source \cite{GSRSData}, as it is (i)
+well-curated, (ii) publicly available, and (iii) naturally
+authoritative due to having been derived from the FDA’s internal
+Substance Registration System \cite{GSRS}. Furthermore, G-SRS contains
+over 100K substances rigorously defined according to the ISO 11238
+standard and spanning six different classes: chemical, polymer,
+protein, nucleic acid, mixture, and structurally diverse.
 
 Furthermore, by establishing a reference data source
 for data integration, we have finer control over the following: 
@@ -708,8 +708,9 @@ data curation and data integration.
 \end{description}
 While the G-SRS data provide rigorous definitions for substances, they lack
 other information such as approval status, year, jurisdiction,
-indications, patents, publications, etc. The complete list of
-data sources currently used by \st\ is shown in Table~\ref{tab:data-sources}.
+indications, patents, publications, etc. Table~\ref{tab:data-sources}
+provides the complete list of data sources currently integrated by
+\st\ for the \ix\ resource.
 
 \subsection*{Availability}
 \st\ and the data integration pipeline developed for the \ix\ resource 
@@ -718,7 +719,7 @@ are available as a repository at \url{https://github.com/ncats/stitcher}.
 The \ix\ resource is available at \url{https://drugs.ncats.io}. The
 corresponding stitch multigraph built with the data sources listed in
 Table~\ref{tab:data-sources} is available as a Neo4j database  at
-\url{https://stitcher.ncats.io/browser}. This database currently
+\url{https://stitcher.ncats.io}. This database currently
 contains 192,413 stitch nodes and 11,948,470 edges (relationships and
 stitch keys). Tables~\ref{tab:stitch-keys} and \ref{tab:stitch-values}  
 give a breakdown of the stitch keys and values, respectively, in the
@@ -754,11 +755,14 @@ caused many spurious stitch keys. \st\ is able to disambiguate the
 connected component into three distinct entities that represent the
 mixture, \emph{R-}, and \emph{S-}isomer.
 
-\section*{Discussion}
+\subsection*{External validation}
 To further illustrate the practical utility of our approach, we
-consider how DrugBank 2018 \cite{wishart2018} entities are mapped onto
-the sgroup nodes.
+compare the concept of ``drug'' in \st\ to that of DrugBank
+\cite{wishart2018} database based on the July, 2020 snapshot. For this
+analysis, we simply consider the number of DrugBank nodes associated
+with each sgroup node in the stitch multigraph.
 
+\section*{Discussion}
 Data integration remains a major challenge for drug discovery as
 biomedical research continues to generate data at an unprecedented
 rate. 
@@ -783,7 +787,8 @@ valuable proof-reading of early drafts of the manuscript. We also
 thank our colleague, Tongan Zhao for his help in developing a
 prototype curation user interface for \st. We are particularly grateful
 to Alexey Zakharov and Tim Sheils for their constant encouragement and
-support.
+support. Funding for this work is provided by the NCATS intramural
+program of the Division of Preclinical Innovation (DPI).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                  The Bibliography                       %%

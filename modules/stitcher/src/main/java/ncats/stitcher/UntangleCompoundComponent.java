@@ -514,7 +514,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                     // 
                 }
                 else if (clique (e, N_Name, I_CAS,
-                                 I_DB, I_ChEMBL, H_LyChI_L3)) {
+                                 I_DB, I_ChEMBL/*, H_LyChI_L3*/)) {
                 }
                 /*
                 else if (clique (e, false, H_LyChI_L3)) {
