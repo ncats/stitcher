@@ -398,8 +398,10 @@ public class OntEntityFactory extends EntityRegistry {
                     else {
                         String s = v.toString();
                         if ("".equals(s) || s.length() < MIN_XREF_LENGTH);
-                        else if (s.startsWith("ICD"))
-                            icds.add(s);
+                        else if (s.startsWith("ICD")) {
+                            if (s.endsWith(":-1"))
+                                icds.add(s);
+                        }
                         else
                             xrefs.add(transform (s));
                     }
@@ -411,7 +413,10 @@ public class OntEntityFactory extends EntityRegistry {
             else {
                 String v = value.toString();
                 if ("".equals(v) || v.length() < MIN_XREF_LENGTH);
-                else if (v.startsWith("ICD")) icds.add(v);
+                else if (v.startsWith("ICD")) {
+                    if (!v.endsWith(":-1"))
+                        icds.add(v);
+                }
                 else xrefs.add(transform (v));
             }
         }
@@ -1048,8 +1053,14 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("HTTP")
                     )
                     others.add(x);
-                else
+                else {
+                    if (u.startsWith("SNOMEDCT_US")) {
+                        int pos = u.indexOf(':');
+                        if (pos > 0)
+                            useful.add("SNOWMEDCT_US:"+u.indexOf(pos+1));
+                    }
                     useful.add(x);
+                }
             }
         }
         else if ("human_phenotype".equals
@@ -1265,12 +1276,21 @@ public class OntEntityFactory extends EntityRegistry {
             if (!others.isEmpty())
                 data.put("_hasDbXref", others.toArray(new String[0]));
         }
+
+        if (!icds.isEmpty()) {
+            for (String x : icds) {
+                if (x.startsWith("ICD10")) {
+                    int pos = x.indexOf(':');
+                    if (pos > 0) {
+                        xrefs.add("ICD10CM:"+x.substring(pos+1));
+                    }
+                }
+            }
+            data.put("ICD", icds.toArray(new String[0]));
+        }
         
         if (!xrefs.isEmpty())
             data.put("hasDbXref", xrefs.toArray(new String[0]));
-            
-        if (!icds.isEmpty())
-            data.put("ICD", icds.toArray(new String[0]));
 
         //logger.info("... registering: "+data);
         return data;
