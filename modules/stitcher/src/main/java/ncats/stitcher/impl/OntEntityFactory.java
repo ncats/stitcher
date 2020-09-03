@@ -1054,10 +1054,22 @@ public class OntEntityFactory extends EntityRegistry {
                     )
                     others.add(x);
                 else {
-                    if (u.startsWith("SNOMEDCT_US")) {
-                        int pos = u.indexOf(':');
-                        if (pos > 0)
-                            useful.add("SNOWMEDCT_US:"+u.indexOf(pos+1));
+                    int pos = u.indexOf(':');
+                    if (pos <= 0) {
+                    }
+                    else if (u.startsWith("SNOMEDCT_US")) {
+                        useful.add("SNOWMEDCT_US"+u.substring(pos));
+                    }
+                    else if (u.startsWith("ORDO:")) {
+                        useful.add("ORPHA"+u.substring(pos));
+                    }
+                    else if (u.startsWith("NCI:")) {
+                        useful.add("NCIT"+u.substring(pos));
+                    }
+                    else if (u.startsWith("GARD:")) {
+                        useful.add("GARD:"+String.format
+                                   ("%1$07d", Integer.parseInt
+                                    (u.substring(pos+1))));
                     }
                     useful.add(x);
                 }
