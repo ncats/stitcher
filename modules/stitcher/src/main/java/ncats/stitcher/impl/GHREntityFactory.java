@@ -21,12 +21,12 @@ import static ncats.stitcher.StitchKey.*;
  */
 public class GHREntityFactory extends EntityRegistry {
     static final String GHR_URL =
-        "https://ghr.nlm.nih.gov/download/ghr-summaries.xml";
+        "https://medlineplus.gov/download/ghr-summaries.xml";
     static final Logger logger =
         Logger.getLogger(GHREntityFactory.class.getName());
 
     static final String NS =
-        "https://ghr.nlm.nih.gov/download/ghr-summaries-20170124.xsd";
+        "https://medlineplus.gov/download/ghr-summaries-20170124.xsd";
     static final QName Root = new QName (NS, "summaries");
     static final QName Name = new QName (NS, "name");
     static final QName Page = new QName (NS, "ghr-page");
@@ -41,6 +41,10 @@ public class GHREntityFactory extends EntityRegistry {
     static final QName DbKeyList = new QName (NS, "db-key-list");
     static final QName Reviewed = new QName (NS, "reviewed");
     static final QName Published = new QName (NS, "published");
+    static final QName InheritancePatternList = new QName (NS, "inheritance-pattern-list");
+    static final QName InheritancePattern = new QName (NS, "inheritance-pattern");
+    static final QName Code = new QName (NS, "code");
+    static final QName Memo = new QName (NS, "memo");
     static final QName RelatedChromosome = new QName (NS, "related-chromosome");
     static final QName RelatedGene = new QName (NS, "related-gene");
     static final QName RelatedGeneList = new QName (NS, "related-gene-list");
@@ -120,26 +124,14 @@ public class GHREntityFactory extends EntityRegistry {
                 String value = buf.toString();
                 
                 QName name = se.getName();
-                //System.out.println(name);
+                //logger.info("** /"+name);
                 
                 if (Root.equals(name)) {
                 }
                 else if (HealthConditionSummary.equals(name)) {
                     // register current record
                     ncats.stitcher.Entity e = register (data);
-                    logger.info(count+": "+data.get("name")+" ("+e.getId()+")");
-                }
-                else if (HealthConditionSummary.equals(parent.getName())) {
-                    if (Name.equals(name)) {
-                        data.put("name", value);
-                    }
-                    else if (Page.equals(name)) {
-                        data.put("ghr-page", value);
-                    }
-                    else if (Reviewed.equals(name))
-                        data.put("reviewed", value);
-                    else if (Published.equals(name))
-                        data.put("published", value);
+                    //logger.info(count+": "+data.get("name")+" ("+e.getId()+")"+"\n"+data);
                 }
                 else if (Synonym.equals(name)
                          && SynonymList.equals(parent.getName())) {
@@ -160,6 +152,12 @@ public class GHREntityFactory extends EntityRegistry {
                     data.put("genes", old != null
                              ? Util.merge(old, value) : value);
                 }
+                else if (Memo.equals(name)
+                         && InheritancePattern.equals(parent.getName())) {
+                    Object old = data.get("inheritance");
+                    data.put("inheritance", old != null
+                             ? Util.merge(old, value) : value);
+                }
                 else if (TextRole.equals(name)) {
                     textRole = value;
                 }
@@ -167,17 +165,39 @@ public class GHREntityFactory extends EntityRegistry {
                     data.put(textRole, text.toArray(new String[0]));
                 }
                 else if (Db.equals(name)) {
-                    db = buf.toString().replaceAll("\\s", "_").toUpperCase();
+                    db = value.replaceAll("\\s", "_").toUpperCase();
+                    switch (db) {
+                    case "GTR": db = "UMLS"; break;
+                    case "SNOMED_CT": db = "SNOMEDCT_US"; break;
+                    case "ICD-10-CM": db = "ICD10CM"; break;
+                    }
                 }
                 else if (Key.equals(name)) {
                     key = value;
                 }
                 else if (DbKey.equals(name)
                          && DbKeyList.equals(parent.getName())) {
+                    //logger.info("+ "+db+":"+key);
                     xrefs.add(db+":"+key);
+                    if (db.equals("ORPHANET"))
+                        xrefs.add("ORPHA:"+key);
                 }
                 else if (DbKeyList.equals(name)) {
+                    //logger.info("+ xrefs "+xrefs);
                     data.put("xrefs", xrefs.toArray(new String[0]));
+                }
+                // make sure this is last!
+                else if (HealthConditionSummary.equals(parent.getName())) {
+                    if (Name.equals(name)) {
+                        data.put("name", value);
+                    }
+                    else if (Page.equals(name)) {
+                        data.put("ghr-page", value);
+                    }
+                    else if (Reviewed.equals(name))
+                        data.put("reviewed", value);
+                    else if (Published.equals(name))
+                        data.put("published", value);
                 }
             }
             else if (ev.isCharacters()) {

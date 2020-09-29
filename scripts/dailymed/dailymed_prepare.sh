@@ -29,6 +29,7 @@ files=(
 		dm_spl_release_human_otc.zip
 		dm_spl_release_remainder.zip
 		dm_spl_release_animal.zip
+		dm_spl_release_homeopathic.zip
 		)
 		
 # append full paths to file names
@@ -51,10 +52,12 @@ fi
 
 ######################################## parse/prepare ########################################
 types=(
-		_rem
 		_rx
 		_otc
-                _ani)
+		_rem
+        _ani
+		_homeo
+		)
 
 for type in ${types[@]}; do
 	# select necessary files
@@ -75,8 +78,8 @@ for type in ${types[@]}; do
 	sed -i '/^[[:cntrl:]]/ d' spl_acti$type.txt 
 	sed -i '/^java/ d' spl_acti$type.txt
 	
-	# gzip the original file
-	gzip spl$type.txt
+	# gzip the original file [deprecated/unnecessary]
+	#gzip spl$type.txt
 	#tar -czf spl$type.tar.gz spl$type.txt 
 done
 

@@ -862,8 +862,13 @@ public class Entity extends CNode {
     public Map<String, Object> _payload () {
         Map<String, Object> payload = new TreeMap<String, Object>();
         Node latest = _latestPayload ();
-        for (String key : latest.getPropertyKeys()) {
-            payload.put(key, latest.getProperty(key));
+        if (latest != null) {
+            for (String key : latest.getPropertyKeys()) {
+                payload.put(key, latest.getProperty(key));
+            }
+        }
+        else {
+            logger.log(Level.SEVERE, "Node "+getId()+" has no PAYLOAD!");
         }
         return payload;
     }

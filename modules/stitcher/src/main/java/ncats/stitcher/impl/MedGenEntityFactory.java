@@ -204,6 +204,8 @@ public class MedGenEntityFactory extends EntityRegistry {
             
             if (rec.isEmpty()) {
                 rec.put("CUI", cui);
+                // add a fake obo uri so that other sources can resolve 
+                rec.put(Props.URI, "http://purl.obolibrary.org/obo/UMLS_"+cui);
                 if (name != null) rec.put("NAME", name);
                 else rec.put("SYNONYMS", syn);
                 rec.put("XREFS", new String[]{
