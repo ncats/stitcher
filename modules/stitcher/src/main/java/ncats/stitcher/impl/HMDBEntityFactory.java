@@ -106,7 +106,7 @@ public class HMDBEntityFactory extends EntityRegistry {
                     break;
                     
                 case "name":
-                    //case "description":
+                case "description":
                 case "alternative_parent":
                 case "substituent":
                 case "external_descriptor":

@@ -100,11 +100,18 @@ public class EntityRegistry extends EntityFactory {
                                     }
                                 }
 
-                                if (sb != null)
-                                    node.setProperty("_"+k, sb.toString());
+                                if (sb != null) {
+                                    String sv = sb.toString();
+                                    if (sv.length() > 8192)
+                                        sv = sb.substring(0, 8192);
+                                    node.setProperty("_"+k, sv);
+                                }
                             }
                             else if (value instanceof String) {
-                                node.setProperty("_"+k, value);
+                                String sv = (String)value;
+                                if (sv.length() > 8192)
+                                    sv = sv.substring(0, 8192);
+                                node.setProperty("_"+k, sv);
                             }
                         }
                     }
