@@ -59,6 +59,16 @@ def uniiClashes(unii2stitch, stitch):
                     unii2stitch[unii].append(stitch['id'])
     return unii2stitch
 
+def curationsApplied(unii2stitch, stitch):
+    for node in stitch['sgroup']['members']:
+        if 'id' in node and node['id'] == 'VOY':
+            if not node.has_key('stitches') or not node['stitches'].has_key('I_UNII'):
+                if not unii2stitch.has_key('WCH9HW127L'):
+                    unii2stitch['WCH9HW127L'] = []
+                unii2stitch['WCH9HW127L'].append(stitch['id'])
+                unii2stitch['WCH9HW127L'].append(' does NOT contain a UNII, indicating curations have NOT been applied!!!!!')
+    return unii2stitch
+
 def approvedStitches(approved, stitch):
     appr = ''
     apprType = ''
@@ -429,9 +439,10 @@ if __name__=="__main__":
     #findOrphans: Some resource entries were supposed to be stitched, but are orphaned
     #approvedStitches: Report on all the approved stitches from API
 
-    tests = [nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
-    #tests = [DrugBankClashes]
+    tests = [curationsApplied, nmeClashes, nmeClashes2, PMEClashes, activemoietyClashes, uniiClashes, approvedStitches, highestStatus, findOrphans]
+    #tests = [curationsApplied]
     testHeaders = dict()
+    testHeaders['curationsApplied'] = 'Have Curations been applied to the stitcher database? - no results here indicates all good'
     testHeaders['nmeClashes'] = 'nmeClashes\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['nmeClashes2'] = '\nnmeClashes2\tUNII\tPN\tStitch Node\tStitch Rank\tClash UNII 1\tClash PN 1\tClash UNII 2\tClash PN 2\tetc.'
     testHeaders['PMEClashes'] = '\nPMEClashes\tIngredient\t[Blank]\tStitch Node\tStitch Rank\tClash Ingredient 1\tClash Ingredient 2\tetc.'
@@ -443,7 +454,7 @@ if __name__=="__main__":
     testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tNode PN\tStatus\tStitch\tStitch Rank'
 
     # initialize list of NMEs
-    nmeList = open("../../data/approvalYears-2019-10-24.txt", "r").readlines()
+    nmeList = open("../../data/approvalYears-2020-07-23.txt", "r").readlines()
     for entry in nmeList[1:]:
         sline = entry.split('\t')
         if sline[0] not in NMEs:
@@ -464,7 +475,7 @@ if __name__=="__main__":
         uniis[sline[2]] = sline[3]
         line = fp.readline()
     fp.close()
-    
+
     # iterate over stitches, perform tests
     outputs = iterateStitches(tests)
 
