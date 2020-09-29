@@ -176,9 +176,18 @@ public class HMDBEntityFactory extends EntityRegistry {
         
         try (HMDBEntityFactory hmdb = new HMDBEntityFactory (argv[0])) {
             for (int i = 1; i < argv.length; ++i) {
-                File file = new File (argv[i]);
-                logger.info("Registering "+file+"...");
-                hmdb.register(file);
+                if (argv[i].startsWith("cache=")) {
+                    hmdb.setCache(argv[i].substring(6));
+                    if ((i+1) >= argv.length) {
+                        logger.warning("No input file specified!");
+                        System.exit(1);
+                    }
+                }
+                else {
+                    File file = new File (argv[i]);
+                    logger.info("Registering "+file+"...");
+                    hmdb.register(file);
+                }
             }
         }
     }
