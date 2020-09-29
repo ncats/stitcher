@@ -297,7 +297,7 @@ public class TextIndexer extends TransactionEventHandler.Adapter
         //System.err.println("** query: "+query);
         try (IndexReader reader = DirectoryReader.open(indexWriter)) {
             IndexSearcher searcher = new IndexSearcher (reader);
-            TopDocs hits = searcher.search(query, top+skip);
+            TopDocs hits = searcher.search(query, skip+top);
             SearchResult result = new SearchResult (skip, top, hits.totalHits);
             int size = Math.min(skip+top, hits.totalHits);
             for (int i = skip; i < size; ++i) {

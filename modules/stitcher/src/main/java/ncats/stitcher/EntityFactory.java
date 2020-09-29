@@ -2334,7 +2334,7 @@ public class EntityFactory implements Props, AutoCloseable {
                        String query, int skip, int top) {
         int total = 0;
         try (Transaction tx = gdb.beginTx()) {
-            TextIndexer.SearchResult result = indexer.search(query, 0, 1000);
+            TextIndexer.SearchResult result = indexer.search(query, skip, top);
             List<Entity> results = new ArrayList<>();
             Set<Long> unique = new HashSet<>();
             for (TextIndexer.Result r : result.matches) {
@@ -2350,7 +2350,8 @@ public class EntityFactory implements Props, AutoCloseable {
                     }
                 }
             }
-            total = unique.size();
+            //total = unique.size();
+            total = result.total;
             out.put("total", total);
             out.put("entities", results.toArray(new Entity[0]));
             out.put("count", results.size());
@@ -2470,11 +2471,16 @@ public class EntityFactory implements Props, AutoCloseable {
     protected void traversal (Node node, LinkedList<Node> path,
                               List<Node[]> paths, Set<Node> seen,
                               Direction dir, StitchKey... keys) {
+        if (seen.contains(node))
+            return;
         path.push(node);
         for (Relationship rel : node.getRelationships(dir, keys)) {
-            Node xn = rel.getOtherNode(node);
-            if (path.indexOf(xn) < 0)
-                traversal (xn, path, paths, seen, dir, keys);
+            Set sources = Util.toSet(rel.getProperty(SOURCE, null));
+            if (sources.contains(node.getProperty(SOURCE))) {
+                Node xn = rel.getOtherNode(node);
+                if (path.indexOf(xn) < 0)
+                    traversal (xn, path, paths, seen, dir, keys);
+            }
         }
         
         if (!seen.contains(path.peek())) {

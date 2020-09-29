@@ -360,7 +360,7 @@ particularly instrumental in the analysis of electronic health records
 (EHRs) \cite{Karr2019}. In the context of drug discovery, however, ER
 has received little attention; to our knowledge, the work by Croset
 et al. toward a drug product terminology \cite{Croset2015} is the only
-recent effort directly addressing ER. The authors utilized
+recent effort directly addressing ER. Here, the authors utilized
 graph density and betweenness centrality metrics to merge and identify 
 problematic entities for each connected component within the link
 graph. The lack of available data and code, however, prevents further
@@ -758,9 +758,11 @@ mixture, \emph{R-}, and \emph{S-}isomer.
 \subsection*{External validation}
 To further illustrate the practical utility of our approach, we
 compare the concept of ``drug'' in \st\ to that of DrugBank
-\cite{wishart2018} database based on the July, 2020 snapshot. For this
-analysis, we simply consider the number of DrugBank nodes associated
-with each sgroup node in the stitch multigraph.
+database \cite{wishart2018}. 
+Table~\ref{tab:drugbank-dist} gives the distributions of the number of
+DrugBank entities associated with each sgroup node in the stitch
+multigraph. Of the total 13,580 records in the DrugBank July, 2020
+snapshot, 12,547 have one-to-one mappings with sgroup nodes. 
 
 \section*{Discussion}
 Data integration remains a major challenge for drug discovery as
@@ -964,22 +966,45 @@ Stitch key & Stitch value & Size\\ \midrule
 \caption{Data sources used in the current version of \st.\label{tab:data-sources}}
 \begin{tabular}{@{}ll@{}}\toprule
 Data source & Size\\ \midrule
-G-SRS, April 2019&	105,019\\
+G-SRS, April 2020&	109,257\\
 Withdrawn and Shortage Drugs List Feb 2018 &	674\\
 Broad Institute Drug List 2018-09-07 &	6,125\\
 NCATS Pharmaceutical Collection, April 2012 &	14,814\\
-Rancho BioSciences, March 2019 &	51,591\\
+Rancho BioSciences, July 2020 &	58,710\\
 Pharmaceutical Manufacturing Encyclopedia (Third Edition) &	2,268\\
-DailyMed Rx, July 2020 &	74,850\\
-DrugBank, July 2020&	11,922\\
-DailyMed Other, July 2020&	13,393\\
-DailyMed OTC, July 2020&	79,448\\
-Drugs\@FDA \& Orange Book, July 2019&	28,256\\
-ClinicalTrials, December 2017&	305,833\\
+DailyMed Rx, July 2020 &	79,005\\
+DailyMed Other, July 2020&	11567\\
+DailyMed OTC, July 2020&	84,110\\
+DrugBank, July 2020&	13,580\\
+Drugs\@FDA \& Orange Book, July 2020&	30,931\\
+ClinicalTrials, December 2017&	305,834\\
 OTC Monographs, December 2018&	2,713\\
 FDA NADA and ANADAs, December 2018&	554\\
-FDA Excipients, December 2018&	10,212\\ \bottomrule
+FDA Excipients, December 2018&	10,214\\ \bottomrule
 \end{tabular}
+\end{table}
+
+\begin{table}[ht!]
+  \caption{Distribution of DrugBank entities per sgroup node in the
+    stitch multigraph.\label{tab:drugbank-dist}}
+  \begin{tabular}{@{}rl@{}}\toprule
+1 & 12,547\\ 
+2 & 354\\
+3 & 26\\
+4 & 10\\
+5 & 7\\
+6 & 2\\
+7 & 3\\
+8 & 1\\
+9 & 3\\
+10 & 1\\
+11 & 1\\
+13 & 1\\
+14 & 1\\
+16 & 1\\
+19 & 1\\
+21 & 1\\ \bottomrule
+  \end{tabular}
 \end{table}
 
 \section*{Algorithms}
