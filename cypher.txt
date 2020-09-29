@@ -45,6 +45,8 @@ MATCH (n:`Designated`)-[e*1..2]-(m:`human_phenotype`)-[]-(d:DATA) unwind e as g 
 
 match(n)-[]-(d:DATA) where d.id='MONDO:0019035' with n,d match(n)-[:R_subClassOf*1..9]->(m)-[]-(a:DATA) return n,d,m,a
 
+match(n)-[]-(d:DATA) where d.id='MONDO:0011308' with n,d match p=(n)-[e:R_subClassOf*1..9]->(m:S_MONDO)<--(a:DATA) where not m:TRANSIENT and all(x in e where x.source=n.source or n.source in x.source) return n,d,m,a
+
 match(n)--(d:DATA) where d.id='MONDO:0019035' with n,d match p=(n:S_MONDO)-[e:R_subClassOf*1..6]->(m:S_MONDO)--(:DATA) where all(x in e where x.value =~ 'http://purl.obolibrary.org/obo/MONDO.*') return p
 
 match(n:`S_MONDO`)-[]-(m:DATA) where exists(m.label) and not exists(n.status) and not (n)<-[:R_subClassOf]-() return count(n)

@@ -50,7 +50,8 @@ public class GHREntityFactory extends EntityRegistry {
     static final QName RelatedGeneList = new QName (NS, "related-gene-list");
     static final QName GeneSymbol = new QName (NS, "gene-symbol");
     static final QName TextRole = new QName (NS, "text-role");
-    static final QName HtmlP = new QName ("http://www.w3.org/1999/xhtml", "p");
+    static final QName HtmlP0 = new QName ("DDhttp://www.w3.org/1999/xhtml", "p");
+    static final QName HtmlP1 = new QName ("http://www.w3.org/1999/xhtml", "p");
     static final QName Text = new QName (NS, "text");
 
     public GHREntityFactory (String dir) throws IOException {
@@ -140,7 +141,8 @@ public class GHREntityFactory extends EntityRegistry {
                 else if (SynonymList.equals(name)) {
                     data.put("synonyms", syns.toArray(new String[0]));
                 }
-                else if (HtmlP.equals(name)) {
+                else if (HtmlP0.equals(name) || HtmlP1.equals(name)) {
+                    //logger.info("*** "+value);
                     text.add(value);
                 }
                 else if (Name.equals(name)
