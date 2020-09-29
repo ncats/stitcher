@@ -24,7 +24,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, April 2020\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, July 2020\" cache=data/hash.db ../stitcher-rawinputs/files/rancho-export_2019-09-27_13-00.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, July 2020\" cache=data/hash.db ../stitcher-rawinputs/files/rancho-export_2020-07-24_14-33.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
@@ -39,19 +39,19 @@ echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 # these add additional data for event calculator
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_rx.conf"
-echo 'DailyMedRx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+echo 'DailyMed-Rx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_rem.conf"
-echo 'DailyMedRem:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+echo 'DailyMed-Rem:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_otc.conf"
-echo 'DailyMedOTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+echo 'DailyMed-OTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_animal.conf"
-echo 'DailyMedOTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+# sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_animal.conf"
+# echo 'DailyMed-Animal:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_homeo.conf"
-echo 'DailyMedOTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+# sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_homeo.conf"
+# echo 'DailyMed-Homeopathic:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/ob.conf"
 echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log

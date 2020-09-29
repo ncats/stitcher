@@ -17,8 +17,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import ncats.stitcher.*;
+import ncats.stitcher.impl.MoleculeEntityFactory;
 import static ncats.stitcher.StitchKey.*;
 
+import chemaxon.struc.Molecule;
+import chemaxon.util.MolHandler;
+import chemaxon.formats.MolImporter;
+
+/*
+ * to run all test here
+ *   sbt stitcher/"testOnly ncats.stitcher.test.TestStitcher"
+ */
 public class TestStitcher {
     static final Logger logger =
         Logger.getLogger(TestStitcher.class.getName());
@@ -63,14 +72,14 @@ public class TestStitcher {
             List<Long> comps = new ArrayList<>();
             int nc = reg.components(comps);
             assertTrue ("Expect 1 component but instead got "+nc, nc == 1);
-	    for (Long id : comps) {
-		Component comp = reg.component(id);
-		reg.untangle(new UntangleCompoundComponent (ds, comp));
-	    }
+            for (Long id : comps) {
+                Component comp = reg.component(id);
+                reg.untangle(new UntangleCompoundComponent (ds, comp));
+            }
             
             //reg.untangle(new UntangleCompoundStitches (ds, threshold));
             
-            count = reg.count(ds.getName());
+            count = reg.count(ds.getLabel());
             assertTrue ("Expect "+ncomp
                         +" stitch node(s) but instead got "+count,
                         count == ncomp);
@@ -121,6 +130,7 @@ public class TestStitcher {
             (name.getMethodName(), 3, null,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
     }
+
     /*
     @Test
     public void testStitch5 () throws Exception {
@@ -158,4 +168,49 @@ public class TestStitcher {
              EntityRegistry.class.getResourceAsStream("/69312.json"));
     }
     */
+
+    @Test
+    public void testStitch9 () throws Exception {
+        logger.info("##################################### "
+                    +name.getMethodName());
+        MolImporter molimp = new MolImporter
+            (EntityRegistry.class.getResourceAsStream("/simple_l3.smi"));
+        try (MoleculeEntityFactory reg = new MoleculeEntityFactory
+             (GraphDb.createTempDb(name.getMethodName())) {
+                @Override
+                protected void init () {
+                    super.init();
+                    setIdField ("field_0");
+                }
+            }) {
+            reg.setDataSource(reg.getDataSourceFactory()
+                              .register(name.getMethodName()));
+            int n = 0;
+            for (Molecule mol = new Molecule (); molimp.read(mol); ) {
+                logger.info("### registering "+mol.getProperty("field_0"));
+                Entity e = reg.register(mol);
+                if (e != null)
+                    ++n;
+            }
+            long count = reg.count(AuxNodeType.ENTITY);
+            assertTrue ("Expecting "+n+" entities but instead got "
+                        +count, n == count); 
+            DataSource ds = reg.getDataSourceFactory()
+                .register("stitch_v1");
+            
+            List<Long> comps = new ArrayList<>();
+            int nc = reg.components(comps);
+            assertTrue ("Expect 1 component but instead got "+nc, nc == 1);
+            for (Long id : comps) {
+                Component comp = reg.component(id);
+                reg.untangle(new UntangleCompoundComponent (ds, comp));
+            }
+            
+            int ncomp = 2; // should be 2 components
+            count = reg.count(ds.getLabel());
+            assertTrue ("Expect "+ncomp
+                        +" stitch node(s) but instead got "+count,
+                        count == ncomp);
+        }
+    }
 }

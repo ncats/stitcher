@@ -1,7 +1,7 @@
 #!/bin/sh
 
 opts='-mem 16384'
-version="v20200704"
+version="v`date +%Y%m%d`"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
 orphclass="orphanet_classifications"
@@ -11,6 +11,7 @@ hpo="hpo"
 medgen="medgen"
 #clinvar if available
 clinvar="clinvar/ClinVarVariationRelease_00-latest.xml.gz"
+genereviews="gene_NBK1116"
 #this might be too much right now
 ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 
@@ -43,9 +44,7 @@ owl="doid.owl.gz \
    rxno.owl.gz \
    ogms.owl \
    pato.owl.gz \
-   fma.owl.gz \
-   efo.owl.gz \
-   mondo.owl.gz"
+   fma.owl.gz"
 owl_path="owl-202002"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
@@ -102,6 +101,11 @@ if test -e $orpha/en_product4_HPO.xml; then
     sbt stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4_HPO.xml"
 fi
 
+# load disease-gene association; the associations in the owl file aren't up to date
+if test -e $orpha/en_product6.xml; then
+    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetDiseaseGeneAssociationEntityFactory $out $orpha/en_product6.xml"
+fi
+
 #load MedGen if available
 if test -d $medgen; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.MedGenEntityFactory $out $medgen"
@@ -112,7 +116,18 @@ if test -f $clinvar; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.ClinVarVariationEntityFactory $out $clinvar"
 fi
 
+#load gene reviews if avaiable
+if test -f $genereviews; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.GeneReviewsEntityFactory $out $genereviews"
+fi
+
 #load PPI if available
 if test -f $ppi; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $ppi"
 fi
+
+# make sure these are loaded after medgen
+owl_last="efo.owl.gz mondo.owl.gz"
+for f in `echo $owl_last | xargs printf " ${owl_path}/%s"`; do
+    sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $f"
+done

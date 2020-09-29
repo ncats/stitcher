@@ -32,6 +32,7 @@ public class OntEntityFactory extends EntityRegistry {
         Logger.getLogger(OntEntityFactory.class.getName());
 
     static final int DEBUG = 0;
+    static final String OBO_URI = "http://purl.obolibrary.org/obo/";
 
     /*
      * minimum length for xref
@@ -262,6 +263,7 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_GENE, "OGG_0000000004")
             .add(I_GENE, "IAO_0000118")
             .add(I_GENE, "P321")
+            .add(I_GENE, "GENES")
             //.add(I_PMID, "OGG_0000000030")
             //.add(I_PMID, "P171")
             .add(I_CAS, "CAS")
@@ -295,10 +297,19 @@ public class OntEntityFactory extends EntityRegistry {
         // map http://purl.bioontology.org/ontology/MESH/D014406
         // to http://purl.obolibrary.org/obo/MESH_D014406
         // so as to match MONDO reference
-        if (uri != null
-            && uri.startsWith("http://purl.bioontology.org/ontology/MESH/")) {
-            String[] toks = uri.split("/");
-            uri = "http://purl.obolibrary.org/obo/MESH_"+toks[toks.length-1];
+        if (uri != null) {
+            if (uri.startsWith("http://purl.bioontology.org/ontology/")) {
+                String[] toks = uri.split("/");
+                String id = toks[toks.length-1], ns = toks[toks.length-2];
+                if (ns.equals("MEDLINEPLUS")) {
+                    ns = "UMLS";
+                }
+                uri = OBO_URI+ns+"_"+id;
+            }
+            else if (uri.startsWith("http://linkedlifedata.com")) {
+                String[] toks = uri.split("/");
+                uri = OBO_URI+"UMLS_"+toks[toks.length-1];
+            }
         }
         else if (uri == null) {
             //uri = r.toString();
@@ -387,8 +398,10 @@ public class OntEntityFactory extends EntityRegistry {
                     else {
                         String s = v.toString();
                         if ("".equals(s) || s.length() < MIN_XREF_LENGTH);
-                        else if (s.startsWith("ICD"))
-                            icds.add(s);
+                        else if (s.startsWith("ICD")) {
+                            if (s.endsWith(":-1"))
+                                icds.add(s);
+                        }
                         else
                             xrefs.add(transform (s));
                     }
@@ -400,7 +413,10 @@ public class OntEntityFactory extends EntityRegistry {
             else {
                 String v = value.toString();
                 if ("".equals(v) || v.length() < MIN_XREF_LENGTH);
-                else if (v.startsWith("ICD")) icds.add(v);
+                else if (v.startsWith("ICD")) {
+                    if (!v.endsWith(":-1"))
+                        icds.add(v);
+                }
                 else xrefs.add(transform (v));
             }
         }
@@ -428,6 +444,17 @@ public class OntEntityFactory extends EntityRegistry {
         }
 
         if (ontology == null) {
+        }
+        else if (ontology.resource != null
+                 && ontology.resource.getLocalName() != null
+                 && ontology.resource.getLocalName().indexOf("ORDO") >= 0) {
+            if (data.containsKey("symbol")) {
+                // this is a gene
+                Object symbol = data.get("symbol");
+                Object genes = data.get("hasDbXref");
+                data.put("GENES", genes != null
+                         ? Util.merge(genes, symbol) : symbol);
+            }
         }
         else if (ontology.resource != null
                  && "Thesaurus.owl".equals(ontology.resource.getLocalName())) {
@@ -1026,8 +1053,26 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("HTTP")
                     )
                     others.add(x);
-                else
+                else {
+                    int pos = u.indexOf(':');
+                    if (pos <= 0) {
+                    }
+                    else if (u.startsWith("SNOMEDCT_US")) {
+                        useful.add("SNOWMEDCT_US"+u.substring(pos));
+                    }
+                    else if (u.startsWith("ORDO:")) {
+                        useful.add("ORPHA"+u.substring(pos));
+                    }
+                    else if (u.startsWith("NCI:")) {
+                        useful.add("NCIT"+u.substring(pos));
+                    }
+                    else if (u.startsWith("GARD:")) {
+                        useful.add("GARD:"+String.format
+                                   ("%1$07d", Integer.parseInt
+                                    (u.substring(pos+1))));
+                    }
                     useful.add(x);
+                }
             }
         }
         else if ("human_phenotype".equals
@@ -1133,8 +1178,11 @@ public class OntEntityFactory extends EntityRegistry {
                     ) {
                     others.add(x);
                 }
-                else
+                else {
+                    if (u.startsWith("ORPHANET:"))
+                        useful.add("Orpha:"+ x.substring(x.indexOf(':')+1));
                     useful.add(x);
+                }
             }
         }
         else if (ontology.props.get("title") != null
@@ -1240,12 +1288,21 @@ public class OntEntityFactory extends EntityRegistry {
             if (!others.isEmpty())
                 data.put("_hasDbXref", others.toArray(new String[0]));
         }
+
+        if (!icds.isEmpty()) {
+            for (String x : icds) {
+                if (x.startsWith("ICD10")) {
+                    int pos = x.indexOf(':');
+                    if (pos > 0) {
+                        xrefs.add("ICD10CM:"+x.substring(pos+1));
+                    }
+                }
+            }
+            data.put("ICD", icds.toArray(new String[0]));
+        }
         
         if (!xrefs.isEmpty())
             data.put("hasDbXref", xrefs.toArray(new String[0]));
-            
-        if (!icds.isEmpty())
-            data.put("ICD", icds.toArray(new String[0]));
 
         //logger.info("... registering: "+data);
         return data;
