@@ -760,6 +760,8 @@ public class Api extends Controller {
                             throw new Exception("Payload does not contain property: "+updateProperty);
                         } else if ("add".equals(operation) && oldVal.size() != 0) {
                             throw new Exception("Old value must be null if adding anew");
+                        } else if ("replace".equals(operation) && (oldV.asText().equals(newV.asText()))) {
+                            throw new Exception("Can't replace if old and new value are the same");
                         }
 
                         // create new payload object
@@ -854,18 +856,42 @@ public class Api extends Controller {
                                 cn[i] = nodes.get(i);
                             CompoundStitcher cs = new CompoundStitcher(es.getEntityFactory());
                             Component comp = es.getEntityFactory().component(rootId, cn);
-                            List<String> nSL = cs.testStitch(ver, comp);
+                            List<String> nSL = new ArrayList<String>();
+                            try {
+                                nSL = cs.testStitch(ver, comp);
+                            } catch (Exception ex) {
+                                throw ex;
+                            } finally {
+                                if (test)
+                                    updateNode.update(sk, newValO, oldValO);
+                            }
                             if (test) {
                                 // undo stitchkey update if just testing
-                                updateNode.update(sk, newValO, oldValO);
                                 response = "updating payload and stitchkey, does not affect stitching.";
-                                if (nSL.size() != sL.size()) {
-                                    response = "updating payload and stitchkey causes restitching of node.";
+                                if (nSL.size() < sL.size()) {
+                                    response = "updating payload and stitchkey causes merging of stitch node.";
                                     ArrayNode nSLA = mapper.createArrayNode();
                                     for (String entry: nSL)
                                         nSLA.add(entry);
                                     message.put("newStitches", nSLA);
                                     message.put("previousStitchCount", sL.size());
+                                } else if (nSL.size() > sL.size()) {
+                                    response = "updating payload and stitchkey causes splitting of stitch node.";
+                                    ArrayNode nSLA = mapper.createArrayNode();
+                                    for (String entry: nSL)
+                                        nSLA.add(entry);
+                                    message.put("newStitches", nSLA);
+                                    message.put("previousStitchCount", sL.size());
+                                } else {
+                                    for (int j = 0; j < nSL.size(); j++) {
+                                        if (nSL.get(j).indexOf(String.valueOf(updateNode.getId())) > -1) {
+                                            if (nSL.get(j).indexOf(String.valueOf(rootId)) == -1) {
+                                                response = "updating payload and stitchkey moves entity into new stitch node.";
+                                                message.put("newStitchNode", nSL.get(j));
+                                                message.put("previousStitchNode", rootId);
+                                            }
+                                        }
+                                    }
                                 }
                             } else if (nSL.size() != sL.size()) {
                                 ArrayNode nSLA = mapper.createArrayNode();
