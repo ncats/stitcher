@@ -111,8 +111,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 }
             }
             
-            if (cmin == null
-                || (cmin > c && !checkExt (vmin, "-M")) || hasMetal) {
+            if (c != null && // https://github.com/ncats/stitcher/issues/142
+                    (cmin == null || (cmin > c && !checkExt (vmin, "-M")) || hasMetal)) {
                 boolean update = checkNoExt (u.get(key), vset, "-S")
                     && checkNoExt (kval, vset, "-S")
                     && checkActiveMoiety (u, v);
