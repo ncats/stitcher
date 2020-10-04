@@ -120,7 +120,7 @@ def getCuration(node, type, oldValue, value):
         operation = 'add'
 
     cur['stitches'] = node
-    cur['nodeSource'] = "DrugBank, December 2018"
+    cur['nodeSource'] = "DrugBank, July 2020"
     cur['nodeId'] = node
     cur['node'] = 368958
     cur['jsonPath'] = "$['properties'][?(@['key']=='"+type+"' )]['value']"
@@ -150,7 +150,7 @@ if __name__=="__main__":
         drug = requestJson(url)
         if drug is not None:
             for member in drug['sgroup']['members']:
-                if member['source'] == "DrugBank, December 2018" and member['id'] == dbid:
+                if member['source'] == "DrugBank, July 2020" and member['id'] == dbid:
                     if 'stitches' in member:
                         if 'I_UNII' in member['stitches']:
                             if isinstance(member['stitches']['I_UNII'], list):
@@ -165,6 +165,7 @@ if __name__=="__main__":
                             else:
                                 names[dbid] = member['stitches']['N_Name']
 
+    print uniis
     resps = dict()
     errors = []
     for unii1 in uniis.keys():
@@ -174,6 +175,7 @@ if __name__=="__main__":
                 oldValue = uniis[unii1]
                 value = uniis[unii2]
                 curr = getCuration(unii1, type, oldValue, value)
+                print curr
                 resp = applyCuration(curr)
                 if 'statusMessage' in resp:
                     if resp['status'] == 'success':
