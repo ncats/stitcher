@@ -15,7 +15,7 @@ public abstract class StitchCalculator implements Consumer<Stitch>{
         return ef.maps(e -> {
             Stitch s = Stitch._getStitch(e);
             accept (s);
-        }, "stitch_v"+version);
+        }, "S_STITCH_V"+version);
     }
 
     public int recalculateNodes (long[] nodes) {

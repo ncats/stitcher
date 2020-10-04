@@ -135,7 +135,7 @@ public class App extends Controller {
                             Integer rows, Integer page) {
         Label[] labels = {
             AuxNodeType.SGROUP,
-            Label.label("stitch_v"+version)
+            Label.label("S_STITCH_V"+version)
         };
         String uri = routes.App.stitches(version, q, rows, page).url();
         Logger.debug(uri);
@@ -177,7 +177,7 @@ public class App extends Controller {
         catch (Exception ex) {
             // now try looking by name or id
             Entity[] entities = es.getEntityFactory()
-                .filter("id", "'"+name+"'", "stitch_v"+version);
+                .filter("id", "'"+name+"'", "S_STITCH_V"+version);
             
             return ok (stitches.render
                        (version, name, new int[]{entities.length},
