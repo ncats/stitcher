@@ -68,6 +68,11 @@ public class MoleculeEntityFactory extends EntityRegistry {
         // add unique identifier to node (source is already present as label?)
         if (idField != null) {
             idval = mol.getProperty(idField);
+            if (idval != null) {
+                String[] vals = idval.split("[\n\\s,]+");
+                if (vals.length > 0)
+                    idval = vals[0].trim();
+            }
         }
 
         Entity ent = Entity._getEntity(_createNode ());

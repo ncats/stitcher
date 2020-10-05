@@ -22,13 +22,13 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static {
         mappedRels.put("ACTIVE MOIETY", R_activeMoiety);
         // TODO These other relationships cause OutOfMemory ... and excessive traverses
-        //mappedRels.put("PARENT->SALT/SOLVATE", R_rel); // QO84GZ3TST has two such relationships, enabling this causes it not to get linked to 5UX2SD1KE2
-        //mappedRels.put("SALT/SOLVATE->PARENT", R_rel);
-        //mappedRels.put("METABOLITE ACTIVE->PARENT", R_activeMoiety);
-        //mappedRels.put("PARENT->METABOLITE ACTIVE", R_rel);
-        //mappedRels.put("METABOLITE ACTIVE->PRODRUG", R_activeMoiety);
-        //mappedRels.put("PRODRUG->METABOLITE ACTIVE", R_rel);
-        //mappedRels.put("RACEMATE->ENANTIOMER", R_activeMoiety);
+        mappedRels.put("PARENT->SALT/SOLVATE", R_rel); // QO84GZ3TST has two such relationships, enabling this causes it not to get linked to 5UX2SD1KE2
+        mappedRels.put("SALT/SOLVATE->PARENT", R_rel);
+        mappedRels.put("METABOLITE ACTIVE->PARENT", R_rel);
+        mappedRels.put("PARENT->METABOLITE ACTIVE", R_rel);
+        mappedRels.put("METABOLITE ACTIVE->PRODRUG", R_rel);
+        mappedRels.put("PRODRUG->METABOLITE ACTIVE", R_rel);
+        mappedRels.put("RACEMATE->ENANTIOMER", R_rel);
     }
     Map<String, Entity> activeMoieties = new HashMap<>();
     Map<String, Set<Entity>> unresolved = new HashMap<>();
@@ -57,11 +57,11 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         add (I_CAS, "CAS");
         add (I_UNII, "UNII");
         add (I_CID, "PUBCHEM");
+        add (I_CODE, "Codes");
         add (T_Keyword, "Class");
     }
 
     void register (String line, int total) {
-        System.out.println("+++++ "+(count+1)+"/"+total+" +++++");
         String[] toks = line.split("\t");
         if (toks.length < 2) {
             logger.warning(total+": Expecting 3 fields, but instead got "
@@ -76,10 +76,12 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         }
         else if (vobj instanceof Molecule) {
             Molecule mol = (Molecule)vobj;
+            //logger.info("### "+mol.toFormat("sdf"));
             for (int i = 0; i < mol.getPropertyCount(); ++i) {
                 String prop = mol.getPropertyKey(i);
                 properties.add(prop);
             }
+            logger.info("+++++ "+mol.getName()+" "+(count+1)+"/"+total+" +++++");
             
             Entity ent = register (mol);
             String relationships = mol.getProperty(RELATIONSHIPS);
@@ -95,7 +97,8 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         else { // not chemical
             Map<String, Object> map = (Map)vobj;
             properties.addAll(map.keySet());
-            
+
+            logger.info("+++++ "+map.get("UNII")+" "+(count+1)+"/"+total+" +++++");
             Entity ent = register (map);
             vobj = map.get(RELATIONSHIPS);
             if (vobj != null) {
@@ -120,7 +123,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         String entry[] = rel.split("\\|");
         String type = entry[0];
         if (entry.length == 1) {
-            System.err.println("oops");
+            logger.log(Level.SEVERE, "Relationship has no target: "+rel);
             return;
         }
         String id = entry[1];
@@ -129,19 +132,36 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
             link = mappedRels.get(type);
         else return;
         Map<String, Object> attrs = new HashMap<>();
-        attrs.put(type, id);
+        //attrs.put(type, id);
+        attrs.put(NAME, type);
         if (activeMoieties.containsKey(id)) {
             Entity e = activeMoieties.get(id);
             // create manual stitch from ent -> e
             if (!ent.equals(e))
                 ent.stitch(e, link, id, attrs);
-        } if (force) {
+        }
+        if (force) {
             int cnt = 0;
+            Object obj = ent.payload("UNII");
+            String eid = null;
+            if (obj.getClass().isArray()) {
+                eid = (String)Array.get(obj, 0);
+            }
+            else {
+                eid = obj.toString();
+            }
             for (Iterator<Entity> it = find (I_UNII, id);
                  it.hasNext(); ++cnt) {
                 Entity active = it.next();
-                if (!active.equals(ent))
-                    ent.stitch(active, link, id, attrs);
+                if (!active.equals(ent)) {
+                    switch (link) {
+                    case R_activeMoiety:
+                        ent.stitch(active, link, id, attrs);
+                        break;
+                    default:
+                        active.stitch(ent, link, eid, attrs);
+                    }
+                }
             }
 
             if (cnt == 0)
@@ -177,33 +197,6 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         for (Map.Entry<String, Set<Entity>> me : unresolved.entrySet()) {
             for (Entity ent : me.getValue())
                 processGSRSRel(ent, me.getKey(), true);
-//            String rel = me.getKey();
-//            String entry[] = rel.split("\\|");
-//            String type = entry[0];
-//            String id = entry[1];
-//            StitchKey link = R_rel;
-//            if (type.equals("ACTIVE MOIETY"))
-//                link = R_activeMoiety;
-//            Entity active = activeMoieties.get(id);
-//            if (active != null) {
-//                for (Entity e : me.getValue())
-//                    if (!active.equals(e))
-//                        e.stitch(active, link, id);
-//            }
-//            else {
-//                int cnt = 0;
-//                for (Iterator<Entity> it = find (I_UNII, id);
-//                     it.hasNext(); ++cnt) {
-//                    active = it.next();
-//                    for (Entity e : me.getValue())
-//                        if (!active.equals(e))
-//                            e.stitch(active, link, id);
-//                }
-//
-//                if (cnt == 0)
-//                    logger.warning("** Unknown reference to active moiety: "
-//                                   +id+":"+me.getKey());
-//            }
         }
 
         return count;
