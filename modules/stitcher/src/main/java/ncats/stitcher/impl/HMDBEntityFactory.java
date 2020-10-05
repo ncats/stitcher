@@ -38,9 +38,9 @@ public class HMDBEntityFactory extends EntityRegistry {
         setIdField ("id");
         setStrucField ("smiles");
         add (N_Name, "name")
-            .add(N_Name, "synonym")
+            //.add(N_Name, "synonym")
             .add(I_CAS, "cas_registry_number")
-            .add(I_GENE, "gene_name")
+            //.add(I_GENE, "gene_name")
             .add(I_CODE, "accession")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "patient_information")
@@ -89,23 +89,43 @@ public class HMDBEntityFactory extends EntityRegistry {
                 }
             }
             else if (ev.isEndElement()) {
+                String value = buf.toString().trim();
                 StartElement se = (StartElement) stack.pop();
                 StartElement parent = (StartElement) stack.peek();
-                String value = buf.toString().trim();
-
+                
                 String tag = se.getName().getLocalPart();
+                Object old = data.get(tag);
                 switch (tag) {
                 case "accession":
                     if ("metabolite".equals(parent.getName().getLocalPart())) {
                         data.put("id", value);
                     }
                     else {
-                        Object old = data.get(tag);
                         data.put(tag, old != null ? Util.merge(old, value) : value);
                     }
                     break;
-                    
+                        
                 case "name":
+                    switch (parent.getName().getLocalPart()) {
+                    case "metabolite":
+                        data.put(tag, value);
+                        break;
+                            
+                    case "pathway":
+                        if (!"".equals(value))
+                            data.put("pathway", old != null
+                                     ? Util.merge(old, value) : value);
+                        break;
+                    }
+                    break;
+                        
+                case "biospecimen":
+                    if ("biospecimen_locations".equals
+                        (parent.getName().getLocalPart())) {
+                        // fall thru
+                    }
+                    else
+                        break;
                 case "description":
                 case "alternative_parent":
                 case "substituent":
@@ -116,33 +136,38 @@ public class HMDBEntityFactory extends EntityRegistry {
                 case "smiles":
                 case "inchikey":
                 case "cellular":
-                case "biospecimen":
                 case "tissue":
                 case "gene_name":
-                    { Object old = data.get(tag);
+                    if (!"".equals(value))
                         data.put(tag, old != null ? Util.merge(old, value) : value);
-                    }
                 break;
-                
+                    
                 case "synonym":
                     if ("metabolite".equals(stack.get(1).asStartElement()
-                                            .getName().getLocalPart())) {
-                        Object old = data.get(tag);
+                                            .getName().getLocalPart())
+                        && !"".equals(value)) {
                         data.put(tag, old != null ? Util.merge(old, value) : value);
                     }
                     break;
                     
                 case "average_molecular_weight":
                 case "monisotopic_molecular_weight":
-                    data.put(tag, Double.parseDouble(value));
+                    try {
+                        data.put(tag, Double.parseDouble(value));
+                    }
+                    catch (Exception ex) {
+                        logger.log(Level.WARNING, "Bogus value for "
+                                   +tag+": "+value);
+                    }
                 break;
                 
                 case "patient_information":
                     for (XMLEvent xe : stack) {
                         if ("abnormal_concentrations"
-                            .equals(xe.asStartElement().getName().getLocalPart())) {
-                            Object old = data.get(tag);
+                            .equals(xe.asStartElement().getName().getLocalPart())
+                            && !"".equals(value)) {
                             data.put(tag, old != null ? Util.merge(old, value) : value);
+                            break;
                         }
                     }
                     break;

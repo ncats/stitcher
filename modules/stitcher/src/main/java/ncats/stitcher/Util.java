@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.net.URL;
 import java.net.URI;
+import java.util.stream.Stream;
 import java.util.zip.*;
 import java.util.regex.*;
 import java.util.function.Predicate;
@@ -580,80 +581,13 @@ public class Util {
         else {
             logger.warning("No UNII found!");
         }
-                    
-        JsonNode names = node.get("names");
-        if (names != null && names.isArray()) {
-            int size = names.size();
-            StringBuilder sb = new StringBuilder ();
-            for (int i = 0; i < size; ++i) {
-                JsonNode n = names.get(i);
-                String name = n.get("name").asText();
-                if (name.length() > 3) {
-                    if (sb.length() > 0) sb.append("\n");
-                    sb.append(name);
-
-                    if (n.get("displayName").asBoolean()) {
-                        mol.setProperty("PreferredName", name);
-                    }
-                }
-            }
-                        
-            mol.setProperty("Synonyms", sb.toString());
-        }
-                    
-        JsonNode codes = node.get("codes");
-        if (codes != null && codes.isArray()) {
-            int size = codes.size();
-            Map<String, StringBuilder> buf =
-                new HashMap<String, StringBuilder>();
-            for (int i = 0; i < size; ++i) {
-                JsonNode n = codes.get(i);
-                if (n.has("type") && "PRIMARY".equals(n.get("type").asText())) {
-                    String sys = n.get("codeSystem").asText();
-                    StringBuilder sb = buf.get(sys);
-                    if (sb == null) {
-                        buf.put(sys, sb = new StringBuilder ());
-                    }
-                    if (sb.length() > 0) sb.append("\n");
-                    sb.append(n.get("code").asText());
-                }
-            }
-                        
-            for (Map.Entry<String, StringBuilder> me
-                     : buf.entrySet()) {
-                mol.setProperty(me.getKey(),
-                                me.getValue().toString());
-            }
-        }
-
-        JsonNode refs = node.get("references");
-        if (refs != null && refs.isArray()) {
-            int size = refs.size();
-            StringBuilder sb = new StringBuilder ();
-            for (int i = 0; i < size; ++i) {
-                JsonNode n = refs.get(i);
-                if (sb.length() > 0) sb.append("\n");
-                if (n.has("citation"))
-                    sb.append(n.get("citation").asText());
-            }
-            mol.setProperty("References", sb.toString());
-        }
-
-        JsonNode rels = node.get("relationships");
-        StringBuilder sb = new StringBuilder();
-        if (rels != null && rels.isArray() && rels.size() > 0) {
-            for (int i = 0; i < rels.size(); ++i) {
-                JsonNode n = rels.get(i);
-                String type = n.get("type").asText();
-                String id = n.get("relatedSubstance")
-                        .get("approvalID").asText();
-                if (sb.length() > 0) sb.append("\n");
-                sb.append(type+"|"+id);
-            }
-
-            mol.setProperty("relationships", sb.toString());
-        }
         
+        Map<String, Object> props = parseSubstance (node);
+        for (Map.Entry<String, Object> me : props.entrySet()) {
+            final StringBuilder sb = new StringBuilder ();
+            Stream.of(toArray(me.getValue())).forEach(v -> sb.append(v+"\n"));
+            mol.setProperty(me.getKey(), sb.toString());
+        }
         return mol;
     }
 
@@ -675,6 +609,8 @@ public class Util {
         if (cls != null) {
             map.put("Class", cls.asText());
         }
+        if (node.has("uuid"))
+            map.put("uuid", node.get("uuid").asText());
                     
         JsonNode names = node.get("names");
         if (names != null && names.isArray()) {
@@ -682,19 +618,26 @@ public class Util {
             StringBuilder sb = new StringBuilder ();
             for (int i = 0; i < size; ++i) {
                 JsonNode n = names.get(i);
+                String type = n.get("type").asText();
                 String name = n.get("name").asText();
                 // make sure the synonym must be more than 3 characters!
-                if (name.length() > 3) {
-                    Object val = map.get("Synonyms");
-                    if (val != null)
-                        val = Util.merge(val, name);
-                    else
-                        val = name;
-                    map.put("Synonyms", val);
-                    
-                    if (n.get("displayName").asBoolean()) {
-                        map.put("PreferredName", name);
+                switch (type) {
+                case "cn":
+                    if (name.length() > 3) {
+                        Object val = map.get("Synonyms");
+                        map.put("Synonyms", val != null
+                                ? Util.merge(val, name) : name);
+                        if (n.get("displayName").asBoolean()) {
+                            map.put("PreferredName", name);
+                        }
                     }
+                    break;
+                case "cd":
+                    { Object val = map.get("Codes");
+                        map.put("Codes", val != null ? Util.merge(val, name)
+                                : name);
+                    }
+                    break;
                 }
             }
         }
@@ -709,11 +652,27 @@ public class Util {
                     String sys = n.get("codeSystem").asText();
                     Object val = map.get(sys);
                     String code = n.get("code").asText();
-                    if (val != null)
-                        val = Util.merge(val, code);
-                    else
-                        val = code;
-                    map.put(sys, val);
+                    map.put(sys, val != null ? Util.merge(val, code) : code);
+                    switch (sys) {
+                    case "NCI_THESAURUS":
+                        code = "NCIT:"+code;
+                        break;
+                    case "PUBCHEM":
+                        code = "CID:"+code;
+                        break;
+                    case "MESH":
+                    case "CAS":
+                        code = sys+":"+code;
+                        break;
+                    case "ChEMBL":
+                        break;
+                    default:
+                        code = null;
+                    }
+                    if (code != null) {
+                        val = map.get("Codes");
+                        map.put("Codes", val != null ? Util.merge(val, code) : code);
+                    }
                 }
             }
         }
