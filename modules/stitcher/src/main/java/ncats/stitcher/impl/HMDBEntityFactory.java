@@ -40,7 +40,7 @@ public class HMDBEntityFactory extends EntityRegistry {
         add (N_Name, "name")
             //.add(N_Name, "synonym")
             .add(I_CAS, "cas_registry_number")
-            //.add(I_GENE, "gene_name")
+            .add(I_GENE, "gene_name")
             .add(I_CODE, "accession")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "patient_information")
@@ -71,7 +71,12 @@ public class HMDBEntityFactory extends EntityRegistry {
     protected int register (XMLEventReader events) throws Exception {
         LinkedList<XMLEvent> stack = new LinkedList<>();        
         StringBuilder buf = new StringBuilder ();
+        
         Map<String, Object> data = new TreeMap<>();
+        Map<String, Set<String>> pathways = new HashMap<>();
+        List<String> pwids = new ArrayList<>();
+        String pathway = null;
+        
         int count = 0, nreg = 0;
         for (XMLEvent ev; events.hasNext(); ) {
             ev = events.nextEvent();
@@ -85,6 +90,14 @@ public class HMDBEntityFactory extends EntityRegistry {
                 case "metabolite":
                     ++count;
                     data.clear();
+                    break;
+                case "pathway":
+                    pwids.clear();
+                    pathway = null;
+                    break;
+
+                case "pathways":
+                    pathways.clear();
                     break;
                 }
             }
@@ -112,10 +125,28 @@ public class HMDBEntityFactory extends EntityRegistry {
                         break;
                             
                     case "pathway":
-                        if (!"".equals(value))
+                        if (!"".equals(value)) {
+                            old = data.get("pathway");
                             data.put("pathway", old != null
                                      ? Util.merge(old, value) : value);
+                            pathway = value;
+                        }
                         break;
+                    }
+                    break;
+
+                case "smpdb_id":
+                case "kegg_map_id":
+                    if (!"".equals(value))
+                        pwids.add(value);
+                    break;
+
+                case "pathway":
+                    if (!pwids.isEmpty()) {
+                        old = data.get("pathway_id");
+                        String[] val = pwids.toArray(new String[0]);
+                        data.put("pathway_id", old != null ? Util.merge(old, val)  : val);
+                        pathways.put(pathway, new HashSet<>(pwids));
                     }
                     break;
                         
@@ -176,6 +207,29 @@ public class HMDBEntityFactory extends EntityRegistry {
                     //logger.info("**** " + data);
                     { ncats.stitcher.Entity e = register (data);
                         if (e != null) {
+                            Object val = data.get("pathway");
+                            if (val != null) {
+                                String[] pways = {};
+                                if (val.getClass().isArray()) {
+                                    pways = (String[])val;
+                                }
+                                else {
+                                    pways = new String[]{(String)val};
+                                }
+                                Map<String, Object> attrs = new HashMap<>();
+                                attrs.put(NAME, "pathway");
+                                for (String pw : pways) {
+                                    attrs.put("pathway", pw);
+                                    for (String id : pathways.get(pw)) {
+                                        for (Iterator<ncats.stitcher.Entity> it
+                                                 = find ("pathway_id", id); it.hasNext(); ) {
+                                            ncats.stitcher.Entity pe = it.next();
+                                            if (!e.equals(pe)) 
+                                                e.stitch(pe, R_rel, id, attrs);
+                                        }
+                                    }
+                                }
+                            }
                             ++nreg;
                             logger.info("+++++++ "+nreg+"/"+count+" "+e.getId()+" "
                                         +data.get("id") +" +++++++");
