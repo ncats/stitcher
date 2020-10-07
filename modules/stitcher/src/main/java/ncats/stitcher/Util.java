@@ -697,18 +697,21 @@ public class Util {
 
         JsonNode rels = node.get("relationships");
         if (rels != null && rels.isArray()) {
+            Set<String> activeMoieties = new TreeSet<>();
             for (int i = 0; i < rels.size(); ++i) {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
-                String id = n.get("relatedSubstance")
-                        .get("approvalID").asText();
+                String id = n.get("relatedSubstance").get("approvalID").asText();
                 Object val = map.get("relationships");
                 if (val != null)
                     val = Util.merge(val, type+"|"+id);
                 else
                     val = type+"|"+id;
+                if ("ACTIVE MOIETY".equals(type))
+                    activeMoieties.add(id);
                 map.put("relationships", val);
             }
+            map.put("ActiveMoieties", activeMoieties.toArray(new String[0]));
         }
 
         return map;
