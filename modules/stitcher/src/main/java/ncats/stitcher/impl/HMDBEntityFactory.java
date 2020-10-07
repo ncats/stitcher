@@ -19,6 +19,15 @@ public class HMDBEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(HMDBEntityFactory.class.getName());
 
+    LinkedList<XMLEvent> stack = new LinkedList<>();        
+    StringBuilder buf = new StringBuilder ();
+    
+    Map<String, Object> data = new TreeMap<>();
+    Map<String, Set<String>> pathways = new HashMap<>();
+    List<String> pwids = new ArrayList<>();
+    String pathway;
+    int count, nreg;
+    
     public HMDBEntityFactory (String dir) throws IOException {
         super (dir);
     }
@@ -40,7 +49,7 @@ public class HMDBEntityFactory extends EntityRegistry {
         add (N_Name, "name")
             //.add(N_Name, "synonym")
             .add(I_CAS, "cas_registry_number")
-            .add(I_GENE, "gene_name")
+            //.add(I_GENE, "gene_name")
             .add(I_CODE, "accession")
             .add(H_InChIKey, "inchikey")
             .add(T_Keyword, "patient_information")
@@ -69,15 +78,7 @@ public class HMDBEntityFactory extends EntityRegistry {
     }
 
     protected int register (XMLEventReader events) throws Exception {
-        LinkedList<XMLEvent> stack = new LinkedList<>();        
-        StringBuilder buf = new StringBuilder ();
-        
-        Map<String, Object> data = new TreeMap<>();
-        Map<String, Set<String>> pathways = new HashMap<>();
-        List<String> pwids = new ArrayList<>();
-        String pathway = null;
-        
-        int count = 0, nreg = 0;
+        nreg = count = 0;
         for (XMLEvent ev; events.hasNext(); ) {
             ev = events.nextEvent();
             if (ev.isStartElement()) {
@@ -207,29 +208,7 @@ public class HMDBEntityFactory extends EntityRegistry {
                     //logger.info("**** " + data);
                     { ncats.stitcher.Entity e = register (data);
                         if (e != null) {
-                            Object val = data.get("pathway");
-                            if (val != null) {
-                                String[] pways = {};
-                                if (val.getClass().isArray()) {
-                                    pways = (String[])val;
-                                }
-                                else {
-                                    pways = new String[]{(String)val};
-                                }
-                                Map<String, Object> attrs = new HashMap<>();
-                                attrs.put(NAME, "pathway");
-                                for (String pw : pways) {
-                                    attrs.put("pathway", pw);
-                                    for (String id : pathways.get(pw)) {
-                                        for (Iterator<ncats.stitcher.Entity> it
-                                                 = find ("pathway_id", id); it.hasNext(); ) {
-                                            ncats.stitcher.Entity pe = it.next();
-                                            if (!e.equals(pe)) 
-                                                e.stitch(pe, R_rel, id, attrs);
-                                        }
-                                    }
-                                }
-                            }
+                            //stitchPathways (e);
                             ++nreg;
                             logger.info("+++++++ "+nreg+"/"+count+" "+e.getId()+" "
                                         +data.get("id") +" +++++++");
@@ -245,6 +224,34 @@ public class HMDBEntityFactory extends EntityRegistry {
         events.close();
         return count;
     }
+
+    void stitchPathways (ncats.stitcher.Entity e) {
+        Object val = data.get("pathway");
+        if (val != null) {
+            String[] pways = {};
+            if (val.getClass().isArray()) {
+                pways = (String[])val;
+            }
+            else {
+                pways = new String[]{(String)val};
+            }
+            
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put(NAME, "pathway");
+            for (String pw : pways) {
+                attrs.put("pathway", pw);
+                for (String id : pathways.get(pw)) {
+                    for (Iterator<ncats.stitcher.Entity> it
+                             = find ("pathway_id", id); it.hasNext(); ) {
+                        ncats.stitcher.Entity pe = it.next();
+                        if (!e.equals(pe)) 
+                            e.stitch(pe, R_rel, id, attrs);
+                    }
+                }
+            }
+        }
+    }
+        
     
     public static void main (String[] argv) throws Exception {
         if (argv.length < 1) {
