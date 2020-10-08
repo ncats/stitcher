@@ -29,8 +29,12 @@ public class CompoundStitcher implements Consumer<Stitch> {
             if (r != null) {
                 // make sure it's a
                 Entity[] e = component.entities(new long[]{root});
-                URI uri = e[0].datasource().toURI();
-                if (uri != null && !uri.toString().endsWith(".gsrs"))
+                URI uri = null;
+                if (e.length > 0) // a node outside the component can be pulled in during restitching; https://github.com/ncats/stitcher/issues/141
+                    uri = e[0].datasource().toURI();
+                else
+                    uri = ef.getEntity(r).datasource().toURI();
+                if (uri == null || !uri.toString().endsWith(".gsrs"))
                     r = null;
             }
             

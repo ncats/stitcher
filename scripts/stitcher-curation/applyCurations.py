@@ -5,6 +5,7 @@ import sys
 import cookielib
 import urllib
 import urllib2
+import ssl
 import json
 import time
 import argparse
@@ -40,10 +41,14 @@ else:
 
 cookies = cookielib.CookieJar()
 
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
 opener = urllib2.build_opener(
     urllib2.HTTPRedirectHandler(),
     urllib2.HTTPHandler(debuglevel=0),
-    urllib2.HTTPSHandler(debuglevel=0),
+    urllib2.HTTPSHandler(debuglevel=0, context=ctx),
     urllib2.HTTPCookieProcessor(cookies))
 opener.addheaders = [
     ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
@@ -73,7 +78,7 @@ def applyCuration(sline):
 
     req = urllib2.Request(url, json.dumps(obj), {'Content-Type': 'application/json'})
     try:
-        html = urllib2.urlopen(req)
+        html = urllib2.urlopen(req, context=ctx)
         sys.stderr.write(html.read())
         sys.stderr.write("\n")
     except urllib2.HTTPError, e:

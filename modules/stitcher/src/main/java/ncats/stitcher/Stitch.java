@@ -99,20 +99,14 @@ public class Stitch extends Entity {
         String val = null;
         if (ds != null) {
             String field = (String) ds.get(name);
-            if (field != null) {
-                try (Transaction tx = gdb.beginTx()) {
-                    Object value = node.getProperty(field, null);
-                    if (value != null && value.getClass().isArray())
-                        value = Array.get(value, 0);
-                    val = (String)value;
-                    tx.success();
-                }
-            }
-            else {
-                try (Transaction tx = gdb.beginTx()) {
-                    val = (String) node.getProperty(NAME, null);
-                    tx.success();
-                }
+            if (field == null)
+                field = NAME;
+            try (Transaction tx = gdb.beginTx()) {
+                Object value = node.getProperty(field, null);
+                if (value != null && value.getClass().isArray())
+                    value = Array.get(value, 0);
+                val = (String)value;
+                tx.success();
             }
         }
         return val;
