@@ -2244,7 +2244,7 @@ public class EntityFactory implements Props, AutoCloseable {
     }   
 
     public Entity entity (Integer ver, String id) {
-        Entity[] entities = filter("id", "'"+id+"'", "stitch_v"+ver);
+        Entity[] entities = filter("id", "'"+id+"'", "S_STITCH_V"+ver);
         if (entities.length > 0) {
             int index = 0;
             if (entities.length > 1) {

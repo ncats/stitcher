@@ -445,7 +445,7 @@ public class Entity extends CNode {
                     for (Relationship sr: n.getRelationships
                              (Direction.BOTH, AuxRelType.STITCH)) {
                         Node sn = sr.getOtherNode(n);
-                        if (sn.hasLabel(Label.label("stitch_v"+ver)))
+                        if (sn.hasLabel(Label.label("S_STITCH_V"+ver)))
                             s = Stitch.getStitch(sn);
                     }
                 }

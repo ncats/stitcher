@@ -9,10 +9,10 @@ curr_time=$(date +%s)
 
 echo $(date) > $log
 
-#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/russian_medicines.conf"
+#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/russian_medicines.conf"
 #echo 'Russian medicines:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
+#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/ruili.conf"
 #echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/withdrawn.conf"
