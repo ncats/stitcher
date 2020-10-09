@@ -28,8 +28,8 @@ opener.addheaders = [
 
 #site = 'https://stitcher.ncats.io/'
 #site = 'https://stitcher-dev.ncats.io/'
-site = 'https://stitcher-test.ncats.io/'
-#site = 'http://localhost:8080/'
+#site = 'https://stitcher-test.ncats.io/'
+site = 'http://localhost:8080/'
 
 def requestJson(uri):
     try:
@@ -273,27 +273,32 @@ def iterateStitches(funcs):
         dicts.append(dict())
     skip = 0
     top = 10
-    max = 300000
+    max = 320000
     while skip < max:
         uri = site+'api/stitches/v1?top='+str(top)+'&skip='+str(skip)
         obj = requestJson(uri)
-        if not obj.has_key('contents'):
+        if obj is None:
+            if top == 1:
+                skip = skip + 1
+            else:
+                top = 1
+        elif not obj.has_key('contents'):
             newobj = dict()
             newobj['contents'] = []
             newobj['contents'].append(obj)
             obj = newobj
             skip = max
-        if obj is None:
-            skip = skip
         elif len(obj['contents']) == 0:
             skip = max
         else:
             for stitch in obj['contents']:
                 for i in range(len(funcs)):
                     funcs[i](dicts[i], stitch)
+            skip = skip + top
+            if top == 1:
+                top = 10
         sys.stderr.write(uri+"\n")
         sys.stderr.flush()
-        skip = skip + top
     return dicts
 
 def getName(obj):
