@@ -141,6 +141,7 @@ public class HoofBeats {
     final EntityFactory ef;    
     final UnionFind uf = new UnionFind ();
     final ObjectMapper mapper = new ObjectMapper ();
+    final Map<String, String> hpCategories = new HashMap<>();
     
     class DiseaseComponent {
         final Component component;
@@ -410,6 +411,31 @@ public class HoofBeats {
             return genes;
         }
 
+        String getHpCategory (String id) {
+            String cat = hpCategories.get(id);
+            if (cat == null) {
+                final StringBuilder sb = new StringBuilder ();
+                ef.cypher(row -> {
+                        Object label = row.get("label");
+                        for (Object obj : Util.toArray(label)) {
+                            String c = (String)obj;
+                            if (sb.length() > 0) sb.append(";");
+                            sb.append(c.replaceAll("Abnormality of the", "")
+                                      .replaceAll("Abnormality of", "")
+                                      .replaceAll("abnormality", "")
+                                      .replaceAll("Abnormal", "").trim());
+                        }
+                        return false;
+                    }, String.format(HP_CATEGORY_FMT, id));
+                
+                if (sb.length() > 0) {
+                    cat = sb.toString();
+                    hpCategories.put(id, cat);
+                }
+            }
+            return cat;
+        }
+            
         JsonNode doPhenotypes () {
             ArrayNode phenotypes = mapper.createArrayNode();
             Entity[] ents = get("S_GARD");
@@ -422,23 +448,8 @@ public class HoofBeats {
                                 ObjectNode node = newJsonObject ();
                                 String hpid = (String) xe.payload("notation");
                                 node.put("curie", hpid);
-                                ef.cypher(row -> {
-                                        Object label = row.get("label");
-                                        StringBuilder sb = new StringBuilder ();
-                                        for (Object obj : Util.toArray(label)) {
-                                            String cat = (String)obj;
-                                            if (sb.length() > 0) sb.append(";");
-                                            sb.append(cat.replaceAll("Abnormality of the", "")
-                                                      .replaceAll("Abnormality of", "")
-                                                      .replaceAll("abnormality", "")
-                                                      .replaceAll("Abnormal", "").trim());
-                                        }
-                                        
-                                        if (sb.length() > 0) {
-                                            node.put("category", sb.toString());
-                                        }
-                                        return false;
-                                    }, String.format(HP_CATEGORY_FMT, hpid));
+                                String cat = getHpCategory (hpid);
+                                node.put("category", cat != null ? cat : "");
                                 node.put("label", getString (xe.payload("label")));
                                 node.put("synonym",
                                          getString (xe.payload("hasExactSynonym")));
