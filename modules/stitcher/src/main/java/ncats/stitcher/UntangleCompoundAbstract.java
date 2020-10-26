@@ -53,6 +53,34 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
         return root;
     }
 
+    /*
+     * if p and q contains uniis, then they must overlap
+     * or either p or q doesn't have uniis
+     */
+    static protected boolean compatible (Entity p, Entity q) {
+        Set<String> qu = new HashSet<>();
+        Set<String> pu = new HashSet<>();
+        
+        Object uniis = p.get(I_UNII);
+        if (uniis != null) {
+            for (Object u : Util.toArray(uniis))
+                qu.add((String)u);
+        }
+        uniis = q.get(I_UNII);
+        if (uniis != null) {
+            for (Object u : Util.toArray(uniis))
+                pu.add((String)u);
+        }
+
+        boolean compat = true;
+        if (!qu.isEmpty() && !pu.isEmpty()) {
+            qu.retainAll(pu);
+            compat = !qu.isEmpty();
+        }
+            
+        return compat;
+    }
+
     protected boolean union (Entity... entities) {
         if (entities == null || entities.length < 2)
             return false;
@@ -62,8 +90,8 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             Entity P = entities[i-1];
             Entity Q = entities[i];
             
-            Long p = uf.root(P.getId());
-            Long q = uf.root(Q.getId());
+            Long p = getEqvClass (P.getId());
+            Long q = getEqvClass (Q.getId());
             if (p != null && q != null) {
                 if (!p.equals(q)) {
                     boolean pr = isRoot (ef.entity(p));
@@ -78,6 +106,9 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                         
                         return false; // bail out
                     }
+                    else if (!compatible (P, Q)) {
+                        // fail
+                    }
                     else if (pr)
                         ids.add(new long[]{p, q});
                     else
@@ -86,7 +117,8 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             }
             else {
                 Object u = getActiveMoiety (P), v = getActiveMoiety (Q);
-                if (u != null && v != null && !Util.equals(u, v))
+                if ((u != null && v != null && !Util.equals(u, v))
+                    || !compatible (P, Q))
                     return false; // bail..
 
                 if (q != null)
@@ -97,8 +129,8 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
         }
 
         for (long[] pair : ids) {
-            logger.info("..."+pair[0]+" ("+uf.root(pair[0])+") <- "
-                        +pair[1]+" ("+uf.root(pair[1])+")");
+            logger.info("..."+pair[0]+" ("+getEqvClass (pair[0])+") <- "
+                        +pair[1]+" ("+getEqvClass (pair[1])+")");
             uf.union(pair[0], pair[1], false);
         }
         
@@ -116,6 +148,10 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                         +(i+1)+"/"+components.length+"...");            
             consumer.accept(getRoot (comp), comp);
         }
+    }
+
+    protected Long getEqvClass (long id) {
+        return uf.root(id);
     }
 
     /*

@@ -2668,6 +2668,23 @@ public class EntityFactory implements Props, AutoCloseable {
         return result;  
     }
 
+    public void cypher (Function<Map<String, Object>, Boolean> func, String cypher) {
+        try (Transaction tx = gdb.beginTx()) {
+            try (Result result = gdb.execute(cypher)) {
+                while (result.hasNext()) {
+                    Map<String, Object> row = result.next();
+                    if (!func.apply(row)) {
+                        break;
+                    }
+                }
+            }
+            tx.success();
+        }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, "Can't execute cypher query: "+cypher, ex);
+        }
+    }
+
     public Stitch createStitch (DataSource source, Component component) {
         try (Transaction tx = gdb.beginTx()) {
             Stitch ent = _createStitch (source, component);
