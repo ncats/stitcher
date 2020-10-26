@@ -10,6 +10,7 @@ import org.neo4j.graphdb.traversal.Traverser;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -871,6 +872,23 @@ public class Entity extends CNode {
             logger.log(Level.SEVERE, "Node "+getId()+" has no PAYLOAD!");
         }
         return payload;
+    }
+
+    public void _data (Consumer<Map<String, Object>> consumer, String name) {
+        // data is always pointing to the entity
+        for (Relationship rel : _node.getRelationships
+                 (Direction.INCOMING, RelationshipType.withName(name))) {
+            Node xn = rel.getOtherNode(_node);
+            if (xn.hasLabel(AuxNodeType.DATA))
+                consumer.accept(xn.getAllProperties());
+        }
+    }
+
+    public void data (Consumer<Map<String, Object>> consumer, String name) {
+        try (Transaction tx = gdb.beginTx()) {
+            _data (consumer, name);
+            tx.success();
+        }
     }
     
     protected void index (String name, Object value) {

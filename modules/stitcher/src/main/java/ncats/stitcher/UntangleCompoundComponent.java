@@ -2,6 +2,7 @@ package ncats.stitcher;
 
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -328,6 +329,61 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 }, key, value);
         }
     } // CliqueClosure
+
+    /*
+     * for cliques that are maximally non-overlapping, they constitute equivalence
+     * classes. for cliques that overlap with other cliques, we 
+     */
+    static class DisjointCliques {
+        int score;
+        List<Clique> cliques = new ArrayList<>();
+    }
+    
+    class MaximumDisjointCliques {
+        MaximumDisjointCliques (Clique... cliques) {
+            logger.info("****** searching for maximum disjoint cliques ******");
+            for (Clique c : cliques) {
+                Util.dump(c);
+            }
+
+            final List<DisjointCliques> disjoints = new ArrayList<>();
+            
+            GrayCode code = GrayCode.createBinaryCode(cliques.length);
+            code.generate(c -> {
+                    DisjointCliques dc = new DisjointCliques ();
+                    for (int i = 0; i < c.length; ++i) {
+                        if (c[i] == 1) {
+                            Clique ci = cliques[i];
+                            for (int j = 0; j < i; ++j) {
+                                if (c[j] == 1) {
+                                    Clique cj = cliques[j];
+                                    if (ci.overlaps(cj))
+                                        return;
+                                }
+                            }
+                            dc.score += ci.size();
+                            dc.cliques.add(cliques[i]);
+                        }
+                    }
+                    
+                    if (dc.cliques.size() > 1)
+                        disjoints.add(dc);
+                });
+            
+            logger.info("********* MAXIMUM DISJOINT CLIQUES: ");
+            Collections.sort(disjoints, (a, b) -> {
+                    int d = b.score - a.score;
+                    if (d == 0)
+                        d = b.cliques.size() - a.cliques.size();
+                    return d;
+                });
+            for (DisjointCliques dc : disjoints) {
+                logger.info("...score="+dc.score);
+                for (Clique c : dc.cliques)
+                    Util.dump(c);
+            }
+        }
+    }
     
     public UntangleCompoundComponent (DataSource dsource,
                                       Component component) {
@@ -397,34 +453,43 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         component.stitches((source, target) -> {
                 //Entity[] out = source.outNeighbors(R_activeMoiety);
                 Object moietyKeys = source.keys().get(R_activeMoiety);
-                int keyCount = 0;
+                Set uniis = new HashSet ();
                 if (moietyKeys.getClass().isArray()) {
-                    keyCount = Array.getLength(moietyKeys);
+                    for (int i = 0; i < Array.getLength(moietyKeys); ++i)
+                        uniis.add(Array.get(moietyKeys, i));
+
                     // prodrugs sometimes has 2 active moieties, ignore self one e.g. 54K37P50KH
+                    /*
                     Object unii = source.get(I_UNII);
-                    if (unii.getClass().isArray() && Array.getLength(unii) == 1)
-                        unii = Array.get(unii, 0);
-                    else if (unii.getClass().isArray())
-                        unii = "unknown";
-                    for (int i=0; i<keyCount; i++)
-                        if (unii.equals(Array.get(moietyKeys, i)))
-                            keyCount--;
+                    if (unii.getClass().isArray()) {
+                        if (Array.getLength(unii) > 1) {
+                            unii = null;
+                        }
+                        else {
+                            unii = Array.get(unii, 0);
+                        }
+                    }
+                    uniis.remove(unii);
+                    */
                 }
-                else if (moietyKeys != null && ((String)moietyKeys).length() == 10) // activeMoiety is a UNII
-                    keyCount = 1;
+                // activeMoiety is a UNII.. what else can it be if not unii?
+                else if (moietyKeys != null && ((String)moietyKeys).length() == 10) 
+                    uniis.add(moietyKeys);
+                
+                int uniiCount = uniis.size();
                 Entity[] in = target.inNeighbors(R_activeMoiety);
                 //logger.info(" ("+out.length+") "+source.getId()
-                logger.info(" ("+keyCount+") "+source.getId()
+                logger.info(" ("+uniiCount+") "+source.getId()
                             +" -> "+target.getId()+" ["
                             +isRoot (target)+"] ("+in.length+")");
                 
                 //if (out.length == 1) {
-                if (keyCount == 1) {
+                if (uniiCount == 1) {
                     // first collapse single/terminal active moieties
                     uf.union(target.getId(), source.getId());
                 }
                 //else if (out.length > 1) {
-                else if (keyCount > 1) {
+                else if (uniiCount > 1) {
                     unsure.add(source);
                 }
 
@@ -497,8 +562,10 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
 
         // we need to do another pass over each component to see
         // if we have multi-value cliques that span components
-        mergeComponents (N_Name, I_CAS, I_DB, I_ChEMBL,
-                         I_CID, I_SID, H_LyChI_L4);
+        Clique[] cliques = mergeComponents (N_Name, I_CAS, I_DB, I_ChEMBL,
+                                               I_CID, I_SID, H_LyChI_L4);
+        new MaximumDisjointCliques(cliques);
+        
         //mergeCliqueComponents (H_LyChI_L3);
 
         List<Entity> singletons = new ArrayList<>();
@@ -639,8 +706,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 }, key, me.getKey());
         }
     }
-    
-    void mergeComponents (StitchKey... span) {
+
+    Clique[] mergeComponents (StitchKey... span) {
         logger.info("Merging components with different equivalence classes...");
         final Map<Clique, Set<StitchKey>> cliques = new HashMap<>();
         for (StitchKey key : span) {
@@ -711,6 +778,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 union (entities);
             }
         }
+        
+        return cliques.keySet().toArray(new Clique[0]);
     }
 
     void mergeSingletons (Collection<Entity> singletons, StitchKey... span) {
