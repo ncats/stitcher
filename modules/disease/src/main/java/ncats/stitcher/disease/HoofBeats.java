@@ -423,17 +423,21 @@ public class HoofBeats {
                                 String hpid = (String) xe.payload("notation");
                                 node.put("curie", hpid);
                                 ef.cypher(row -> {
-                                        String cat = (String)row.get("label");
-                                        boolean cont = false;
-                                        if (cat != null) {
-                                            node.put("category",
-                                                     cat.replaceAll("Abnormality of the", "")
-                                                     .replaceAll("Abnormality of", "")
-                                                     .replaceAll("abnormality", "")
-                                                     .replaceAll("Abnormal", "").trim());
+                                        Object label = row.get("label");
+                                        StringBuilder sb = new StringBuilder ();
+                                        for (Object obj : Util.toArray(label)) {
+                                            String cat = (String)obj;
+                                            if (sb.length() > 0) sb.append(";");
+                                            sb.append(cat.replaceAll("Abnormality of the", "")
+                                                      .replaceAll("Abnormality of", "")
+                                                      .replaceAll("abnormality", "")
+                                                      .replaceAll("Abnormal", "").trim());
                                         }
-                                        else cont = true;
-                                        return cont;
+                                        
+                                        if (sb.length() > 0) {
+                                            node.put("category", sb.toString());
+                                        }
+                                        return false;
                                     }, String.format(HP_CATEGORY_FMT, hpid));
                                 node.put("label", getString (xe.payload("label")));
                                 node.put("synonym",
