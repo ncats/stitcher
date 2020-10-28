@@ -789,14 +789,24 @@ public class EntityFactory implements Props, AutoCloseable {
 
         @Override
         public Component add (Component comp) {
-            return new ComponentImpl (this, comp);
+            Component _comp;
+            try (Transaction tx = gdb.beginTx()) {
+                _comp = new ComponentImpl (this, comp);
+                tx.success();
+            }
+            return _comp;
         }
 
         @Override
         public Component and (Component comp) {
-            List<Entity> ov = ov (comp);
-            return ov.isEmpty() ? null
-                : new ComponentImpl (ov.toArray(new Entity[0]));
+            Component _comp;
+            try (Transaction tx = gdb.beginTx()) {
+                List<Entity> ov = ov (comp);
+                _comp = ov.isEmpty() ? null
+                    : new ComponentImpl (ov.toArray(new Entity[0]));
+                tx.success();
+            }
+            return _comp;
         }
 
         protected Iterable<Relationship> getRelationships
