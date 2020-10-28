@@ -334,54 +334,37 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
      * for cliques that are maximally non-overlapping, they constitute equivalence
      * classes. for cliques that overlap with other cliques, we 
      */
-    static class DisjointCliques {
+    static class DisjointCliques implements Iterable<Clique> {
         int score;
         List<Clique> cliques = new ArrayList<>();
-    }
-    
-    class MaximumDisjointCliques {
-        MaximumDisjointCliques (Clique... cliques) {
-            logger.info("****** searching for maximum disjoint cliques ******");
-            for (Clique c : cliques) {
-                Util.dump(c);
-            }
 
-            final List<DisjointCliques> disjoints = new ArrayList<>();
-            
-            GrayCode code = GrayCode.createBinaryCode(cliques.length);
-            code.generate(c -> {
-                    DisjointCliques dc = new DisjointCliques ();
-                    for (int i = 0; i < c.length; ++i) {
-                        if (c[i] == 1) {
-                            Clique ci = cliques[i];
-                            for (int j = 0; j < i; ++j) {
-                                if (c[j] == 1) {
-                                    Clique cj = cliques[j];
-                                    if (ci.overlaps(cj))
-                                        return;
-                                }
-                            }
-                            dc.score += ci.size();
-                            dc.cliques.add(cliques[i]);
-                        }
-                    }
-                    
-                    if (dc.cliques.size() > 1)
-                        disjoints.add(dc);
-                });
-            
-            logger.info("********* MAXIMUM DISJOINT CLIQUES: ");
-            Collections.sort(disjoints, (a, b) -> {
-                    int d = b.score - a.score;
-                    if (d == 0)
-                        d = b.cliques.size() - a.cliques.size();
-                    return d;
-                });
-            for (DisjointCliques dc : disjoints) {
-                logger.info("...score="+dc.score);
-                for (Clique c : dc.cliques)
-                    Util.dump(c);
+        public Iterator<Clique> iterator () {
+            return cliques.iterator();
+        }
+        public void add (Clique c) {
+            score += c.size();
+            cliques.add(c);
+        }
+        public boolean overlaps (Clique clique) {
+            for (Clique c : cliques)
+                if (c.overlaps(clique))
+                    return true;
+            return false;
+        }
+        public int size () { return cliques.size(); }
+        /*
+         * partition the given clique against this disjoint clique
+         * with the k index corresponds to the kth clique
+         */
+        public Map<Integer, Set<Long>> partition (Clique clique) {
+            Map<Integer, Set<Long>> partitions = new TreeMap<>();
+            for (int k = 0; k < cliques.size(); ++k) {
+                Component ov = clique.and(cliques.get(k));
+                if (ov != null) {
+                    partitions.put(k, ov.nodeSet());
+                }
             }
+            return partitions;
         }
     }
     
@@ -563,8 +546,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         // we need to do another pass over each component to see
         // if we have multi-value cliques that span components
         Clique[] cliques = mergeComponents (N_Name, I_CAS, I_DB, I_ChEMBL,
-                                               I_CID, I_SID, H_LyChI_L4);
-        new MaximumDisjointCliques(cliques);
+                                            I_CID, I_SID, H_LyChI_L4);
+        maximumDisjointCliques (cliques);
         
         //mergeCliqueComponents (H_LyChI_L3);
 
@@ -708,7 +691,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
     }
 
     Clique[] mergeComponents (StitchKey... span) {
-        logger.info("Merging components with different equivalence classes...");
+        logger.info("$$$$ Merging components with different equivalence "
+                    +"classes...");
         final Map<Clique, Set<StitchKey>> cliques = new HashMap<>();
         for (StitchKey key : span) {
             Map<Object, Integer> values = component.values(key);
@@ -767,6 +751,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 } // foreach values
             } // endif cont
         }
+        logger.info("$$$$ "+cliques.size()+" cliques found for component!");
 
         for (Map.Entry<Clique, Set<StitchKey>> me : cliques.entrySet()) {
             Set<StitchKey> keys = me.getValue();
@@ -780,6 +765,125 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         }
         
         return cliques.keySet().toArray(new Clique[0]);
+    }
+
+    Map<Long, Integer> maximumDisjointCliques (Clique... cliques) {
+        logger.info("$$$$ search for maximum "
+                    +"disjoint cliques: "+cliques.length);
+        Arrays.sort(cliques, (a, b) -> b.size() - a.size());
+        for (Clique c : cliques) {
+            Util.dump(c);
+        }
+        
+        List<DisjointCliques> dsets = new ArrayList<>();
+        for (int i = 0; i < cliques.length; ++i) {
+            DisjointCliques dc = new DisjointCliques ();
+            dc.add(cliques[i]);
+            for (int j = i+1; j < cliques.length; ++j) {
+                Clique cj = cliques[j];
+                if (!dc.overlaps(cj))
+                    dc.add(cj);
+            }
+            if (dc.size() > 1)
+                dsets.add(dc);
+        }
+
+        Map<Long, Integer> maps = new TreeMap<>();        
+        if (dsets.isEmpty()) {
+            logger.warning("**** no disjoint cliques found!");
+            return maps;
+        }
+        
+        Collections.sort(dsets, (a, b) -> {
+                int d = b.score - a.score;
+                if (d == 0)
+                    d = b.size() - a.size();
+                return d;
+            });
+        logger.info("##### MAXIMUM DISJOINT CLIQUES:");
+        /*
+          for (DisjointCliques dc : dsets) {
+                    logger.info("...score="+dc.score);
+                    for (Clique c : dc)
+                    Util.dump(c);
+                    }
+        */
+        DisjointCliques dc = dsets.get(0); // best disjoint clique
+        logger.info("...score="+dc.score);
+        for (Clique c : dc)
+            Util.dump(c);
+        
+        logger.info("~~~~~~~~~~ partitioning cliques ~~~~~~~~~~");
+        for (Clique c : cliques) {
+            Util.dump(c);
+            Map<Integer, Set<Long>> part = dc.partition(c);
+            logger.info("-- parition: "+part);
+            int npart = part.size();
+            if (npart == 0) {
+                // disjoint clique; should never be the case!
+                logger.warning("*** disjoint clique: "+c.getId());
+            }
+            else if (npart == 1) { // nothing to do
+            }
+            else { // >1
+                // here we identify nodes that are problematic in that
+                // they span multiple cliques
+                List<Map.Entry<Integer, Set<Long>>> entries =
+                    new ArrayList<>(part.entrySet());
+                Collections.sort(entries, (a, b) -> {
+                        int d = b.getValue().size() - a.getValue().size();
+                        if (d == 0) {
+                            d = a.getKey() - b.getKey();
+                        }
+                        return d;
+                    });
+                
+                Map.Entry<Integer, Set<Long>> best = entries.get(0);
+                for (int i = 1; i < entries.size(); ++i) {
+                    Map.Entry<Integer, Set<Long>> e = entries.get(i);
+                    if (e.getValue().size() == best.getValue().size()) {
+                        best = null;
+                        break;
+                    }
+                    else {
+                        logger.warning("...flagging nodes "+e.getValue()
+                                    +" as suspect!");
+                        for (Long n : e.getValue()) {
+                            Integer cnt = maps.get(n);
+                            maps.put(n, cnt == null ? 1 : cnt+1);
+                        }
+                    }
+                }
+
+                if (best != null) {
+                    logger.info("...equivalence "+best.getValue());
+                }
+                else {
+                    // all members of this clique is suspect
+                    logger.warning("...flagging clique as suspect "+c);
+                    for (Long n : c.nodeSet()) {
+                        Integer cnt = maps.get(n);
+                        maps.put(n, cnt==null ? 1 : cnt+1);
+                    }
+                }
+            }
+        }
+
+        // do another pass and perform transitive closure on nodes
+        // that aren't suspect
+        for (Clique c : cliques) {
+            long[] nodes = c.nodes();
+            for (int i = 0; i < nodes.length; ++i) {
+                if (!maps.containsKey(nodes[i])) {
+                    for (int j = i+1; j < nodes.length; ++j) {
+                        if (!maps.containsKey(nodes[j])) {
+                            uf.union(nodes[i], nodes[j]);
+                        }
+                    }
+                }
+            }
+        }
+        return maps;
     }
 
     void mergeSingletons (Collection<Entity> singletons, StitchKey... span) {

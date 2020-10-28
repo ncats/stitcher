@@ -99,7 +99,7 @@ public class HoofBeats {
         +"[e:R_subClassOf*0..]->(m:S_HP)-[:R_subClassOf]->(:S_HP)--(z:DATA) "
         +"where d.notation='%1$s' and all(x in e where x.source=n.source or "
         +"n.source in x.source) and z.notation='HP:0000118' with m match "
-        +"p=(m)<--(d:DATA) return distinct d.label as label";
+        +"p=(m)<--(d:DATA) return d.label as label limit 1";
     
     // lookup of GR short id to book id
     static final Map<String, String> GENEREVIEWS = new HashMap<>();
@@ -130,7 +130,7 @@ public class HoofBeats {
             if (value.getClass().isArray()) {
                 StringBuilder sb = new StringBuilder ((String)Array.get(value, 0));
                 for (int i = 1; i < Array.getLength(value); ++i)
-                    sb.append(";"+Array.get(value, i));
+                    sb.append("; "+Array.get(value, i));
                 value = sb.toString();
             }
             return (String)value;
