@@ -147,6 +147,8 @@ public class HoofBeats {
         final Component component;
         final Map<Source, Entity[]> entities = new TreeMap<>();
         final Entity[] gard;
+        Entity[] genes;
+        Entity[] phenotypes;
         
         DiseaseComponent (long[] comp) {
             component = ef.component(comp);
@@ -406,7 +408,9 @@ public class HoofBeats {
                             return true;
                         }, R_rel);
                 }
+                this.genes = dups.toArray(new Entity[0]);
             }
+            else this.genes = null;
             
             return genes;
         }
@@ -471,7 +475,9 @@ public class HoofBeats {
                             return true;
                         }, R_hasPhenotype);
                 }
+                this.phenotypes = dups.toArray(new Entity[0]);
             }
+            else this.phenotypes = null;
             
             // TODO: other sources..
             
@@ -634,6 +640,7 @@ public class HoofBeats {
                     try (FileOutputStream fos =
                          new FileOutputStream (id+".json")) {
                         writer.writeValue(fos, json);
+                        writeGenes (id, dc.genes);
                     }
                     catch (IOException ex) {
                         ex.printStackTrace();
@@ -645,6 +652,43 @@ public class HoofBeats {
         if (count > 0)
             ps.println("]");
         return count;
+    }
+
+    void writeGenes (String id, Entity[] genes) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream (id+"_genes.json")) {
+            PrintStream ps = new PrintStream (fos);
+            ps.println("{");
+            ps.println("  \"allOrNone\": false,"); // ?
+            ps.println("  \"records\": [");
+            for (int i = 0; i < genes.length; ++i) {
+                Entity e = genes[i];
+                if (i > 0) {
+                    ps.println(",");
+                }
+                
+                ps.println("    {");
+                ps.println("        \"attributes\": {");
+                ps.println("            \"type\": \"Gene__c\"");
+                ps.println("         },");
+                ps.println("        \"Name\": \""
+                           +getString (e.payload("gene_symbol"))+"\",");
+                ps.println("        \"Gene_Name__c\": \""
+                           +getString (e.payload("label"))+"\",");
+                ps.println("        \"GHR_URL__c\": \"\",");
+                ps.println("        \"Gene_Type__c\": \"\",");
+                ps.println("        \"Chromosome_Location__c\": \"\",");
+                Object[] xrefs = Util.toArray(e.payload("hasDbXref"));
+                for (Object ref : xrefs) {
+                    String syn = (String)ref;
+                    if (syn.startsWith("HGNC:"))
+                        ps.println("        \"Gene_Identifier__c\": \""
+                                   +syn+"\"");
+                }
+                ps.print("    }");
+            }
+            ps.println("   ]");
+            ps.println("}");
+        }
     }
 
     public void untangle (EntityFactory ef, BiConsumer<Long, long[]> consumer) {

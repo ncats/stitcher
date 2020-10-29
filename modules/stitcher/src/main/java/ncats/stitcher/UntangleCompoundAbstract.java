@@ -26,7 +26,7 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
     static protected boolean isRoot (Entity e) {
         Object v = getActiveMoiety (e);
         if (v != null) {
-            Object u = e.payload("UNII");
+            Object u = e.get(I_UNII);
             return u != null && Util.delta(u, v) == null;
         }
 
@@ -40,7 +40,7 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             for (Entity nb : in) {
                 v = getActiveMoiety (nb);
                 if (v != null) {
-                    Object u = nb.payload("UNII");
+                    Object u = nb.get(I_UNII);
                     // can't have active moiety relationship to another entity
                     // and self, so the relationship must be flipped
                     if (u != null && Util.delta(u, v) == null)
