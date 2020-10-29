@@ -671,7 +671,7 @@ public class HoofBeats {
                 ps.println("            \"type\": \"Gene__c\"");
                 ps.println("         },");
                 ps.println("        \"Name\": \""
-                           +getString (e.payload("gene_symbol"))+"\",");
+                           +getString (e.payload("symbol"))+"\",");
                 ps.println("        \"Gene_Name__c\": \""
                            +getString (e.payload("label"))+"\",");
                 ps.println("        \"GHR_URL__c\": \"\",");
@@ -686,7 +686,7 @@ public class HoofBeats {
                 }
                 ps.print("    }");
             }
-            ps.println("   ]");
+            ps.println("]");
             ps.println("}");
         }
     }
