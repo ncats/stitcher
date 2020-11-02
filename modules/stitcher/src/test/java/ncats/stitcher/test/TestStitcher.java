@@ -203,11 +203,12 @@ public class TestStitcher {
         }
     }
     
-    void testMergedStitches (String name, int ncomp, Double threshold,
+    void testMergedStitches (String name, int[] stitches, Double threshold,
                              InputStream... streams)
         throws Exception {
         ObjectMapper mapper = new ObjectMapper ();
         ArrayNode data = mapper.createArrayNode();
+        int ncomp = stitches.length;
 
         int total = 0;
         for (InputStream is : streams) {
@@ -254,6 +255,16 @@ public class TestStitcher {
             assertTrue ("Expect "+ncomp
                         +" stitch node(s) but instead got "+count,
                         count == ncomp);
+            final Set<Integer> sizes = new TreeSet<>();
+            for (int i = 0; i < stitches.length; ++i)
+                sizes.add(stitches[i]);
+            reg.maps(e -> {
+                    Stitch s = Stitch.getStitch(e);
+                    logger.info("@@@@@ stitch node "+s.getId()
+                                +" of size "+s.size());
+                    assertTrue ("Stitch size "+s.size()+" is not expected: "
+                                + sizes, sizes.contains(s.size()));
+                }, "SGROUP");
         }
         finally {
             reg.shutdown();
@@ -269,7 +280,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 1, null,
+            (name.getMethodName(), new int[]{6}, null,
              EntityRegistry.class.getResourceAsStream("/1JQS135EYN.json"));
     }
 
@@ -278,7 +289,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 1, null,
+            (name.getMethodName(), new int[]{5}, null,
              EntityRegistry.class.getResourceAsStream("/cefotetan1.json"),
              EntityRegistry.class.getResourceAsStream("/cefotetan2.json"));
     }
@@ -288,7 +299,7 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 1, null,
+            (name.getMethodName(), new int[]{9}, null,
              EntityRegistry.class.getResourceAsStream("/OZAGREL1.json"),
              EntityRegistry.class.getResourceAsStream("/OZAGREL2.json"));
     }
@@ -298,19 +309,37 @@ public class TestStitcher {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 3, null,
+            (name.getMethodName(), new int[]{10,6,6}, null,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
     }
-    
+    */
     @Test
     public void testStitch05 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
+        /*
+          12 [10,13,15,28,44,66,74,76,82,84,88,92]
+          5 [1,5,68,72,94]
+          4 [21,42,80,100]
+          4 [34,36,78,102]
+          4 [52,64,86,96]
+          3 [8,70,106]
+          3 [40,46,108]
+          3 [48,50,90]
+          3 [54,56,104]
+          3 [58,60,98]
+          2 [3,38]
+          2 [17,19]
+          2 [24,26]
+          2 [30,32]
+          1 [62]
+        */
         testMergedStitches
-            (name.getMethodName(), 16, null,
+            (name.getMethodName(), new int[]{12, 5, 4, 4, 4, 3, 3,
+                                             3, 3, 3, 2, 2, 2, 2, 1}, null,
              EntityRegistry.class.getResourceAsStream("/heparin.json"));
     }
-
+    /*
     @Test
     public void testStitch06 () throws Exception {
         logger.info("##################################### "
@@ -329,16 +358,16 @@ public class TestStitcher {
              EntityRegistry.class.getResourceAsStream("/12871.json"));
     }
     */
+    /*
     @Test
     public void testStitch08 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
         testMergedStitches
-            (name.getMethodName(), 3, null,
+            (name.getMethodName(), new int[]{13, 7, 4}, null,
              EntityRegistry.class.getResourceAsStream("/69312.json"));
     }
 
-    /*
     @Test
     public void testStitch09 () throws Exception {
         logger.info("##################################### "

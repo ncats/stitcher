@@ -154,6 +154,10 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
         return uf.root(id);
     }
 
+    protected boolean assigned (long id) {
+        return uf.contains(id);
+    }
+
     /*
      * TODO: find the root active moiety and if exists return it
      */

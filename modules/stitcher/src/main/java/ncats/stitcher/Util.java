@@ -1109,6 +1109,7 @@ public class Util {
         ps.println("size: "+clique.size());
         ps.println(String.format("score: %1$.3f",
                                          clique.potential()));
+        ps.println("weight: "+clique.weight());
         if (clique.size() > 0) {
             Entity e = clique.entities()[0].parent();
             ps.println("parent: " +e.getId()
