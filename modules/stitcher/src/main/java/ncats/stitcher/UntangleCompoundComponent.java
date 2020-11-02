@@ -32,15 +32,22 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         final Entity[] nb;
         final StitchKey key;
         final Object kval;
-        
+        final boolean force;
+
         TransitiveClosure (Entity e, StitchKey key) {
-            this (e, e.neighbors(key), key);
+            this (e, key, false);
         }
-        
+        TransitiveClosure (Entity e, StitchKey key, boolean force) {
+            this (e, e.neighbors(key), key, force);
+        }
         TransitiveClosure (Entity e, Entity[] nb, StitchKey key) {
+            this (e, nb, key, false);
+        }
+        TransitiveClosure (Entity e, Entity[] nb, StitchKey key, boolean force) {
             this.e = e;
             this.nb = nb;
             this.key = key;
+            this.force = force;
             
             kval = e.get(key);
             counts = stats.get(key);
@@ -137,19 +144,29 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             // now merge
             boolean ok = false;
             if (emin != null) {
-                if (uf.contains(emin.getId())) {
+                if (assigned (emin.getId())) {
                     if (cmin < 1000) {
+                        if (force) {
+                            uf.union(e.getId(), emin.getId());
+                            ok = force;
+                        }
+                        else {
+                            ok = union (e, emin);
+                        }
                         logger.info(".."+e.getId()+" <-["+key+"="
-                                    +vmin+":"+cmin+"]-> "+emin.getId());
-                        union (e, emin);
-                        ok = true;
+                                    +vmin+":"+cmin+"]-> "+emin.getId()+" :: "+ok);
                     }
                 }
                 else {
+                    if (force) {
+                        uf.union(e.getId(), emin.getId());
+                        ok = force;
+                    }
+                    else {
+                        ok = union (e, emin);
+                    }
                     logger.info(".."+e.getId()+" <-["+key+"="
-                                +vmin+":"+cmin+"]-> "+emin.getId());
-                    union (e, emin);
-                    ok = true;
+                                +vmin+":"+cmin+"]-> "+emin.getId()+" :: "+ok);
                 }
             }
             
@@ -219,8 +236,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             boolean closure = false;
             if (bestClique != null) {
                 Entity[] entities = bestClique.entities();
-                for (int i = 1; i < entities.length; ++i)
-                    union (entities[i], entities[i-1]);
+                union (entities);
                 closure = true;
             }
             else if (!nodes.isEmpty()) {
@@ -232,9 +248,9 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                          cliques.entrySet()) {
                     Clique clique = me.getKey();
                     Set<StitchKey> keys = me.getValue();
-                    if (keys.size() > 1) {
+                    if (keys.size() > 1 || clique.size() == 2) {
                         logger.info("## collapsing clique "+clique.nodeSet()
-                                    +" due to multiple spans: "+keys);
+                                    +" due to span: "+keys);
                         for (Entity e : clique.entities())
                             union (entity, e);
                         closure = true;
@@ -307,6 +323,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
 
                         if (classes.size() == 1) {
                             // nothing to do
+                            updateCliques (cliques, key, clique);
                         }
                         else if (classes.size() < 2
                             && (anyvalue
@@ -352,6 +369,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             return false;
         }
         public int size () { return cliques.size(); }
+
         /*
          * partition the given clique against this disjoint clique
          * with the k index corresponds to the kth clique
@@ -545,6 +563,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         Map<Long, Set<StitchKey>> suspects = 
             mergeMaximumDisjointCliques (I_UNII, N_Name, I_CAS, I_DB,
                                          I_ChEMBL, I_CID, I_SID, H_LyChI_L4);
+        dump ("##### maximum disjoint cliques");
+        logger.info("#### suspect nodes: "+suspects);
         
         //mergeCliqueComponents (H_LyChI_L3);
 
@@ -554,13 +574,20 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         for (Entity e : component) {
             if (unsure.contains(e)) {
             }
-            else if (!uf.contains(e.getId())) {
+            else if (!assigned (e.getId())) {
                 logger.info("++++++++++++++ resolving unresolved " +processed
                             +"/"+total+" ++++++++++++++");
-                if (transitive (e, H_LyChI_L4)) {
+                boolean force = false;
+                if (suspects.containsKey(e.getId())) {
+                    Set<StitchKey> keys = suspects.get(e.getId());
+                    // conflict of unii, so we need to force it
+                    force = keys.contains(I_UNII); 
+                }
+                
+                if (transitive (e, H_LyChI_L4, force)) {
                     // 
                 }
-                else if (clique (e, N_Name, I_CAS,
+                else if (clique (e, I_UNII, N_Name, I_CAS, I_CID, I_SID,
                                  I_DB, I_ChEMBL/*, H_LyChI_L3*/)) {
                 }
                 /*
@@ -585,7 +612,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         // assign to the class with less references 
         for (Entity e : unsure) {
             Entity[] nb = e.outNeighbors(R_activeMoiety);
-            if (nb.length > 1 && !uf.contains(e.getId())) {
+            if (nb.length > 1 && !assigned (e.getId())) {
                 Map<Long, Integer> votes = new HashMap<>();
                 for (Entity u : nb) {
                     for (Object v : Util.toSet(u.get(H_LyChI_L4))) {
@@ -612,8 +639,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
     }
     
 
-    boolean transitive (Entity e, StitchKey key) {
-        return new TransitiveClosure(e, key).closure();
+    boolean transitive (Entity e, StitchKey key, boolean force) {
+        return new TransitiveClosure(e, key, force).closure();
     }
 
     boolean transitive (Entity e, Entity[] nb, StitchKey key) {
@@ -820,8 +847,33 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         
         logger.info("$$$$ searching for maximum disjoint cliques...");
         Map.Entry[] cliques = _cliques.entrySet().toArray(new Map.Entry[0]);
-        Arrays.sort(cliques, (a, b) -> ((Clique)b.getKey()).size()
-                    - ((Clique)a.getKey()).size());
+        Arrays.sort(cliques, (_a, _b) -> {
+                Clique a = (Clique)_a.getKey();
+                Clique b = (Clique)_b.getKey();
+                
+                int d = a.size() - b.size();
+                if (d == 0) {
+                    Map<StitchKey, Object> avals = a.values();
+                    Map<StitchKey, Object> bvals = b.values();
+                    OptionalInt ai = avals.entrySet().stream()
+                        .mapToInt(me -> me.getKey().priority).max();
+                    OptionalInt bi = bvals.entrySet().stream()
+                        .mapToInt(me -> me.getKey().priority).max();
+                    if (ai.isPresent() && bi.isPresent()) {
+                        d = bi.getAsInt() - ai.getAsInt();
+                    }
+                    if (d == 0) {
+                        int acnt = 0;
+                        for (Object v : avals.values())
+                            acnt += Util.toArray(v).length;
+                        int bcnt = 0;
+                        for (Object v : bvals.values())
+                            bcnt += Util.toArray(v).length;
+                        d = bcnt - acnt;
+                    }
+                }
+                return d;
+            });
         for (Map.Entry me : cliques) {
             Util.dump((Clique)me.getKey());
         }
@@ -835,7 +887,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 if (!dc.overlaps(cj))
                     dc.add(cj);
             }
-            if (dc.size() > 1)
+            if (dc.size() > 0)
                 dsets.add(dc);
         }
 
@@ -846,9 +898,9 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         }
         
         Collections.sort(dsets, (a, b) -> {
-                int d = b.score - a.score;
+                int d = b.size() - a.size(); // favor number of disjoints
                 if (d == 0)
-                    d = b.size() - a.size();
+                    d = b.score - a.score;
                 return d;
             });
         logger.info("##### MAXIMUM DISJOINT CLIQUES:");
@@ -933,16 +985,21 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
 
         // do another pass and perform transitive closure on nodes
         // that aren't suspect
-        Set<Long> ns = new HashSet<>();
         for (Map.Entry me : cliques) {
             Clique c = (Clique)me.getKey();
-            ns.clear();
-            ns.addAll(c.nodeSet());
-            ns.removeAll(maps.keySet());
-            Long[] nodes = ns.toArray(new Long[0]);
-            for (int i = 0; i < nodes.length; ++i)
-                for (int j = i+1; j < nodes.length; ++j)
-                    uf.union(nodes[i], nodes[j]);
+            List<Entity> valid = new ArrayList<>();
+            for (Entity e : c.entities())
+                if (!maps.containsKey(e.getId())
+                    // a node is not suspect if it's already assigned
+                    || assigned (e.getId())
+                    // or its stitchkey span has higher priority than those
+                    //   that caused conflicts
+                    || c.subordinate(maps.get(e.getId())
+                                     .toArray(new StitchKey[0]))
+                    )
+                    valid.add(e);
+            if (!valid.isEmpty())
+                union (valid.toArray(new Entity[0]));
         }
         return maps;
     }

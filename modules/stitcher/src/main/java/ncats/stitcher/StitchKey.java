@@ -16,13 +16,14 @@ public enum StitchKey implements RelationshipType {
     /*
      * Compound identifiers
      */
-    I_UNII(3), // FDA UNII
+    I_UNII(4), // FDA UNII
     I_CAS(2), // CAS registry number
-    I_SID(Long.class), // pubchem sid
-    I_CID(2, Long.class), // public cid
-    I_ChEMBL(2), // CHEMBL_ID
-    I_DB(2), // DrugBank
-    I_CODE, // any code
+    I_SID(3, Long.class), // pubchem sid
+    I_CID(3, Long.class), // pubchem cid
+    I_ChEMBL(3), // CHEMBL_ID
+    I_DB(3), // DrugBank
+    
+    I_CODE(2), // any code
 
     /*
      * Other identifiers
@@ -38,10 +39,10 @@ public enum StitchKey implements RelationshipType {
      * Compound hash
      */
     H_InChIKey(3), // InChIKey
-    H_LyChI_L1(0), // LyChI Layer 1
-    H_LyChI_L2(0), // LyChI layer 2
-    H_LyChI_L3(0), // LyChI layer 3
-    H_LyChI_L4(2), // LyChI layer 4
+    H_LyChI_L1(1), // LyChI Layer 1
+    H_LyChI_L2(1), // LyChI layer 2
+    H_LyChI_L3(1), // LyChI layer 3
+    H_LyChI_L4(3), // LyChI layer 4
     H_LyChI_L5(3), // LyChI layer 4 with salt + solvent
 
     /*
@@ -61,9 +62,9 @@ public enum StitchKey implements RelationshipType {
      * Ontology relationships
      */
     R_subClassOf (1, true),
-    R_equivalentClass,
-    R_exactMatch,
-    R_closeMatch,
+    R_equivalentClass(5),
+    R_exactMatch(5),
+    R_closeMatch(4),
     R_axiom,
 
     /*

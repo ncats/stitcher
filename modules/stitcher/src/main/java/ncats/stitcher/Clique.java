@@ -1,6 +1,8 @@
 package ncats.stitcher;
 
 import java.util.Map;
+import java.util.Arrays;
+import java.lang.reflect.Array;
 
 /*
  * by virtual of being a clique, all entities returned are 
@@ -16,4 +18,23 @@ public interface Clique extends Component {
      * determine which.
      */
     Map<StitchKey, Object> values ();
+    default int weight () {
+        Map<StitchKey, Object> values = values ();
+        int wt = 0;
+        for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
+            Object val = me.getValue();
+            if (val != null) {
+                wt += me.getKey().priority *
+                    (val.getClass().isArray() ? Array.getLength(val) : 1);
+            }
+        }
+        return wt*size();
+    }
+
+    default boolean subordinate (StitchKey... _keys) {
+        StitchKey[] keys = values().keySet().toArray(new StitchKey[0]);
+        Arrays.sort(keys, (a, b) -> b.priority - a.priority);
+        Arrays.sort(_keys, (a, b) -> b.priority - a.priority);
+        return keys[0].priority >= _keys[0].priority;
+    }
 }
