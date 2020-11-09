@@ -86,6 +86,7 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
             return false;
 
         List<long[]> ids = new ArrayList<>();
+        int eqv = 0;
         for (int i = 1; i < entities.length; ++i) {
             Entity P = entities[i-1];
             Entity Q = entities[i];
@@ -106,20 +107,21 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
                         
                         return false; // bail out
                     }
-                    else if (!compatible (P, Q)) {
-                        // fail
-                    }
                     else if (pr)
                         ids.add(new long[]{p, q});
                     else
                         ids.add(new long[]{q, p});
                 }
+                else
+                    ++eqv;
             }
             else {
                 Object u = getActiveMoiety (P), v = getActiveMoiety (Q);
-                if ((u != null && v != null && !Util.equals(u, v))
-                    || !compatible (P, Q))
+                if (u != null && v != null && !Util.equals(u, v)) {
+                    logger.warning(P+" and "+P+" have active moieties "+u+
+                                   " and "+v+", respectively!");
                     return false; // bail..
+                }
 
                 if (q != null)
                     ids.add(new long[]{Q.getId(), P.getId()});
@@ -129,12 +131,13 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
         }
 
         for (long[] pair : ids) {
-            logger.info("..."+pair[0]+" ("+getEqvClass (pair[0])+") <- "
-                        +pair[1]+" ("+getEqvClass (pair[1])+")");
-            uf.union(pair[0], pair[1], false);
+            String mesg = "..."+pair[0]+" ("+getEqvClass (pair[0])+") <-> "
+                +pair[1]+" ("+getEqvClass (pair[1])+") ==> ";
+            long cls = uf.union(pair[0], pair[1], false);
+            logger.info(mesg+cls);
         }
         
-        return !ids.isEmpty();
+        return !ids.isEmpty() || eqv > 0;
     }
 
     protected void createStitches (BiConsumer<Long, long[]> consumer) {

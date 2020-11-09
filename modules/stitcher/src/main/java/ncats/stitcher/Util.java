@@ -1099,13 +1099,17 @@ public class Util {
     }
 
     public static void dump (Clique clique) {
-        dump (System.out, clique);
+        dump (System.out, clique, "");
+    }
+
+    public static void dump (Clique clique, String mesg) {
+        dump (System.out, clique, mesg);
     }
     
-    public static void dump (OutputStream os, Clique clique) {
+    public static void dump (OutputStream os, Clique clique, String mesg) {
         PrintStream ps = new PrintStream (os);
         ps.println
-            ("+++++++ Clique "+clique.getId()+" +++++++");
+            ("+++++++ Clique "+clique.getId()+mesg+" +++++++");
         ps.println("size: "+clique.size());
         ps.println(String.format("score: %1$.3f",
                                          clique.potential()));

@@ -18,10 +18,10 @@ public enum StitchKey implements RelationshipType {
      */
     I_UNII(4), // FDA UNII
     I_CAS(2), // CAS registry number
-    I_SID(3, Long.class), // pubchem sid
-    I_CID(3, Long.class), // pubchem cid
-    I_ChEMBL(3), // CHEMBL_ID
-    I_DB(3), // DrugBank
+    I_SID(2, Long.class), // pubchem sid
+    I_CID(2, Long.class), // pubchem cid
+    I_ChEMBL(2), // CHEMBL_ID
+    I_DB(2), // DrugBank
     
     I_CODE(2), // any code
 
@@ -61,7 +61,7 @@ public enum StitchKey implements RelationshipType {
     /*
      * Ontology relationships
      */
-    R_subClassOf (1, true),
+    R_subClassOf(1, true),
     R_equivalentClass(5),
     R_exactMatch(5),
     R_closeMatch(4),

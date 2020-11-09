@@ -2,6 +2,7 @@ package ncats.stitcher;
 
 import java.util.*;
 import java.io.*;
+import java.util.stream.Collectors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.logging.Logger;
@@ -385,7 +386,18 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             return partitions;
         }
     }
-    
+
+    static int getCliqueScore (Clique clique) {
+        Map<StitchKey, Object> values = clique.values();
+        OptionalInt maxp = values.entrySet().stream()
+            .mapToInt(me -> me.getKey().priority).max();
+        int cnt = 0;
+        for (Object v : values.values())
+            for (Object x : Util.toArray(v))
+                cnt += x.toString().length();
+        return (maxp.getAsInt() << 24) | (cnt << 16) | (clique.size() & 0xffff);
+    }
+
     public UntangleCompoundComponent (DataSource dsource,
                                       Component component) {
         super (dsource);
@@ -556,15 +568,10 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         dump ("##### L4 keys stitching");
         }
         
-        // we need to do another pass over each component to see
-        // if we have multi-value cliques that span components
-        //Clique[] cliques = mergeComponents (I_UNII, N_Name, I_CAS, I_DB,
-        //                                    I_ChEMBL, I_CID, I_SID, H_LyChI_L4);
         Map<Long, Set<StitchKey>> suspects = 
             mergeMaximumDisjointCliques (I_UNII, N_Name, I_CAS, I_DB,
                                          I_ChEMBL, I_CID, I_SID, H_LyChI_L4);
-        dump ("##### maximum disjoint cliques");
-        logger.info("#### suspect nodes: "+suspects);
+        dump ("##### MAXIMUM DISJOINT CLIQUES");
         
         //mergeCliqueComponents (H_LyChI_L3);
 
@@ -714,98 +721,14 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         }
     }
 
-    Clique[] mergeComponents (StitchKey... span) {
-        logger.info("$$$$ Merging components with different equivalence "
-                    +"classes...");
-        final Map<Clique, Set<StitchKey>> cliques = new HashMap<>();
-        for (StitchKey key : span) {
-            Map<Object, Integer> values = component.values(key);
-            
-            boolean skip = false;
-            /*
-            switch (key) {
-            case H_LyChI_L3:
-            case H_LyChI_L4:
-            case H_LyChI_L5:
-                // we won't consider metals here
-                for (Map.Entry<Object, Integer> me : values.entrySet()) {
-                    if (me.getKey().toString().endsWith("-M")) {
-                        skip = true;
-                        break;
-                    }
-                }
-                break;
-            }
-            */
-            // only consider clique of side 3 or larger             
-            if (!skip) {
-                for (Map.Entry<Object, Integer> me : values.entrySet()) {
-                    Object value = me.getKey();
-                    if (me.getValue() > 2) {
-                        component.cliques(clique -> {
-                                logger.info("$$$$ searching for cliques "+key
-                                            +": "+me.getKey()
-                                            +"="+me.getValue());
-                                // only consider this if there are missing
-                                // stereocenters
-                                boolean cont = true;
-                                if (key == H_LyChI_L3) {
-                                    int undef = 0;
-                                    for (Entity e : clique) {
-                                        Molecule mol = e.mol();
-                                        if (mol != null) {
-                                            Map props = Util.calcMolProps(mol);
-                                            Integer cnt = (Integer)props
-                                                .get("undefinedStereo");
-                                            if (cnt > 0) ++undef; 
-                                        }
-                                    }
-                                    
-                                    logger.info("$$$$ entities with undefined "
-                                                +"stereocenters: "+undef);
-                                    cont = undef > 0;
-                                }
-                                
-                                if (cont) {
-                                    Util.dump(clique);
-                                    updateCliques (cliques, key, clique);
-                                }
-                                return cont;
-                            }, key, value);
-                    }
-                    else {
-                        logger.warning("*** skip clique "+key+": "+me.getKey()
-                                       +"="+me.getValue());
-                    }
-                } // foreach values
-            } 
-            else {
-                logger.warning("*** skipping clique with span "+key);
-            } // endif cont
-        }
-        logger.info("$$$$ "+cliques.size()+" cliques found for component!");
-
-        for (Map.Entry<Clique, Set<StitchKey>> me : cliques.entrySet()) {
-            Set<StitchKey> keys = me.getValue();
-            if (keys.size() > 1) {
-                Clique clique = me.getKey();
-                logger.info("$$$$ collapsing clique "
-                            +clique.nodeSet()+" due to spanning keys "+keys);
-                Entity[] entities = clique.entities();
-                union (entities);
-            }
-        }
-        
-        return cliques.keySet().toArray(new Clique[0]);
-    }
-
     Map<Long, Set<StitchKey>> mergeMaximumDisjointCliques (StitchKey... span) {
         final Map<Clique, Set<StitchKey>> _cliques = new HashMap<>();
+        final Map<Long, Set<StitchKey>> priorities = new HashMap<>();
         for (StitchKey key : span) {
             Map<Object, Integer> values = component.values(key);
             for (Map.Entry<Object, Integer> me : values.entrySet()) {
                 Object value = me.getKey();
-                if (me.getValue() > 2) {
+                if (me.getValue() > 1) {
                     component.cliques(clique -> {
                             logger.info("$$$$ searching for cliques "+key
                                         +": "+me.getKey()
@@ -833,6 +756,15 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                             if (cont) {
                                 Util.dump(clique);
                                 updateCliques (_cliques, key, clique);
+
+                                for (Entity e : clique) {
+                                    Set<StitchKey> keys =
+                                        priorities.get(e.getId());
+                                    if (keys == null)
+                                        priorities.put
+                                            (e.getId(), keys = new TreeSet<>());
+                                    keys.add(key);
+                                }
                             }
                             return cont;
                         }, key, value);
@@ -845,37 +777,16 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         } 
         logger.info("$$$$ "+_cliques.size()+" cliques found for component!");
         
-        logger.info("$$$$ searching for maximum disjoint cliques...");
+        logger.info("$$$$ SEARCHING FOR MAXIMUM DISJOINT CLIQUES...");
         Map.Entry[] cliques = _cliques.entrySet().toArray(new Map.Entry[0]);
         Arrays.sort(cliques, (_a, _b) -> {
                 Clique a = (Clique)_a.getKey();
                 Clique b = (Clique)_b.getKey();
-                
-                int d = a.size() - b.size();
-                if (d == 0) {
-                    Map<StitchKey, Object> avals = a.values();
-                    Map<StitchKey, Object> bvals = b.values();
-                    OptionalInt ai = avals.entrySet().stream()
-                        .mapToInt(me -> me.getKey().priority).max();
-                    OptionalInt bi = bvals.entrySet().stream()
-                        .mapToInt(me -> me.getKey().priority).max();
-                    if (ai.isPresent() && bi.isPresent()) {
-                        d = bi.getAsInt() - ai.getAsInt();
-                    }
-                    if (d == 0) {
-                        int acnt = 0;
-                        for (Object v : avals.values())
-                            acnt += Util.toArray(v).length;
-                        int bcnt = 0;
-                        for (Object v : bvals.values())
-                            bcnt += Util.toArray(v).length;
-                        d = bcnt - acnt;
-                    }
-                }
-                return d;
+                return getCliqueScore (b) - getCliqueScore (a);
             });
         for (Map.Entry me : cliques) {
-            Util.dump((Clique)me.getKey());
+            Clique c = (Clique)me.getKey();
+            Util.dump(c, " (score="+getCliqueScore (c)+")");
         }
         
         List<DisjointCliques> dsets = new ArrayList<>();
@@ -916,7 +827,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         for (Clique c : dc)
             Util.dump(c);
         
-        logger.info("~~~~~~~~~~ partitioning cliques ~~~~~~~~~~");
+        logger.info("############## PARTITIONING CLIQUES ##############");
         for (Map.Entry me : cliques) {
             Clique c = (Clique)me.getKey();
             Set<StitchKey> keys = (Set)me.getValue();
@@ -985,21 +896,42 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
 
         // do another pass and perform transitive closure on nodes
         // that aren't suspect
+        logger.info("######## NOW MERGING ENTITIES IN DISJOINT CLIQUES #######"
+                    +"\n::: SUSPECT NODES: "+maps);
         for (Map.Entry me : cliques) {
             Clique c = (Clique)me.getKey();
             List<Entity> valid = new ArrayList<>();
-            for (Entity e : c.entities())
+            for (Entity e : c.entities()) {
                 if (!maps.containsKey(e.getId())
                     // a node is not suspect if it's already assigned
                     || assigned (e.getId())
-                    // or its stitchkey span has higher priority than those
-                    //   that caused conflicts
-                    || c.subordinate(maps.get(e.getId())
+                    // or its stitchkey span has highest priority for this node
+                    || c.subordinate(priorities.get(e.getId())
                                      .toArray(new StitchKey[0]))
-                    )
+                    ) {
                     valid.add(e);
-            if (!valid.isEmpty())
-                union (valid.toArray(new Entity[0]));
+                }
+            }
+            
+            if (!valid.isEmpty()) {
+                Util.dump(c, " merge subset "+new TreeSet<>
+                          (valid.stream().mapToLong(e -> e.getId()).boxed()
+                           .collect(Collectors.toSet()))+" "+me.getValue());
+                boolean ok = union (valid.toArray(new Entity[0]));
+                if (!ok) {
+                    Set<StitchKey> keys = new TreeSet<>(c.values().keySet());
+                    logger.warning
+                        ("Can't merge subset; marking each entity as suspect: "
+                         +keys);
+                    for (Entity e : valid) {
+                        Set<StitchKey> pkeys = maps.get(e.getId());
+                        if (pkeys != null)
+                            pkeys.addAll(keys);
+                        else
+                            maps.put(e.getId(), new TreeSet<>(keys));
+                    }
+                }
+            }
         }
         return maps;
     }
