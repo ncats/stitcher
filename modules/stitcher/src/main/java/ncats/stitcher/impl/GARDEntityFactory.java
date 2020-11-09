@@ -33,7 +33,8 @@ public class GARDEntityFactory extends EntityRegistry {
     static final String DEFAULT_JDBC_AUTH =
         "integratedSecurity=true;authenticationScheme=JavaKerberos";
     static final String GARD_JDBC =
-        "jdbc:sqlserver://ncatswnsqldvv02.nih.gov;databaseName=ORDRGARD_DEV;";
+        //"jdbc:sqlserver://ncatswnsqldvv02.nih.gov;databaseName=ORDRGARD_DEV;";
+        "jdbc:sqlserver://ncatswnsqlpdv04.nih.gov;databaseName=ORDRGARD;";
 
     static class EqvNode {
         EqvNode parent;

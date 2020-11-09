@@ -187,6 +187,11 @@ public class OntEntityFactory extends EntityRegistry {
             toString (sb, props);
             sb.append("...links\n");
             toString (sb, links);
+            if (!axioms.isEmpty()) {
+                sb.append("...axioms\n");
+                for (OntologyResource or : axioms)
+                    sb.append(or.toString());
+            }
             return sb.toString();
         }
 
@@ -239,6 +244,8 @@ public class OntEntityFactory extends EntityRegistry {
             .add(N_Name, "altLabel")
             .add(N_Name, "hasExactSynonym")
             .add(N_Name, "hasRelatedSynonym")
+            .add(N_Name, "hasBroadSynonym")
+            .add(N_Name, "hasNarrowSynonym")
             .add(N_Name, "IAO_0000118") // alternative term
             .add(N_Name, "P90") // synonym
             .add(N_Name, "P107") // display name
@@ -1379,6 +1386,28 @@ public class OntEntityFactory extends EntityRegistry {
         if (or.props.isEmpty() && or.axioms.isEmpty()) {
             // transient entity
             ent.addLabel(AuxNodeType.TRANSIENT);
+        }
+        else if (!or.axioms.isEmpty()) {
+            for (OntologyResource ax : or.axioms) {
+                Map<String, Object> rel = new TreeMap<>();
+                rel.put(Props.ID, ax.resource.toString());
+                rel.put(Props.SOURCE, source.getKey());
+                Map<String, Object> val = new TreeMap<>();
+                val.put(Props.SOURCE, source.getKey());
+                for (Map.Entry<String, Object> me : ax.props.entrySet()) {
+                    Object[] v = Util.toArray(me.getValue());
+                    val.put(me.getKey(), v.length == 1 ? v[0].toString()
+                            : Arrays.stream(v).map(x -> x.toString())
+                            .toArray(String[]::new));
+                }
+                for (Map.Entry<String, Object> me : ax.links.entrySet()) {
+                    Object[] v = Util.toArray(me.getValue());
+                    val.put(me.getKey(), v.length == 1 ? v[0].toString()
+                            : Arrays.stream(v)
+                            .map(x -> x.toString()).toArray(String[]::new));
+                }
+                ent.addIfAbsent("AXIOM", rel, val);
+            }
         }
         
         Object deprecated = data.get("deprecated");

@@ -25,7 +25,7 @@ import chemaxon.util.MolHandler;
 import chemaxon.formats.MolImporter;
 
 /*
- * to run all test here
+ * to run all tests here
  *   sbt stitcher/"testOnly ncats.stitcher.test.TestStitcher"
  */
 public class TestStitcher {
@@ -288,6 +288,7 @@ public class TestStitcher {
     public void testStitch02 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
+        //5 [1,3,6,8,10]
         testMergedStitches
             (name.getMethodName(), new int[]{5}, null,
              EntityRegistry.class.getResourceAsStream("/cefotetan1.json"),
@@ -298,6 +299,7 @@ public class TestStitcher {
     public void testStitch03 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
+        //9 [1,3,6,8,10,12,14,16,18]
         testMergedStitches
             (name.getMethodName(), new int[]{9}, null,
              EntityRegistry.class.getResourceAsStream("/OZAGREL1.json"),
@@ -308,47 +310,57 @@ public class TestStitcher {
     public void testStitch04 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
+        //10 [3,18,26,28,30,32,38,40,42,44]
+        //6 [1,8,12,16,22,36]
+        //6 [6,10,14,20,24,34]
         testMergedStitches
             (name.getMethodName(), new int[]{10,6,6}, null,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
     }
-    */
+
     @Test
     public void testStitch05 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
-        /*
-          12 [10,13,15,28,44,66,74,76,82,84,88,92]
-          5 [1,5,68,72,94]
-          4 [21,42,80,100]
-          4 [34,36,78,102]
-          4 [52,64,86,96]
-          3 [8,70,106]
-          3 [40,46,108]
-          3 [48,50,90]
-          3 [54,56,104]
-          3 [58,60,98]
-          2 [3,38]
-          2 [17,19]
-          2 [24,26]
-          2 [30,32]
-          1 [62]
-        */
+        //12 [10,13,15,28,44,66,74,76,82,84,88,92]
+        //5 [1,5,68,72,94]
+        //4 [21,42,80,100]
+        //4 [34,36,78,102]
+        //4 [52,64,86,96]
+        //3 [8,70,106]
+        //3 [40,46,108]
+        //3 [48,50,90]
+        //3 [54,56,104]
+        //3 [58,60,98]
+        //2 [3,38]
+        //2 [17,19]
+        //2 [24,26]
+        //2 [30,32]
+        //1 [62]
         testMergedStitches
             (name.getMethodName(), new int[]{12, 5, 4, 4, 4, 3, 3,
                                              3, 3, 3, 2, 2, 2, 2, 1}, null,
              EntityRegistry.class.getResourceAsStream("/heparin.json"));
     }
-    /*
+    */
     @Test
     public void testStitch06 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
+        //14 [5,13,19,39,41,49,51,53,61,65,71,85,87,95]
+        //12 [3,17,21,25,35,57,67,73,77,79,83,89]
+        //7 [8,11,37,59,75,81,91]
+        //3 [15,43,69]
+        //3 [23,33,63]
+        //2 [1,93]
+        //2 [27,45]
+        //2 [29,47]
+        //2 [31,55]        
         testMergedStitches
-            (name.getMethodName(), 13, null,
+            (name.getMethodName(), new int[]{14, 12, 7, 3, 3, 2, 2, 2, 2}, null,
              EntityRegistry.class.getResourceAsStream("/2991.json"));
     }
-
+    /*
     @Test
     public void testStitch07 () throws Exception {
         logger.info("##################################### "
