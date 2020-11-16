@@ -414,31 +414,6 @@ public class HoofBeats {
             
             return genes;
         }
-
-        String getHpCategory (String id) {
-            String cat = hpCategories.get(id);
-            if (cat == null) {
-                final StringBuilder sb = new StringBuilder ();
-                ef.cypher(row -> {
-                        Object label = row.get("label");
-                        for (Object obj : Util.toArray(label)) {
-                            String c = (String)obj;
-                            if (sb.length() > 0) sb.append(";");
-                            sb.append(c.replaceAll("Abnormality of the", "")
-                                      .replaceAll("Abnormality of", "")
-                                      .replaceAll("abnormality", "")
-                                      .replaceAll("Abnormal", "").trim());
-                        }
-                        return false;
-                    }, String.format(HP_CATEGORY_FMT, id));
-                
-                if (sb.length() > 0) {
-                    cat = sb.toString();
-                    hpCategories.put(id, cat);
-                }
-            }
-            return cat;
-        }
             
         JsonNode doPhenotypes () {
             ArrayNode phenotypes = mapper.createArrayNode();
@@ -520,6 +495,31 @@ public class HoofBeats {
         this.ef = ef;
     }
 
+    String getHpCategory (String id) {
+        String cat = hpCategories.get(id);
+        if (cat == null) {
+            final StringBuilder sb = new StringBuilder ();
+            ef.cypher(row -> {
+                    Object label = row.get("label");
+                    for (Object obj : Util.toArray(label)) {
+                        String c = (String)obj;
+                        if (sb.length() > 0) sb.append(";");
+                        sb.append(c.replaceAll("Abnormality of the", "")
+                                  .replaceAll("Abnormality of", "")
+                                  .replaceAll("abnormality", "")
+                                  .replaceAll("Abnormal", "").trim());
+                    }
+                    return false;
+                }, String.format(HP_CATEGORY_FMT, id));
+                
+            if (sb.length() > 0) {
+                cat = sb.toString();
+                hpCategories.put(id, cat);
+            }
+        }
+        return cat;
+    }
+    
     public void test () {
         ef.stitches((source, target, values) -> {
                 try {
@@ -641,6 +641,7 @@ public class HoofBeats {
                          new FileOutputStream (id+".json")) {
                         writer.writeValue(fos, json);
                         writeGenes (id, dc.genes);
+                        writePhenotypes (id, dc.phenotypes);
                     }
                     catch (IOException ex) {
                         ex.printStackTrace();
@@ -684,6 +685,43 @@ public class HoofBeats {
                         ps.println("        \"Gene_Identifier__c\": \""
                                    +syn+"\"");
                 }
+                ps.print("    }");
+            }
+            ps.println("]");
+            ps.println("}");
+        }
+    }
+
+    void writePhenotypes (String id, Entity[] phenotypes) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream (id+"_phenotypes.json")) {
+            PrintStream ps = new PrintStream (fos);
+            ps.println("{");
+            ps.println("  \"allOrNone\": false,"); // ?
+            ps.println("  \"records\": [");
+            for (int i = 0; i < phenotypes.length; ++i) {
+                Entity e = phenotypes[i];
+                if (i > 0) {
+                    ps.println(",");
+                }
+                
+                ps.println("    {");
+                ps.println("        \"attributes\": {");
+                ps.println("            \"type\": \"Feature__c\"");
+                ps.println("         },");
+                ps.println("        \"Name\": \""
+                           +getString (e.payload("notation"))+"\",");
+                ps.println("        \"HPO_Name__c\": \""
+                           +getString (e.payload("label"))+"\",");
+                ps.println("        \"HPO_Synonym__c\": \""
+                           +getString (e.payload("hasExactSynonym"))+"\",");
+                ps.println("        \"HPO_Category__c\": \""
+                           +getHpCategory (id)+"\",");
+                ps.println("        \"HPO_Description__c\": \""+
+                           getString (e.payload("IAO_0000115"))+"\",");
+                ps.println("        \"HPO_Feature_URL__c\": \""
+                           +"https://hpo.jax.org/app/browse/term/"+id+"\",");
+                ps.println("        \"External_ID__c\": \""
+                           +getString (e.payload("hasDbXref"))+"\"");
                 ps.print("    }");
             }
             ps.println("]");

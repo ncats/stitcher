@@ -142,15 +142,9 @@ public class TestStitcher {
                 Entity e = reg.register(dmap);
                 if (e != null && dmap.containsKey("ActiveMoieties")) {
                     Object am = dmap.get("ActiveMoieties");
-                    Set<String> uniis = new HashSet<>();
-                    if (am.getClass().isArray()) {
-                        for (int k = 0; k < Array.getLength(am); ++k)
-                            uniis.add((String) Array.get(am, k));
-                    }
-                    else {
-                        uniis.add((String)am);
-                    }
-                    activeMoieties.put(e, uniis.toArray(new String[0]));
+                    activeMoieties.put
+                        (e, Arrays.stream(Util.toArray(am))
+                         .map(v -> v.toString()).toArray(String[]::new));
                 }
             }
 
@@ -161,10 +155,10 @@ public class TestStitcher {
                     for (Iterator<Entity> iter = reg.find(I_UNII, u);
                          iter.hasNext(); ++cnt) {
                         Entity e = iter.next();
-                        if (!ent.equals(e))
+                        if (!ent.equals(e)) {
                             ent.stitch(e, R_activeMoiety, u);
+                        }
                     }
-
                     assertTrue ("Active moiety "+u+" not found!", cnt > 0);
                 }
             }
@@ -305,7 +299,7 @@ public class TestStitcher {
              EntityRegistry.class.getResourceAsStream("/OZAGREL1.json"),
              EntityRegistry.class.getResourceAsStream("/OZAGREL2.json"));
     }
-
+    */
     @Test
     public void testStitch04 () throws Exception {
         logger.info("##################################### "
@@ -317,16 +311,16 @@ public class TestStitcher {
             (name.getMethodName(), new int[]{10,6,6}, null,
              EntityRegistry.class.getResourceAsStream("/1020343.json"));
     }
-
+    /*
     @Test
     public void testStitch05 () throws Exception {
         logger.info("##################################### "
                     +name.getMethodName());
-        //12 [10,13,15,28,44,66,74,76,82,84,88,92]
+        //10 [13,15,28,44,66,74,76,84,88,92]
+        //6 [10,52,64,82,86,96]
         //5 [1,5,68,72,94]
         //4 [21,42,80,100]
         //4 [34,36,78,102]
-        //4 [52,64,86,96]
         //3 [8,70,106]
         //3 [40,46,108]
         //3 [48,50,90]
@@ -338,11 +332,11 @@ public class TestStitcher {
         //2 [30,32]
         //1 [62]
         testMergedStitches
-            (name.getMethodName(), new int[]{12, 5, 4, 4, 4, 3, 3,
+            (name.getMethodName(), new int[]{10, 6, 5, 4, 4, 3, 3,
                                              3, 3, 3, 2, 2, 2, 2, 1}, null,
              EntityRegistry.class.getResourceAsStream("/heparin.json"));
     }
-    */
+
     @Test
     public void testStitch06 () throws Exception {
         logger.info("##################################### "
@@ -360,7 +354,7 @@ public class TestStitcher {
             (name.getMethodName(), new int[]{14, 12, 7, 3, 3, 2, 2, 2, 2}, null,
              EntityRegistry.class.getResourceAsStream("/2991.json"));
     }
-    /*
+
     @Test
     public void testStitch07 () throws Exception {
         logger.info("##################################### "

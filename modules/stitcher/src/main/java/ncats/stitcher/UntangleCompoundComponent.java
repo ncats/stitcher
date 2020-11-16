@@ -395,7 +395,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         for (Object v : values.values())
             for (Object x : Util.toArray(v))
                 cnt += x.toString().length();
-        return (maxp.getAsInt() << 24) | (cnt << 16) | (clique.size() & 0xffff);
+        return (maxp.getAsInt() << 24)|((cnt & 0xff)<<16)|(clique.size() & 0xffff);
     }
 
     public UntangleCompoundComponent (DataSource dsource,
