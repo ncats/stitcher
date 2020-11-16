@@ -107,24 +107,28 @@ public class TestRegistry extends EntityRegistry {
             
         for (Map.Entry<Object, Object> me : activeMoieties.entrySet()) {
             Entity child = entities.get(me.getKey());
-            Object am = me.getValue();
-            if (am.getClass().isArray()) {
-                int len = Array.getLength(am);
-                for (int i = 0; i < len; ++i) {
-                    Object v = Array.get(am, i);
-                    Entity parent = entities.get(v);
-                    if (parent == null) {
-                        logger.warning("Can't lookup parent entity: "+v);
+            List<Entity> targets = new ArrayList<>();
+            boolean reversed = false;
+            for (Object v : Util.toArray(me.getValue())) {
+                Entity parent = entities.get(v);
+                if (parent == null) {
+                    logger.warning("Can't lookup parent entity: "+v);
+                }
+                else if (!child.equals(parent)) {
+                    if (!reversed) {
+                        Object moieties = parent.get("moieties");
+                        reversed = moieties != null
+                            && moieties.getClass().isArray();
                     }
-                    else if (!child.equals(parent))
-                        child.stitch(parent, R_activeMoiety, v);
+                    targets.add(parent);
                 }
             }
-            else {
-                Entity parent = entities.get(am);
-                if (!child.equals(parent))
-                    child.stitch(parent, R_activeMoiety, am);
-            }
+            if (reversed)
+                for (Entity t : targets)
+                    t.stitch(child, R_activeMoiety, "");
+            else
+                for (Entity t : targets)
+                    child.stitch(t, R_activeMoiety, "");
         }
     }
 
