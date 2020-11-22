@@ -2023,12 +2023,14 @@ public class EntityFactory implements Props, AutoCloseable {
         return iterator;
     }
 
-    public Entity[] filter (String key, Object value, int skip, int top, String... labels) {
+    public Entity[] filter (String key, Object value,
+                            int skip, int top, String... labels) {
         return filter (key, value, skip, top, Arrays.stream(labels)
                        .map(l -> Label.label(l)).toArray(Label[]::new));
     }
 
-    public Entity[] filter (String key, Object value, int skip, int top, Label... labels, ) {
+    public Entity[] filter (String key, Object value,
+                            int skip, int top, Label... labels) {
         if (key == null)
             throw new IllegalArgumentException
                 ("Can't filter with key is null!");
