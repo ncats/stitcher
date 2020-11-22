@@ -395,7 +395,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         for (Object v : values.values())
             for (Object x : Util.toArray(v))
                 cnt += x.toString().length();
-        return (maxp.getAsInt() << 24)|((cnt & 0xff)<<16)|(clique.size() & 0xffff);
+        return (maxp.getAsInt() << 24)|((cnt & 0xff)<<16)
+            |(0xffff - (clique.size() & 0xffff)); // prefer compact clique
     }
 
     public UntangleCompoundComponent (DataSource dsource,
@@ -466,29 +467,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         component.stitches((source, target) -> {
                 //Entity[] out = source.outNeighbors(R_activeMoiety);
                 Object moietyKeys = source.keys().get(R_activeMoiety);
-                Set uniis = new HashSet ();
-                if (moietyKeys.getClass().isArray()) {
-                    for (int i = 0; i < Array.getLength(moietyKeys); ++i)
-                        uniis.add(Array.get(moietyKeys, i));
-
-                    // prodrugs sometimes has 2 active moieties, ignore self one e.g. 54K37P50KH
-                    /*
-                    Object unii = source.get(I_UNII);
-                    if (unii.getClass().isArray()) {
-                        if (Array.getLength(unii) > 1) {
-                            unii = null;
-                        }
-                        else {
-                            unii = Array.get(unii, 0);
-                        }
-                    }
-                    uniis.remove(unii);
-                    */
-                }
-                // activeMoiety is a UNII.. what else can it be if not unii?
-                else if (moietyKeys != null && ((String)moietyKeys).length() == 10) 
-                    uniis.add(moietyKeys);
-                
+                Set uniis = Util.toSet(moietyKeys);
                 int uniiCount = uniis.size();
                 Entity[] in = target.inNeighbors(R_activeMoiety);
                 //logger.info(" ("+out.length+") "+source.getId()
@@ -496,12 +475,10 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                             +" -> "+target.getId()+" ["
                             +isRoot (target)+"] ("+in.length+")");
                 
-                //if (out.length == 1) {
                 if (uniiCount == 1) {
                     // first collapse single/terminal active moieties
                     uf.union(target.getId(), source.getId());
                 }
-                //else if (out.length > 1) {
                 else if (uniiCount > 1) {
                     unsure.add(source);
                 }
@@ -531,7 +508,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 }
             }, R_activeMoiety);
         //dumpActiveMoieties ();
-        dump ("##### active moiety stitching");
+        dump ("##### ACTIVE MOIETY");
 
         if(false){
         // collapse based on trusted stitch keys; e.g., unii
@@ -802,10 +779,10 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 dsets.add(dc);
         }
 
-        Map<Long, Set<StitchKey>> maps = new TreeMap<>();        
+        Map<Long, Set<StitchKey>> conflicts = new TreeMap<>();        
         if (dsets.isEmpty()) {
             logger.warning("**** no disjoint cliques found!");
-            return maps;
+            return conflicts;
         }
         
         Collections.sort(dsets, (a, b) -> {
@@ -868,11 +845,11 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                         // capture the stitch keys and their values
                         // and mark them as suspect for these nodes!
                         for (Long n : e.getValue()) {
-                            Set<StitchKey> pkeys = maps.get(n);
+                            Set<StitchKey> pkeys = conflicts.get(n);
                             if (pkeys != null)
                                 pkeys.addAll(keys);
                             else
-                                maps.put(n, new TreeSet<>(keys));
+                                conflicts.put(n, new TreeSet<>(keys));
                         }
                     }
                 }
@@ -884,11 +861,11 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                     // all members of this clique is suspect
                     logger.warning("...flagging clique as suspect "+c);
                     for (Long n : c.nodeSet()) {
-                        Set<StitchKey> pkeys = maps.get(n);
+                        Set<StitchKey> pkeys = conflicts.get(n);
                         if (pkeys != null)
                             pkeys.addAll(keys);
                         else
-                            maps.put(n, new TreeSet<>(keys));
+                            conflicts.put(n, new TreeSet<>(keys));
                     }
                 }
             }
@@ -897,23 +874,30 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         // do another pass and perform transitive closure on nodes
         // that aren't suspect
         logger.info("######## NOW MERGING ENTITIES IN DISJOINT CLIQUES #######"
-                    +"\n::: SUSPECT NODES: "+maps);
+                    +"\n::: SUSPECT NODES: "+conflicts);
         for (Map.Entry me : cliques) {
             Clique c = (Clique)me.getKey();
             List<Entity> valid = new ArrayList<>();
             for (Entity e : c.entities()) {
-                if (!maps.containsKey(e.getId())
-                    // a node is not suspect if it's already assigned
-                    || assigned (e.getId())
+                Set<StitchKey> conkeys = conflicts.get(e.getId());
+                /*
+                logger.info("^^^^ "+e.getId()+" ("
+                            +getEqvClass (e.getId())+") stitch keys="
+                            +priorities.get(e.getId()));
+                */
+                if (conkeys == null
+                    // a node is not suspect if it's already assigned and for
+                    //  which the conflict stitchkeys is not greater than 1 
+                    || (assigned (e.getId()) && conkeys.size() < 2)
                     // or its stitchkey span has highest priority for this node
-                    || c.subordinate(priorities.get(e.getId())
-                                     .toArray(new StitchKey[0]))
+                    || c.inf(priorities.get
+                             (e.getId()).toArray(new StitchKey[0]))
                     ) {
                     valid.add(e);
                 }
             }
             
-            if (!valid.isEmpty()) {
+            if (valid.size() > 1) {
                 Util.dump(c, " merge subset "+new TreeSet<>
                           (valid.stream().mapToLong(e -> e.getId()).boxed()
                            .collect(Collectors.toSet()))+" "+me.getValue());
@@ -924,16 +908,19 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                         ("Can't merge subset; marking each entity as suspect: "
                          +keys);
                     for (Entity e : valid) {
-                        Set<StitchKey> pkeys = maps.get(e.getId());
+                        Set<StitchKey> pkeys = conflicts.get(e.getId());
                         if (pkeys != null)
                             pkeys.addAll(keys);
                         else
-                            maps.put(e.getId(), new TreeSet<>(keys));
+                            conflicts.put(e.getId(), new TreeSet<>(keys));
                     }
                 }
             }
+            else {
+                Util.dump(c, " not sufficient members: "+valid);
+            }
         }
-        return maps;
+        return conflicts;
     }
 
     void mergeSingletons (Collection<Entity> singletons, StitchKey... span) {

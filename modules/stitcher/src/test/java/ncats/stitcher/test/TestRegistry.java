@@ -107,7 +107,7 @@ public class TestRegistry extends EntityRegistry {
             
         for (Map.Entry<Object, Object> me : activeMoieties.entrySet()) {
             Entity child = entities.get(me.getKey());
-            List<Entity> targets = new ArrayList<>();
+            Map<String, Entity> targets = new HashMap<>();
             boolean reversed = false;
             for (Object v : Util.toArray(me.getValue())) {
                 Entity parent = entities.get(v);
@@ -120,15 +120,15 @@ public class TestRegistry extends EntityRegistry {
                         reversed = moieties != null
                             && moieties.getClass().isArray();
                     }
-                    targets.add(parent);
+                    targets.put(v.toString(), parent);
                 }
             }
             if (reversed)
-                for (Entity t : targets)
-                    t.stitch(child, R_activeMoiety, "");
+                for (Map.Entry<String, Entity> t : targets.entrySet())
+                    t.getValue().stitch(child, R_activeMoiety, t.getKey());
             else
-                for (Entity t : targets)
-                    child.stitch(t, R_activeMoiety, "");
+                for (Map.Entry<String, Entity> t : targets.entrySet())
+                    child.stitch(t.getValue(), R_activeMoiety, t.getKey());
         }
     }
 
