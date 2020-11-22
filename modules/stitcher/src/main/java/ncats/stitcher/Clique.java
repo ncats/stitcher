@@ -31,7 +31,7 @@ public interface Clique extends Component {
         return wt*size();
     }
 
-    default boolean subordinate (StitchKey... _keys) {
+    default boolean inf (StitchKey... _keys) {
         StitchKey[] keys = values().keySet().toArray(new StitchKey[0]);
         Arrays.sort(keys, (a, b) -> b.priority - a.priority);
         Arrays.sort(_keys, (a, b) -> b.priority - a.priority);

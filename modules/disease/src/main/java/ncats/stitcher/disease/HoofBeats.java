@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class HoofBeats {
     static final Logger logger = Logger.getLogger(HoofBeats.class.getName());
+    static final int BATCH_SIZE = 10;
 
     static class Source implements Comparable {
         final String name;
@@ -96,10 +97,12 @@ public class HoofBeats {
     }
 
     static final String HP_CATEGORY_FMT = "match (d:DATA)-->(n:S_HP)-"
-        +"[e:R_subClassOf*0..]->(m:S_HP)-[:R_subClassOf]->(:S_HP)--(z:DATA) "
+        +"[e:R_subClassOf*0..10]->(m:S_HP)-[:R_subClassOf]->(:S_HP)--(z:DATA) "
         +"where d.notation='%1$s' and all(x in e where x.source=n.source or "
         +"n.source in x.source) and z.notation='HP:0000118' with m match "
         +"p=(m)<--(d:DATA) return d.label as label limit 1";
+
+    static final String HP_CATEGORY_NONE = "";
     
     // lookup of GR short id to book id
     static final Map<String, String> GENEREVIEWS = new HashMap<>();
@@ -125,6 +128,37 @@ public class HoofBeats {
         return null;
     }
 
+    static String escape (String s) {
+        StringBuilder sb = new StringBuilder ();
+        s = s.trim();
+        for (int i = 0; i < s.length(); ++i) {
+            char ch = s.charAt(i);
+            switch (ch) {
+            case '\n':
+                sb.append("\\n");
+                break;
+            case '\b':
+                sb.append("\\b");
+                break;
+            case '\f':
+                sb.append("\\f");
+                break;
+            case '\r':
+                sb.append("\\r");
+                break;
+            case '\t':
+                sb.append("\\t");
+                break;
+            case '"':
+                sb.append("\\");
+                // fall thru
+            default:
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
+    
     static String getString (Object value) {
         if (value != null) {
             if (value.getClass().isArray()) {
@@ -133,7 +167,7 @@ public class HoofBeats {
                     sb.append("; "+Array.get(value, i));
                 value = sb.toString();
             }
-            return (String)value;
+            return escape (value.toString());
         }
         return "";
     }
@@ -352,7 +386,8 @@ public class HoofBeats {
                     e.data(props -> {
                             ObjectNode n = newJsonObject ();
                             n.put("class", (String)props.get("PrevalenceClass"));
-                            n.put("geographic", (String)props.get("PrevalenceGeographic"));
+                            n.put("geographic",
+                                  (String)props.get("PrevalenceGeographic"));
                             n.put("qualification",
                                   (String)props.get("PrevalenceQualification"));
                             n.put("type", (String)props.get("PrevalenceType"));
@@ -428,7 +463,14 @@ public class HoofBeats {
                                 String hpid = (String) xe.payload("notation");
                                 node.put("curie", hpid);
                                 String cat = getHpCategory (hpid);
-                                node.put("category", cat != null ? cat : "");
+                                if (cat == HP_CATEGORY_NONE) {
+                                    logger.warning(e.payload("gard_id")+" -> "
+                                                   +hpid+" ("
+                                                   +xe.payload("label")
+                                                   +") has no category!");
+                                }
+                                node.put("category", cat);
+                                
                                 node.put("label", getString (xe.payload("label")));
                                 node.put("synonym",
                                          getString (xe.payload("hasExactSynonym")));
@@ -471,8 +513,10 @@ public class HoofBeats {
                                 String bookid = GENEREVIEWS.get(gr);
                                 if (bookid != null) {
                                     ObjectNode node = newJsonObject ();
-                                    node.put("label", getString (xe.payload("title")));
-                                    node.put("genes", toJsonArray (xe.payload("genes")));
+                                    node.put("label",
+                                             getString (xe.payload("title")));
+                                    node.put("genes",
+                                             toJsonArray (xe.payload("genes")));
                                     node.put("url", "https://www.ncbi.nlm.nih.gov/books/"
                                              +bookid);
                                     node.put("type", "Systematic Review");
@@ -512,10 +556,11 @@ public class HoofBeats {
                     return false;
                 }, String.format(HP_CATEGORY_FMT, id));
                 
-            if (sb.length() > 0) {
+            if (sb.length() > 0)
                 cat = sb.toString();
-                hpCategories.put(id, cat);
-            }
+            else
+                cat = HP_CATEGORY_NONE;
+            hpCategories.put(id, cat);
         }
         return cat;
     }
@@ -606,11 +651,29 @@ public class HoofBeats {
         logger.info("**** "+components.length+" components!");
     }
 
-    public int writeJson (String outfile) throws IOException {
-        return writeJson (new FileOutputStream (outfile));
+    public int writeJson (String base) throws IOException {
+        try (PrintStream diseases = new PrintStream (new FileOutputStream
+                                                     (base+"_diseases.json"));
+             PrintStream genes = new PrintStream (new FileOutputStream
+                                                  (base+"_genes.json"));
+             PrintStream phenotypes = new PrintStream (new FileOutputStream
+                                                       (base+"_phenotypes.json"))) {
+            return writeJson (diseases, genes, phenotypes);
+        }
+    }
+
+    void sfJsonHeader (PrintStream ps) {
+        ps.println("{");
+        ps.println("  \"allOrNone\": false,"); // ?
+        ps.println("  \"records\": [");
+    }
+
+    void sfJsonFooter (PrintStream ps) {
+        ps.println("}");
     }
     
-    public int writeJson (OutputStream os) throws IOException {
+    public int writeJson (PrintStream dps, PrintStream gps, PrintStream pps)
+        throws IOException {
         ef.stitches((source, target, values) -> {
                 /*
                 logger.info(source.getId()+": "+source.labels()
@@ -620,20 +683,26 @@ public class HoofBeats {
                 uf.union(source.getId(), target.getId());
             }, R_exactMatch, R_equivalentClass);
 
-        int count = 0;        
-        PrintStream ps = new PrintStream (os);
-        ps.print("[");
+        int count = 0;
+        Random rand = new Random ();
+        Set<Long> genes = new HashSet<>();
+        Set<Long> phenotypes = new HashSet<>();
+        
+        dps.println("[");
+        gps.print("[");
+        pps.print("[");
         ObjectMapper mapper = new ObjectMapper ();            
         ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+        
         long[][] components = uf.components();
-        Random rand = new Random ();
+        logger.info("###### "+components.length+" components! ########");
         for (long[] comp : components) {
             DiseaseComponent dc = new DiseaseComponent (comp);
             JsonNode json = dc.toJson();
             if (json != null) {
-                if (count > 0) ps.print(",");
+                if (count > 0) dps.print(",");
                 String jstr = writer.writeValueAsString(json);
-                ps.print(jstr);
+                dps.print(jstr);
                 if (count < 10 && rand.nextFloat() > 0.5f) {
                     String id = json.get("term").get("curie")
                         .asText().replaceAll(":", "_");
@@ -649,9 +718,47 @@ public class HoofBeats {
                     ++count;
                 }
             }
+
+            if (dc.genes != null) {
+                for (Entity e : dc.genes) {
+                    if (!genes.contains(e.getId())) {
+                        if (genes.size() % BATCH_SIZE != 0) 
+                            gps.println(",");
+                        else {
+                            if (!genes.isEmpty())
+                                gps.println("]\n},");
+                            sfJsonHeader (gps);
+                        }
+                        writeGene (gps, e);
+                        genes.add(e.getId());
+                    }
+                }
+            }
+            
+            if (dc.phenotypes != null) {
+                for (Entity e : dc.phenotypes) {
+                    if (!phenotypes.contains(e.getId())) {
+                        if (phenotypes.size() % BATCH_SIZE != 0)
+                            pps.println(",");
+                        else {
+                            if (!phenotypes.isEmpty())
+                                pps.println("]\n},");
+                            sfJsonHeader (pps);
+                        }
+                        writePhenotype (pps, e);
+                        phenotypes.add(e.getId());
+                    }
+                }
+            }
         }
-        if (count > 0)
-            ps.println("]");
+        dps.println("]");
+        gps.println("]\n}]");
+        pps.println("]\n}]");
+
+        logger.info("######## "+components.length+" diseases!");
+        logger.info("######## "+genes.size()+" genes!");
+        logger.info("######## "+phenotypes.size()+" phenotypes!");
+        
         return count;
     }
 
@@ -666,30 +773,51 @@ public class HoofBeats {
                 if (i > 0) {
                     ps.println(",");
                 }
-                
-                ps.println("    {");
-                ps.println("        \"attributes\": {");
-                ps.println("            \"type\": \"Gene__c\"");
-                ps.println("         },");
-                ps.println("        \"Name\": \""
-                           +getString (e.payload("symbol"))+"\",");
-                ps.println("        \"Gene_Name__c\": \""
-                           +getString (e.payload("label"))+"\",");
-                ps.println("        \"GHR_URL__c\": \"\",");
-                ps.println("        \"Gene_Type__c\": \"\",");
-                ps.println("        \"Chromosome_Location__c\": \"\",");
-                Object[] xrefs = Util.toArray(e.payload("hasDbXref"));
-                for (Object ref : xrefs) {
-                    String syn = (String)ref;
-                    if (syn.startsWith("HGNC:"))
-                        ps.println("        \"Gene_Identifier__c\": \""
-                                   +syn+"\"");
-                }
-                ps.print("    }");
+                writeGene (ps, e);
             }
             ps.println("]");
             ps.println("}");
         }
+    }
+
+    void writeGene (PrintStream ps, Entity e) {
+        ps.println("    {");
+        ps.println("        \"attributes\": {");
+        ps.println("            \"type\": \"Gene__c\"");
+        ps.println("         },");
+        ps.println("        \"Name\": \""
+                   +getString (e.payload("symbol"))+"\",");
+        ps.println("        \"Gene_Name__c\": \""
+                   +getString (e.payload("label"))+"\",");
+        ps.println("        \"GHR_URL__c\": \"\",");
+        StringBuilder type = new StringBuilder ();
+        StringBuilder locus = new StringBuilder ();
+        e.neighbors((id, xe, key, reversed, props) -> {
+                if ("hasDbXref".equals(props.get("name"))
+                    && props.get("value").toString().startsWith("HGNC:")
+                    && xe.is("S_OGG")) {
+                    locus.append(getString (xe.payload("OGG_0000000008")));
+                    type.append(getString (xe.payload("OGG_0000000018")));
+                }
+                return true;
+            }, I_CODE);
+        ps.println("        \"Gene_Type__c\": \""+type+"\",");        
+        ps.println("        \"Chromosome_Location__c\": \""+locus+"\",");
+        Object[] xrefs = Util.toArray(e.payload("hasDbXref"));
+        boolean hasId = false;
+        for (Object ref : xrefs) {
+            String syn = (String)ref;
+            if (syn.startsWith("HGNC:")) {
+                ps.println("        \"Gene_Identifier__c\": \""
+                           +syn+"\"");
+                hasId = true;
+            }
+        }
+        if (!hasId) {
+            ps.println("        \"Gene_Identifier__c\": \""
+                       +getString(e.payload("notation"))+"\"");
+        }
+        ps.print("    }");
     }
 
     void writePhenotypes (String id, Entity[] phenotypes) throws IOException {
@@ -703,30 +831,37 @@ public class HoofBeats {
                 if (i > 0) {
                     ps.println(",");
                 }
-                
-                ps.println("    {");
-                ps.println("        \"attributes\": {");
-                ps.println("            \"type\": \"Feature__c\"");
-                ps.println("         },");
-                ps.println("        \"Name\": \""
-                           +getString (e.payload("notation"))+"\",");
-                ps.println("        \"HPO_Name__c\": \""
-                           +getString (e.payload("label"))+"\",");
-                ps.println("        \"HPO_Synonym__c\": \""
-                           +getString (e.payload("hasExactSynonym"))+"\",");
-                ps.println("        \"HPO_Category__c\": \""
-                           +getHpCategory (id)+"\",");
-                ps.println("        \"HPO_Description__c\": \""+
-                           getString (e.payload("IAO_0000115"))+"\",");
-                ps.println("        \"HPO_Feature_URL__c\": \""
-                           +"https://hpo.jax.org/app/browse/term/"+id+"\",");
-                ps.println("        \"External_ID__c\": \""
-                           +getString (e.payload("hasDbXref"))+"\"");
-                ps.print("    }");
+                writePhenotype (ps, e);
             }
             ps.println("]");
             ps.println("}");
         }
+    }
+
+    void writePhenotype (PrintStream ps, Entity e) {
+        ps.println("    {");
+        ps.println("        \"attributes\": {");
+        ps.println("            \"type\": \"Feature__c\"");
+        ps.println("         },");
+        ps.println("        \"Name\": \""
+                   +getString (e.payload("notation"))+"\",");
+        ps.println("        \"HPO_Name__c\": \""
+                   +getString (e.payload("label"))+"\",");
+        ps.println("        \"HPO_Synonym__c\": \""
+                   +getString (e.payload("hasExactSynonym"))+"\",");
+        String hpid = (String) e.payload("notation");
+        String cat = getHpCategory (hpid);
+        if (cat == HP_CATEGORY_NONE) {
+            logger.warning(hpid+": can't find phenotype category!");
+        }
+        ps.println("        \"HPO_Category__c\": \""+cat+"\",");
+        ps.println("        \"HPO_Description__c\": \""+
+                   getString (e.payload("IAO_0000115"))+"\",");
+        ps.println("        \"HPO_Feature_URL__c\": \""
+                   +"https://hpo.jax.org/app/browse/term/"+hpid+"\",");
+        ps.println("        \"External_ID__c\": \""
+                   +getString (e.payload("notation"))+"\"");
+        ps.print("    }");
     }
 
     public void untangle (EntityFactory ef, BiConsumer<Long, long[]> consumer) {
@@ -759,7 +894,11 @@ public class HoofBeats {
         try (EntityFactory ef = new EntityFactory (argv[0])) {
             HoofBeats hb = new HoofBeats (ef, version);
             //hb.beats("zebra_beats.txt");
-            hb.writeJson("hoofbeats.json");
+            int pos = argv[0].indexOf('.');
+            if (pos < 0)
+                pos = argv[0].length();
+            String base = argv[0].substring(0, pos);
+            hb.writeJson(base);
         }
     }
 }
