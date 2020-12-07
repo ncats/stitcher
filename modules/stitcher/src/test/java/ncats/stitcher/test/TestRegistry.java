@@ -118,7 +118,8 @@ public class TestRegistry extends EntityRegistry {
                     if (!reversed) {
                         Object moieties = parent.get("moieties");
                         reversed = moieties != null
-                            && moieties.getClass().isArray();
+                            && moieties.getClass().isArray()
+                            && Array.getLength(moieties) > 1;
                     }
                     targets.put(v.toString(), parent);
                 }

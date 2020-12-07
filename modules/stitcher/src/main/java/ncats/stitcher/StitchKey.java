@@ -43,7 +43,7 @@ public enum StitchKey implements RelationshipType {
     H_LyChI_L2(1), // LyChI layer 2
     H_LyChI_L3(1), // LyChI layer 3
     H_LyChI_L4(3), // LyChI layer 4
-    H_LyChI_L5(3), // LyChI layer 4 with salt + solvent
+    H_LyChI_L5(4), // LyChI layer 4 with salt + solvent
 
     /*
      * Generic hash

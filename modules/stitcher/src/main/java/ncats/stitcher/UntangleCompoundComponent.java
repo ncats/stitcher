@@ -547,7 +547,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         
         Map<Long, Set<StitchKey>> suspects = 
             mergeMaximumDisjointCliques (I_UNII, N_Name, I_CAS, I_DB,
-                                         I_ChEMBL, I_CID, I_SID, H_LyChI_L4);
+                                         I_ChEMBL, I_CID, I_SID,
+                                         H_LyChI_L4, H_LyChI_L5);
         dump ("##### MAXIMUM DISJOINT CLIQUES");
         
         //mergeCliqueComponents (H_LyChI_L3);
@@ -581,7 +582,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 */
                 else {
                     logger.warning("** unmapped entity "+e.getId()+": "
-                                   +e.keys());
+                                   +Util.toString(e.keys()));
                     singletons.add(e);
                 }
                 ++processed;
@@ -713,21 +714,33 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                             // only consider this if there are missing
                             // stereocenters
                             boolean cont = true;
-                            if (key == H_LyChI_L3) {
-                                int undef = 0;
-                                for (Entity e : clique) {
-                                    Molecule mol = e.mol();
-                                    if (mol != null) {
-                                        Map props = Util.calcMolProps(mol);
-                                        Integer cnt = (Integer)props
-                                            .get("undefinedStereo");
-                                        if (cnt > 0) ++undef; 
+                            switch (key) {
+                            case H_LyChI_L3:
+                                { int undef = 0;
+                                    for (Entity e : clique) {
+                                        Molecule mol = e.mol();
+                                        if (mol != null) {
+                                            Map props = Util.calcMolProps(mol);
+                                            Integer cnt = (Integer)props
+                                                .get("undefinedStereo");
+                                            if (cnt > 0) ++undef; 
+                                        }
                                     }
+                                    
+                                    logger.info("$$$$ entities with undefined "
+                                                +"stereocenters: "+undef);
+                                    cont = undef > 0;
                                 }
-                                
-                                logger.info("$$$$ entities with undefined "
-                                            +"stereocenters: "+undef);
-                                cont = undef > 0;
+                                // fall through
+                            case H_LyChI_L4:
+                            case H_LyChI_L5:
+                                { String hval = value.toString();
+                                    // don't consider salt and/or metal
+                                    if (hval.endsWith("-S")
+                                        || hval.endsWith("-M"))
+                                        cont = false;
+                                }
+                                break;
                             }
                             
                             if (cont) {
@@ -767,16 +780,28 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         }
         
         List<DisjointCliques> dsets = new ArrayList<>();
-        for (int i = 0; i < cliques.length; ++i) {
-            DisjointCliques dc = new DisjointCliques ();
-            dc.add((Clique)cliques[i].getKey());
-            for (int j = i+1; j < cliques.length; ++j) {
-                Clique cj = (Clique)cliques[j].getKey();
-                if (!dc.overlaps(cj))
-                    dc.add(cj);
+        if (false) {
+            for (int i = 0; i < cliques.length; ++i) {
+                DisjointCliques dc = new DisjointCliques ();
+                dc.add((Clique)cliques[i].getKey());
+                for (int j = i+1; j < cliques.length; ++j) {
+                    Clique cj = (Clique)cliques[j].getKey();
+                    if (!dc.overlaps(cj))
+                        dc.add(cj);
+                }
+                if (dc.size() > 0)
+                    dsets.add(dc);
             }
-            if (dc.size() > 0)
-                dsets.add(dc);
+        }
+        else {
+            DisjointCliques dc = new DisjointCliques ();
+            dc.add((Clique)cliques[0].getKey());
+            for (int i = 1; i < cliques.length; ++i) {
+                Clique c = (Clique)cliques[i].getKey();
+                if (!dc.overlaps(c))
+                    dc.add(c);
+            }
+            dsets.add(dc);
         }
 
         Map<Long, Set<StitchKey>> conflicts = new TreeMap<>();        
@@ -877,23 +902,32 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                     +"\n::: SUSPECT NODES: "+conflicts);
         for (Map.Entry me : cliques) {
             Clique c = (Clique)me.getKey();
+            Set<Entity> maxsup = c.maximalSupport();
+            
+            logger.info(":::::: "+c.getId()+" :::::::");
             List<Entity> valid = new ArrayList<>();
             for (Entity e : c.entities()) {
                 Set<StitchKey> conkeys = conflicts.get(e.getId());
-                /*
-                logger.info("^^^^ "+e.getId()+" ("
-                            +getEqvClass (e.getId())+") stitch keys="
-                            +priorities.get(e.getId()));
-                */
                 if (conkeys == null
-                    // a node is not suspect if it's already assigned and for
-                    //  which the conflict stitchkeys is not greater than 1 
-                    || (assigned (e.getId()) && conkeys.size() < 2)
+                    /*
+                     * a node is not suspect if it's already assigned and for
+                     * which the conflict stitchkeys is not greater than 1
+                     * and that it's maximal support (see definition for what
+                     * this means in the Clique definition
+                     */ 
+                    || (assigned (e)
+                        && conkeys.size() < 2 && maxsup.contains(e))
                     // or its stitchkey span has highest priority for this node
                     || c.inf(priorities.get
                              (e.getId()).toArray(new StitchKey[0]))
                     ) {
                     valid.add(e);
+                }
+                else {
+                    logger.warning("^^^^ "+e.getId()+" ("
+                                   +getEqvClass (e.getId())+") stitch keys="
+                                   +priorities.get(e.getId())+" conflicts="
+                                   +conkeys+" maxsup="+maxsup.contains(e));
                 }
             }
             
@@ -917,7 +951,9 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                 }
             }
             else {
-                Util.dump(c, " not sufficient members: "+valid);
+                Util.dump(c, " not sufficient members: "
+                          +valid.stream().mapToLong(e -> e.getId()).boxed()
+                          .collect(Collectors.toSet()));
             }
         }
         return conflicts;
@@ -964,7 +1000,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             }
 
             if (!merged) {
-                logger.info("**** singleton entity "+e.getId()+": "+e.keys());
+                logger.info("**** singleton entity "+e.getId()+": "
+                            +Util.toString(e.keys()));
                 uf.add(e.getId());
             }
         }

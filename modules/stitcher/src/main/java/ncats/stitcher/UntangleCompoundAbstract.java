@@ -161,6 +161,10 @@ public abstract class UntangleCompoundAbstract extends UntangleAbstract {
         return uf.contains(id);
     }
 
+    protected boolean assigned (Entity e) {
+        return uf.contains(e.getId());
+    }
+
     /*
      * TODO: find the root active moiety and if exists return it
      */

@@ -374,7 +374,15 @@ public class Util {
         }
         return array;
     }
-    
+
+    public static Stream<?> stream (Object value) {
+        return Arrays.stream(Util.toArray(value));
+    }
+
+    public static Object[] filter (Object value, Predicate pred) {
+        return stream(value).filter(pred).toArray();
+    }
+
     public static Object merge (Object... values) {
         Class type = null;
         for (Object val : values) {
