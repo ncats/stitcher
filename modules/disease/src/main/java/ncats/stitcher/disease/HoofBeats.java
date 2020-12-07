@@ -176,6 +176,156 @@ public class HoofBeats {
     final UnionFind uf = new UnionFind ();
     final ObjectMapper mapper = new ObjectMapper ();
     final Map<String, String> hpCategories = new HashMap<>();
+
+    class OrphanetGenes implements NeighborVisitor {
+        ArrayNode genes;
+        
+        OrphanetGenes (Entity... ents) {
+            if (ents.length > 0) {
+                genes = mapper.createArrayNode();
+                for (Entity e : ents) {
+                    e.neighbors(this, R_rel);
+                }
+            }
+        }
+
+        public boolean visit (long id, Entity xe, StitchKey key,
+                              boolean reversed, Map<String, Object> props) {
+            if (!reversed && xe.is("S_ORDO_ORPHANET")
+                && "disease_associated_with_gene".equals(props.get("name"))) {
+                ObjectNode node = newJsonObject ();
+                Object[] xrefs = Util.toArray(xe.payload("hasDbXref"));
+                for (Object ref : xrefs) {
+                    String syn = (String)ref;
+                    if (syn.startsWith("HGNC:"))
+                        node.put("curie", syn);
+                }
+
+                String orpha = getString (xe.payload("notation"));
+                if (!node.has("curie")) {
+                    logger.warning(orpha+": no HGNC found; attempting "
+                                   +"to find OGG neighbors...");
+                    ef.cypher(row -> {
+                            Optional<String> hgnc =
+                                Util.stream(row.get("xrefs"))
+                                .map(Object::toString)
+                                .filter(x -> x.startsWith("HGNC:"))
+                                .findFirst();
+                            if (hgnc.isPresent()) {
+                                node.put("curie", hgnc.get());
+                            }
+                            else {
+                                logger.warning
+                                    (orpha+": no OGG neighbors found!");
+                                node.put("curie", orpha);
+                            }
+                            return false;
+                        }, "match (d:DATA)-->(n:S_ORDO_ORPHANET)--(:S_OMIM:T028)-[e]-(:S_OGG)<--(z:DATA) where d.notation='"+orpha+"' with z, count(e) as cnt return z.hasDbXref as xrefs order by cnt desc limit 1");
+                }
+                node.put("source_curie", orpha);
+                node.put("source_label", getString (xe.payload("label")));
+                node.put("gene_symbol", getString (xe.payload("symbol")));
+                node.put("association_type",
+                         getString (props.get
+                                    ("DisorderGeneAssociationType")));
+                node.put("source_validation", getString
+                         (props.get
+                          ("DisorderGeneAssociationValidationStatus")));
+                node.put("gene_sfdc_id", "");
+                genes.add(node);
+            }
+            return true;
+        }
+    }
+
+    class OrphanetEpidemiology implements Consumer<Map<String, Object>> {
+        ArrayNode epi;
+        String notation;
+        
+        OrphanetEpidemiology (Entity... ents) {
+            if (ents.length > 0) {
+                epi = mapper.createArrayNode();
+                for (Entity e : ents) {
+                    notation = getString (e.payload("notation"));
+                    e.data(this, "PREVALENCE");
+                }
+            }
+        }
+
+        public void accept (Map<String, Object> props) {
+            ObjectNode n = newJsonObject ();
+            n.put("class", (String)props.get("PrevalenceClass"));
+            n.put("geographic", (String)props.get("PrevalenceGeographic"));
+            n.put("qualification",(String)props.get("PrevalenceQualification"));
+            n.put("type", (String)props.get("PrevalenceType"));
+            Object source = props.get("Source");
+            n.put("references", getString (source));
+            // orphanet number
+            n.put("source_curie", notation);
+            Object valmoy = props.get("ValMoy");
+            //n.put("valmoy", (Double)valmoy);
+            n.put("valmoy", valmoy != null ? valmoy.toString():"");
+            n.put("source_validation",
+                  (String)props.get("PrevalenceValidationStatus"));
+            epi.add(n);
+        }
+    }
+
+    class GARDPhenotypes implements NeighborVisitor {
+        ArrayNode phenotypes;
+        String gardId;
+        
+        GARDPhenotypes (Entity... ents) {
+            if (ents.length > 0) {
+                phenotypes = mapper.createArrayNode();
+                for (Entity e : ents) {
+                    gardId = getString (e.payload("gard_id"));
+                    e.neighbors(this, R_hasPhenotype);
+                }
+            }
+        }
+
+        public boolean visit (long id, Entity xe, StitchKey key,
+                              boolean reversed, Map<String, Object> props) {
+            if (!reversed && xe.is("S_HP")) {
+                ObjectNode node = newJsonObject ();
+                String hpid = (String) xe.payload("notation");
+                node.put("curie", hpid);
+                String cat = getHpCategory (hpid);
+                if (cat == HP_CATEGORY_NONE) {
+                    logger.warning(gardId+" -> " +hpid+" ("
+                                   +xe.payload("label")
+                                   +") has no category!");
+                }
+                node.put("category", cat);
+                                
+                node.put("label", getString (xe.payload("label")));
+                node.put("synonym",
+                         getString (xe.payload("hasExactSynonym")));
+                node.put("description",
+                         getString (xe.payload("IAO_0000115")));
+                String freq = getString (props.get("Frequency"));
+                if (freq.startsWith("HP:")) {
+                    for (Iterator<Entity> iter = ef.find("notation", freq);
+                         iter.hasNext(); ) {
+                        Entity e = iter.next();
+                        freq = getString (e.payload("label"));
+                    }
+                }
+                node.put("frequency", freq);
+                node.put("hpo_method",
+                         getString (props.get("Evidence")));
+                node.put("sex", getString (props.get("Sex")));
+                node.put("source_curie",
+                         getString (props.get("Reference")));
+                node.put("modifier",
+                         getString (props.get("Modifier")));
+                node.put("phenotype_sfdc_id", "");
+                phenotypes.add(node);
+            }
+            return true;
+        }
+    }
     
     class DiseaseComponent {
         final Component component;
@@ -228,12 +378,6 @@ public class HoofBeats {
 
         boolean has (String source) {
             return entities.containsKey(getSource (source));
-        }
-
-        ObjectNode newJsonObject () {
-            ObjectNode obj = mapper.createObjectNode();
-            obj.put("Id", "");
-            return obj;
         }
         
         JsonNode toJson () {
@@ -300,7 +444,12 @@ public class HoofBeats {
         }
 
         JsonNode doSynonyms () {
-            ArrayNode synonyms = mapper.createArrayNode();
+            ArrayNode synonyms = mapper.createArrayNode();            
+            for (Entity e : gard) {
+                ObjectNode syn = newJsonObject ();
+                syn.put("curie", getString (e.payload("gard_id")));
+                syn.put("label", getString (e.payload("name")));
+            }
             for (Source src : SOURCES) {
                 Entity[] ents = entities.get(src);
                 if (ents != null) {
@@ -341,16 +490,13 @@ public class HoofBeats {
                                     Consumer<JsonNode> consumer) {
             Entity[] ents = get("S_ORDO_ORPHANET");
             if (ents != null) {
-                Set<Entity> dups = new HashSet<>();
                 for (Entity e : ents) {
                     e.neighbors((id, xe, key, reversed, props) -> {
-                            if (!reversed && !dups.contains(xe)
-                                && xe.is("S_ORDO_ORPHANET")
+                            if (!reversed && xe.is("S_ORDO_ORPHANET")
                                 && relname.equals(props.get("name"))) {
                                 ObjectNode node = newJsonObject ();
                                 node.put("curie", getString (xe.payload("notation")));
                                 node.put("label", getString (xe.payload("label")));
-                                dups.add(xe);
                                 consumer.accept(node);
                             }
                             return true;
@@ -379,126 +525,16 @@ public class HoofBeats {
         }
 
         JsonNode doEpidemiology () {
-            ArrayNode epidemiology = mapper.createArrayNode();
-            Entity[] ents = get ("S_ORDO_ORPHANET");
-            if (ents != null) {
-                for (Entity e : ents) {
-                    e.data(props -> {
-                            ObjectNode n = newJsonObject ();
-                            n.put("class", (String)props.get("PrevalenceClass"));
-                            n.put("geographic",
-                                  (String)props.get("PrevalenceGeographic"));
-                            n.put("qualification",
-                                  (String)props.get("PrevalenceQualification"));
-                            n.put("type", (String)props.get("PrevalenceType"));
-                            Object source = props.get("Source");
-                            n.put("source_curie", getString (source));
-                            Object valmoy = props.get("ValMoy");
-                            //n.put("valmoy", (Double)valmoy);
-                            n.put("valmoy", valmoy != null ? valmoy.toString():"");
-                            n.put("source_validation",
-                                  (String)props.get("PrevalenceValidationStatus"));
-                            epidemiology.add(n);
-                        }, "PREVALENCE");
-                }
-            }
-            return epidemiology;
+            return new OrphanetEpidemiology(get ("S_ORDO_ORPHANET")).epi;
         }
 
         JsonNode doGenes () {
-            ArrayNode genes = mapper.createArrayNode();
-            Entity[] ents = get("S_ORDO_ORPHANET");
-            if (ents != null) {
-                Set<Entity> dups = new HashSet<>();
-                for (Entity e : ents) {
-                    e.neighbors((id, xe, key, reversed, props) -> {
-                            if (!reversed && !dups.contains(xe)
-                                && xe.is("S_ORDO_ORPHANET")
-                                && "disease_associated_with_gene"
-                                .equals(props.get("name"))) {
-                                ObjectNode node = newJsonObject ();
-                                Object[] xrefs =
-                                    Util.toArray(xe.payload("hasDbXref"));
-                                for (Object ref : xrefs) {
-                                    String syn = (String)ref;
-                                    if (syn.startsWith("HGNC:"))
-                                        node.put("curie", syn);
-                                }
-                                node.put("source_curie",
-                                         getString (xe.payload("notation")));
-                                node.put("source_label",
-                                         getString (xe.payload("label")));
-                                node.put("gene_symbol",
-                                         getString (xe.payload("symbol")));
-                                node.put("association_type",
-                                         getString (props.get
-                                                    ("DisorderGeneAssociationType")));
-                                node.put("source_validation", getString
-                                         (props.get
-                                          ("DisorderGeneAssociationValidationStatus")));
-                                node.put("gene_sfdc_id", "");
-                                dups.add(xe);
-                                genes.add(node);
-                            }
-                            return true;
-                        }, R_rel);
-                }
-                this.genes = dups.toArray(new Entity[0]);
-            }
-            else this.genes = null;
-            
-            return genes;
+            return new OrphanetGenes(get("S_ORDO_ORPHANET")).genes;
         }
             
         JsonNode doPhenotypes () {
-            ArrayNode phenotypes = mapper.createArrayNode();
-            Entity[] ents = get("S_GARD");
-            if (ents != null) {
-                Set<Entity> dups = new HashSet<>();
-                for (Entity e : ents) {
-                    e.neighbors((id, xe, key, reversed, props) -> {
-                            if (!reversed
-                                && !dups.contains(xe) && xe.is("S_HP")) {
-                                ObjectNode node = newJsonObject ();
-                                String hpid = (String) xe.payload("notation");
-                                node.put("curie", hpid);
-                                String cat = getHpCategory (hpid);
-                                if (cat == HP_CATEGORY_NONE) {
-                                    logger.warning(e.payload("gard_id")+" -> "
-                                                   +hpid+" ("
-                                                   +xe.payload("label")
-                                                   +") has no category!");
-                                }
-                                node.put("category", cat);
-                                
-                                node.put("label", getString (xe.payload("label")));
-                                node.put("synonym",
-                                         getString (xe.payload("hasExactSynonym")));
-                                node.put("description",
-                                         getString (xe.payload("IAO_0000115")));
-                                node.put("frequency",
-                                         getString (props.get("Frequency")));
-                                node.put("hpo_method",
-                                         getString (props.get("Evidence")));
-                                node.put("sex", getString (props.get("Sex")));
-                                node.put("source_curie",
-                                         getString (props.get("Reference")));
-                                node.put("modifier",
-                                         getString (props.get("Modifier")));
-                                node.put("phenotype_sfdc_id", "");
-                                dups.add(xe);
-                                phenotypes.add(node);
-                            }
-                            return true;
-                        }, R_hasPhenotype);
-                }
-                this.phenotypes = dups.toArray(new Entity[0]);
-            }
-            else this.phenotypes = null;
-            
+            return new GARDPhenotypes(get ("S_GARD")).phenotypes;
             // TODO: other sources..
-            
-            return phenotypes;
         }
 
         JsonNode doEvidence () {
@@ -539,6 +575,12 @@ public class HoofBeats {
         this.ef = ef;
     }
 
+    ObjectNode newJsonObject () {
+        ObjectNode obj = mapper.createObjectNode();
+        obj.put("Id", "");
+        return obj;
+    }
+    
     String getHpCategory (String id) {
         String cat = hpCategories.get(id);
         if (cat == null) {

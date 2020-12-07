@@ -506,13 +506,19 @@ public class Entity extends CNode {
     }
 
     public void _neighbors (NeighborVisitor visitor, StitchKey... keys) {
+        Set<Node> seen = new HashSet<>();
         for (Relationship rel : _node.getRelationships(Direction.BOTH, keys)) {
             Node n = rel.getOtherNode(_node);
             boolean reverse = rel.getStartNode().equals(n);
-            if (!visitor.visit(rel.getId(), Entity._getEntity(n),
-                               StitchKey.valueOf(rel.getType().name()),
-                               reverse, rel.getAllProperties()))
-                break;
+            if (!seen.contains(n)) {
+                boolean cont = visitor.visit
+                    (rel.getId(), Entity._getEntity(n),
+                     StitchKey.valueOf(rel.getType().name()),
+                     reverse, rel.getAllProperties());
+                if (!cont)
+                    break;
+                seen.add(n);
+            }
         }
     }
 
