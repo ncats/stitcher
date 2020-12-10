@@ -116,12 +116,12 @@ if test -d $medgen; then
 fi
 
 #load clinvar if avaiable
-if test -f $clinvar; then
+if test -e $clinvar; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.ClinVarVariationEntityFactory $out $clinvar"
 fi
 
 #load gene reviews if avaiable
-if test -f $genereviews; then
+if test -d $genereviews; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.GeneReviewsEntityFactory $out $genereviews"
 fi
 
