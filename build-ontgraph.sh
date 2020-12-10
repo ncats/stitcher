@@ -85,7 +85,7 @@ sbt $opts stitcher/"runMain ncats.stitcher.impl.FDAOrphanDesignationEntityFactor
 
 #load hpo annotations
 if test -e $hpo/phenotype.hpoa; then
-    sbt stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out $hpo/phenotype.hpoa"
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out $hpo/phenotype.hpoa"
 fi
 
 #load additional orphanet relationships if available
@@ -94,16 +94,20 @@ fi
 #fi
 
 if test -e $orpha/en_product9_prev.xml; then
-    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetPrevalenceEntityFactory $out $orpha/en_product9_prev.xml"
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetPrevalenceEntityFactory $out $orpha/en_product9_prev.xml"
+fi
+
+if test -e $orpha/en_product9_ages.xml; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetNaturalHistoryEntityFactory $out $orpha/en_product9_ages.xml"
 fi
 
 if test -e $orpha/en_product4_HPO.xml; then
-    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4_HPO.xml"
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4_HPO.xml"
 fi
 
 # load disease-gene association; the associations in the owl file aren't up to date
 if test -e $orpha/en_product6.xml; then
-    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetDiseaseGeneAssociationEntityFactory $out $orpha/en_product6.xml"
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetDiseaseGeneAssociationEntityFactory $out $orpha/en_product6.xml"
 fi
 
 #load MedGen if available
