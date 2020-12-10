@@ -36,10 +36,13 @@ public abstract class OrphanetEntityFactory extends EntityRegistry {
     static final QName OrphaNumber = new QName (NS, "OrphaNumber");
     static final QName Name = new QName (NS, "Name");
 
-    static class Disorder {
-        public List<Disorder> parents = new ArrayList<>();
+    static class Term {
         public Integer orphaNumber;
-        public String name;
+        public String name;        
+    }
+    
+    static class Disorder extends Term {
+        public List<Disorder> parents = new ArrayList<>();
         public String type; // DisorderType
         public String link; // ExperLink
         public List<Entity> entities = new ArrayList<>();
@@ -62,6 +65,20 @@ public abstract class OrphanetEntityFactory extends EntityRegistry {
     
     public OrphanetEntityFactory (File dir) throws IOException {
         super (dir);
+    }
+
+    protected Entity[] getEntities (Term t) {
+        return getEntities (t, "ORPHA");
+    }
+    
+    protected Entity[] getEntities (Term t, String prefix) {
+        List<Entity> entities = new ArrayList<>();
+        Iterator<Entity> iter = find ("notation", prefix+":"+t.orphaNumber);
+        while (iter.hasNext()) {
+            Entity e = iter.next();
+            entities.add(e);
+        }
+        return entities.toArray(new Entity[0]);
     }
     
     protected Entity[] getEntities (Disorder d) {
