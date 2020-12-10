@@ -130,6 +130,29 @@ public class OntEntityFactory extends EntityRegistry {
                         }
                         break;
                         
+                    case "reason_for_obsolescence": // sigh.. from orphanet
+                        { String text = obj.toString();
+                            if (text.startsWith("This class is deprecated")) {
+                                props.put("deprecated", "true");
+                                int pos = text.indexOf("http://");
+                                if (pos > 0) {
+                                    int end = pos+7;
+                                    while (end < text.length()
+                                           && text.charAt(++end) != ' ')
+                                        ;
+                                    Resource r = res.getModel().createResource
+                                        (text.substring(pos, end));
+                                    Object old = links.get("equivalentClass");
+                                    links.put("equivalentClass", old != null ?
+                                              Util.merge(old, r) : r);
+                                }
+                            }
+                            Object old = props.get(pname);
+                            props.put(pname, old != null
+                                      ? Util.merge(old, text) : text);
+                        }
+                        break;
+                        
                     default: 
                         try {
                             Object v = obj.asLiteral().getValue();

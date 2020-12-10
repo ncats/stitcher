@@ -102,6 +102,11 @@ public class HoofBeats {
         +"n.source in x.source) and z.notation='HP:0000118' with m match "
         +"p=(m)<--(d:DATA) return distinct d.label as label order by label";
 
+    static final String HP_INHERITANCE_FMT = "match (d:DATA)-->(n:S_HP)-[e:R_subClassOf*0..]->(:S_HP)--(z:DATA) where d.notation='%1$s' and all(x in e where x.source=n.source or n.source in x.source) and z.notation='HP:0000005' return d.label as inheritance";
+
+    // HP:0040006 - mortality/aging
+    // HP:0003674 - onset
+
     static final String HP_CATEGORY_NONE = "";
     
     // lookup of GR short id to book id
@@ -178,13 +183,14 @@ public class HoofBeats {
     final Map<String, String> hpCategories = new HashMap<>();
 
     class OrphanetGenes implements NeighborVisitor {
-        ArrayNode genes;
+        ArrayNode genes = mapper.createArrayNode();
         Set<Entity> neighbors = new LinkedHashSet<>();
+        String notation;
         
         OrphanetGenes (Entity... ents) {
             if (ents != null && ents.length > 0) {
-                genes = mapper.createArrayNode();
                 for (Entity e : ents) {
+                    notation = getString (e.payload("notation"));
                     e.neighbors(this, R_rel);
                 }
             }
@@ -223,7 +229,7 @@ public class HoofBeats {
                             return false;
                         }, "match (d:DATA)-->(n:S_ORDO_ORPHANET)--(:S_OMIM:T028)-[e]-(:S_OGG)<--(z:DATA) where d.notation='"+orpha+"' with z, count(e) as cnt return z.hasDbXref as xrefs order by cnt desc limit 1");
                 }
-                node.put("source_curie", orpha);
+                node.put("source_curie", notation);
                 node.put("source_label", getString (xe.payload("label")));
                 node.put("gene_symbol", getString (xe.payload("symbol")));
                 node.put("association_type",
@@ -241,7 +247,7 @@ public class HoofBeats {
     }
 
     class OrphanetEpidemiology implements Consumer<Map<String, Object>> {
-        ArrayNode epi;
+        ArrayNode epi = mapper.createArrayNode();
         String notation;
         
         OrphanetEpidemiology (Entity... ents) {
@@ -273,15 +279,45 @@ public class HoofBeats {
         }
     }
 
+    class OrphanetRelationships implements NeighborVisitor {
+        ArrayNode neighbors = mapper.createArrayNode();
+        final String relname;
+        String notation;
+        
+        OrphanetRelationships (String relname, Entity... ents) {
+            this.relname = relname;
+            if (ents != null && ents.length > 0) {
+                for (Entity e : ents) {
+                    notation = getString (e.payload("notation"));
+                    e.neighbors(this, R_rel);
+                }
+            }
+        }
+
+        public boolean visit (long id, Entity xe, StitchKey key,
+                              boolean reversed, Map<String, Object> props) {
+            if ("ORPHA:79445".equals(notation) && xe.is("S_ORDO_ORPHANET")) {
+                logger.info("..."+notation+" -["+relname+"]-> "+getString (xe.payload("notation"))+" reversed="+reversed+" labels="+xe.labels()+" props="+props);
+            }
+            if (!reversed && xe.is("S_ORDO_ORPHANET")
+                && relname.equals(props.get("name"))) {
+                ObjectNode node = newJsonObject ();
+                node.put("curie", notation);
+                node.put("label", getString (xe.payload("label")));
+                neighbors.add(node);
+            }
+            return true;
+        }
+    }
+
     class GARDPhenotypes implements NeighborVisitor {
-        ArrayNode phenotypes;
+        ArrayNode phenotypes = mapper.createArrayNode();
         String gardId;
         Set<Entity> neighbors = new LinkedHashSet<>();
         
         GARDPhenotypes (Entity... ents) {
             if (ents != null && ents.length > 0) {
-                phenotypes = mapper.createArrayNode();
-                for (Entity e : ents) {
+                 for (Entity e : ents) {
                     gardId = getString (e.payload("gard_id"));
                     e.neighbors(this, R_hasPhenotype);
                 }
@@ -490,43 +526,40 @@ public class HoofBeats {
             }
             return xrefs;
         }
-
-        void orphanetRelationships (String relname,
-                                    Consumer<JsonNode> consumer) {
-            Entity[] ents = get("S_ORDO_ORPHANET");
+        
+        JsonNode doInheritance () {
+            ArrayNode inheritance = new OrphanetRelationships
+                ("has_inheritance", get ("S_ORDO_ORPHANET")).neighbors;
+            
+            Entity[] ents = get ("S_OMIM");
             if (ents != null) {
                 for (Entity e : ents) {
+                    final String notation = getString (e.payload("notation"));
                     e.neighbors((id, xe, key, reversed, props) -> {
-                            if (!reversed && xe.is("S_ORDO_ORPHANET")
-                                && relname.equals(props.get("name"))) {
+                            if (!reversed && xe.is("S_OMIM")
+                                && "has_inheritance_type"
+                                .equals(props.get("name"))) {
                                 ObjectNode node = newJsonObject ();
-                                node.put("curie", getString (xe.payload("notation")));
-                                node.put("label", getString (xe.payload("label")));
-                                consumer.accept(node);
+                                node.put("curie", notation);
+                                node.put("label",
+                                         getString (xe.payload("label")));
+                                inheritance.add(node);
                             }
                             return true;
                         }, R_rel);
                 }
             }
-        }
-        
-        JsonNode doInheritance () {
-            ArrayNode inheritance = mapper.createArrayNode();
-            orphanetRelationships ("has_inheritance", n -> inheritance.add(n));
-            // TODO: check for others
             return inheritance;
         }
 
         JsonNode doAgeOfOnset () {
-            ArrayNode ageOfOnset = mapper.createArrayNode();
-            orphanetRelationships ("has_age_of_onset", n -> ageOfOnset.add(n));
-            return ageOfOnset;
+            return new OrphanetRelationships
+                ("has_age_of_onset", get ("S_ORDO_ORPHANET")).neighbors;
         }
 
         JsonNode doAgeOfDeath () {
-            ArrayNode ageOfDeath = mapper.createArrayNode();
-            orphanetRelationships ("has_age_of_death", n -> ageOfDeath.add(n));
-            return ageOfDeath;
+            return new OrphanetRelationships
+                ("has_age_of_death", get ("S_ORDO_ORPHANET")).neighbors;
         }
 
         JsonNode doEpidemiology () {
@@ -774,6 +807,7 @@ public class HoofBeats {
                     ++count;
                 }
                 */
+                ++count;
             }
 
             for (Entity e : dc.genes) {
