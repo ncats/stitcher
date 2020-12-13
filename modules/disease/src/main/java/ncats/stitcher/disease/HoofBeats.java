@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class HoofBeats {
     static final Logger logger = Logger.getLogger(HoofBeats.class.getName());
-    static final int BATCH_SIZE = 10;
+    static final int BATCH_SIZE = 200;
 
     static class Source implements Comparable {
         final String name;
@@ -296,9 +296,6 @@ public class HoofBeats {
 
         public boolean visit (long id, Entity xe, StitchKey key,
                               boolean reversed, Map<String, Object> props) {
-            if ("ORPHA:79445".equals(notation) && xe.is("S_ORDO_ORPHANET")) {
-                logger.info("..."+notation+" -["+relname+"]-> "+getString (xe.payload("notation"))+" reversed="+reversed+" labels="+xe.labels()+" props="+props);
-            }
             if (!reversed && xe.is("S_ORDO_ORPHANET")
                 && relname.equals(props.get("name"))) {
                 ObjectNode node = newJsonObject ();
@@ -343,22 +340,27 @@ public class HoofBeats {
                          getString (xe.payload("hasExactSynonym")));
                 node.put("description",
                          getString (xe.payload("IAO_0000115")));
-                String freq = getString (props.get("Frequency"));
-                if (freq.startsWith("HP:")) {
-                    for (Iterator<Entity> iter = ef.find("notation", freq);
-                         iter.hasNext(); ) {
-                        Entity e = iter.next();
-                        freq = getString (e.payload("label"));
+                StringBuilder freq = new StringBuilder ();
+                for (Object v : Util.toArray(props.get("Frequency"))) {
+                    String val = v.toString();
+                    if (val.startsWith("HP:")) {
+                        for (Iterator<Entity> iter = ef.find("notation", val);
+                             iter.hasNext(); ) {
+                            Entity e = iter.next();
+                            if (freq.length() > 0) freq.append("; ");
+                            freq.append(getString (e.payload("label")));
+                        }
+                    }
+                    else {
+                        if (freq.length() > 0) freq.append("; ");
+                        freq.append(val);
                     }
                 }
-                node.put("frequency", freq);
-                node.put("hpo_method",
-                         getString (props.get("Evidence")));
+                node.put("frequency", freq.toString());
+                node.put("hpo_method", getString (props.get("Evidence")));
                 node.put("sex", getString (props.get("Sex")));
-                node.put("source_curie",
-                         getString (props.get("Reference")));
-                node.put("modifier",
-                         getString (props.get("Modifier")));
+                node.put("source_curie", getString (props.get("Reference")));
+                node.put("modifier", getString (props.get("Modifier")));
                 node.put("phenotype_sfdc_id", "");
                 phenotypes.add(node);
                 neighbors.add(xe);
@@ -771,7 +773,7 @@ public class HoofBeats {
                 uf.union(source.getId(), target.getId());
             }, R_exactMatch, R_equivalentClass);
 
-        int count = 0;
+        int count = 0, cnt = 0;
         Random rand = new Random ();
         Set<Long> genes = new HashSet<>();
         Set<Long> phenotypes = new HashSet<>();
@@ -791,22 +793,21 @@ public class HoofBeats {
                 if (count > 0) dps.print(",");
                 String jstr = writer.writeValueAsString(json);
                 dps.print(jstr);
-                /*
-                if (count < 10 && rand.nextFloat() > 0.5f) {
+                if (cnt < 10 && rand.nextFloat() > 0.5f) {
                     String id = json.get("term").get("curie")
                         .asText().replaceAll(":", "_");
                     try (FileOutputStream fos =
                          new FileOutputStream (id+".json")) {
                         writer.writeValue(fos, json);
-                        writeGenes (id, dc.genes);
-                        writePhenotypes (id, dc.phenotypes);
+                        writeGenes (id, dc.genes.toArray(new Entity[0]));
+                        writePhenotypes
+                            (id, dc.phenotypes.toArray(new Entity[0]));
                     }
                     catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    ++count;
+                    ++cnt;
                 }
-                */
                 ++count;
             }
 
@@ -907,8 +908,10 @@ public class HoofBeats {
         ps.print("    }");
     }
 
-    void writePhenotypes (String id, Entity[] phenotypes) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream (id+"_phenotypes.json")) {
+    void writePhenotypes (String id, Entity[] phenotypes)
+        throws IOException {
+        try (FileOutputStream fos =
+             new FileOutputStream (id+"_phenotypes.json")) {
             PrintStream ps = new PrintStream (fos);
             ps.println("{");
             ps.println("  \"allOrNone\": false,"); // ?
