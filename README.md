@@ -199,3 +199,11 @@ Access to underlying Neo4j database
 ===================================
 
 The underlying Neo4j for stitcher is publicly accessible [here](https://stitcher.ncats.io/browser/). Please specify ```stitcher.ncats.io:80``` in the ```Host``` field. No credentials are needed.
+
+Scripts for Recent Approval Data from FDA
+=========================================
+
+cd scripts
+python approvalYears.py   [requires python 2.7]
+in the /data folder, there should now be a file like approvalYears-2020-12-14.txt. If acceptable, update the filename reference in /data/conf/ob.conf to point to this new file.
+
