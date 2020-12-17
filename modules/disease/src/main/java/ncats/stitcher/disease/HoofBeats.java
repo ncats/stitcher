@@ -102,12 +102,19 @@ public class HoofBeats {
         +"n.source in x.source) and z.notation='HP:0000118' with m match "
         +"p=(m)<--(d:DATA) return distinct d.label as label order by label";
 
+    static final String CATEGORY_FMT = "match (d:DATA)-->(n:`%1$s`)-"
+        +"[e:R_subClassOf*0..13]->(m:`%1$s`)-[:R_subClassOf]->(:`%1$s`)"
+        +"--(z:DATA) where d.notation='%2$s' and all(x in e where "
+        +"x.source=n.source or n.source in x.source) and z.notation='%3$s' "
+        +"with m match p=(m)<--(d:DATA) return distinct d.label as label, "
+        +"d.notation as notation order by label";
+
     static final String HP_INHERITANCE_FMT = "match (d:DATA)-->(n:S_HP)-[e:R_subClassOf*0..]->(:S_HP)--(z:DATA) where d.notation='%1$s' and all(x in e where x.source=n.source or n.source in x.source) and z.notation='HP:0000005' return d.label as inheritance";
 
     // HP:0040006 - mortality/aging
     // HP:0003674 - onset
 
-    static final String HP_CATEGORY_NONE = "";
+    static final String CATEGORY_NONE = "";
     
     // lookup of GR short id to book id
     static final Map<String, String> GENEREVIEWS = new HashMap<>();
@@ -124,6 +131,22 @@ public class HoofBeats {
             ex.printStackTrace();
             System.exit(1);
         }
+    }
+
+    static String getHpCategoryCypher (String id) {
+        return getHpCategoryCypher (id, "HP:0000118");
+    }
+    
+    static String getHpCategoryCypher (String id, String root) {
+        return String.format(CATEGORY_FMT, "S_HP", id, root);
+    }
+
+    static String getMondoCategoryCypher (String id) {
+        return getMondoCategoryCypher (id, "MONDO:0000001");
+    }
+
+    static String getMondoCategoryCypher (String id, String root) {
+        return String.format(CATEGORY_FMT, "S_MONDO", id, root);
     }
     
     static Source getSource (String name) {
@@ -183,11 +206,15 @@ public class HoofBeats {
     final Map<String, String> hpCategories = new HashMap<>();
 
     class OrphanetGenes implements NeighborVisitor {
-        ArrayNode genes = mapper.createArrayNode();
+        ArrayNode genes;
         Set<Entity> neighbors = new LinkedHashSet<>();
         String notation;
-        
+
         OrphanetGenes (Entity... ents) {
+            this (mapper.createArrayNode(), ents);
+        }
+        OrphanetGenes (ArrayNode genes, Entity... ents) {
+            this.genes = genes;
             if (ents != null && ents.length > 0) {
                 for (Entity e : ents) {
                     notation = getString (e.payload("notation"));
@@ -198,7 +225,7 @@ public class HoofBeats {
 
         public boolean visit (long id, Entity xe, StitchKey key,
                               boolean reversed, Map<String, Object> props) {
-            if (!reversed && xe.is("S_ORDO_ORPHANET")
+            if (!neighbors.contains(xe) && !reversed && xe.is("S_ORDO_ORPHANET")
                 && "disease_associated_with_gene".equals(props.get("name"))) {
                 ObjectNode node = newJsonObject ();
                 Object[] xrefs = Util.toArray(xe.payload("hasDbXref"));
@@ -246,6 +273,92 @@ public class HoofBeats {
         }
     }
 
+    class OMIMGenes implements NeighborVisitor {
+        ArrayNode genes;
+        Entity curent, bestnb;
+        Object[] values;
+        Set<String> hgnc = new HashSet<>();
+        Set<Entity> neighbors = new LinkedHashSet<>();
+        Set<Entity> seen = new HashSet<>();
+        
+        OMIMGenes (Entity... ents) {
+            this (mapper.createArrayNode(), ents);
+        }
+        OMIMGenes (ArrayNode genes, Entity... ents) {
+            this.genes = genes;
+            if (ents != null && ents.length > 0) {
+                for (int i = 0; i < genes.size(); ++i) {
+                    JsonNode n = genes.get(i);
+                    if (n.has("curie"))
+                        hgnc.add(n.get("curie").asText());
+                }
+                for (Entity e : ents) {
+                    curent = e;
+                    // molecular basis known
+                    if ("3".equals(getString (e.payload("MIMTYPE")))) {
+                        bestnb = null;
+                        values = null;
+                        e.neighbors(this, I_GENE);
+                        if (bestnb != null) {
+                            instrument (bestnb);
+                        }
+                    }
+                }
+            }
+        }
+
+        void instrument (Entity e) {
+            // get hgnc from ogg
+            e.neighbors((id, xe, key, reversed, props) -> {
+                    if (!neighbors.contains(xe) && xe.is("S_OGG")) {
+                        ObjectNode node = newJsonObject ();
+                        Object[] xrefs = Util.toArray(xe.payload("hasDbXref"));
+                        for (Object ref : xrefs) {
+                            String syn = (String)ref;
+                            if (syn.startsWith("HGNC:"))
+                                node.put("curie", syn);
+                        }
+
+                        if (node.has("curie")
+                            && !hgnc.contains(node.get("curie").asText())) {
+                            // add only if we don't already have this hgnc
+                            node.put("source_curie",
+                                     getString (curent.payload("notation")));
+                            node.put("source_label",
+                                     getString (curent.payload("label")));
+                            // ogg's label is the gene symbol
+                            node.put("gene_symbol",
+                                     getString (xe.payload("label")));
+                            node.put("association_type",
+                                     getString (curent.payload
+                                                ("MIMTYPEVALUE")));
+                            node.put("source_validation",
+                                     getString (curent.payload
+                                                ("MIMTYPEMEANING")));
+                            node.put("gene_sfdc_id", "");
+                            genes.add(node);
+                            neighbors.add(xe);
+                        }
+                    }
+                    return true;
+                }, I_CODE);
+        }
+            
+
+        public boolean visit (long id, Entity xe, StitchKey key,
+                              boolean reversed, Map<String, Object> props) {
+            if (!seen.contains(xe) && xe.is("S_OMIM") && xe.is("T028")) {
+                Object[] vals = Util.toArray(props.get("I_GENE"));
+                if (values == null || vals.length > values.length) {
+                    values = vals;
+                    bestnb = xe;
+                }
+                seen.add(xe);
+            }
+            return true;
+        }
+    }
+    
     class OrphanetEpidemiology implements Consumer<Map<String, Object>> {
         ArrayNode epi = mapper.createArrayNode();
         String notation;
@@ -283,6 +396,7 @@ public class HoofBeats {
         ArrayNode neighbors = mapper.createArrayNode();
         final String relname;
         String notation;
+        Set<Entity> seen = new HashSet<>();
         
         OrphanetRelationships (String relname, Entity... ents) {
             this.relname = relname;
@@ -296,12 +410,13 @@ public class HoofBeats {
 
         public boolean visit (long id, Entity xe, StitchKey key,
                               boolean reversed, Map<String, Object> props) {
-            if (!reversed && xe.is("S_ORDO_ORPHANET")
+            if (!seen.contains(xe) && !reversed && xe.is("S_ORDO_ORPHANET")
                 && relname.equals(props.get("name"))) {
                 ObjectNode node = newJsonObject ();
                 node.put("curie", notation);
                 node.put("label", getString (xe.payload("label")));
                 neighbors.add(node);
+                seen.add(xe);
             }
             return true;
         }
@@ -323,12 +438,12 @@ public class HoofBeats {
 
         public boolean visit (long id, Entity xe, StitchKey key,
                               boolean reversed, Map<String, Object> props) {
-            if (!reversed && xe.is("S_HP")) {
+            if (!neighbors.contains(xe) && !reversed && xe.is("S_HP")) {
                 ObjectNode node = newJsonObject ();
                 String hpid = (String) xe.payload("notation");
                 node.put("curie", hpid);
                 String cat = getHpCategory (hpid);
-                if (cat == HP_CATEGORY_NONE) {
+                if (cat == CATEGORY_NONE) {
                     logger.warning(gardId+" -> " +hpid+" ("
                                    +xe.payload("label")
                                    +") has no category!");
@@ -500,10 +615,17 @@ public class HoofBeats {
                         String curie = src.prefix+e.payload(src.id);
                         for (String s : src.synonyms) {
                             for (Object x : Util.toArray(e.payload(s))) {
-                                ObjectNode syn = newJsonObject ();
-                                syn.put("curie", curie);
-                                syn.put("label", x.toString());
-                                synonyms.add(syn);
+                                String sv = x.toString();
+                                if (sv.length() > 256) {
+                                    logger.warning(curie+": synonym is too "
+                                                   +"long!\n"+sv);
+                                }
+                                else {
+                                    ObjectNode syn = newJsonObject ();
+                                    syn.put("curie", curie);
+                                    syn.put("label", sv);
+                                    synonyms.add(syn);
+                                }
                             }
                         }
                     }
@@ -535,10 +657,11 @@ public class HoofBeats {
             
             Entity[] ents = get ("S_OMIM");
             if (ents != null) {
+                final Set<Entity> seen = new HashSet<>();
                 for (Entity e : ents) {
                     final String notation = getString (e.payload("notation"));
                     e.neighbors((id, xe, key, reversed, props) -> {
-                            if (!reversed && xe.is("S_OMIM")
+                            if (!seen.contains(xe) && !reversed && xe.is("S_OMIM")
                                 && "has_inheritance_type"
                                 .equals(props.get("name"))) {
                                 ObjectNode node = newJsonObject ();
@@ -546,6 +669,7 @@ public class HoofBeats {
                                 node.put("label",
                                          getString (xe.payload("label")));
                                 inheritance.add(node);
+                                seen.add(xe);
                             }
                             return true;
                         }, R_rel);
@@ -571,6 +695,10 @@ public class HoofBeats {
         JsonNode doGenes () {
             OrphanetGenes og = new OrphanetGenes(get("S_ORDO_ORPHANET"));
             this.genes.addAll(og.neighbors);
+            
+            OMIMGenes omim = new OMIMGenes (og.genes, get ("S_OMIM"));
+            this.genes.addAll(omim.neighbors);
+            
             return og.genes;
         }
             
@@ -615,7 +743,7 @@ public class HoofBeats {
         }
     }
 
-    public HoofBeats (EntityFactory ef, int version) {
+    public HoofBeats (EntityFactory ef) {
         this.ef = ef;
     }
 
@@ -629,7 +757,7 @@ public class HoofBeats {
         String cat = hpCategories.get(id);
         if (cat == null) {
             final StringBuilder sb = new StringBuilder ();
-            final String cypher = String.format(HP_CATEGORY_FMT, id);
+            final String cypher = getHpCategoryCypher (id);
             ef.cypher(row -> {
                     Object label = row.get("label");
                     //logger.info("... "+id+" => "+label);
@@ -647,7 +775,7 @@ public class HoofBeats {
             if (sb.length() > 0)
                 cat = sb.toString();
             else {
-                cat = HP_CATEGORY_NONE;
+                cat = CATEGORY_NONE;
                 //logger.warning("***** "+id+": No category for query: "+cypher);
             }
             hpCategories.put(id, cat);
@@ -869,43 +997,49 @@ public class HoofBeats {
     }
 
     void writeGene (PrintStream ps, Entity e) {
+        String sym = "", name = "";
+        StringBuilder type = new StringBuilder ();
+        StringBuilder locus = new StringBuilder ();
+
+        if (e.is("S_OGG")) {
+            locus.append(getString (e.payload("OGG_0000000008")));
+            type.append(getString (e.payload("OGG_0000000018")));
+            sym = getString (e.payload("label"));
+            name = getString (e.payload("OGG_0000000005"));
+        }
+        else if (e.is("S_ORDO_ORPHANET")) {
+            sym = getString (e.payload("symbol"));
+            name = getString (e.payload("label"));
+            Set<Entity> seen = new HashSet<>();
+            e.neighbors((id, xe, key, reversed, props) -> {
+                    if (!seen.contains(xe)
+                        && "hasDbXref".equals(props.get("name"))
+                        && xe.is("S_OGG")
+                        && props.get("value").toString().startsWith("HGNC:")) {
+                        locus.append(getString (xe.payload("OGG_0000000008")));
+                        type.append(getString (xe.payload("OGG_0000000018")));
+                        seen.add(xe);
+                    }
+                    return true;
+                }, I_CODE);
+        }
+        Optional<String> hgnc = Util.stream(e.payload("hasDbXref"))
+            .map(Object::toString)
+            .filter(x -> x.startsWith("HGNC:"))
+            .findFirst();
+        String id = hgnc.isPresent() ? hgnc.get() : getString (e.payload("notation"));
+        
         ps.println("    {");
         ps.println("        \"attributes\": {");
         ps.println("            \"type\": \"Gene__c\"");
         ps.println("         },");
-        ps.println("        \"Name\": \""
-                   +getString (e.payload("symbol"))+"\",");
-        ps.println("        \"Gene_Name__c\": \""
-                   +getString (e.payload("label"))+"\",");
-        ps.println("        \"GHR_URL__c\": \"\",");
-        StringBuilder type = new StringBuilder ();
-        StringBuilder locus = new StringBuilder ();
-        e.neighbors((id, xe, key, reversed, props) -> {
-                if ("hasDbXref".equals(props.get("name"))
-                    && props.get("value").toString().startsWith("HGNC:")
-                    && xe.is("S_OGG")) {
-                    locus.append(getString (xe.payload("OGG_0000000008")));
-                    type.append(getString (xe.payload("OGG_0000000018")));
-                }
-                return true;
-            }, I_CODE);
+        ps.println("        \"Name\": \""+sym+"\",");
+        ps.println("        \"Gene_Name__c\": \""+name+"\",");
+        ps.println("        \"GHR_URL__c\": \""+getString(e.payload("uri"))+"\",");
         ps.println("        \"Gene_Type__c\": \""+type+"\",");        
         ps.println("        \"Chromosome_Location__c\": \""+locus+"\",");
-        Object[] xrefs = Util.toArray(e.payload("hasDbXref"));
-        boolean hasId = false;
-        for (Object ref : xrefs) {
-            String syn = (String)ref;
-            if (syn.startsWith("HGNC:")) {
-                ps.println("        \"Gene_Identifier__c\": \""
-                           +syn+"\"");
-                hasId = true;
-            }
-        }
-        if (!hasId) {
-            ps.println("        \"Gene_Identifier__c\": \""
-                       +getString(e.payload("notation"))+"\"");
-        }
-        ps.print("    }");
+        ps.println("        \"Gene_Identifier__c\": \""+id+"\"");
+        ps.print  ("    }");
     }
 
     void writePhenotypes (String id, Entity[] phenotypes)
@@ -941,7 +1075,7 @@ public class HoofBeats {
                    +getString (e.payload("hasExactSynonym"))+"\",");
         String hpid = (String) e.payload("notation");
         String cat = getHpCategory (hpid);
-        if (cat == HP_CATEGORY_NONE) {
+        if (cat == CATEGORY_NONE) {
             logger.warning(hpid+": can't find phenotype category!");
         }
         ps.println("        \"HPO_Category__c\": \""+cat+"\",");
@@ -973,21 +1107,17 @@ public class HoofBeats {
 
     public static void main (String[] argv) throws Exception {
         if (argv.length == 0) {
-            logger.info("Usage: "+HoofBeats.class.getName()+" DBDIR [VERSION]");
+            logger.info("Usage: "+HoofBeats.class.getName()+" DBDIR");
             System.exit(1);
         }
 
-        int version = 1;
-        if (argv.length > 1)
-            version = Integer.parseInt(argv[1]);
-
         try (EntityFactory ef = new EntityFactory (argv[0])) {
-            HoofBeats hb = new HoofBeats (ef, version);
-            //hb.beats("zebra_beats.txt");
+            HoofBeats hb = new HoofBeats (ef);
             int pos = argv[0].indexOf('.');
             if (pos < 0)
                 pos = argv[0].length();
             String base = argv[0].substring(0, pos);
+            //hb.beats(base+".txt");
             hb.writeJson(base);
         }
     }
