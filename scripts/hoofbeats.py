@@ -96,7 +96,7 @@ def load_disease(d, path='.'):
     term = d['term']
     term['Id'] = LUT[term['curie']]
     r = requests.post(API['disease'], headers=headers, json=d)
-    
+
     base = path+'/'+term['curie'].replace(':', '_')
     sf = r.json()
     with open(base+'_sf.json', 'w') as f:
@@ -106,6 +106,18 @@ def load_disease(d, path='.'):
         print (json.dumps(d, indent=2), file=f)
         
     return (r.status_code, term['curie'], term['Id'])
+
+def reload_disease(file):
+    with open(file, 'r') as f:
+        data = json.load(f)
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % TOKEN
+        }
+        r = requests.post(API['disease'], headers=headers, json=data)
+        print ('%s -- %d' % (file, r.status_code))
+        print (json.dumps(r.json(), indent=2))
+
     
 def load_diseases(file, out):
     with open(file, 'r') as f:
@@ -120,6 +132,85 @@ def load_diseases(file, out):
             count = count + 1
         print('-- %d total record(s) loaded!' % total)
 
+def patch_objects1(target, source, field, *fields):
+    sfids = {}
+    for s in source[field]:
+        sfids[s['curie']] = s
+    for t in target[field]:
+        if t['curie'] in sfids:
+            d = sfids[t['curie']]
+            t['Id'] = d['Id']
+            for f in fields:
+                t[f] = d[f]
+        
+def patch_objects2(target, source, field):
+    sfids = {}
+    for s in source[field]:
+        if s['curie'] in sfids:
+            sfids[s['curie']][s['label']] = s['Id']
+        else:
+            sfids[s['curie']] = {s['label']: s['Id']}
+    for t in target[field]:
+        if t['curie'] in sfids and t['label'] in sfids[t['curie']]:
+            t['Id'] = sfids[t['curie']][t['label']]
+            
+def patch_evidence(target, source):
+    sfids = {}
+    for e in source['evidence']:
+        sfids[e['url']] = e['Id']
+    for e in target['evidence']:
+        if e['url'] in sfids:
+            e['Id'] = sfids[e['url']]
+
+def patch_epidemiology(target, source):
+    for t in target['epidemiology']:
+        best_s = {}
+        ovbest = {}
+        for s in source['epidemiology']:
+            ov = {k: t[k] for k in t if k in s and s[k] == t[k]}
+            if len(ov) > len(ovbest):
+                best_s = s
+                ovbest = ov
+        t['Id'] = best_s['Id']
+    
+def patch_disease(disease, dir):
+    file = dir+'/%s_200.json' % disease['term']['curie'].replace(':','_')
+    r = ()
+    if os.access(file, os.R_OK):
+        with open(file, 'r') as f:
+            d = json.load(f)
+            disease['term']['Id'] = d['term']['Id']
+            patch_objects2 (disease, d, 'synonyms')
+            patch_objects1 (disease, d, 'external_identifiers')
+            patch_objects2 (disease, d, 'inheritance')
+            patch_objects2 (disease, d, 'age_at_onset')
+            patch_objects2 (disease, d, 'age_at_death')
+            patch_epidemiology (disease, d)
+            patch_objects1 (disease, d, 'genes', 'gene_sfdc_id')
+            patch_objects1 (disease, d, 'phenotypes', 'phenotype_sfdc_id')
+            patch_evidence (disease, d)
+            #print(json.dumps(disease, indent=2))
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer %s' % TOKEN
+            }
+            r = requests.post(API['disease'], headers=headers, json=disease)
+            file = dir+'/'+disease['term']['curie'].replace(':','_')+'_%d' % r.status_code
+            if r.status_code != 200:
+                with open(file+'.json', 'w') as f:
+                    print (json.dumps(disease, indent=2), file=f)
+            print('%d...patching %s from %s' % (r.status_code,
+                                                disease['term']['curie'], file))
+    else:
+        r = load_disease(disease, dir)
+    return r
+
+def patch_diseases(file, dir):
+    with open(file, 'r') as f:
+        data = json.load(f)
+        for d in data:
+            patch_disease(d, dir)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', required=True,
@@ -127,9 +218,13 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--type', required=True,
                         choices=['gene', 'phenotype','disease'],
                         help='Input file is of specific type')
+    parser.add_argument('-r', '--reload', help='Reload disease file',
+                        action='store_true')
+    parser.add_argument('-p', '--patch', help='Patch disease based on previously load files per the location specified by -o', action='store_true')
     parser.add_argument('-m', '--mapping', default='gard_diseases_sf.csv',
                         help='Salesforce disease mapping file (default: gard_diseases_sf.csv)')
-    parser.add_argument('-o', '--output', help='Output path (default .)')    
+    parser.add_argument('-o', '--output', default='.',
+                        help='Output path (default .)')    
     parser.add_argument('FILE', help='Input JSON file')
     if len(sys.argv) == 1:
         parser.print_help()
@@ -150,18 +245,27 @@ if __name__ == '__main__':
         os.makedirs(args.output)
     except FileExistsError:
         pass
-    
-    if args.type == 'disease':
-        print('-- mapping: %s' % args.mapping)        
-        with open(args.mapping) as f:
+
+    def load_mappings(lut, file):
+        print('-- mapping: %s' % file)
+        with open(file) as f:
             f.readline() # skip header
             for line in f.readlines():
                 gard, sfid = line.strip().split(',')
-                #print('%s -- %s' % (gard, sfid))
-                LUT[gard] = sfid
-                #print('%d: %s %s!' % (len(LUT), gard, sfid))
-            print('-- %d mappings loaded!' % (len(LUT)))
-        load_diseases(args.FILE, args.output)
+                lut[gard] = sfid
+            print('-- %d mappings loaded!' % (len(lut)))
+        
+    if args.type == 'disease':
+        if args.reload:
+            print('-- reloading...%s' % args.FILE)
+            reload_disease(args.FILE)
+        elif args.patch:
+            load_mappings(LUT, args.mapping)            
+            print('-- patching...%s' % args.FILE)
+            patch_diseases(args.FILE, args.output)
+        else:
+            load_mappings(LUT, args.mapping)
+            load_diseases(args.FILE, args.output)
         
     elif args.type == 'gene':
         load_genes(args.FILE, args.output)

@@ -1602,8 +1602,8 @@ public class EntityFactory implements Props, AutoCloseable {
             query.append("]-(m:ENTITY)<-[:PAYLOAD]-(b:DATA) "
                          +"where not n:TRANSIENT "
                          +"and not m:TRANSIENT "
-                         +"and not exists(a.deprecated) "
-                         +"and not exists(b.deprecated) "
+                         //+"and not exists(a.deprecated) "
+                         //+"and not exists(b.deprecated) "
                          +"return n,m");
             try (Result result = gdb.execute(query.toString())) {
                 while (result.hasNext()) {
