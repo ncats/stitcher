@@ -40,10 +40,8 @@ public class OrphanetDiseaseGeneAssociationEntityFactory
     static final QName DisorderGeneAssociationStatus =
         new QName (NS, "DisorderGeneAssociationStatus");
 
-    static class DisorderGeneAssociation {
+    static class DisorderGeneAssociation extends Term {
         public Set<Long> pmids = new TreeSet<>();
-        public Integer orphaNumber;
-        public String name;
         public String symbol;
         public String type;
         public String status;
