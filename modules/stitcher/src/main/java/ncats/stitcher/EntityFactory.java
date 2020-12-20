@@ -2023,12 +2023,14 @@ public class EntityFactory implements Props, AutoCloseable {
         return iterator;
     }
 
-    public Entity[] filter (String key, Object value, String... labels) {
-        return filter (key, value, Arrays.stream(labels)
+    public Entity[] filter (String key, Object value,
+                            int skip, int top, String... labels) {
+        return filter (key, value, skip, top, Arrays.stream(labels)
                        .map(l -> Label.label(l)).toArray(Label[]::new));
     }
 
-    public Entity[] filter (String key, Object value, Label... labels) {
+    public Entity[] filter (String key, Object value,
+                            int skip, int top, Label... labels) {
         if (key == null)
             throw new IllegalArgumentException
                 ("Can't filter with key is null!");
@@ -2041,10 +2043,18 @@ public class EntityFactory implements Props, AutoCloseable {
                 query.append(":`"+l+"`");
         }
         query.append(") return n");
+        
+        Map<String, Object> params = new HashMap<>();
+        if (top > 0) {
+            query.append(" skip {skip} limit {top}");
+            params.put("skip", skip);
+            params.put("top", top);
+        }
+
         logger.info("QUERY: "+query);
         
         try (Transaction tx = gdb.beginTx();
-             Result result = gdb.execute(query.toString())) {
+             Result result = gdb.execute(query.toString(), params)) {
             List<Entity> entities = new ArrayList<>();
             while (result.hasNext()) {
                 try {
@@ -2244,7 +2254,7 @@ public class EntityFactory implements Props, AutoCloseable {
     }   
 
     public Entity entity (Integer ver, String id) {
-        Entity[] entities = filter("id", "'"+id+"'", "S_STITCH_V"+ver);
+        Entity[] entities = filter("id", "'"+id+"'", 0, 0, "S_STITCH_V"+ver);
         if (entities.length > 0) {
             int index = 0;
             if (entities.length > 1) {

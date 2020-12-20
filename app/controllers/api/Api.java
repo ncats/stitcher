@@ -333,7 +333,7 @@ public class Api extends Controller {
         }
         catch (Exception ex) {
             Entity[] entities = es.getEntityFactory()
-                .filter("id", "'"+id+"'", "S_STITCH_V"+ver);
+                .filter("id", "'"+id+"'", 0, 0, "S_STITCH_V"+ver);
             for (int i = 0; i < entities.length; ++i) {
                 JsonNode n = jsonCodec.encode(entities[i]);
                 if ("simple".equals(format))
@@ -1070,16 +1070,16 @@ public class Api extends Controller {
         }
 
         Entity[] entities;
-        int s, t;
+        int s = skip != null ? skip : 0;
+        int t = top != null ? Math.min(top,1000) : 5;
+
         if (key != null) {
             entities = es.getEntityFactory().filter
-                (key, value, labels.toArray(new String[0]));
+                (key, value, s, t, labels.toArray(new String[0]));
             s = 0;
             t = entities.length;
         }
         else {
-            s = skip != null ? skip : 0;
-            t = top != null ? Math.min(top,1000) : 5;
 
             String page = request().getQueryString("page");
             if (page != null) {
