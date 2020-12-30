@@ -57,7 +57,7 @@ args_p.add_argument("--fdanme",
 args_p.add_argument('--maxsubs',
                     nargs="?",
                     type=int,
-                    default=100000,
+                    default=0, # value less than or equal to zero means get ALL substances
                     help="maximum number of substances to evaluate")
 
 args_p.add_argument('--outdir',
@@ -153,30 +153,66 @@ def approvedStitches(approved, stitch):
               "Rank"]
     '''
 
-    if stitch['USapproved']:
-        apprYear = "not given"
-
-        if 'approvedYear' in stitch:
-            apprYear = stitch['approvedYear']
+    appr = ''
+    apprType = ''
+    if stitch.has_key('highestPhase'):
+        for event in stitch['events']:
+            if event['id'] == stitch['highestPhase']:
+                if event['kind'] in ['USApprovalOTC', 'USApprovalRx', 'USWithdrawn', 'USPreviouslyMarketed']:
+                    appr = stitch['highestPhase']
+                    apprType = event['kind']
+    if appr != '':
+        if stitch.has_key('initiallyMarketedUS') and stitch['initiallyMarketedUS'] != "null":
+            appr = stitch['initiallyMarketedUS']
+        elif stitch.has_key('initiallyMarketed') and stitch['initiallyMarketed'] != "null":
+            appr = stitch['initiallyMarketed']
 
         parent = stitch['sgroup']['parent']
         rank = stitch['rank']
-        unii = ''
+        unii = getRootNode(stitch)
+        # unii = ''
+        # for node in stitch['sgroup']['members']:
+        #     if node['node'] == parent:
+        #         if not node.has_key('id'):
+        #             unii = node['name']
+        #         else:
+        #             unii = node['id']
 
-        for node in stitch['sgroup']['members']:
-            if node['node'] == parent:
-                if 'id' not in node:
-                    unii = node['name']
-                else:
-                    unii = node['id']
+        apprDate = ''
+        apprUnii = unii
+        for event in stitch['events']:
+            if event['id'] == appr:
+                apprDate = 'unknown'
+                if 'startDate' in event:
+                    apprDate = event['startDate']
+                #find unii of product ingredient
+                maxct = 0
+                for member in stitch['sgroup']['members']:
+                    if member['source'][0:5] == 'G-SRS':
+                        memUnii = member['id']
+                        if 'data' in member:
+                            for data in member['data']:
+                                memct = 0
+                                for item1 in event.values():
+                                    for item2 in data.values():
+                                        if item1 == item2:
+                                            memct = memct + 1
+                                if memct > maxct:
+                                    maxct = memct
+                                    apprUnii = memUnii
 
-        name = getName(stitch)
+        # name = getName(stitch)
 
         approved[unii] = [" -- ".join([unii,
                                        all_uniis.get(unii, "")]),
-                          apprYear,
+                          apprDate,
+                          apprType,
                           parent,
-                          rank]
+                          rank,
+                          all_uniis.get(apprUnii, ""),
+                          apprUnii]
+
+        #approved[unii] = [apprDate, parent, rank, name, apprUnii, apprType]
 
     return approved
 
@@ -348,30 +384,20 @@ def findOrphans(orphans, stitch):
     return orphans
 
 
-def iterateStitches(funcs):
+def iterateStitches(funcs, substances = 0):
     dicts = [{} for d in range(len(funcs))]
 
     top = 10
-    # max_subs = get_max_subs(100000, top)
-    # max_subs = 100000
+    if substances < 1:
+        substances = get_max_subs()
 
-    for skip in tqdm(xrange(0, max_subs, top), ncols=100):
-        uri = site+'api/stitches/v1?top='+str(top)+'&skip='+str(skip)
-        obj = requestJson(uri)
+    for skip in tqdm(xrange(0, substances, top), ncols=50):
+        obj = get_site_obj(top, skip)
 
-        if 'contents' not in obj:
-            obj = {'contents': obj}
-            skip = max_subs
-
-        if len(obj['contents']) == 0:
-            skip = max_subs
-        elif obj is not None:
+        if obj is not None:
             for stitch in obj['contents']:
                 for i in range(len(funcs)):
                     funcs[i](dicts[i], stitch)
-
-        # sys.stderr.write(uri+"\n")
-        # sys.stderr.flush()
 
     return dicts
 
@@ -380,42 +406,78 @@ def get_site_obj(top, skip):
     
     uri = site + 'api/stitches/v1?top=' + str(top) + '&skip=' + str(skip)
     
-    sys.stderr.write("Getting " + uri + "\n")
-    sys.stderr.flush()
+    # sys.stderr.write("Getting " + uri + "\n")
+    # sys.stderr.flush()
 
     obj = requestJson(uri)
+    if obj is None: # sometimes the call fails, try again
+        obj = requestJson(uri)
 
     return obj
 
-# TODO: possibly add a way to find the max number of pages
 # helpful for a decent progress bar
-def get_max_subs(startmax, top):
-    precision = 1000
+def get_max_subs():
+    max = 1000000
+    min = 0
 
     # check the page using a start maximum
 
-    "Trying to guess the max number of pages to navigate..."
+    sys.stderr.write("Trying to guess the max number of pages to navigate...\n")
 
-    obj = get_site_obj(top, startmax)
-    
-    # if not contents object present, reduce page number
-    # or the other way around
-    if 'contents' not in obj or len(obj['contents']) == 0:
-        newmax = startmax - precision
-        sys.stderr.write(str(startmax) + " - too high!\n")
-        sys.stderr.flush()
-    else:
-        newmax = startmax + precision
-        sys.stderr.write(str(startmax) + " - too low!\n")
-        sys.stderr.flush()
+    while max - min > 100:
+        guess = max/2 + min/2
+        obj = get_site_obj(1, guess)
 
-    if abs(newnewmax - startmax) > precision:
-        # now if you call the same function 
-        # and it returns the same number (startmax)
+        # if not contents object present, reduce page number
+        # or the other way around
+        if 'count' in obj and obj['count'] == 0:
+            max = guess
+            # sys.stderr.write(str(max) + " - too high!\n")
+            # sys.stderr.flush()
+        else:
+            min = guess
+            # sys.stderr.write(str(min) + " - too low!\n")
+            # sys.stderr.flush()
 
-        startmax = get_max_subs(newmax, top)
+    sys.stderr.write("Max substances less than: " + str(max) +"\n")
+    sys.stderr.flush()
+    return max
 
-    return newmax
+def getRootNode(stitch):
+    root = "unknown"
+    am = ""
+
+    parent = stitch['sgroup']['parent']
+    for node in stitch['sgroup']['members']:
+        if node['node'] == parent:
+            if node.has_key('stitches') and node['stitches'].has_key('R_activeMoiety'):
+                if isinstance(node['stitches']['R_activeMoiety'], list):
+                    if len(node['stitches']['R_activeMoiety']) == 1:
+                        am = node['stitches']['R_activeMoiety'][0]
+                else:
+                    am = node['stitches']['R_activeMoiety']
+            if not node.has_key('id'):
+                root = node['name']
+            else:
+                root = node['id']
+            if am == root:
+                am = ""
+    while len(am) > 0:
+        for node in stitch['sgroup']['members']:
+            if node.has_key('id') and node['id'] == am:
+                if node.has_key('stitches') and node['stitches'].has_key('R_activeMoiety'):
+                    if isinstance(node['stitches']['R_activeMoiety'], list):
+                        am = node['stitches']['R_activeMoiety'][0]
+                    else:
+                        am = node['stitches']['R_activeMoiety']
+                if not node.has_key('id'):
+                    root = node['name']
+                else:
+                    root = node['id']
+                if am == root:
+                    am = ""                 
+
+    return root
 
 def getName(obj):
     name = ""
@@ -695,7 +757,7 @@ if __name__ == "__main__":
 
     # iterate over stitches, perform tests
     # returns a list of dictionaries
-    outputs = iterateStitches(tests)
+    outputs = iterateStitches(tests, max_subs)
 
     # remove unimportant output for uniiClashes
     if uniiClashes in tests:
