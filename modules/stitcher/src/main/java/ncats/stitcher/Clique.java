@@ -3,7 +3,9 @@ package ncats.stitcher;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.function.Predicate;
 import java.lang.reflect.Array;
 
@@ -78,7 +80,46 @@ public interface Clique extends Component {
         
         return maxsup;
     }
-    
+
+    /*
+     * return all members of this clique that have stronger stitches to others
+     * than the values(). members that are in others are not returned.
+     */
+    default Set<Entity> defectors (Set<Entity> others) {
+        Map<StitchKey, Object> values = values ();
+        Comparator<StitchKey> cmp = (a, b) -> b.priority - a.priority;
+        StitchKey[] keys = values.keySet().toArray(new StitchKey[0]);
+        Arrays.sort(keys, cmp);
+        Object[] vals = Util.toArray(values.get(keys[0]));
+        
+        Set<Entity> defectors = new TreeSet<>();
+        for (Entity e : entities ()) {
+            if (!others.contains(e)) {
+                for (Entity xe : others) {
+                    Map<StitchKey, Object> xv = e.keys(xe);
+                    StitchKey[] xk = xv.keySet().toArray(new StitchKey[0]);
+                    Arrays.sort(xk, cmp);
+                    int dif = xk[0].priority - keys[0].priority;
+                    if (dif == 0) {
+                        dif = xv.size() - keys.length;
+                        if (dif == 0) {
+                            Object x = xv.get(keys[0]);
+                            dif = Util.toArray(x).length - vals.length;
+                        }
+                    }
+                    System.err.println("%%%% "+Util.toString(values)+" vs "
+                                       +Util.toString(xv)+" ===> "+dif+" "
+                                       +e.getId()+" "+xe.getId());
+                    if (dif > 0) {
+                        defectors.add(e);
+                        break;
+                    }
+                }
+            }
+        }
+        return defectors;
+    }
+        
     default int weight () {
         Map<StitchKey, Object> values = values ();
         int wt = 0;

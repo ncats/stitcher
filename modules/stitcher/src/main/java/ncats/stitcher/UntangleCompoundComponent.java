@@ -387,16 +387,28 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         }
     }
 
-    static int getCliqueScore (Clique clique) {
+    static int getCliqueRank (Clique clique) {
         Map<StitchKey, Object> values = clique.values();
         OptionalInt maxp = values.entrySet().stream()
             .mapToInt(me -> me.getKey().priority).max();
-        int cnt = 0;
-        for (Object v : values.values())
-            for (Object x : Util.toArray(v))
-                cnt += x.toString().length();
-        return (maxp.getAsInt() << 24)|((cnt & 0xff)<<16)
-            |(0xffff - (clique.size() & 0xffff)); // prefer compact clique
+        int len = 0, cnt = clique.size()-1, xcnt = 0;
+        for (Map.Entry<StitchKey, Object> me : values.entrySet()) {
+            Object[] vals = Util.toArray(me.getValue());
+            for (Object x : vals)
+                len += x.toString().length();
+            for (Entity e : clique)
+                xcnt += Util.toArray(e.get(me.getKey())).length;
+            cnt += vals.length;
+        }
+        int span = (int)(cnt*100.0/xcnt+0.5);
+        logger.info(":: clique "+clique.getId()+": maxp="+maxp.getAsInt()
+                    +" span="+span+" len="+len+" size="+clique.size());
+        return (maxp.getAsInt() << 24) // stitch key priority
+            | (span << 16) // strength of clique bonds
+            | ((255 - Math.min(255, clique.size())) << 8) // prefer compact clique
+            // total length of clique values (for non-fixed length)
+            | Math.min(len, 255) 
+        ;
     }
 
     public UntangleCompoundComponent (DataSource dsource,
@@ -772,11 +784,11 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         Arrays.sort(cliques, (_a, _b) -> {
                 Clique a = (Clique)_a.getKey();
                 Clique b = (Clique)_b.getKey();
-                return getCliqueScore (b) - getCliqueScore (a);
+                return getCliqueRank (b) - getCliqueRank (a);
             });
         for (Map.Entry me : cliques) {
             Clique c = (Clique)me.getKey();
-            Util.dump(c, " (score="+getCliqueScore (c)+")");
+            Util.dump(c, " (rank="+getCliqueRank (c)+")");
         }
         
         List<DisjointCliques> dsets = new ArrayList<>();
@@ -905,7 +917,8 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
             Set<Entity> maxsup = c.maximalSupport();
             
             logger.info(":::::: "+c.getId()+" :::::::");
-            List<Entity> valid = new ArrayList<>();
+            Set<Entity> valid = new TreeSet<>();
+            Set<Entity> invalid = new TreeSet<>();
             for (Entity e : c.entities()) {
                 Set<StitchKey> conkeys = conflicts.get(e.getId());
                 if (conkeys == null
@@ -913,7 +926,7 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                      * a node is not suspect if it's already assigned and for
                      * which the conflict stitchkeys is not greater than 1
                      * and that it's maximal support (see definition for what
-                     * this means in the Clique definition
+                     * this means in the Clique definition)
                      */ 
                     || (assigned (e)
                         && conkeys.size() < 2 && maxsup.contains(e))
@@ -928,13 +941,20 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                                    +getEqvClass (e.getId())+") stitch keys="
                                    +priorities.get(e.getId())+" conflicts="
                                    +conkeys+" maxsup="+maxsup.contains(e));
+                    invalid.add(e);
                 }
             }
             
             if (valid.size() > 1) {
+                // now for those that survived, we make sure they aren't better
+                // matched against those that didn't survive
+                Set<Entity> defectors = c.defectors(invalid);
                 Util.dump(c, " merge subset "+new TreeSet<>
                           (valid.stream().mapToLong(e -> e.getId()).boxed()
-                           .collect(Collectors.toSet()))+" "+me.getValue());
+                           .collect(Collectors.toSet()))+" "+me.getValue()
+                          +" defectors "+new TreeSet<>
+                          (defectors.stream().mapToLong(e -> e.getId()).boxed()
+                           .collect(Collectors.toSet())));
                 boolean ok = union (valid.toArray(new Entity[0]));
                 if (!ok) {
                     Set<StitchKey> keys = new TreeSet<>(c.values().keySet());
