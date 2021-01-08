@@ -608,6 +608,8 @@ public class HoofBeats {
                 syn.put("label", getString (e.payload("name")));
                 synonyms.add(syn);
             }
+            
+            Map<String, Set<String>> syns = new TreeMap<>();
             for (Source src : SOURCES) {
                 Entity[] ents = entities.get(src);
                 if (ents != null) {
@@ -621,16 +623,27 @@ public class HoofBeats {
                                                    +"long!\n"+sv);
                                 }
                                 else {
-                                    ObjectNode syn = newJsonObject ();
-                                    syn.put("curie", curie);
-                                    syn.put("label", sv);
-                                    synonyms.add(syn);
+                                    Set<String> ss = syns.get(curie);
+                                    if (ss == null)
+                                        syns.put(curie, ss = new TreeSet<>());
+                                    ss.add(sv);
                                 }
                             }
                         }
                     }
                 }
             }
+
+            for (Map.Entry<String, Set<String>> me : syns.entrySet()) {
+                String curie = me.getKey();
+                for (String s : me.getValue()) {
+                    ObjectNode syn = newJsonObject ();
+                    syn.put("curie", curie);
+                    syn.put("label", s);
+                    synonyms.add(syn);
+                }
+            }
+
             return synonyms;
         }
 
