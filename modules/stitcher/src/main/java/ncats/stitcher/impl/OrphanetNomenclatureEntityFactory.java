@@ -70,7 +70,7 @@ public class OrphanetNomenclatureEntityFactory extends OrphanetEntityFactory {
         attrs.put(SOURCE, source.getKey());
         attrs.put(NAME, xref.rel);
         attrs.put("status", xref.status);
-        if (!"".equals(xref.relICD10))
+        if (xref.relICD10 != null && !"".equals(xref.relICD10))
             attrs.put("icd10", xref.relICD10);
         StitchKey key = R_closeMatch;
         if (xref.rel.startsWith("E"))
