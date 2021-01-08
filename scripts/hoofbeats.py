@@ -102,7 +102,8 @@ def load_disease(d, path='.'):
     with open(base+'_sf.json', 'w') as f:
         print (json.dumps(sf, indent=2), file=f)
     with open(base+'_%d.json' % r.status_code, 'w') as f:
-        smash(d, sf)
+        if r.status_code == 200:
+            smash(d, sf)
         print (json.dumps(d, indent=2), file=f)
         
     return (r.status_code, term['curie'], term['Id'])
@@ -119,18 +120,30 @@ def reload_disease(file):
         print (json.dumps(r.json(), indent=2))
 
     
-def load_diseases(file, out):
+def load_diseases(file, out, **kwargs):
     with open(file, 'r') as f:
+        curies = {}
+        if 'include' in kwargs and kwargs['include'] != None:
+            for c in kwargs['include']:
+                curies[c] = None
+        start = 0
+        if 'skip' in kwargs and kwargs['skip'] != None:
+            start = kwargs['skip']
         data = json.load(f)
         total = 0
         count = 0
-        for d in data:
-            r = load_disease(d, out)
-            print('%d -- %d/%s %s %s' % (r[0], total, count, r[1], r[2]))
-            if 200 == r[0]:
-                total = total + 1
-            count = count + 1
-        print('-- %d total record(s) loaded!' % total)
+        if isinstance(data, list):
+            for d in data:
+                if ((len(curies) == 0 or d['term']['curie'] in curies)
+                    and (start == 0 or count > start)):
+                    r = load_disease(d, out)
+                    print('%d -- %d/%s %s %s' % (r[0], total, count, r[1], r[2]))
+                    if 200 == r[0]:
+                        total = total + 1
+                count = count + 1
+            print('-- %d total record(s) loaded!' % total)
+        else:
+            load_disease(data, out)
 
 def patch_objects1(target, source, field, *fields):
     sfids = {}
@@ -150,9 +163,20 @@ def patch_objects2(target, source, field):
             sfids[s['curie']][s['label']] = s['Id']
         else:
             sfids[s['curie']] = {s['label']: s['Id']}
+    patches = []
+    processed = {}
     for t in target[field]:
         if t['curie'] in sfids and t['label'] in sfids[t['curie']]:
-            t['Id'] = sfids[t['curie']][t['label']]
+            id = sfids[t['curie']][t['label']]
+            if id not in processed:
+                t['Id'] = id
+                processed[id] = None
+                patches.append(t)
+        else:
+            patches.append(t)
+            
+    if len(patches) > 0:
+        target[field] = patches
             
 def patch_evidence(target, source):
     sfids = {}
@@ -162,16 +186,29 @@ def patch_evidence(target, source):
         if e['url'] in sfids:
             e['Id'] = sfids[e['url']]
 
-def patch_epidemiology(target, source):
-    for t in target['epidemiology']:
+def patch_objects(target, source, field, minlen=0):
+    patches = []
+    processed = {}
+    for t in target[field]:
         best_s = {}
         ovbest = {}
-        for s in source['epidemiology']:
+        
+        t['Id'] = ''
+        for s in source[field]:
             ov = {k: t[k] for k in t if k in s and s[k] == t[k]}
             if len(ov) > len(ovbest):
                 best_s = s
                 ovbest = ov
-        t['Id'] = best_s['Id']
+        if len(ovbest) >= minlen:
+            t['Id'] = best_s['Id']
+            if t['Id'] not in processed:
+                patches.append(t)
+                processed[t['Id']] = None
+        else:
+            patches.append(t)
+            
+    if len(patches) > 0:
+        target[field] = patches
     
 def patch_disease(disease, dir):
     file = dir+'/%s_200.json' % disease['term']['curie'].replace(':','_')
@@ -181,11 +218,11 @@ def patch_disease(disease, dir):
             d = json.load(f)
             disease['term']['Id'] = d['term']['Id']
             patch_objects2 (disease, d, 'synonyms')
-            patch_objects1 (disease, d, 'external_identifiers')
+            patch_objects (disease, d, 'external_identifiers', 3)
             patch_objects2 (disease, d, 'inheritance')
             patch_objects2 (disease, d, 'age_at_onset')
             patch_objects2 (disease, d, 'age_at_death')
-            patch_epidemiology (disease, d)
+            patch_objects (disease, d, 'epidemiology')
             patch_objects1 (disease, d, 'genes', 'gene_sfdc_id')
             patch_objects1 (disease, d, 'phenotypes', 'phenotype_sfdc_id')
             patch_evidence (disease, d)
@@ -196,20 +233,28 @@ def patch_disease(disease, dir):
             }
             r = requests.post(API['disease'], headers=headers, json=disease)
             file = dir+'/'+disease['term']['curie'].replace(':','_')+'_%d' % r.status_code
-            if r.status_code != 200:
-                with open(file+'.json', 'w') as f:
-                    print (json.dumps(disease, indent=2), file=f)
+            with open(file+'.json', 'w') as f:
+                print (json.dumps(disease, indent=2), file=f)
+            with open(file+'_sf.json', 'w') as f:
+                print (json.dumps(r.json(), indent=2), file=f)
             print('%d...patching %s from %s' % (r.status_code,
                                                 disease['term']['curie'], file))
     else:
         r = load_disease(disease, dir)
     return r
 
-def patch_diseases(file, dir):
+def patch_diseases(file, dir, include):
     with open(file, 'r') as f:
+        curies = {}
+        for c in include:
+            curies[c] = None
         data = json.load(f)
-        for d in data:
-            patch_disease(d, dir)
+        if isinstance(data, list):
+            for d in data:
+                if len(include) == 0 or d['term']['curie'] in curies:
+                    patch_disease(d, dir)
+        else:
+            patch_disease(data, dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -220,11 +265,15 @@ if __name__ == '__main__':
                         help='Input file is of specific type')
     parser.add_argument('-r', '--reload', help='Reload disease file',
                         action='store_true')
+    parser.add_argument('-i', '--include', dest='curies',
+                        nargs='+', help='Include only those curies specified')
     parser.add_argument('-p', '--patch', help='Patch disease based on previously load files per the location specified by -o', action='store_true')
     parser.add_argument('-m', '--mapping', default='gard_diseases_sf.csv',
-                        help='Salesforce disease mapping file (default: gard_diseases_sf.csv)')
+                        help='🙄 Salesforce disease mapping file (default: gard_diseases_sf.csv)')
+    parser.add_argument('-s', '--skip', default=0, type=int,
+                        help='Skip specified number of records in load')
     parser.add_argument('-o', '--output', default='.',
-                        help='Output path (default .)')    
+                        help='Output path (default .)')
     parser.add_argument('FILE', help='Input JSON file')
     if len(sys.argv) == 1:
         parser.print_help()
@@ -234,13 +283,14 @@ if __name__ == '__main__':
     print('-- type: %s' % args.type)
     print('-- config: %s' % args.config)
     print('-- output: %s' % args.output)
+    print('-- curies: %s' % args.curies)
     print('-- FILE: %s' % args.FILE)
     
     config = parse_config(args.config)
     API = config['api']
     TOKEN = get_auth_token(API['token'], config['params'])
     print('-- TOKEN: %s...' % TOKEN[0:32])
-
+    
     try:
         os.makedirs(args.output)
     except FileExistsError:
@@ -262,10 +312,10 @@ if __name__ == '__main__':
         elif args.patch:
             load_mappings(LUT, args.mapping)            
             print('-- patching...%s' % args.FILE)
-            patch_diseases(args.FILE, args.output)
+            patch_diseases(args.FILE, args.output, args.curies)
         else:
             load_mappings(LUT, args.mapping)
-            load_diseases(args.FILE, args.output)
+            load_diseases(args.FILE, args.output, include=args.curies, skip=args.skip)
         
     elif args.type == 'gene':
         load_genes(args.FILE, args.output)

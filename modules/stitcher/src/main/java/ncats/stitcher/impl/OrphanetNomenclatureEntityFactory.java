@@ -1,3 +1,10 @@
+/*
+           <Name lang="en">BTNT (broader term maps to a narrower term)</Name>
+            <Name lang="en">E (exact mapping (the terms and the concepts are equivalent))</Name>
+            <Name lang="en">ND (not yet decided/unable to decide)</Name>
+            <Name lang="en">NTBT (narrower term maps to a broader term)</Name>
+            <Name lang="en">NTBT/E (narrower term maps to a broader term because of an exact mapping with a synonym in the target terminology)</Name>
+*/
 package ncats.stitcher.impl;
 
 import java.io.*;
@@ -22,74 +29,66 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 
-public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
+public class OrphanetNomenclatureEntityFactory extends OrphanetEntityFactory {
     static final Logger logger =
-        Logger.getLogger(OrphanetNaturalHistoryEntityFactory.class.getName());
+        Logger.getLogger(OrphanetNomenclatureEntityFactory.class.getName());
 
-    static class NaturalHistory {
+    static class Xref {
+        public String rel;
+        public String relICD10;        
+        public String source;
+        public String ref;
+        public String status;
+    }
+    
+    static class Nomenclature {
         public Term disorder = new Term ();
-        public LinkedList<Term> onsets = new LinkedList<>();
-        public LinkedList<Term> deaths = new LinkedList<>();
-        public LinkedList<Term> inheritances = new LinkedList<>();
-
-        boolean isEmpty () {
-            return onsets.isEmpty() && deaths.isEmpty() && inheritances.isEmpty();
-        }
+        public LinkedList<Xref> xrefs = new LinkedList<>();
+        boolean isEmpty () { return xrefs.isEmpty(); }
     }
 
-    public OrphanetNaturalHistoryEntityFactory (GraphDb graphDb)
+    public OrphanetNomenclatureEntityFactory (GraphDb graphDb)
         throws IOException {
         super (graphDb);
     }
     
-    public OrphanetNaturalHistoryEntityFactory (String dir) throws IOException {
+    public OrphanetNomenclatureEntityFactory (String dir) throws IOException {
         super (dir);
     }
     
-    public OrphanetNaturalHistoryEntityFactory (File dir) throws IOException {
+    public OrphanetNomenclatureEntityFactory (File dir) throws IOException {
         super (dir);
     }
 
-    @Override
-    protected void init () {
-        super.init();
-        setIdField (Props.URI);
-        setNameField ("label");
-        add (I_CODE, "notation");
-    }
-    
-    void stitch (Entity d, Term t, String relname) throws Exception {
-        boolean stitched = true;
-        Entity[] entities = getEntities (t, "Orphanet");
-        if (entities.length == 0) {
-            // add new (transient) concept
-            Map<String, Object> data = new TreeMap<>();
-            data.put(Props.URI,
-                     "http://www.orpha.net/ORDO/Orphanet_"+t.orphaNumber);
-            data.put("notation", "Orphanet:"+t.orphaNumber);
-            data.put("label", t.name);
-            ncats.stitcher.Entity ent = register (data);
-            //ent.addLabel(AuxNodeType.TRANSIENT);
-            ent.addLabel("S_ORDO_ORPHANET"); // manually add this
-            entities = new Entity[]{ent};
+    void stitch (Xref xref, Entity... orpha) {
+        String prefix = xref.source.toUpperCase();
+        if ("ICD-10".equals(prefix)) {
+            prefix = "ICD10CM";
         }
-
+        
         Map<String, Object> attrs = new TreeMap<>();
-        attrs.put(NAME, relname);
         attrs.put(SOURCE, source.getKey());
-        for (Entity e : entities)
-            d.stitch(e, R_rel, "Orphanet:"+t.orphaNumber, attrs);
+        attrs.put(NAME, xref.rel);
+        attrs.put("status", xref.status);
+        if (!"".equals(xref.relICD10))
+            attrs.put("icd10", xref.relICD10);
+        StitchKey key = R_closeMatch;
+        if (xref.rel.startsWith("E"))
+            key = R_exactMatch;
+        String value = prefix+":"+xref.ref;
+        for (Iterator<Entity> iter = find ("notation", value);
+             iter.hasNext(); ) {
+            Entity e = iter.next();
+            for (Entity ent : orpha)
+                // ent -> e
+                ent.stitch(e, key, value, attrs);
+        }
     }
     
-    void stitch (NaturalHistory nh) throws Exception {
-        Entity[] disorders = getEntities (nh.disorder);
-        for (Entity d : disorders) {
-            for (Term t : nh.onsets)
-                stitch (d, t, "has_age_of_onset");
-            for (Term t : nh.deaths)
-                stitch (d, t, "has_age_of_death");
-            for (Term t : nh.inheritances)
-                stitch (d, t, "has_inheritance");
+    void stitch (Nomenclature nomen) throws Exception {
+        Entity[] disorders = getEntities (nomen.disorder);
+        for (Xref xref : nomen.xrefs) {
+            stitch (xref, disorders);
         }
     }
     
@@ -101,8 +100,8 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
         ObjectMapper mapper = new ObjectMapper ();       
         LinkedList<XMLEvent> stack = new LinkedList<>();        
         StringBuilder buf = new StringBuilder ();
-        NaturalHistory nh = null;
-        Term term = null;
+        Nomenclature nomen = null;
+        Xref xref = null;
         for (XMLEvent ev; events.hasNext(); ) {
             ev = events.nextEvent();
             if (ev.isStartElement()) {
@@ -113,12 +112,10 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
                 String tag = se.getName().getLocalPart();
                 switch (tag) {
                 case "Disorder":
-                    nh = new NaturalHistory ();
+                    nomen = new Nomenclature ();
                     break;
-                case "AverageAgeOfOnset":
-                case "AverageAgeOfDeath":
-                case "TypeOfInheritance":
-                    term = new Term ();
+                case "ExternalReference":
+                    xref = new Xref ();
                     break;
                 }
             }
@@ -136,9 +133,9 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
                 switch (tag) {
                 case "Disorder":
                     logger.info(mapper.writerWithDefaultPrettyPrinter()
-                                .writeValueAsString(nh));
-                    if (!nh.isEmpty()) {
-                        stitch (nh);
+                                .writeValueAsString(nomen));
+                    if (!nomen.isEmpty()) {
+                        stitch (nomen);
                     }
                     break;
                     
@@ -147,12 +144,7 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
                         Integer orpha = Integer.parseInt(value);
                         switch (parent) {
                         case "Disorder":
-                            nh.disorder.orphaNumber = orpha;
-                            break;
-                        case "AverageAgeOfOnset":
-                        case "AverageAgeOfDeath":
-                        case "TypeOfInheritance":
-                            term.orphaNumber = orpha;
+                            nomen.disorder.orphaNumber = orpha;
                             break;
                         }
                     }
@@ -161,26 +153,38 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
                 case "Name":
                     switch (parent) {
                     case "Disorder":
-                        nh.disorder.name = value;
+                        nomen.disorder.name = value;
                         break;
-                    case "AverageAgeOfOnset":
-                    case "AverageAgeOfDeath":
-                    case "TypeOfInheritance":
-                        term.name = value;
+                    case "DisorderMappingICDRelation":
+                        xref.relICD10 = value;
+                        break;
+                    case "DisorderMappingRelation":
+                        xref.rel = value;
+                        break;
+                    case "DisorderMappingValidationStatus":
+                        xref.status = value;
                         break;
                     }
                     break;
 
-                case "AverageAgeOfOnset":
-                    nh.onsets.push(term);
+                case "Source":
+                    switch (parent) {
+                    case "ExternalReference":
+                        xref.source = value;
+                        break;
+                    }
                     break;
 
-                case "AverageAgeOfDeath":
-                    nh.deaths.push(term);
+                case "Reference":
+                    switch (parent) {
+                    case "ExternalReference":
+                        xref.ref = value;
+                        break;
+                    }
                     break;
 
-                case "TypeOfInheritance":
-                    nh.inheritances.push(term);
+                case "ExternalReference":
+                    nomen.xrefs.push(xref);
                     break;
                 } // endswitch()
             }
@@ -196,13 +200,13 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
     public static void main (String[] argv) throws Exception {
         if (argv.length < 1) {
             logger.info("Usage: "
-                        +OrphanetNaturalHistoryEntityFactory.class.getName()
+                        +OrphanetNomenclatureEntityFactory.class.getName()
                         +" DBDIR XML");
             System.exit(1);
         }
         
-        try (OrphanetNaturalHistoryEntityFactory orph =
-             new OrphanetNaturalHistoryEntityFactory (argv[0])) {
+        try (OrphanetNomenclatureEntityFactory orph =
+             new OrphanetNomenclatureEntityFactory (argv[0])) {
             for (int i = 1; i < argv.length; ++i) {
                 File file = new File (argv[i]);
                 DataSource ds = orph.register(file);
@@ -210,3 +214,4 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
         }
     }
 }
+
