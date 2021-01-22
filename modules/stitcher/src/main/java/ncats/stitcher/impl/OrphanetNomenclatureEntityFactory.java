@@ -85,11 +85,12 @@ public class OrphanetNomenclatureEntityFactory extends OrphanetEntityFactory {
         }
     }
     
-    void stitch (Nomenclature nomen) throws Exception {
+    int stitch (Nomenclature nomen) throws Exception {
         Entity[] disorders = getEntities (nomen.disorder);
         for (Xref xref : nomen.xrefs) {
             stitch (xref, disorders);
         }
+        return disorders.length;
     }
     
     @Override
@@ -135,7 +136,9 @@ public class OrphanetNomenclatureEntityFactory extends OrphanetEntityFactory {
                     logger.info(mapper.writerWithDefaultPrettyPrinter()
                                 .writeValueAsString(nomen));
                     if (!nomen.isEmpty()) {
-                        stitch (nomen);
+                        int cnt = stitch (nomen);
+                        if (cnt > 0)
+                            ++count;
                     }
                     break;
                     
