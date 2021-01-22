@@ -25,9 +25,13 @@ owl="doid.owl.gz \
    MEDLINEPLUS.ttl.gz \
    MESH.ttl.gz \
    OMIM.ttl.gz \
+   SNMI.ttl.gz \
+   ICD9CM.ttl.gz \
    ICD10CM.ttl.gz \
    ordo_orphanet.owl.gz \
-   ORDO_es_2.9.owl.gz \
+   IDO.owl \
+   IDO-COVID-19.owl \
+   CIDO.owl.gz \
    Thesaurus.owl.gz \
    VANDF.ttl.gz \
    bto.owl.gz \
@@ -35,7 +39,6 @@ owl="doid.owl.gz \
    cl.owl.gz \
    ddiem.owl.gz \
    uberon.owl.gz \
-   go.owl.gz \
    geno.owl.gz \
    ogg.owl.gz \
    pw.owl.gz \
@@ -44,7 +47,10 @@ owl="doid.owl.gz \
    rxno.owl.gz \
    ogms.owl \
    pato.owl.gz \
-   fma.owl.gz"
+   RXNORM.ttl.gz \
+   ATC.ttl \
+   fma.owl.gz \
+   COVIDCRFRAPID.owl"
 owl_path="owl-202002"
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
@@ -75,7 +81,7 @@ done
 #fi
 
 #load ChEBI
-sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.xrdf.gz"
+sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.owl.gz"
 
 #load rancho
 sbt $opts stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/rancho-disease-drug_2018-12-18_13-30.txt"
@@ -110,6 +116,10 @@ if test -e $orpha/en_product6.xml; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetDiseaseGeneAssociationEntityFactory $out $orpha/en_product6.xml"
 fi
 
+if test -e $orpha/en_product1.xml; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetNomenclatureEntityFactory $out $orpha/en_product1.xml"
+fi
+
 #load MedGen if available
 if test -d $medgen; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.MedGenEntityFactory $out $medgen"
@@ -131,7 +141,7 @@ if test -f $ppi; then
 fi
 
 # make sure these are loaded after medgen
-owl_last="efo.owl.gz mondo.owl.gz"
+owl_last="go-plus.owl.gz efo.owl.gz mondo.owl.gz"
 for f in `echo $owl_last | xargs printf " ${owl_path}/%s"`; do
     sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $f"
 done
