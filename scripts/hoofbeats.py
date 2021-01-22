@@ -199,7 +199,7 @@ def patch_objects(target, source, field, minlen=0):
             if len(ov) > len(ovbest):
                 best_s = s
                 ovbest = ov
-        if len(ovbest) >= minlen:
+        if len(ovbest) > minlen:
             t['Id'] = best_s['Id']
             if t['Id'] not in processed:
                 patches.append(t)
@@ -210,15 +210,16 @@ def patch_objects(target, source, field, minlen=0):
     if len(patches) > 0:
         target[field] = patches
     
-def patch_disease(disease, dir):
-    file = dir+'/%s_200.json' % disease['term']['curie'].replace(':','_')
+def patch_disease(disease, in_dir, out_dir):
+    file = in_dir+'/%s_200.json' % disease['term']['curie'].replace(':','_')
     r = ()
     if os.access(file, os.R_OK):
         with open(file, 'r') as f:
             d = json.load(f)
+            #print(json.dumps(d, indent=2))
             disease['term']['Id'] = d['term']['Id']
             patch_objects2 (disease, d, 'synonyms')
-            patch_objects (disease, d, 'external_identifiers', 3)
+            patch_objects (disease, d, 'external_identifiers', 2)
             patch_objects2 (disease, d, 'inheritance')
             patch_objects2 (disease, d, 'age_at_onset')
             patch_objects2 (disease, d, 'age_at_death')
@@ -232,29 +233,30 @@ def patch_disease(disease, dir):
                 'Authorization': 'Bearer %s' % TOKEN
             }
             r = requests.post(API['disease'], headers=headers, json=disease)
-            file = dir+'/'+disease['term']['curie'].replace(':','_')+'_%d' % r.status_code
+            file = (out_dir+'/'+disease['term']['curie'].replace(':','_')+'_%d'
+                    % r.status_code)
             with open(file+'.json', 'w') as f:
                 print (json.dumps(disease, indent=2), file=f)
             with open(file+'_sf.json', 'w') as f:
                 print (json.dumps(r.json(), indent=2), file=f)
-            print('%d...patching %s from %s' % (r.status_code,
-                                                disease['term']['curie'], file))
+            print('%d...patching %s' % (r.status_code, disease['term']['curie']))
     else:
-        r = load_disease(disease, dir)
+        r = load_disease(disease, out_dir)
     return r
 
-def patch_diseases(file, dir, include):
+def patch_diseases(file, in_dir, out_dir, include):
     with open(file, 'r') as f:
         curies = {}
-        for c in include:
-            curies[c] = None
+        if include != None:
+            for c in include:
+                curies[c] = None
         data = json.load(f)
         if isinstance(data, list):
             for d in data:
-                if len(include) == 0 or d['term']['curie'] in curies:
-                    patch_disease(d, dir)
+                if len(curies) == 0 or d['term']['curie'] in curies:
+                    patch_disease(d, in_dir, out_dir)
         else:
-            patch_disease(data, dir)
+            patch_disease(data, in_dir, out_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -265,9 +267,10 @@ if __name__ == '__main__':
                         help='Input file is of specific type')
     parser.add_argument('-r', '--reload', help='Reload disease file',
                         action='store_true')
-    parser.add_argument('-i', '--include', dest='curies',
+    parser.add_argument('-i', '--include', dest='curies', default='',
                         nargs='+', help='Include only those curies specified')
-    parser.add_argument('-p', '--patch', help='Patch disease based on previously load files per the location specified by -o', action='store_true')
+    parser.add_argument('-q', '--input', help='Path to previously loaded files')
+    parser.add_argument('-p', '--patch', help='Patch disease based on previously load files per the location specified by -q', action='store_true')
     parser.add_argument('-m', '--mapping', default='gard_diseases_sf.csv',
                         help='🙄 Salesforce disease mapping file (default: gard_diseases_sf.csv)')
     parser.add_argument('-s', '--skip', default=0, type=int,
@@ -311,11 +314,13 @@ if __name__ == '__main__':
             reload_disease(args.FILE)
         elif args.patch:
             load_mappings(LUT, args.mapping)            
-            print('-- patching...%s' % args.FILE)
-            patch_diseases(args.FILE, args.output, args.curies)
+            print('-- patching...%s, input=%s output=%s'
+                  % (args.FILE, args.input, args.output))
+            patch_diseases(args.FILE, args.input, args.output, args.curies)
         else:
             load_mappings(LUT, args.mapping)
-            load_diseases(args.FILE, args.output, include=args.curies, skip=args.skip)
+            load_diseases(args.FILE, args.output,
+                          include=args.curies, skip=args.skip)
         
     elif args.type == 'gene':
         load_genes(args.FILE, args.output)
