@@ -485,6 +485,12 @@ public class OntEntityFactory extends EntityRegistry {
                 data.put("GENES", genes != null
                          ? Util.merge(genes, symbol) : symbol);
             }
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.startsWith("SWISSPROT:")) {
+                    useful.add("UNIPROTKB:"+u.substring(10));
+                }
+            }
         }
         else if (ontology.resource != null
                  && "Thesaurus.owl".equals(ontology.resource.getLocalName())) {
@@ -1397,7 +1403,8 @@ public class OntEntityFactory extends EntityRegistry {
 
             // copy non-annotated properties
             for (Map.Entry<String, Object> me : ax.props.entrySet()) {
-                if (!me.getKey().startsWith("annotated")) {
+                String prop = me.getKey();
+                if (!prop.startsWith("annotated") && !prop.equals("label")) {
                     Object old = data.get(me.getKey());
                     data.put(me.getKey(), old != null
                              ? Util.merge(old, me.getValue()) : me.getValue());

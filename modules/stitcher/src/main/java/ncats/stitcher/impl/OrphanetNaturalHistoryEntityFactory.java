@@ -81,7 +81,7 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
             d.stitch(e, R_rel, "Orphanet:"+t.orphaNumber, attrs);
     }
     
-    void stitch (NaturalHistory nh) throws Exception {
+    int stitch (NaturalHistory nh) throws Exception {
         Entity[] disorders = getEntities (nh.disorder);
         for (Entity d : disorders) {
             for (Term t : nh.onsets)
@@ -91,6 +91,7 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
             for (Term t : nh.inheritances)
                 stitch (d, t, "has_inheritance");
         }
+        return disorders.length;
     }
     
     @Override
@@ -138,7 +139,9 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
                     logger.info(mapper.writerWithDefaultPrettyPrinter()
                                 .writeValueAsString(nh));
                     if (!nh.isEmpty()) {
-                        stitch (nh);
+                        int cnt = stitch (nh);
+                        if (cnt > 0)
+                            ++count;
                     }
                     break;
                     
