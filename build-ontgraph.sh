@@ -31,7 +31,6 @@ owl="doid.owl.gz \
    ordo_orphanet.owl.gz \
    IDO.owl \
    IDO-COVID-19.owl \
-   CIDO.owl.gz \
    Thesaurus.owl.gz \
    VANDF.ttl.gz \
    bto.owl.gz \
@@ -141,7 +140,7 @@ if test -f $ppi; then
 fi
 
 # make sure these are loaded after medgen
-owl_last="go-plus.owl.gz efo.owl.gz mondo.owl.gz"
+owl_last="go-plus.owl.gz efo.owl.gz mondo.owl.gz CIDO.owl.gz"
 for f in `echo $owl_last | xargs printf " ${owl_path}/%s"`; do
     sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $f"
 done
