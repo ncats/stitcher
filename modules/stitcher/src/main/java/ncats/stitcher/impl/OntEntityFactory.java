@@ -493,6 +493,17 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
         else if (ontology.resource != null
+                 && "cido.owl".equals(ontology.resource.getLocalName())) {
+            for (String x : xrefs) {
+                String u = x.toUpperCase();
+                if (u.equals("GC_ID:1"))
+                    others.add(u);
+                else
+                    useful.add(u);
+            }
+            data.put("notation", data.get("id"));
+        }
+        else if (ontology.resource != null
                  && "Thesaurus.owl".equals(ontology.resource.getLocalName())) {
             // NCI Thesaurus
             obj = data.get("NHC0");
@@ -1350,7 +1361,7 @@ public class OntEntityFactory extends EntityRegistry {
         data.putAll(or.props);
         if (!data.containsKey("notation")) {
             String not = or.resource.getLocalName();
-            if (not != null)
+            if (not != null && !"".equals(not))
                 data.put("notation", not.replaceAll("_", ":"));
         }
 
@@ -1456,7 +1467,8 @@ public class OntEntityFactory extends EntityRegistry {
 
             Map<String, Object> attrs = new LinkedHashMap<>();
             attrs.put(Props.NAME, name);
-            attrs.put(Props.PROPERTY, prop);
+            if (prop != null)
+                attrs.put(Props.PROPERTY, prop);
             attrs.put(Props.SOURCE, source.getKey());
 
             String val = (String)or.props.get("hasValue");
@@ -1493,7 +1505,7 @@ public class OntEntityFactory extends EntityRegistry {
                 break;
             }
 
-            if (val != null) {
+            if (val != null && !"".equals(val)) {
                 for (Iterator<Entity> iter = find (Props.URI, prop);
                      iter.hasNext();) {
                     Entity e = iter.next();
