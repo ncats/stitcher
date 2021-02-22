@@ -319,7 +319,7 @@ def activemoietyClashes(stitch2ams, stitch):
 
 orphanList = ['Pharmaceutical Manufacturing Encyclopedia (Third Edition)',
               'Broad Institute Drug List 2017-03-27',
-              'Rancho BioSciences, July 2020',
+              'FRDB, February 2021',
               'DrugBank, July 2020',
               'NCATS Pharmaceutical Collection, April 2012',
               'Withdrawn and Shortage Drugs List Feb 2018']

@@ -226,7 +226,13 @@ def activemoietyClashes(stitch2ams, stitch):
         stitch2ams[entries[0]] = entries[1:]
     return stitch2ams
 
-orphanList = ['Pharmaceutical Manufacturing Encyclopedia (Third Edition)', 'Broad Institute Drug List 2017-03-27', 'Rancho BioSciences, July 2020', 'DrugBank, July 2020', 'NCATS Pharmaceutical Collection, April 2012', 'Withdrawn and Shortage Drugs List Feb 2018']
+orphanList = ['Pharmaceutical Manufacturing Encyclopedia (Third Edition)', 
+              'Broad Institute Drug List 2017-03-27', 
+              'FRDB, February 2021', 
+              'DrugBank, July 2020', 
+              'NCATS Pharmaceutical Collection, April 2012', 
+              'Withdrawn and Shortage Drugs List Feb 2018'
+              ]
 def findOrphans(orphans, stitch):
     key = stitch['id']
     rank = stitch['rank']
