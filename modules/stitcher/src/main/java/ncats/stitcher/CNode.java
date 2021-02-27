@@ -338,6 +338,10 @@ public class CNode implements Props, Comparable<CNode> {
         set (name, value, false);
     }
 
+    public void _set (String name, Object value) {
+        _set (name, value, false);
+    }
+    
     public void _set (String name, Object value, boolean index) {
         if (_node.hasProperty(name)) {
             Object old = _node.getProperty(name);

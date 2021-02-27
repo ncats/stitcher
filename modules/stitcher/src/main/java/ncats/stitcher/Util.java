@@ -375,6 +375,26 @@ public class Util {
         return array;
     }
 
+    public static boolean contained (Object value, Object key) {
+        boolean contained = false;
+        if (value != null) {
+            if (value.getClass().isArray()) {
+                int len = Array.getLength(value);
+                for (int i = 0; i < len && !contained; ++i) {
+                    Object val = Array.get(value, i);
+                    contained = ((key == null && val == null)
+                                 || (key != null && key.equals(val)));
+                }
+            }
+            else {
+                contained = value.equals(key);
+            }
+        }
+        else if (key == null)
+            contained = true;
+        return contained;
+    }
+
     public static Stream<?> stream (Object value) {
         return Arrays.stream(Util.toArray(value));
     }

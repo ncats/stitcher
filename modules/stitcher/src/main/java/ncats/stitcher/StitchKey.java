@@ -62,10 +62,12 @@ public enum StitchKey implements RelationshipType {
      * Ontology relationships
      */
     R_subClassOf(1, true),
+    R_subPropertyOf(1, true),
     R_equivalentClass(5),
     R_exactMatch(5),
     R_closeMatch(4),
-    R_axiom,
+    R_relatedTo(2),
+    R_axiom(3, true),
 
     /*
      * UMLS relationship attributes
@@ -76,7 +78,7 @@ public enum StitchKey implements RelationshipType {
     /*
      * has phenotype relationship
      */
-    R_hasPhenotype,
+    R_hasPhenotype(3, true),
 
     /*
      * Biology relationships
