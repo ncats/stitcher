@@ -2,12 +2,14 @@ package ncats.stitcher.disease;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.function.Function;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
@@ -25,7 +27,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class HoofBeats {
     static final Logger logger = Logger.getLogger(HoofBeats.class.getName());
     static final int BATCH_SIZE = 200;
-
+    static final String RANCHO_LABEL = "S_RANCHO-DISEASE-DRUG_2018-12-18_13-30";
+    static final SimpleDateFormat DF = new SimpleDateFormat ("MM/dd/yy");
+    
     static class Source implements Comparable {
         final String name;
         final String id;
@@ -109,6 +113,141 @@ public class HoofBeats {
         +"with m match p=(m)<--(d:DATA) return distinct d.label as label, "
         +"d.notation as notation order by label";
 
+    static final String MONDO_CATEGORY_FMT = "match (d:DATA)-->(n:`S_MONDO`)-[e:R_subClassOf*0..13]->(m:`S_MONDO`)<-[:PAYLOAD]-(z:DATA) where d.notation='%1$s' and all(x in e where x.source=n.source or n.source in x.source) and z.notation IN ["
+        +"\"MONDO:0003900\","
+        +"\"MONDO:0021147\","
+        +"\"MONDO:0045024\","
+        +"\"MONDO:0024297\","
+        +"\"MONDO:0045028\","
+        +"\"MONDO:0000839\","
+        +"\"MONDO:0024236\","
+        +"\"MONDO:0021178\","
+        +"\"MONDO:0021166\","
+        +"\"MONDO:0005550\","
+        +"\"MONDO:0003847\","
+        +"\"MONDO:0020683\","
+        +"\"MONDO:0002254\","
+        +"\"MONDO:0002025\","
+        +"\"MONDO:0020012\","
+        +"\"MONDO:0021669\","
+        +"\"MONDO:0024575\","
+        +"\"MONDO:0002409\","
+        +"\"MONDO:0004995\","
+        +"\"MONDO:0004335\","
+        +"\"MONDO:0021145\","
+        +"\"MONDO:0024458\","
+        +"\"MONDO:0005151\","
+        +"\"MONDO:0005570\","
+        +"\"MONDO:0005046\","
+        +"\"MONDO:0002051\","
+        +"\"MONDO:0002081\","
+        +"\"MONDO:0005071\","
+        +"\"MONDO:0005087\","
+        +"\"MONDO:0002118\","
+        +"\"MONDO:0100120\","
+        +"\"MONDO:0005135\","
+        +"\"MONDO:0019751\","
+        +"\"MONDO:0007179\","
+        +"\"MONDO:0004992\","
+        +"\"MONDO:0024674\","
+        +"\"MONDO:0024882\","
+        +"\"MONDO:0021058\","
+        +"\"MONDO:0100120\","
+        +"\"MONDO:0005135\","
+        +"\"MONDO:0019052\","
+        +"\"MONDO:0044970\","
+        +"\"MONDO:0005365\","
+        +"\"MONDO:0019512\","
+        +"\"MONDO:0005267\","
+        +"\"MONDO:0005385\","
+        +"\"MONDO:0015111\","
+        +"\"MONDO:0005020\","
+        +"\"MONDO:0006858\","
+        +"\"MONDO:0002356\","
+        +"\"MONDO:0002332\","
+        +"\"MONDO:0004298\","
+        +"\"MONDO:0002263\","
+        +"\"MONDO:0005047\","
+        +"\"MONDO:0003150\","
+        +"\"MONDO:0005328\","
+        +"\"MONDO:0002135\","
+        +"\"MONDO:0021084\","
+        +"\"MONDO:0001941\","
+        +"\"MONDO:0005495\","
+        +"\"MONDO:0015514\","
+        +"\"MONDO:0005154\","
+        +"\"MONDO:0100070\","
+        +"\"MONDO:0002356\","
+        +"\"MONDO:0001223\","
+        +"\"MONDO:0003393\","
+        +"\"MONDO:0003240\","
+        +"\"MONDO:0002280\","
+        +"\"MONDO:0001531\","
+        +"\"MONDO:0002245\","
+        +"\"MONDO:0003804\","
+        +"\"MONDO:0003225\","
+        +"\"MONDO:0044348\","
+        +"\"MONDO:0017769\","
+        +"\"MONDO:0005271\","
+        +"\"MONDO:0009453\","
+        +"\"MONDO:0003778\","
+        +"\"MONDO:0005093\","
+        +"\"MONDO:0024255\","
+        +"\"MONDO:0006607\","
+        +"\"MONDO:0006615\","
+        +"\"MONDO:0019296\","
+        +"\"MONDO:0005218\","
+        +"\"MONDO:0005172\","
+        +"\"MONDO:0023603\","
+        +"\"MONDO:0002602\","
+        +"\"MONDO:0005560\","
+        +"\"MONDO:0005027\","
+        +"\"MONDO:0005559\","
+        +"\"MONDO:0002320\","
+        +"\"MONDO:0005287\","
+        +"\"MONDO:0019117\","
+        +"\"MONDO:0020010\","
+        +"\"MONDO:0005395\","
+        +"\"MONDO:0003620\","
+        +"\"MONDO:0100081\","
+        +"\"MONDO:0000270\","
+        +"\"MONDO:0005275\","
+        +"\"MONDO:0000376\","
+        +"\"MONDO:0004867\","
+        +"\"MONDO:0005240\","
+        +"\"MONDO:0006026\","
+        +"\"MONDO:0020059\","
+        +"\"MONDO:0007254\","
+        +"\"MONDO:0008170\","
+        +"\"MONDO:0001657\","
+        +"\"MONDO:0006517\","
+        +"\"MONDO:0021063\","
+        +"\"MONDO:0005575\","
+        +"\"MONDO:0008903\","
+        +"\"MONDO:0002120\","
+        +"\"MONDO:0005206\","
+        +"\"MONDO:0002898\","
+        +"\"MONDO:0004950\","
+        +"\"MONDO:0001627\","
+        +"\"MONDO:0006999\","
+        +"\"MONDO:0044872\","
+        +"\"MONDO:0003441\","
+        +"\"MONDO:0019956\","
+        +"\"MONDO:0020640\","
+        +"\"MONDO:0020067\","
+        +"\"MONDO:0001835\","
+        +"\"MONDO:0001071\","
+        +"\"MONDO:0000437\","
+        +"\"MONDO:0005258\","
+        +"\"MONDO:0017713\","
+        +"\"MONDO:0016054\","
+        +"\"MONDO:0018075\","
+        +"\"MONDO:0008449\","
+        +"\"MONDO:0019716\","
+        +"\"MONDO:0002561\","
+        +"\"MONDO:0020121\"]"
+        +"return distinct z.label as label, z.notation as notation order by label";
+
     static final String HP_INHERITANCE_FMT = "match (d:DATA)-->(n:S_HP)-[e:R_subClassOf*0..]->(:S_HP)--(z:DATA) where d.notation='%1$s' and all(x in e where x.source=n.source or n.source in x.source) and z.notation='HP:0000005' return d.label as inheritance";
 
     // HP:0040006 - mortality/aging
@@ -190,9 +329,14 @@ public class HoofBeats {
     static String getString (Object value) {
         if (value != null) {
             if (value.getClass().isArray()) {
-                StringBuilder sb = new StringBuilder ((String)Array.get(value, 0));
-                for (int i = 1; i < Array.getLength(value); ++i)
-                    sb.append("; "+Array.get(value, i));
+                StringBuilder sb = new StringBuilder ();
+                for (int i = 0; i < Array.getLength(value); ++i) {
+                    String s = (String)Array.get(value, i);
+                    if (s.length() > 0) {
+                        if (sb.length() > 0) sb.append("; ");
+                        sb.append(s);
+                    }
+                }
                 value = sb.toString();
             }
             return escape (value.toString());
@@ -329,9 +473,13 @@ public class HoofBeats {
                             // ogg's label is the gene symbol
                             node.put("gene_symbol",
                                      getString (xe.payload("label")));
+                            /*
                             node.put("association_type",
                                      getString (curent.payload
                                                 ("MIMTYPEVALUE")));
+                            */
+                            node.put("association_type",
+                                     "Role in the phenotype of");
                             node.put("source_validation",
                                      getString (curent.payload
                                                 ("MIMTYPEMEANING")));
@@ -483,13 +631,83 @@ public class HoofBeats {
             return true;
         }
     }
-    
+
+    class RanchoDrugs {
+        Set<Entity> neighbors = new LinkedHashSet<>();
+        Set<Entity> seen = new HashSet<>();
+        ArrayNode drugs = mapper.createArrayNode();
+        Entity cond;
+        
+        RanchoDrugs (Entity... ents) {
+            if (ents != null && ents.length > 0) {
+                for (Entity e : ents) {
+                    e.neighbors(this::visitCondition, N_Name, I_CODE);
+                }
+            }
+        }
+
+        public boolean visitCondition (long id, Entity xe, StitchKey key,
+                                       boolean reversed,
+                                       Map<String, Object> props) {
+            if (!seen.contains(xe) && xe.is(RANCHO_LABEL)) {
+                // xe is rancho condition node; now we get the drug through
+                // the R_rel neighbors
+                cond = xe;
+                xe.neighbors(this::visitDrug, R_rel);
+                seen.add(xe);
+            }
+            return true;
+        }
+
+        public boolean visitDrug (long id, Entity xe, StitchKey key,
+                                  boolean reversed, Map<String, Object> props) {
+            if (!neighbors.contains(xe)
+                && "Approved".equals(props.get("HighestPhase"))
+                && "indication_of".equals(props.get("value"))
+                && xe.is(RANCHO_LABEL)) {
+                String unii = getString (xe.payload("Unii"));
+                if (!"".equals(unii)) {
+                    ObjectNode node = newJsonObject ();
+                    node.put("name",
+                             getString (xe.payload("CompoundName")));
+                    node.put("modality",
+                             getString (props.get("TreatmentModality")));
+                    node.put("approval_status", "ApprovedRx");
+                    String date = getString
+                        (cond.payload("ConditionProductDate"));
+                    if (!"".equals(date)) {
+                        try {
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(DF.parse(date));
+                            node.put("approval_year",
+                                     String.valueOf
+                                     (cal.get(Calendar.YEAR)));
+                        }
+                        catch (Exception ex) {
+                            logger.log(Level.SEVERE,
+                                       "Bogus date: "+date, ex);
+                        }
+                    }
+                    node.put("source",
+                             getString (props.get("HighestPhaseUri")));
+                    node.put("curie", "UNII:"+unii);
+                    node.put("drug_sfdc_id", "");
+                    drugs.add(node);
+                    // xe is the rancho drug node
+                    neighbors.add(xe);
+                }
+            }
+            return true;
+        }
+    }
+
     class DiseaseComponent {
         final Component component;
         final Map<Source, Entity[]> entities = new TreeMap<>();
         final Entity[] gard;
         final Set<Entity> genes = new LinkedHashSet<>();
         final Set<Entity> phenotypes = new LinkedHashSet<>();
+        final Set<Entity> drugs = new LinkedHashSet<>();
         
         DiseaseComponent (long[] comp) {
             component = ef.component(comp);
@@ -529,8 +747,14 @@ public class HoofBeats {
             return ary;
         }
         
-        Entity[] get (String source) {
-            return entities.get(getSource (source));
+        Entity[] get (String... sources) {
+            List<Entity> entities = new ArrayList<>();
+            for (String s : sources) {
+                Entity[] ents = this.entities.get(getSource (s));
+                if (ents != null && ents.length > 0)
+                    entities.addAll(Arrays.asList(ents));
+            }
+            return entities.isEmpty() ? null : entities.toArray(new Entity[0]);
         }
 
         boolean has (String source) {
@@ -539,18 +763,22 @@ public class HoofBeats {
         
         JsonNode toJson () {
             ObjectNode disease = null;
-            if (gard != null) {
+            if (gard != null && gard.length > 0) {
                 disease = mapper.createObjectNode();            
                 disease.put("term", doTerm ());
+                disease.put("disease_categories", doDiseaseCategories ());
                 disease.put("synonyms", doSynonyms ());
                 disease.put("external_identifiers", doExternalIdentifiers ());
                 disease.put("inheritance", doInheritance ());
                 disease.put("age_at_onset", doAgeOfOnset ());
                 disease.put("age_at_death", doAgeOfDeath ());
+                disease.put("diagnosis", doDiagnoses ());                
                 disease.put("epidemiology", doEpidemiology ());
                 disease.put("genes", doGenes ());
                 disease.put("phenotypes", doPhenotypes ());
+                disease.put("drugs", doDrugs ());
                 disease.put("evidence", doEvidence ());
+                disease.put("related_diseases", doRelatedDiseases ());
             }
             return disease;
         }
@@ -571,20 +799,24 @@ public class HoofBeats {
                 term.put("description", getString (medgen[0].payload("DEF")));
                 term.put("description_curie", "MEDGEN:"
                          +getString (medgen[0].payload("id")));
-                term.put("description_URL", getSource("S_MEDGEN").url(medgen[0]));
+                term.put("description_URL",
+                         getSource("S_MEDGEN").url(medgen[0]));
             }
 
             JsonNode desc = term.get("description");
             if (desc != null && desc.isNull() && orpha != null) {
-                term.put("description", getString (orpha[0].payload("definition")));
+                term.put("description",
+                         getString (orpha[0].payload("definition")));
                 term.put("description_curie",
                          getString (orpha[0].payload("notation")));
-                term.put("description_URL", getSource("S_ORDO_ORPHANET").url(orpha[0]));
+                term.put("description_URL",
+                         getSource("S_ORDO_ORPHANET").url(orpha[0]));
             }
 
             desc = term.get("description");
             if (desc != null && desc.isNull() && mondo != null) {
-                term.put("description", getString (mondo[0].payload("IAO_0000115")));
+                term.put("description",
+                         getString (mondo[0].payload("IAO_0000115")));
                 term.put("description_curie",
                          getString (mondo[0].payload("notation")));
                 term.put("description_URL", getSource("S_MONDO").url(mondo[0]));
@@ -600,6 +832,31 @@ public class HoofBeats {
             return term;
         }
 
+        JsonNode doDiseaseCategories () {
+            final Map<String, String> cats = new TreeMap<>();
+            Entity[] ents = get ("S_MONDO");
+            if (ents != null && ents.length > 0) {
+                for (Entity e : ents) {
+                    String mondo = getString (e.payload("notation"));
+                    ef.cypher(row -> {
+                            cats.put((String)row.get("notation"),
+                                     (String)row.get("label"));
+                            return true;
+                        }, String.format(MONDO_CATEGORY_FMT, mondo));
+                }
+            }
+
+            ArrayNode categories = mapper.createArrayNode();
+            for (Map.Entry<String, String> me : cats.entrySet()) {
+                ObjectNode node = newJsonObject ();
+                node.put("label", me.getValue());
+                node.put("curie", me.getKey());
+                node.put("category_sfdc_id", "");
+                categories.add(node);
+            }
+            return categories;
+        }
+        
         JsonNode doSynonyms () {
             ArrayNode synonyms = mapper.createArrayNode();            
             for (Entity e : gard) {
@@ -674,7 +931,8 @@ public class HoofBeats {
                 for (Entity e : ents) {
                     final String notation = getString (e.payload("notation"));
                     e.neighbors((id, xe, key, reversed, props) -> {
-                            if (!seen.contains(xe) && !reversed && xe.is("S_OMIM")
+                            if (!seen.contains(xe)
+                                && !reversed && xe.is("S_OMIM")
                                 && "has_inheritance_type"
                                 .equals(props.get("name"))) {
                                 ObjectNode node = newJsonObject ();
@@ -701,6 +959,31 @@ public class HoofBeats {
                 ("has_age_of_death", get ("S_ORDO_ORPHANET")).neighbors;
         }
 
+        JsonNode doDiagnoses () {
+            ArrayNode diagnoses = mapper.createArrayNode();
+            Entity[] ents = get ("S_MEDGEN");
+            if (ents != null && ents.length > 0) {
+                for (Entity e : ents) {
+                    boolean hasGTR = false;
+                    for (Object source : Util.toArray(e.payload("SOURCES"))) {
+                        if ("GTR".equals(source)) {
+                            hasGTR = true;
+                            break;
+                        }
+                    }
+                    
+                    if (hasGTR) {
+                        ObjectNode node = newJsonObject ();
+                        node.put("Id", "");
+                        node.put("type", "GTR");
+                        node.put("curie", "MEDGEN:"+e.payload("CUI"));
+                        diagnoses.add(node);
+                    }
+                }
+            }
+            return diagnoses;
+        }
+        
         JsonNode doEpidemiology () {
             return new OrphanetEpidemiology(get ("S_ORDO_ORPHANET")).epi;
         }
@@ -722,6 +1005,12 @@ public class HoofBeats {
             return gp.phenotypes;
         }
 
+        JsonNode doDrugs () {
+            RanchoDrugs rd = new RanchoDrugs(get ("S_DOID", "S_MESH"));
+            this.drugs.addAll(rd.neighbors);
+            return rd.drugs;
+        }
+
         JsonNode doEvidence () {
             ArrayNode evidence = mapper.createArrayNode();
             Entity[] ents = get("S_GARD");
@@ -738,13 +1027,16 @@ public class HoofBeats {
                                              getString (xe.payload("title")));
                                     node.put("genes",
                                              toJsonArray (xe.payload("genes")));
-                                    node.put("url", "https://www.ncbi.nlm.nih.gov/books/"
-                                             +bookid);
+                                    node.put
+                                        ("url",
+                                         "https://www.ncbi.nlm.nih.gov/books/"
+                                         +bookid);
                                     node.put("type", "Systematic Review");
                                     evidence.add(node);
                                 }
                                 else {
-                                    logger.warning("Can't lookup GeneReviews "+gr);
+                                    logger.warning
+                                        ("Can't lookup GeneReviews "+gr);
                                 }
                                 dups.add(xe);
                             }
@@ -753,6 +1045,19 @@ public class HoofBeats {
                 }
             }
             return evidence;
+        }
+
+        JsonNode doRelatedDiseases () {
+            ArrayNode related = mapper.createArrayNode();
+            Entity[] ents = get ("S_MONDO");
+            if (ents != null) {
+                // get all children of mondo nodes and get their
+                // corresponding gard nodes
+                for (Entity e : ents) {
+                    
+                }
+            }
+            return related;
         }
     }
 
@@ -810,14 +1115,28 @@ public class HoofBeats {
     }
 
     static String getIds (Component component, String source, String prop) {
+        return getIds (component, source,
+                       e -> Util.stream(e.payload(prop))
+                       .map(Object::toString)
+                       .collect(Collectors.toSet()));
+    }
+
+    static String getIds (Component component, String source,
+                          Function<Entity, Set<String>> eval) {
         StringBuilder sb = new StringBuilder ();
         Entity[] entities = filter (component, source);
         if (entities.length > 0) {
-            sb.append(entities[0].payload(prop));
-            for (int i = 1; i < entities.length; ++i)
-                sb.append(","+entities[i].payload(prop));
+            Set<String> vals = new TreeSet<>();
+            for (int i = 0; i < entities.length; ++i) {
+                vals.addAll(eval.apply(entities[i]));
+            }
+
+            for (String v : vals) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(v);
+            }
         }
-        return sb.toString();
+        return sb.toString();        
     }
 
     static Entity[] filter (Component component, String source) {
@@ -858,7 +1177,18 @@ public class HoofBeats {
         ps.print(getIds (component, "S_MESH", "notation")+"\t");
         ps.print(getIds (component, "S_DOID", "notation")+"\t");
         ps.print(getIds (component, "S_MEDLINEPLUS", "notation")+"\t");
-        ps.print(getIds (component, "S_EFO", "notation"));
+        ps.print(getIds (component, "S_EFO", "notation")+"\t");
+        ps.print(getIds (component, "S_ICD10CM", "notation")+"\t");
+        ps.print(getIds (component, "S_MONDO", e -> 
+                         Util.stream(e.payload("hasDbXref"))
+                         .map(Object::toString)
+                         .filter(x -> x.startsWith("MedDRA"))
+                         .collect(Collectors.toSet()))+"\t");
+        ps.print(getIds (component, "S_MONDO", e ->
+                         Util.stream(e.payload("hasDbXref"))
+                         .map(Object::toString)
+                         .filter(x -> x.startsWith("SCTID"))
+                         .collect(Collectors.toSet())));
         ps.println();
     }
     
@@ -873,7 +1203,7 @@ public class HoofBeats {
         File file = new File (outfile);
         PrintStream ps = new PrintStream (new FileOutputStream (file));
         ps.println("MONDO\tOrphanet\tGARD\tOMIM\tMedGen\tMeSH\tDOID\t"
-                   +"MedLinePlus\tEFO");
+                   +"MedLinePlus\tEFO\tICD10\tMedDRA\tSNOMEDCT");
         long[][] components = uf.components();
         for (long[] comp : components) {
             beats (ps, comp);
@@ -887,9 +1217,11 @@ public class HoofBeats {
                                                      (base+"_diseases.json"));
              PrintStream genes = new PrintStream (new FileOutputStream
                                                   (base+"_genes.json"));
-             PrintStream phenotypes = new PrintStream (new FileOutputStream
-                                                       (base+"_phenotypes.json"))) {
-            return writeJson (diseases, genes, phenotypes);
+             PrintStream phenotypes = new PrintStream
+             (new FileOutputStream (base+"_phenotypes.json"));
+             PrintStream drugs = new PrintStream (new FileOutputStream
+                                                  (base+"_drugs.json"))) {
+            return writeJson (diseases, genes, phenotypes, drugs);
         }
     }
 
@@ -903,8 +1235,8 @@ public class HoofBeats {
         ps.println("}");
     }
     
-    public int writeJson (PrintStream dps, PrintStream gps, PrintStream pps)
-        throws IOException {
+    public int writeJson (PrintStream ps, PrintStream gps, PrintStream pps,
+                          PrintStream dps) throws IOException {
         ef.stitches((source, target, values) -> {
                 /*
                 logger.info(source.getId()+": "+source.labels()
@@ -914,14 +1246,16 @@ public class HoofBeats {
                 uf.union(source.getId(), target.getId());
             }, R_exactMatch, R_equivalentClass);
 
-        int count = 0, cnt = 0;
+        int cnt = 0;
         Random rand = new Random ();
         Set<Long> genes = new HashSet<>();
         Set<Long> phenotypes = new HashSet<>();
-        
-        dps.println("[");
+        Set<Long> drugs = new HashSet<>();
+        Map<String, JsonNode> diseases = new TreeMap<>();
+    
         gps.print("[");
         pps.print("[");
+        dps.print("[");
         ObjectMapper mapper = new ObjectMapper ();            
         ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
         
@@ -931,12 +1265,12 @@ public class HoofBeats {
             DiseaseComponent dc = new DiseaseComponent (comp);
             JsonNode json = dc.toJson();
             if (json != null) {
-                if (count > 0) dps.print(",");
-                String jstr = writer.writeValueAsString(json);
-                dps.print(jstr);
-                if (cnt < 10 && rand.nextFloat() > 0.5f) {
-                    String id = json.get("term").get("curie")
-                        .asText().replaceAll(":", "_");
+                //if (count > 0) ps.print(",");
+                //String jstr = writer.writeValueAsString(json);
+                //ps.print(jstr);
+                String curie = json.get("term").get("curie").asText();
+                if (false && cnt < 10 && rand.nextFloat() > 0.5f) {
+                    String id = curie.replaceAll(":", "_");
                     try (FileOutputStream fos =
                          new FileOutputStream (id+".json")) {
                         writer.writeValue(fos, json);
@@ -949,64 +1283,69 @@ public class HoofBeats {
                     }
                     ++cnt;
                 }
-                ++count;
+                diseases.put(curie, json);
             }
 
-            for (Entity e : dc.genes) {
-                if (!genes.contains(e.getId())) {
-                    if (genes.size() % BATCH_SIZE != 0) 
-                        gps.println(",");
-                    else {
-                        if (!genes.isEmpty())
-                            gps.println("]\n},");
-                        sfJsonHeader (gps);
-                    }
-                    writeGene (gps, e);
-                    genes.add(e.getId());
-                }
-            }
-            
-            for (Entity e : dc.phenotypes) {
-                if (!phenotypes.contains(e.getId())) {
-                    if (phenotypes.size() % BATCH_SIZE != 0)
-                        pps.println(",");
-                    else {
-                        if (!phenotypes.isEmpty())
-                            pps.println("]\n},");
-                        sfJsonHeader (pps);
-                    }
-                    writePhenotype (pps, e);
-                    phenotypes.add(e.getId());
-                }
-            }
+            writeEntities (gps, dc.genes, genes, this::writeGene);
+            writeEntities (pps, dc.phenotypes, phenotypes, this::writePhenotype);
+            writeEntities (dps, dc.drugs, drugs, this::writeDrug);
         }
-        dps.println("]");
         gps.println("]\n}]");
         pps.println("]\n}]");
+        dps.println("]\n}]");
+        
+        ps.println("[");
+        int count = 0;
+        for (JsonNode node : diseases.values()) {
+            ArrayNode related = (ArrayNode) node.get("related_diseases");
+            for (int i = 0; i < related.size(); ++i) {
+                ObjectNode r = (ObjectNode) related.get(i);
+                JsonNode xref = diseases.get(r.get("curie").asText());
+                if (xref != null) {
+                    r.put("disease_sfdc_id",
+                          xref.get("term").get("Id").asText());
+                }
+                else {
+                    logger.warning("*** Disease "
+                                   +node.get("term").get("curie").asText()
+                                   +" references unknown disease "
+                                   +r.get("curie").asText()+"!!!");
+                }
+            }
+            if (count++ > 0)
+                ps.print(",");
+            ps.print(writer.writeValueAsString(node));
+        }
+        ps.println("]");
 
         logger.info("######## "+components.length+" diseases!");
         logger.info("######## "+genes.size()+" genes!");
         logger.info("######## "+phenotypes.size()+" phenotypes!");
+        logger.info("######## "+drugs.size()+" drugs!");
         
         return count;
     }
 
-    void writeGenes (String id, Entity[] genes) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream (id+"_genes.json")) {
-            PrintStream ps = new PrintStream (fos);
-            ps.println("{");
-            ps.println("  \"allOrNone\": false,"); // ?
-            ps.println("  \"records\": [");
-            for (int i = 0; i < genes.length; ++i) {
-                Entity e = genes[i];
-                if (i > 0) {
+    void writeEntities (PrintStream ps, Collection<Entity> entities,
+                        Set<Long> processed,
+                        BiConsumer<PrintStream, Entity> writer) {
+        for (Entity e : entities) {
+            if (!processed.contains(e.getId())) {
+                if (processed.size() % BATCH_SIZE != 0) 
                     ps.println(",");
+                else {
+                    if (!processed.isEmpty())
+                        ps.println("]\n},");
+                    sfJsonHeader (ps);
                 }
-                writeGene (ps, e);
+                writer.accept(ps, e);
+                processed.add(e.getId());
             }
-            ps.println("]");
-            ps.println("}");
         }
+    }
+
+    void writeGenes (String id, Entity[] genes) throws IOException {
+        writeEntities (id+"_genes.json", genes, this::writeGene);
     }
 
     void writeGene (PrintStream ps, Entity e) {
@@ -1040,7 +1379,8 @@ public class HoofBeats {
             .map(Object::toString)
             .filter(x -> x.startsWith("HGNC:"))
             .findFirst();
-        String id = hgnc.isPresent() ? hgnc.get() : getString (e.payload("notation"));
+        String id = hgnc.isPresent()
+            ? hgnc.get() : getString (e.payload("notation"));
         
         ps.println("    {");
         ps.println("        \"attributes\": {");
@@ -1057,22 +1397,7 @@ public class HoofBeats {
 
     void writePhenotypes (String id, Entity[] phenotypes)
         throws IOException {
-        try (FileOutputStream fos =
-             new FileOutputStream (id+"_phenotypes.json")) {
-            PrintStream ps = new PrintStream (fos);
-            ps.println("{");
-            ps.println("  \"allOrNone\": false,"); // ?
-            ps.println("  \"records\": [");
-            for (int i = 0; i < phenotypes.length; ++i) {
-                Entity e = phenotypes[i];
-                if (i > 0) {
-                    ps.println(",");
-                }
-                writePhenotype (ps, e);
-            }
-            ps.println("]");
-            ps.println("}");
-        }
+        writeEntities (id+"_phenotypes.json", phenotypes, this::writePhenotype);
     }
 
     void writePhenotype (PrintStream ps, Entity e) {
@@ -1099,6 +1424,54 @@ public class HoofBeats {
         ps.println("        \"External_ID__c\": \""
                    +getString (e.payload("notation"))+"\"");
         ps.print("    }");
+    }
+
+    void writeDrugs (String id, Entity[] drugs) throws IOException {
+        writeEntities (id+"_drugs.json", drugs, this::writeDrug);
+    }
+
+    void writeDrug (PrintStream ps, Entity e) {
+        ps.println("    {");
+        ps.println("        \"attributes\": {");
+        ps.println("            \"type\": \"Drug__c\"");
+        ps.println("         },");
+        String unii = getString (e.payload("Unii"));
+        ps.println("        \"Name\": \""+unii+"\",");
+        ps.println("        \"Drug_Name__c\": \""
+                   +getString (e.payload("CompoundName"))+"\",");
+        ps.println("        \"Drug_Identifier__c\": \"UNII:"+unii+"\",");
+        final Set<String> syns = new TreeSet<>();
+        e.neighbors((id, xe, key, reversed, props) -> {
+                if ("Approved".equals(props.get("HighestPhase"))
+                    && "indication_of".equals(props.get("value"))
+                    && xe.is(RANCHO_LABEL)) {
+                    syns.add(getString (xe.payload("ConditionProductName")));
+                }
+                return true;
+            }, R_rel);
+        ps.println("        \"Drug_Synonyms__c\": \""
+                   +getString (syns.toArray(new String[0]))+"\"");
+        ps.print  ("    }");
+    }
+
+    void writeEntities (String file, Entity[] entities,
+                        BiConsumer<PrintStream, Entity> writeEntity)
+        throws IOException {
+        try (FileOutputStream fos = new FileOutputStream (file)) {
+            PrintStream ps = new PrintStream (fos);
+            ps.println("{");
+            ps.println("  \"allOrNone\": false,"); // ?
+            ps.println("  \"records\": [");
+            for (int i = 0; i < entities.length; ++i) {
+                Entity e = entities[i];
+                if (i > 0) {
+                    ps.println(",");
+                }
+                writeEntity.accept(ps, e);
+            }
+            ps.println("]");
+            ps.println("}");
+        }
     }
 
     public void untangle (EntityFactory ef, BiConsumer<Long, long[]> consumer) {
@@ -1130,7 +1503,7 @@ public class HoofBeats {
             if (pos < 0)
                 pos = argv[0].length();
             String base = argv[0].substring(0, pos);
-            //hb.beats(base+".txt");
+            hb.beats(base+"_mappings.txt");
             hb.writeJson(base);
         }
     }

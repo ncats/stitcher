@@ -17,6 +17,11 @@ def set_phenotype_id(s, d):
     if 'Id' in d:
         s['Id'] = d['Id']        
         s['phenotype_sfdc_id'] = d['Feature__c']
+
+def set_drug_id(s, d):
+    if 'Id' in d:
+        s['Id'] = d['Id']
+        s['drug_sfdc_id'] = d['Drug__c']
     
 def _smash(array, r, type, fn = set_id):
     data = []
@@ -25,16 +30,19 @@ def _smash(array, r, type, fn = set_id):
             data.append(x)
     for (i,s) in enumerate(array):
         fn(s, data[i])
-    
+
 def smash(d, r):
+    _smash (d['disease_categories'], r, 'GARD_Disease_Category__c')
     _smash (d['synonyms'], r, 'Disease_Synonym__c')
     _smash (d['external_identifiers'], r, 'External_Identifier_Disease__c')
     _smash (d['inheritance'], r, 'Inheritance__c')
     _smash (d['age_at_onset'], r, 'Age_At_Onset__c')
     _smash (d['age_at_death'], r, 'Age_At_Death__c')
+    _smash (d['diagnosis'], r, 'Diagnosis__c')
     _smash (d['epidemiology'], r, 'Epidemiology__c')
     _smash (d['genes'], r, 'GARD_Disease_Gene__c', set_gene_id)
     _smash (d['phenotypes'], r, 'GARD_Disease_Feature__c', set_phenotype_id)
+    _smash (d['drugs'], r, 'GARD_Disease_Drug__c', set_drug_id)
     _smash (d['evidence'], r, 'Evidence__c')
 
 
@@ -87,6 +95,11 @@ def load_phenotypes(file, out):
     with open(file, 'r') as f:
         data = json.load(f)
         load_objects(API['phenotype'], data, out, 'phenotype')
+
+def load_drugs(file, out):
+    with open(file, 'r') as f:
+        data = json.load(f)
+        load_objects(API['drug'], data, out, 'drug')
 
 def load_disease(d, path='.'):
     headers = {
@@ -146,37 +159,39 @@ def load_diseases(file, out, **kwargs):
             load_disease(data, out)
 
 def patch_objects1(target, source, field, *fields):
-    sfids = {}
-    for s in source[field]:
-        sfids[s['curie']] = s
-    for t in target[field]:
-        if t['curie'] in sfids:
-            d = sfids[t['curie']]
-            t['Id'] = d['Id']
-            for f in fields:
-                t[f] = d[f]
+    if field in source:
+        sfids = {}
+        for s in source[field]:
+            sfids[s['curie']] = s
+        for t in target[field]:
+            if t['curie'] in sfids:
+                d = sfids[t['curie']]
+                t['Id'] = d['Id']
+                for f in fields:
+                    t[f] = d[f]
         
 def patch_objects2(target, source, field):
-    sfids = {}
-    for s in source[field]:
-        if s['curie'] in sfids:
-            sfids[s['curie']][s['label']] = s['Id']
-        else:
-            sfids[s['curie']] = {s['label']: s['Id']}
-    patches = []
-    processed = {}
-    for t in target[field]:
-        if t['curie'] in sfids and t['label'] in sfids[t['curie']]:
-            id = sfids[t['curie']][t['label']]
-            if id not in processed:
-                t['Id'] = id
-                processed[id] = None
+    if field in source:
+        sfids = {}        
+        for s in source[field]:
+            if s['curie'] in sfids:
+                sfids[s['curie']][s['label']] = s['Id']
+            else:
+                sfids[s['curie']] = {s['label']: s['Id']}
+        patches = []
+        processed = {}
+        for t in target[field]:
+            if t['curie'] in sfids and t['label'] in sfids[t['curie']]:
+                id = sfids[t['curie']][t['label']]
+                if id not in processed:
+                    t['Id'] = id
+                    processed[id] = None
+                    patches.append(t)
+            else:
                 patches.append(t)
-        else:
-            patches.append(t)
             
-    if len(patches) > 0:
-        target[field] = patches
+        if len(patches) > 0:
+            target[field] = patches
             
 def patch_evidence(target, source):
     sfids = {}
@@ -187,28 +202,34 @@ def patch_evidence(target, source):
             e['Id'] = sfids[e['url']]
 
 def patch_objects(target, source, field, minlen=0):
-    patches = []
-    processed = {}
-    for t in target[field]:
-        best_s = {}
-        ovbest = {}
+    if field in source and field in target:
+        patches = []
+        processed = {}
+        for t in target[field]:
+            best_s = {}
+            ovbest = {}
         
-        t['Id'] = ''
-        for s in source[field]:
-            ov = {k: t[k] for k in t if k in s and s[k] == t[k]}
-            if len(ov) > len(ovbest):
-                best_s = s
-                ovbest = ov
-        if len(ovbest) > minlen:
-            t['Id'] = best_s['Id']
-            if t['Id'] not in processed:
+            t['Id'] = ''
+            for s in source[field]:
+                ov = {k: t[k] for k in t if k in s and s[k] == t[k]}
+                if len(ov) > len(ovbest):
+                    best_s = s
+                    ovbest = ov
+            if len(ovbest) > minlen:
+                t['Id'] = best_s['Id']
+                if t['Id'] not in processed:
+                    patches.append(t)
+                    processed[t['Id']] = None
+            else:
                 patches.append(t)
-                processed[t['Id']] = None
-        else:
-            patches.append(t)
             
-    if len(patches) > 0:
-        target[field] = patches
+        if len(patches) > 0:
+            target[field] = patches
+            
+    elif field in source:
+        # deleted field
+        print("** target object doesn't have field '%s'; "
+              "deletion is currently not supported!" % field, file=sys.stderr)
     
 def patch_disease(disease, in_dir, out_dir):
     file = in_dir+'/%s_200.json' % disease['term']['curie'].replace(':','_')
@@ -218,14 +239,17 @@ def patch_disease(disease, in_dir, out_dir):
             d = json.load(f)
             #print(json.dumps(d, indent=2))
             disease['term']['Id'] = d['term']['Id']
+            patch_objects2 (disease, d, 'disease_categories')
             patch_objects2 (disease, d, 'synonyms')
             patch_objects (disease, d, 'external_identifiers', 2)
             patch_objects2 (disease, d, 'inheritance')
             patch_objects2 (disease, d, 'age_at_onset')
             patch_objects2 (disease, d, 'age_at_death')
+            patch_objects (disease, d, 'diagnosis', 1)
             patch_objects (disease, d, 'epidemiology')
             patch_objects1 (disease, d, 'genes', 'gene_sfdc_id')
             patch_objects1 (disease, d, 'phenotypes', 'phenotype_sfdc_id')
+            patch_objects1 (disease, d, 'drugs', 'drug_sfdc_id')
             patch_evidence (disease, d)
             #print(json.dumps(disease, indent=2))
             headers = {
@@ -235,11 +259,14 @@ def patch_disease(disease, in_dir, out_dir):
             r = requests.post(API['disease'], headers=headers, json=disease)
             file = (out_dir+'/'+disease['term']['curie'].replace(':','_')+'_%d'
                     % r.status_code)
-            with open(file+'.json', 'w') as f:
-                print (json.dumps(disease, indent=2), file=f)
+            sf = r.json()
             with open(file+'_sf.json', 'w') as f:
-                print (json.dumps(r.json(), indent=2), file=f)
+                print (json.dumps(sf, indent=2), file=f)
             print('%d...patching %s' % (r.status_code, disease['term']['curie']))
+            with open(file+'.json', 'w') as f:
+                if 200 == r.status_code:
+                    smash(disease, sf)
+                print (json.dumps(disease, indent=2), file=f)
     else:
         r = load_disease(disease, out_dir)
     return r
@@ -263,7 +290,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', required=True,
                         help='Required configuration in json format')
     parser.add_argument('-t', '--type', required=True,
-                        choices=['gene', 'phenotype','disease'],
+                        choices=['gene', 'phenotype', 'disease', 'drug'],
                         help='Input file is of specific type')
     parser.add_argument('-r', '--reload', help='Reload disease file',
                         action='store_true')
@@ -324,6 +351,9 @@ if __name__ == '__main__':
         
     elif args.type == 'gene':
         load_genes(args.FILE, args.output)
+
+    elif args.type == 'drug':
+        load_drugs(args.FILE, args.output)
 
     elif args.type == 'phenotype':
         load_phenotypes(args.FILE, args.output)

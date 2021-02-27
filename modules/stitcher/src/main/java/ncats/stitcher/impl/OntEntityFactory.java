@@ -88,7 +88,7 @@ public class OntEntityFactory extends EntityRegistry {
 
     static class OntologyResource {
         final public Resource resource;
-        public String uri;
+        final public String uri;
         final public String type;
         final public boolean anonymous;
         final public Map<String, Object> props = new TreeMap<>();
@@ -172,13 +172,14 @@ public class OntEntityFactory extends EntityRegistry {
                 }
             }
 
-            this.uri = getURI (res);
-            if (this.uri == null && "Class".equalsIgnoreCase(t)) {
-                this.uri = res.toString();
+            String uri = getURI (res);
+            if (uri == null && "Class".equalsIgnoreCase(t)) {
+                uri = res.toString();
                 this.anonymous = true;
             }
             else
                 this.anonymous = false;
+            this.uri = uri;
             this.type = t;
             this.resource = res;
         }
@@ -288,6 +289,7 @@ public class OntEntityFactory extends EntityRegistry {
             .add(I_CODE, "SY")
             .add(I_CODE, "RQ")
             .add(I_CODE, "cui")
+            .add(I_CODE, "ICD")
             .add(I_UNII, "P319")
             .add(I_GENE, "GENESYMBOL")
             .add(I_GENE, "OGG_0000000004")
@@ -339,6 +341,14 @@ public class OntEntityFactory extends EntityRegistry {
             else if (uri.startsWith("http://linkedlifedata.com")) {
                 String[] toks = uri.split("/");
                 uri = OBO_URI+"UMLS_"+toks[toks.length-1];
+            }
+            else if (uri.startsWith("http://identifiers.org")) {
+                String[] toks = uri.split("/");
+                String ns = toks[toks.length-2].toUpperCase();
+                String id = toks[toks.length-1];
+                if (ns.equals("SNOWMEDCT"))
+                    ns = ns+"_US";
+                uri = OBO_URI+ns+"_"+id;
             }
         }
         else if (uri == null) {
@@ -526,6 +536,11 @@ public class OntEntityFactory extends EntityRegistry {
             obj = data.get("P93");
             if (obj != null)
                 xrefs.add("UNIPROTKB:"+obj);
+            obj = data.remove("notation");
+            if (obj != null) {
+                data.put("notation", map (obj, a -> "NCIT:"+a));
+                data.put("uri", OBO_URI+"NCIT_"+obj);
+            }
         }
         else if (ontology.resource != null
                  && "cl.owl".equals(ontology.resource.getLocalName())) {
@@ -1105,7 +1120,9 @@ public class OntEntityFactory extends EntityRegistry {
                     if (pos <= 0) {
                     }
                     else if (u.startsWith("SNOMEDCT_US")) {
-                        useful.add("SNOWMEDCT_US"+u.substring(pos));
+                        String id = u.substring(pos);
+                        useful.add("SNOWMEDCT_US"+id);
+                        useful.add("SNOWMEDCT"+id);
                     }
                     else if (u.startsWith("ORDO:")) {
                         useful.add("ORPHA"+u.substring(pos));
@@ -1140,7 +1157,12 @@ public class OntEntityFactory extends EntityRegistry {
                     || (u.startsWith("BTO:")
                         && Character.isDigit(u.charAt(4)))
                     ) {
-                    useful.add(x);
+                    if (u.startsWith("SNOMEDCT")) {
+                        int pos = u.indexOf(':');
+                        if (pos > 0)
+                            useful.add("SNOMEDCT"+x.substring(pos));
+                    }
+                    useful.add(x);                    
                 }
                 else if (u.charAt(0) == 'C'
                          && Character.isDigit(u.charAt(1))) {
@@ -1213,7 +1235,7 @@ public class OntEntityFactory extends EntityRegistry {
                  && "mondo.owl".equals(ontology.resource.getLocalName())) {
             for (String x : xrefs) {
                 String u = x.toUpperCase();
-                // these are not stitch identifiers
+                // these are not stitch identifiers 🙄
                 if (u.startsWith("MONDO")
                     || u.equals("NCIT:P378")
                     || u.equals("MTH:NOCODE")
@@ -1222,13 +1244,32 @@ public class OntEntityFactory extends EntityRegistry {
                     || u.startsWith("HTTP")
                     || u.startsWith("PMID")
                     || u.startsWith("WIKIPEDIA")
+                    || u.startsWith("GC_ID:")
+                    || u.startsWith("GOC:")
+                    || u.startsWith("HPO:")
+                    || u.startsWith("ORCID:")
+                    || u.startsWith("FB:")
+                    || u.startsWith("EURENOMICS")
+                    || u.startsWith("DDD:")
                     ) {
                     others.add(x);
                 }
                 else {
-                    if (u.startsWith("ORPHANET:"))
-                        useful.add("Orpha:"+ x.substring(x.indexOf(':')+1));
-                    useful.add(x);
+                    int pos = x.indexOf(':');
+                    if (pos <= 0) {
+                    }
+                    else {
+                        String id = x.substring(pos);
+                        if (u.startsWith("ORPHANET:"))
+                            useful.add("Orpha"+ id);
+                        else if (u.startsWith("MSH:"))
+                            useful.add("MESH"+id);
+                        else if (u.startsWith("SNOMEDCT_US:"))
+                            useful.add("SNOMEDCT"+id);
+                        else if (u.startsWith("MTHICD9_2006:"))
+                            useful.add("ICD9CM"+id);
+                        useful.add(x);
+                    }
                 }
             }
         }
@@ -1329,6 +1370,11 @@ public class OntEntityFactory extends EntityRegistry {
             if (obj != null)
                 data.put("notation", map (obj, a -> "ICD10CM:"+a));
         }
+        else if ("ICD9CM".equals(ontology.props.get("label"))) {
+            obj = data.remove("notation");
+            if (obj != null)
+                data.put("notation", map (obj, a -> "ICD9CM:"+a));
+        }
         
         if (!useful.isEmpty() || !others.isEmpty()) {
             xrefs = useful;
@@ -1342,6 +1388,12 @@ public class OntEntityFactory extends EntityRegistry {
                     int pos = x.indexOf(':');
                     if (pos > 0) {
                         xrefs.add("ICD10CM:"+x.substring(pos+1));
+                    }
+                }
+                else if (x.startsWith("ICD9")) {
+                    int pos = x.indexOf(':');
+                    if (pos > 0) {
+                        xrefs.add("ICD9CM:"+x.substring(pos+1));
                     }
                 }
             }
@@ -1395,6 +1447,7 @@ public class OntEntityFactory extends EntityRegistry {
         }
 
         // now process all axioms that aren't deferred
+        Map<String, Object> svals = new TreeMap<>();
         for (OntologyResource ax : or.axioms) {
             Resource r = (Resource) ax.links.get("annotatedProperty");
             String rn = r.getLocalName();
@@ -1408,6 +1461,12 @@ public class OntEntityFactory extends EntityRegistry {
                 }
                 else {
                     Object v = ax.props.get("annotatedTarget");
+                    if ("hasDbXref".equals(rn)
+                        && Util.contained(ax.props.get("source"),
+                                          "MONDO:equivalentTo")) {
+                        // sigh.. why doesn't mondo add a skos:equivalentClass?
+                        svals.put(v.toString(), ax.props.get("source"));
+                    }
                     data.put(rn, old != null ? Util.merge(old, v) : v);
                 }
             }
@@ -1423,10 +1482,15 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
 
+        if (!svals.isEmpty()) {
+            // create equivalentTo property
+            data.put("equivalentTo", svals.keySet().toArray(new String[0]));
+        }
+
         Entity ent = register (sigh (data));
         if (or.props.isEmpty() && or.axioms.isEmpty()) {
             // transient entity
-            ent.addLabel(AuxNodeType.TRANSIENT);
+            ent._addLabel(AuxNodeType.TRANSIENT);
         }
         else if (!or.axioms.isEmpty()) {
             for (OntologyResource ax : or.axioms) {
@@ -1447,14 +1511,31 @@ public class OntEntityFactory extends EntityRegistry {
                             : Arrays.stream(v)
                             .map(x -> x.toString()).toArray(String[]::new));
                 }
-                ent.addIfAbsent("AXIOM", rel, val);
+                ent._addIfAbsent("AXIOM", rel, val);
+            }
+        }
+
+        if (!svals.isEmpty()) {
+            // now explicitly map entries in equivalentTo
+            Map<String, Object> attrs = new TreeMap<>();
+            attrs.put(Props.SOURCE, source.getKey());
+            attrs.put(Props.NAME, "equivalentTo");
+            for (Map.Entry<String, Object> me : svals.entrySet()) {
+                String uri = OBO_URI+me.getKey().replace(":", "_");
+                attrs.put("_source", me.getValue());
+                for (Iterator<Entity> iter = find (Props.URI, uri);
+                     iter.hasNext(); ) {
+                    Entity e = iter.next();
+                    if (!ent.equals(e))
+                        ent._stitch(e, R_equivalentClass, me.getKey(), attrs);
+                }
             }
         }
         
         Object deprecated = data.get("deprecated");
         if (deprecated != null
             && "true".equalsIgnoreCase(deprecated.toString())) {
-            ent.set(Props.STATUS, "deprecated");
+            ent._set(Props.STATUS, "deprecated");
         }
         
         return ent;
@@ -1541,29 +1622,34 @@ public class OntEntityFactory extends EntityRegistry {
                 attrs.put(Props.NAME, name);
                 attrs.put(Props.SOURCE, source.getKey());
             }
-            
+
+            Set<Entity> matches = new HashSet<>();
             for (Iterator<Entity> iter = find (Props.URI, uri);
                  iter.hasNext();) {
                 Entity e = iter.next();
                 if (!e.equals(ent)) {
+                    StitchKey key = R_rel;
                     switch (name) {
-                    case "subClassOf":
-                        ent._stitch(e, R_subClassOf, uri, attrs);
-                        break;
-                    case "equivalentClass":
-                        ent._stitch(e, R_equivalentClass, uri, attrs);
-                        break;
-                    case "exactMatch":
-                        ent._stitch(e, R_exactMatch, uri, attrs);
-                        break;
-                    case "closeMatch":
-                        ent._stitch(e, R_closeMatch, uri, attrs);
-                        break;
-                    default:
-                        ent._stitch(e, R_rel, uri, attrs);
-                        //logger.warning("Unknown stitch relationship: "+name);
+                    case "subClassOf": key = R_subClassOf; break;
+                    case "subPropertyOf": key = R_subPropertyOf; break;
+                    case "equivalentClass": key = R_equivalentClass; break;
+                    case "exactMatch": key = R_exactMatch; break;
+                    case "closeMatch": key = R_closeMatch; break;
                     }
+                    ent._stitch(e, key, uri, attrs);
+                    matches.add(e);
                 }
+            }
+            
+            if (matches.isEmpty()) {
+                logger.warning("*** couldn't resolve resource "
+                               +name+"="+getURI (res));
+                Map<String, Object> rel = new HashMap<>();
+                rel.putAll(attrs);
+                rel.put(ID, uri);
+                Map<String, Object> data = new HashMap<>();
+                data.put(URI, uri);
+                ent._addIfAbsent("UNRESOLVED", rel, data);
             }
         }
         else if (xrefs.containsKey(res)) {
@@ -1737,6 +1823,7 @@ public class OntEntityFactory extends EntityRegistry {
         while (iter.hasNext()) {
             Resource res = iter.nextResource();
             OntologyResource or = new OntologyResource (res);
+            logger.info("##############\n"+or);
             if (or.isOntology()) {
             }
             else if (or.isAxiom()) {
