@@ -505,8 +505,9 @@ public class Entity extends CNode {
         return neighbors.toArray(new Entity[0]);
     }
 
-    public void _neighbors (NeighborVisitor visitor, StitchKey... keys) {
-        for (Relationship rel : _node.getRelationships(Direction.BOTH, keys)) {
+    protected void _neighbors (NeighborVisitor visitor,
+                               Direction dir, StitchKey... keys) {
+        for (Relationship rel : _node.getRelationships(dir, keys)) {
             Node n = rel.getOtherNode(_node);
             boolean reverse = rel.getStartNode().equals(n);
             boolean cont = visitor.visit
@@ -515,7 +516,19 @@ public class Entity extends CNode {
                  reverse, rel.getAllProperties());
             if (!cont)
                 break;
-        }
+        } 
+    }
+
+    public void _inNeighbors (NeighborVisitor visitor, StitchKey... keys) {
+        _neighbors (visitor, Direction.INCOMING, keys);
+    }
+    
+    public void _outNeighbors (NeighborVisitor visitor, StitchKey... keys) {
+        _neighbors (visitor, Direction.OUTGOING, keys);
+    }
+    
+    public void _neighbors (NeighborVisitor visitor, StitchKey... keys) {
+        _neighbors (visitor, Direction.BOTH, keys);
     }
 
     public void neighbors (NeighborVisitor visitor, StitchKey... keys) {
@@ -525,6 +538,20 @@ public class Entity extends CNode {
         }
     }
 
+    public void inNeighbors (NeighborVisitor visitor, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            _inNeighbors (visitor, keys);
+            tx.success();
+        }
+    }
+
+    public void outNeighbors (NeighborVisitor visitor, StitchKey... keys) {
+        try (Transaction tx = gdb.beginTx()) {
+            _outNeighbors (visitor, keys);
+            tx.success();
+        }
+    }
+    
     public double similarity (Entity other, StitchKey... keys) {
         Map<StitchKey, Object> values = keys (other);
         if (values.containsKey(R_exactMatch)
@@ -720,7 +747,7 @@ public class Entity extends CNode {
         if (id == null)
             throw new IllegalArgumentException (ID+" property can't be null!");
 
-        String source = (String)relationshipProps.get(SOURCE);
+        Object source = relationshipProps.get(SOURCE);
         if (source == null)
             throw new IllegalArgumentException
                 (SOURCE+" property can't be null!");
@@ -743,9 +770,8 @@ public class Entity extends CNode {
             else
                 node.setProperty(me.getKey(), me.getValue());
         }
+        
         Relationship rel = node.createRelationshipTo(_node, reltype);
-        rel.setProperty(SOURCE, source);
-        rel.setProperty(ID, id);
         for (Map.Entry<String, Object> me : relationshipProps.entrySet())
             rel.setProperty(me.getKey(), me.getValue());
 

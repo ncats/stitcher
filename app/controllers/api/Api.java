@@ -1075,7 +1075,7 @@ public class Api extends Controller {
 
         if (key != null) {
             entities = es.getEntityFactory().filter
-                (key, value, s, t, skiplabels.toArray(new String[0]));
+                (key, value, s, t, labels.toArray(new String[0]));
             s = 0;
             t = entities.length;
         }

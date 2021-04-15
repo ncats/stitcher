@@ -1,7 +1,10 @@
-import os, sys, json, requests, argparse
+import os, sys, json, requests, argparse, traceback
 
 LUT = {}
 API = {}
+GENES = {}
+PHENOTYPES = {}
+DISEASES = {}
 TOKEN = ''
 
 def set_id(s, d):
@@ -285,13 +288,340 @@ def patch_diseases(file, in_dir, out_dir, include):
         else:
             patch_disease(data, in_dir, out_dir)
 
+class DiseaseUpdate:
+    def __init__(self, d):
+        self.term = d['term']['curie']
+        data = self.query(
+            "SELECT Id FROM GARD_Disease__c where DiseaseID__c = '%s'"
+            % self.term)
+        #print(json.dumps(data,indent=2))
+        self.d = None # latest d
+        self.Id = None
+        if data != None:
+            d['term']['Id'] = self.Id = data['Id']
+            self.d = d
+        # salesforce version of d                   
+        self.sd = self.fetch_sf_disease(self.term)
+                         
+    @staticmethod
+    def query(q):
+        headers = {
+            'Authorization': 'Bearer %s' % TOKEN
+        }
+        #print('Query: %s...' % q)    
+        r = requests.get(API['query'], params={'q': q},  headers = headers)
+        if 200 == r.status_code:
+            data = r.json()
+            size = data['totalSize']
+            if size == 1:
+                return data['records'][0]
+            elif size > 1:
+                return data['records']
+        else:
+            print('error: query returns status %d\n%s' % (
+                r.status_code, q), file=stderr)
+        return None
+
+    @staticmethod
+    def fetch_sf_disease(term):
+        headers = {
+            'Authorization': 'Bearer %s' % TOKEN
+        }
+        r = requests.get(API['disease'],
+                         params={ 'term': term}, headers=headers)
+        if 200 == r.status_code:
+            return r.json()
+        else:
+            print('error: %s returns status %d' % (
+                API['disease'], r.status_code), file=sys.stderr)
+        return None
+        
+    def instrument(self):
+        if self.Id == None:
+            return
+        self.categories()
+        self.synonyms()
+        self.external_identifiers()
+        self.inheritance()
+        self.age_at_onset()
+        self.age_at_death()
+        self.diagnosis()
+        self.epidemiology()
+        self.genes()
+        self.phenotypes()
+        self.drugs()
+        self.evidence()
+        self.related_diseases()
+        print(json.dumps(self.d, indent=2))
+
+    def commit(self):
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % TOKEN
+        }
+        return requests.post(API['disease'], headers=headers, json=self.d)
+
+    def categories(self):
+        data = self.query("""
+SELECT Id,Disease_Category_Curie__c,Disease_Category__c 
+FROM GARD_Disease_Category__c where GARD_Disease__c = '%s'
+""" % self.Id)
+        if data != None:
+            if isinstance(data, list):
+                categories = {x['Disease_Category_Curie__c']: {
+                    'Id': x['Id'],
+                    'category_sfdc_id': x['Disease_Category__c']
+                } for x in data}
+            else:
+                categories = {
+                    data['Disease_Category_Curie__c']: {
+                        'Id': data['Id'],
+                        'category_sfdc_id': data['Disease_Category__c']
+                    }
+                }
+            for x in self.d['disease_categories']:
+                c = categories[x['curie']]
+                if c != None:
+                    x['Id'] = c['Id']
+                    x['category_sfdc_id'] = c['category_sfdc_id']
+                else:
+                    x['Id'] = ''
+                    x['category_sfdc_id'] = ''
+
+    def synonyms(self):
+        self.set_id('synonyms', lambda x: self.key(x['curie'], x['label']),
+                    'Disease_Synonym__c', lambda x: self.key(
+                        x['Disease_Synonym_Source__c'],
+                        x['Disease_Synonym__c']))
+
+    def external_identifiers(self):
+        self.set_id('external_identifiers', lambda x: self.key(
+            x['source'],x['curie']), 'External_Identifier_Disease__c',
+                    lambda x: self.key(x['Source__c'], x['Display_Value__c']))
+        
+    def inheritance(self):
+        keyf = lambda x: self.key(x['curie'], x['label'])
+        keyt = lambda x: self.key(
+            x['Inheritance_Attribution_Source__c'],
+            x['Inheritance_Attribution__c'])
+        self.set_id('inheritance', keyf, 'Inheritance__c', keyt)
+
+    def age_at_onset(self):
+        self.set_id('age_at_onset', lambda x: self.key(x['curie'], x['label']),
+                    'Age_At_Onset__c', lambda x: self.key(
+                        x['AgeAtOnset_AttributionSource__c'],
+                        x['Age_At_Onset__c']))
+
+    def age_at_death(self):
+        self.set_id('age_at_death', lambda x: self.key(x['curie'], x['label']),
+                    'Age_At_Death__c', lambda x: self.key(
+                        x['AgeAtDeath_AttributionSource__c'],
+                        x['Age_At_Death__c']))
+
+    def diagnosis(self):
+        self.set_id('diagnosis', lambda x: self.key(x['type'], x['curie']),
+                    'Diagnosis__c', lambda x: self.key(
+                        x['Type__c'], x['Curie__c']))
+
+    def epidemiology(self):
+        def keyf(x):
+            try:
+                return self.key(
+                    x['geographic'], x['type'],
+                    x['qualification'], x['valmoy'])
+            except KeyError:
+                print('KeyError: in %s' % x, file=sys.stderr)
+                traceback.print_exc()
+                
+        def keyt(x):
+            try:
+                return self.key(
+                    x['Location__c'], x['Type__c'],
+                    x['Qualification__c'], x['Value__c'])
+            except KeyError:
+                print('KeyError: in %s' % x, file=sys.stderr)
+                traceback.print_exc()
+                
+        self.set_id('epidemiology', keyf, 'Epidemiology__c', keyt)
+
+    def genes(self):
+        def get_sfdc_id(x):
+            # we also need to set gene_sfdc_id
+            sfdc = None
+            if x['gene_symbol'] in GENES:
+                sfdc = GENES[x['gene_symbol']]
+
+            if sfdc == None:
+                data = self.query("SELECT Id FROM Gene__c where Name = '%s'"
+                                  % x['gene_symbol'])
+                if data != None:
+                    if isinstance(data, list) and len(data) > 0:
+                        print('%s: has %d genes in salesforce!' %(
+                            x['gene_symbol'], len(data)), file=sys.stderr)
+                        data = data[0]
+                    GENES[x['gene_symbol']] = sfdc = data['Id']
+                else:
+                    print('%s: gene not found in salesforce!'
+                          % x['gene_symbol'], file=sys.stderr)
+            x['gene_sfdc_id'] = sfdc
+            
+        self.set_id('genes', lambda x: x['gene_symbol'], 'GARD_Disease_Gene__c',
+                    lambda x: x['GeneSymbol__c'], get_sfdc_id)
+
+    def phenotypes(self):
+        def get_sfdc_id(x):
+            sfdc = None
+            if x['curie'] in PHENOTYPES:
+                sfdc = PHENOTYPES[x['curie']]
+
+            if sfdc == None:
+                data = self.query("""
+SELECT Id FROM Feature__c where External_ID__c = '%s'
+""" % x['curie'])
+                if data != None:
+                    if isinstance(data, list) and len(data) > 0:
+                        print('%s: has %d features in salesforce!' %(
+                            x['label'], len(data)), file=sys.stderr)
+                        data = data[0]
+                    PHENOTYPES[x['curie']] = sfdc = data['Id']
+                else:
+                    print('%s: phenotype not found in salesforce!'
+                          % x['curie'], file=sys.stderr)
+            x['phenotype_sfdc_id'] = sfdc
+            
+        self.set_id('phenotypes', lambda x: x['label'],
+                    'GARD_Disease_Feature__c', lambda x: x['HPO_Name__c'],
+                    get_sfdc_id)
+
+    def drugs(self):
+        self.set_id('drugs', lambda x: x['curie'], 'GARD_Disease_Drug__c',
+                    lambda x: x['Drug_Curie__c'])
+
+    def evidence(self):
+        self.set_id('evidence', lambda x: x['label'], 'Evidence__c',
+                    lambda x: x['Evidence_Label__c'])
+
+    def related_diseases(self):
+        def get_sfdc_id(x):
+            sfdc = None
+            if x['curie'] in DISEASES:
+                sfdc = DISEASES[x['curie']]
+                
+            if sfdc == None:
+                data = self.query(
+                    "select Id from GARD_Disease__c where DiseaseID__c = '%s'"
+                    % x['curie'])
+                if data != None:
+                    if isinstance(data, list) and len(data) > 0:
+                        print('%s has %d diseases in salesforce!' % (
+                            x['curie'], len(data)), file=sys.stderr)
+                        data = data[0]
+                    DISEASES[x['curie']] = sfdc = data['Id']
+                else:
+                    print('%s: disease not found in salesforce!'
+                          % x['curie'], file=sys.stderr)
+            x['disease_sfdc_id'] = sfdc
+            
+        self.set_id('related_diseases', lambda x: x['curie'],
+                    'Related_Disease__c', lambda x: x['Related_Disease_ID__c'],
+                    get_sfdc_id)
+
+    def set_id(self, f, keyf, t, keyt, postfn = None):
+        lut = {
+            keyt(x): x['Id']
+            for x in list(filter(
+                    lambda x: x['attributes']['type']==t, self.sd))}
+        notfound = []
+        for x in self.d[f]:
+            key = keyf(x)
+            if key in lut:
+                x['Id'] = lut[key]
+                if postfn != None:
+                   postfn(x)
+            else:
+                print('%s: key %s not found for %s; treating as new' % (
+                    self.term, key, f), file=sys.stderr)
+                notfound.append(key)
+        return notfound
+
+    @staticmethod
+    def key(*kargs):
+        return '/'.join(kargs).lower()
+
+
+def update_diseases(file, include = None):
+    with open(file, 'r') as f:
+        curies = {}
+        if include != None:
+            for c in include:
+                curies[c] = None
+        data = json.load(f)
+        if isinstance(data, list):
+            for d in data:
+                if len(curies) == 0 or d['term']['curie'] in curies:
+                    du = DiseaseUpdate(d)
+                    du.instrument()
+        else:
+            du = DiseaseUpdate(data)
+            du.instrument()
+            
+def fetch_term(term):
+#    print('fetching terms...%s' % term)
+    headers = {
+        'Authorization': 'Bearer %s' % TOKEN
+    }
+    
+    r = requests.get(API['disease'], params={ 'term': term }, headers=headers)
+    if 200 == r.status_code:
+        print (json.dumps(r.json(), indent=2))
+    else:
+        print ('%s: returns status code %d for term %s'
+               % (API['disease'], r.status_code, t), file=sys.stderr)
+
+def browse():
+    headers = {
+        'Authorization': 'Bearer %s' % TOKEN
+    }
+    r = requests.get(API['browse'], headers = headers)
+    if 200 == r.status_code:
+        print (json.dumps(r.json(), indent=2))
+    else:
+        print ('%s: returns status code %d' % (
+            API['browse'], r.status_code), file=sys.stderr)
+
+def query(q):
+    headers = {
+        'Authorization': 'Bearer %s' % TOKEN
+    }
+    print('Query: %s...' % q)    
+    r = requests.get(API['query'], params={'q': q},  headers = headers)
+    if 200 == r.status_code:
+        print (json.dumps(r.json(), indent=2))
+    else:
+        print ('%s: returns status code %d' % (
+            API['query'], r.status_code), file=sys.stderr)
+    
+class TypeAction(argparse.Action):
+    def __call__(self, parser, namespace, value, opts = None):
+        setattr(namespace, self.dest, value)        
+        print('value => %r opts => %r namespace => %r' % (
+            value, opts, namespace))
+        if 'browse' != value and len(namespace.ARG) == 0:
+            parser.print_help()
+            print('%s: error: the following arguments are required: ARG'
+                  % parser.prog)
+            sys.exit(1)
+
+        
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', required=True,
                         help='Required configuration in json format')
     parser.add_argument('-t', '--type', required=True,
-                        choices=['gene', 'phenotype', 'disease', 'drug'],
-                        help='Input file is of specific type')
+                        choices=['gene', 'phenotype', 'disease',
+                                 'drug', 'term', 'browse', 'query'],
+#                        action = TypeAction,
+                        help='Input argument is of specific type')
     parser.add_argument('-r', '--reload', help='Reload disease file',
                         action='store_true')
     parser.add_argument('-i', '--include', dest='curies', default='',
@@ -304,22 +634,25 @@ if __name__ == '__main__':
                         help='Skip specified number of records in load')
     parser.add_argument('-o', '--output', default='.',
                         help='Output path (default .)')
-    parser.add_argument('FILE', help='Input JSON file')
+    parser.add_argument('-u', '--update', action='store_true',
+                        help='Update diseases via syncing with salesforce api')
+    parser.add_argument('ARG', nargs='?', default=[],
+                        help="Input arguments either as terms or file")
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
 
     args = parser.parse_args()
-    print('-- type: %s' % args.type)
-    print('-- config: %s' % args.config)
-    print('-- output: %s' % args.output)
-    print('-- curies: %s' % args.curies)
-    print('-- FILE: %s' % args.FILE)
+    print('-- type: %s' % args.type, file=sys.stderr)
+    print('-- config: %s' % args.config, file=sys.stderr)
+    print('-- output: %s' % args.output, file=sys.stderr)
+    print('-- curies: %s' % args.curies, file=sys.stderr)
+    print('-- ARG: %s' % args.ARG, file=sys.stderr)
     
     config = parse_config(args.config)
     API = config['api']
     TOKEN = get_auth_token(API['token'], config['params'])
-    print('-- TOKEN: %s...' % TOKEN[0:32])
+    print('-- TOKEN: %s...' % TOKEN[0:32], file=sys.stderr)
     
     try:
         os.makedirs(args.output)
@@ -327,33 +660,39 @@ if __name__ == '__main__':
         pass
 
     def load_mappings(lut, file):
-        print('-- mapping: %s' % file)
+        print('-- mapping: %s' % file, file=sys.stderr)
         with open(file) as f:
             f.readline() # skip header
             for line in f.readlines():
                 gard, sfid = line.strip().split(',')
                 lut[gard] = sfid
-            print('-- %d mappings loaded!' % (len(lut)))
+            print('-- %d mappings loaded!' % (len(lut)), file=sys.stderr)
         
     if args.type == 'disease':
-        if args.reload:
-            print('-- reloading...%s' % args.FILE)
-            reload_disease(args.FILE)
+        if args.update:
+            print('-- updating...%s' % args.ARG, file=sys.stderr)
+            update_diseases(args.ARG, args.curies)
+        elif args.reload:
+            print('-- reloading...%s' % args.ARG[0], file=sys.stderr)
+            reload_disease(args.ARG)
         elif args.patch:
             load_mappings(LUT, args.mapping)            
             print('-- patching...%s, input=%s output=%s'
-                  % (args.FILE, args.input, args.output))
-            patch_diseases(args.FILE, args.input, args.output, args.curies)
+                  % (args.ARG[0], args.input, args.output), file=sys.stderr)
+            patch_diseases(args.ARG, args.input, args.output, args.curies)
         else:
             load_mappings(LUT, args.mapping)
-            load_diseases(args.FILE, args.output,
+            load_diseases(args.ARG, args.output,
                           include=args.curies, skip=args.skip)
-        
     elif args.type == 'gene':
-        load_genes(args.FILE, args.output)
-
+        load_genes(args.ARG, args.output)
     elif args.type == 'drug':
-        load_drugs(args.FILE, args.output)
-
+        load_drugs(args.ARG, args.output)
     elif args.type == 'phenotype':
-        load_phenotypes(args.FILE, args.output)
+        load_phenotypes(args.ARG, args.output)
+    elif args.type == 'term':
+        fetch_term(args.ARG)
+    elif args.type == 'browse':
+        browse()
+    elif args.type == 'query':
+        query(args.ARG)

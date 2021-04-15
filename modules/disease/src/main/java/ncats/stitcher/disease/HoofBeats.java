@@ -32,6 +32,7 @@ public class HoofBeats {
     
     static class Source implements Comparable {
         final String name;
+        final String[] types;
         final String id;
         final String prefix;
         final String label;
@@ -40,7 +41,12 @@ public class HoofBeats {
 
         Source (String name, String id, String prefix,
                 String label, String source, String... synonyms) {
+            this (name, null, id, prefix, label, source, synonyms);
+        }
+        Source (String name, String[] types, String id, String prefix,
+                String label, String source, String... synonyms) {
             this.name = name;
+            this.types = types;
             this.id = id;
             this.prefix = prefix;
             this.label = label;
@@ -61,6 +67,10 @@ public class HoofBeats {
                 }
             }
             return getString (e.payload("uri"));
+        }
+
+        public boolean valid (Entity e) {
+            return e.is(name) && (types == null || e.hasAnyLabels(types));
         }
         
         public int compareTo (Object obj) {
@@ -86,18 +96,23 @@ public class HoofBeats {
                                 "Orphanet", "alternative_term"));
         SOURCES.add(new Source ("S_GARD", "gard_id", "", "name",
                                 "GARD", "synonyms"));
-        SOURCES.add(new Source ("S_OMIM", "notation", "", "label",
-                                "OMIM", "altLabel"));
-        SOURCES.add(new Source ("S_MEDGEN", "id", "MEDGEN:", "NAME",
-                                "MedGen", "SYNONYMS"));
-        SOURCES.add(new Source ("S_MESH", "notation", "", "label",
-                                "MeSH", "altLabel"));
+        SOURCES.add(new Source ("S_OMIM", new String[]{
+                    "T047", "T019", "T191", "T190", "T184"},
+                "notation", "", "label", "OMIM", "altLabel"));
+        SOURCES.add(new Source ("S_MEDGEN", new String[]{
+                    "T047", "T191", "T019", "T190", "T184"},
+                "id", "MEDGEN:", "NAME", "MedGen", "SYNONYMS"));
+        SOURCES.add(new Source ("S_MESH", new String[]{
+                    "T047", "T191", "T019", "T190", "T184"},
+                "notation", "", "label", "MeSH", "altLabel"));
         SOURCES.add(new Source ("S_DOID", "notation", "", "label",
                                 "DiseaseOntology", "hasExactSynonym"));
         SOURCES.add(new Source ("S_MEDLINEPLUS", "notation", "",
                                 "label", "MedlinePlus", "altLabel"));
         SOURCES.add(new Source ("S_EFO", "notation", "", "label", "EFO",
                                 "hasExactSynonym", "hasRelatedSynonym"));
+        SOURCES.add(new Source ("S_ICD10CM", "notation", "", "label",
+                                "ICD10", "altLabel"));
     }
 
     static final String HP_CATEGORY_FMT = "match (d:DATA)-->(n:S_HP)-"
@@ -248,6 +263,15 @@ public class HoofBeats {
         +"\"MONDO:0020121\"]"
         +"return distinct z.label as label, z.notation as notation order by label";
 
+    static final String[] HPO_TYPE_IMAGING_MRI = {
+        "HP:0002500", "HP:0030890", "HP:007103",
+        "HP:0012696", "HP:0012747", "HP:0012751",
+        "HP:0040332", "HP:0040329", "HP:0002419",
+        "HP:0040272", "HP:0007183", "HP:0040331",
+        "HP:0040328", "HP:0040333", "HP:0040330",
+        "HP:0007266", "HP:0032615", "HP:0500016"
+    };
+        
     static final String HP_INHERITANCE_FMT = "match (d:DATA)-->(n:S_HP)-[e:R_subClassOf*0..]->(:S_HP)--(z:DATA) where d.notation='%1$s' and all(x in e where x.source=n.source or n.source in x.source) and z.notation='HP:0000005' return d.label as inheritance";
 
     // HP:0040006 - mortality/aging
@@ -292,6 +316,7 @@ public class HoofBeats {
         for (Source s : SOURCES)
             if (s.equals(name))
                 return s;
+        //logger.log(Level.SEVERE, "BOGUS SOURCE: "+name);
         return null;
     }
 
@@ -420,10 +445,10 @@ public class HoofBeats {
     class OMIMGenes implements NeighborVisitor {
         ArrayNode genes;
         Entity curent, bestnb;
-        Object[] values;
+        //Object[] values;
         Set<String> hgnc = new HashSet<>();
         Set<Entity> neighbors = new LinkedHashSet<>();
-        Set<Entity> seen = new HashSet<>();
+        Map<Entity, Object> values = new HashMap<>();
         
         OMIMGenes (Entity... ents) {
             this (mapper.createArrayNode(), ents);
@@ -440,11 +465,15 @@ public class HoofBeats {
                     curent = e;
                     // molecular basis known
                     if ("3".equals(getString (e.payload("MIMTYPE")))) {
-                        bestnb = null;
-                        values = null;
                         e.neighbors(this, I_GENE);
-                        if (bestnb != null) {
-                            instrument (bestnb);
+                        if (!values.isEmpty()) {
+                            Entity[] g = values.keySet().toArray(new Entity[0]);
+                            Arrays.sort(g, (a, b) -> {
+                                    Object[] xa = Util.toArray(values.get(a));
+                                    Object[] xb = Util.toArray(values.get(b));
+                                    return xb.length - xa.length;
+                                });
+                            instrument (g[0]);
                         }
                     }
                 }
@@ -495,13 +524,10 @@ public class HoofBeats {
 
         public boolean visit (long id, Entity xe, StitchKey key,
                               boolean reversed, Map<String, Object> props) {
-            if (!seen.contains(xe) && xe.is("S_OMIM") && xe.is("T028")) {
-                Object[] vals = Util.toArray(props.get("I_GENE"));
-                if (values == null || vals.length > values.length) {
-                    values = vals;
-                    bestnb = xe;
-                }
-                seen.add(xe);
+            if (xe.is("S_OMIM") && xe.is("T028")) {
+                Object[] vals = Util.toArray(props.get("value"));
+                Object xval = values.get(xe);
+                values.put(xe, Util.merge(xval, vals));
             }
             return true;
         }
@@ -570,30 +596,31 @@ public class HoofBeats {
         }
     }
 
-    class GARDPhenotypes implements NeighborVisitor {
+    class HPOPhenotypes implements NeighborVisitor {
         ArrayNode phenotypes = mapper.createArrayNode();
-        String gardId;
         Set<Entity> neighbors = new LinkedHashSet<>();
+        ArrayNode diagnosis = mapper.createArrayNode();
+        String id;
         
-        GARDPhenotypes (Entity... ents) {
+        HPOPhenotypes (Entity... ents) {
             if (ents != null && ents.length > 0) {
                  for (Entity e : ents) {
-                    gardId = getString (e.payload("gard_id"));
-                    e.neighbors(this, R_hasPhenotype);
+                     id = getString (e.payload("notation"));
+                     e.neighbors(this, R_hasPhenotype);
                 }
             }
         }
 
         public boolean visit (long id, Entity xe, StitchKey key,
                               boolean reversed, Map<String, Object> props) {
-            if (!neighbors.contains(xe) && !reversed && xe.is("S_HP")) {
+            String hpid = (String) xe.payload("notation");
+            if (!neighbors.contains(xe) && !reversed
+                && xe.is("S_HP") && hpid != null && hpid.startsWith("HP:")) {
                 ObjectNode node = newJsonObject ();
-                String hpid = (String) xe.payload("notation");
                 node.put("curie", hpid);
                 String cat = getHpCategory (hpid);
                 if (cat == CATEGORY_NONE) {
-                    logger.warning(gardId+" -> " +hpid+" ("
-                                   +xe.payload("label")
+                    logger.warning(id+" -> " +hpid+" ("+xe.payload("label")
                                    +") has no category!");
                 }
                 node.put("category", cat);
@@ -625,7 +652,22 @@ public class HoofBeats {
                 node.put("source_curie", getString (props.get("Reference")));
                 node.put("modifier", getString (props.get("Modifier")));
                 node.put("phenotype_sfdc_id", "");
-                phenotypes.add(node);
+
+                // move this to diagnosis
+                boolean diag = false;
+                for (String _id : HPO_TYPE_IMAGING_MRI) {
+                    if (_id.equals(hpid)) {
+                        diag = true;
+                        break;
+                    }
+                }
+
+                if (diag) {
+                    diagnosis.add(node);
+                }
+                else {
+                    phenotypes.add(node);
+                }
                 neighbors.add(xe);
             }
             return true;
@@ -701,6 +743,44 @@ public class HoofBeats {
         }
     }
 
+    class RelatedDiseases {
+        Set<Entity> children = new HashSet<>();
+        ArrayNode related = mapper.createArrayNode();
+        
+        RelatedDiseases (Entity... ents) {
+            if (ents != null && ents.length > 0) {
+                for (Entity e : ents) {
+                    e.inNeighbors(this::visitChild, R_subClassOf);
+                }
+            }
+        }
+
+        public boolean visitChild (long id, Entity child, StitchKey key,
+                                   boolean reversed,
+                                   Map<String, Object> props) {
+            if (child.is("S_MONDO")) {
+                child.neighbors(this::visitGARD,
+                                R_equivalentClass, R_exactMatch);
+                
+            }
+            return true;
+        }
+
+        public boolean visitGARD (long id, Entity xe, StitchKey key,
+                                  boolean reversed, Map<String, Object> props) {
+            if (xe.is("S_GARD") && !children.contains(xe)) {
+                ObjectNode node = newJsonObject ();
+                node.put("curie", getString (xe.payload("gard_id")));
+                node.put("label", getString (xe.payload("name")));
+                node.put("type", "child");
+                node.put("disease_sfdc_id", "");
+                related.add(node);
+                children.add(xe);
+            }
+            return true;
+        }
+    }
+
     class DiseaseComponent {
         final Component component;
         final Map<Source, Entity[]> entities = new TreeMap<>();
@@ -717,7 +797,11 @@ public class HoofBeats {
                 Set<String> labels = e.labels();
                 for (String lbl : labels) {
                     Source src = getSource (lbl);
-                    if (src != null) {
+                    if (src != null && src.valid(e)) {
+                        /*
+                         * only add if this entity satisfies any additional
+                         * type constraints
+                         */ 
                         Set<Entity> set = map.get(src);
                         if (set == null)
                             map.put(src, set = new TreeSet<>());
@@ -772,10 +856,12 @@ public class HoofBeats {
                 disease.put("inheritance", doInheritance ());
                 disease.put("age_at_onset", doAgeOfOnset ());
                 disease.put("age_at_death", doAgeOfDeath ());
-                disease.put("diagnosis", doDiagnoses ());                
+                ArrayNode diagnosis = (ArrayNode)doDiagnoses ();
+                ArrayNode phenotypes = (ArrayNode) doPhenotypes (diagnosis);
+                disease.put("diagnosis", diagnosis);                
                 disease.put("epidemiology", doEpidemiology ());
                 disease.put("genes", doGenes ());
-                disease.put("phenotypes", doPhenotypes ());
+                disease.put("phenotypes", phenotypes);
                 disease.put("drugs", doDrugs ());
                 disease.put("evidence", doEvidence ());
                 disease.put("related_diseases", doRelatedDiseases ());
@@ -865,13 +951,14 @@ public class HoofBeats {
                 syn.put("label", getString (e.payload("name")));
                 synonyms.add(syn);
             }
-            
+
             Map<String, Set<String>> syns = new TreeMap<>();
             for (Source src : SOURCES) {
                 Entity[] ents = entities.get(src);
                 if (ents != null) {
                     for (Entity e : ents) {
                         String curie = src.prefix+e.payload(src.id);
+                        Set<String> unique = new HashSet<>();
                         for (String s : src.synonyms) {
                             for (Object x : Util.toArray(e.payload(s))) {
                                 String sv = x.toString();
@@ -879,11 +966,16 @@ public class HoofBeats {
                                     logger.warning(curie+": synonym is too "
                                                    +"long!\n"+sv);
                                 }
+                                else if (unique.contains(sv.toLowerCase())) {
+                                    // don't bother synonyms that are different
+                                    // based on case
+                                }
                                 else {
                                     Set<String> ss = syns.get(curie);
                                     if (ss == null)
                                         syns.put(curie, ss = new TreeSet<>());
                                     ss.add(sv);
+                                    unique.add(sv.toLowerCase());
                                 }
                             }
                         }
@@ -906,6 +998,7 @@ public class HoofBeats {
 
         JsonNode doExternalIdentifiers () {
             ArrayNode xrefs = mapper.createArrayNode();
+            Map<Entity, Set<Entity>> nord = new HashMap<>();
             for (Source src : SOURCES) {
                 Entity[] ents = entities.get(src);
                 if (ents != null) {
@@ -914,9 +1007,30 @@ public class HoofBeats {
                         node.put("curie", getString (e.payload(src.id)));
                         node.put("url", src.url(e));
                         node.put("source", src.source);
+                        e.neighbors((id, xe, key, reversed, props) -> {
+                                if (xe.is("S_NORD")) {
+                                    Set<Entity> set = nord.get(xe);
+                                    if (set == null) {
+                                        nord.put(xe, set = new HashSet<>());
+                                    }
+                                    set.add(e);
+                                }
+                                return true;
+                            }, N_Name);
                         xrefs.add(node);
                     }
                 }
+            }
+            if (!nord.isEmpty()) {
+                Entity[] nordes = nord.keySet().toArray(new Entity[0]);
+                Arrays.sort(nordes, (a, b)
+                            -> nord.get(b).size() - nord.get(a).size());
+                ObjectNode node = newJsonObject ();
+                node.put("curie", "NORD:"+getString (nordes[0].payload("id")));
+                node.put("url", getString (nordes[0].payload("url")));
+                node.put("label", getString (nordes[0].payload("name")));
+                node.put("source", "NORD");
+                xrefs.add(node);
             }
             return xrefs;
         }
@@ -974,13 +1088,13 @@ public class HoofBeats {
                     
                     if (hasGTR) {
                         ObjectNode node = newJsonObject ();
-                        node.put("Id", "");
                         node.put("type", "GTR");
                         node.put("curie", "MEDGEN:"+e.payload("CUI"));
                         diagnoses.add(node);
                     }
                 }
             }
+
             return diagnoses;
         }
         
@@ -998,11 +1112,18 @@ public class HoofBeats {
             return og.genes;
         }
             
-        JsonNode doPhenotypes () {
-            // TODO: other sources..
-            GARDPhenotypes gp = new GARDPhenotypes (get ("S_GARD"));
-            this.phenotypes.addAll(gp.neighbors);
-            return gp.phenotypes;
+        JsonNode doPhenotypes (ArrayNode diagnosis) {
+            HPOPhenotypes hp = new HPOPhenotypes
+                (get ("S_OMIM", "S_ORDO_ORPHANET"));
+            for (int i = 0; i < hp.diagnosis.size(); ++i) {
+                ObjectNode n = (ObjectNode) hp.diagnosis.get(i);
+                ObjectNode node = newJsonObject ();
+                node.put("curie", n.get("curie").asText());
+                node.put("type", "Imaging_MRI"); // FIXME
+                diagnosis.add(node);
+            }
+            this.phenotypes.addAll(hp.neighbors);
+            return hp.phenotypes;
         }
 
         JsonNode doDrugs () {
@@ -1048,16 +1169,8 @@ public class HoofBeats {
         }
 
         JsonNode doRelatedDiseases () {
-            ArrayNode related = mapper.createArrayNode();
-            Entity[] ents = get ("S_MONDO");
-            if (ents != null) {
-                // get all children of mondo nodes and get their
-                // corresponding gard nodes
-                for (Entity e : ents) {
-                    
-                }
-            }
-            return related;
+            RelatedDiseases rd = new RelatedDiseases (get ("S_MONDO"));
+            return rd.related;
         }
     }
 
@@ -1114,14 +1227,23 @@ public class HoofBeats {
             }, I_CODE, N_Name);
     }
 
-    static String getIds (Component component, String source, String prop) {
+    static String getIds (Component component, String source) {
+        return getIds (component, getSource (source));
+    }
+    
+    static String getIds (Component component, Source source) {
         return getIds (component, source,
-                       e -> Util.stream(e.payload(prop))
+                       e -> Util.stream(e.payload(source.id))
                        .map(Object::toString)
                        .collect(Collectors.toSet()));
     }
 
     static String getIds (Component component, String source,
+                          Function<Entity, Set<String>> eval) {
+        return getIds (component, getSource (source), eval);
+    }
+    
+    static String getIds (Component component, Source source,
                           Function<Entity, Set<String>> eval) {
         StringBuilder sb = new StringBuilder ();
         Entity[] entities = filter (component, source);
@@ -1139,9 +1261,9 @@ public class HoofBeats {
         return sb.toString();        
     }
 
-    static Entity[] filter (Component component, String source) {
+    static Entity[] filter (Component component, Source source) {
         return component.stream()
-            .filter(e -> e.is(source)).toArray(Entity[]::new);
+            .filter(e -> source.valid(e)).toArray(Entity[]::new);
     }
 
     void beats (PrintStream ps, long[] comp) throws IOException {
@@ -1169,16 +1291,16 @@ public class HoofBeats {
                     +" N_Name="+names+" I_CODE="+codes+"\n*** "
                     +ef.component(Util.toArray(all)));
         
-        ps.print(getIds (component, "S_MONDO", "notation")+"\t");
-        ps.print(getIds (component, "S_ORDO_ORPHANET", "notation")+"\t");
-        ps.print(getIds (component, "S_GARD", "gard_id")+"\t");
-        ps.print(getIds (component, "S_OMIM", "notation")+"\t");
-        ps.print(getIds (component, "S_MEDGEN", "id")+"\t");
-        ps.print(getIds (component, "S_MESH", "notation")+"\t");
-        ps.print(getIds (component, "S_DOID", "notation")+"\t");
-        ps.print(getIds (component, "S_MEDLINEPLUS", "notation")+"\t");
-        ps.print(getIds (component, "S_EFO", "notation")+"\t");
-        ps.print(getIds (component, "S_ICD10CM", "notation")+"\t");
+        ps.print(getIds (component, "S_MONDO")+"\t");
+        ps.print(getIds (component, "S_ORDO_ORPHANET")+"\t");
+        ps.print(getIds (component, "S_GARD")+"\t");
+        ps.print(getIds (component, "S_OMIM")+"\t");
+        ps.print(getIds (component, "S_MEDGEN")+"\t");
+        ps.print(getIds (component, "S_MESH")+"\t");
+        ps.print(getIds (component, "S_DOID")+"\t");
+        ps.print(getIds (component, "S_MEDLINEPLUS")+"\t");
+        ps.print(getIds (component, "S_EFO")+"\t");
+        ps.print(getIds (component, "S_ICD10CM")+"\t");
         ps.print(getIds (component, "S_MONDO", e -> 
                          Util.stream(e.payload("hasDbXref"))
                          .map(Object::toString)
@@ -1282,6 +1404,14 @@ public class HoofBeats {
                         ex.printStackTrace();
                     }
                     ++cnt;
+                }
+                ArrayNode xrefs = (ArrayNode)json.get("external_identifiers");
+                for (int i = 0; i < xrefs.size(); ++i) {
+                    JsonNode n = xrefs.get(i);
+                    String ref = n.get("curie").asText();
+                    if (ref.startsWith("GARD:")) {
+                        diseases.put(ref, json);
+                    }
                 }
                 diseases.put(curie, json);
             }
@@ -1388,7 +1518,7 @@ public class HoofBeats {
         ps.println("         },");
         ps.println("        \"Name\": \""+sym+"\",");
         ps.println("        \"Gene_Name__c\": \""+name+"\",");
-        ps.println("        \"GHR_URL__c\": \""+getString(e.payload("uri"))+"\",");
+        ps.println("        \"GHR_URL__c\": \"https://medlineplus.gov/genetics/gene/"+sym.toLowerCase()+"\",");
         ps.println("        \"Gene_Type__c\": \""+type+"\",");        
         ps.println("        \"Chromosome_Location__c\": \""+locus+"\",");
         ps.println("        \"Gene_Identifier__c\": \""+id+"\"");

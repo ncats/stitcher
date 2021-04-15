@@ -117,5 +117,11 @@ lazy val disease = (project in file("modules/disease"))
     javacOptions ++= javaBuildOptions
   ).dependsOn(stitcher).aggregate(stitcher)
 
+lazy val spectral = (project in file("modules/spectral"))
+  .settings(name := "stitcher-spectral",
+    unmanagedBase := baseDirectory { base => base / "../../lib" }.value,
+    libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.31",
+    javacOptions ++= javaBuildOptions
+  )
 
 fork in run := true
