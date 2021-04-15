@@ -2033,6 +2033,10 @@ public class EntityFactory implements Props, AutoCloseable {
         return iterator;
     }
 
+    public Entity[] filter (String key, Object value, String... labels) {
+        return filter (key, value, 0, 10, labels);
+    }
+    
     public Entity[] filter (String key, Object value,
                             int skip, int top, String... labels) {
         return filter (key, value, skip, top, Arrays.stream(labels)

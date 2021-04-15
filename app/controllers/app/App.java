@@ -197,10 +197,10 @@ public class App extends Controller {
     }
 
     public Result structure (Long id, Integer size ) {
-	Entity e = es.getEntityFactory().getEntity(id);
-	if (e != null) {
-	    return ok (structure.render(e, size));
-	}
-	return badRequest ("Unknown entity: "+id);
+    Entity e = es.getEntityFactory().getEntity(id);
+    if (e != null) {
+        return ok (structure.render(e, size));
+    }
+    return badRequest ("Unknown entity: "+id);
     }
 }
