@@ -9,7 +9,7 @@ curr_time=$(date +%s)
 
 echo $(date) > $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, April 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-04-09.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, April 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-04-17.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, April 2020\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
