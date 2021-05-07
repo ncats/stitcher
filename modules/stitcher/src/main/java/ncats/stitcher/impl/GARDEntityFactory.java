@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.security.MessageDigest;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -386,6 +387,7 @@ public class GARDEntityFactory extends EntityRegistry {
             rset.close();
         }
 
+        
         public Map<String, Object> instrument (long id) throws SQLException {
             Map<String, Object> data = new TreeMap<>();
             data.put("gard_id", format (id));
@@ -422,6 +424,12 @@ public class GARDEntityFactory extends EntityRegistry {
                         if ("orphanet".equalsIgnoreCase(type)) {
                             // make sure we have ORPHA:XXX and ORPHANET:XXX 
                             xrefs.add("ORPHA:"+value); 
+                        }
+                        else if ("nci thesaurus".equalsIgnoreCase(type)) {
+                            type = "ncit";
+                        }
+                        else if ("snomed ct".equalsIgnoreCase(type)) {
+                            type = "snomedct_us";
                         }
                         xrefs.add(type.toUpperCase()+":"+value);
                     }
@@ -728,6 +736,7 @@ public class GARDEntityFactory extends EntityRegistry {
             //.add(I_CODE, "HPO")
             .add(T_Keyword, "categories")
             .add(T_Keyword, "sources")
+            .add(T_Keyword, "status")
             ;
     }
         
@@ -743,8 +752,16 @@ public class GARDEntityFactory extends EntityRegistry {
         }
         
         setDataSource (ds);
+        /* StatusID
+         * 1    Draft
+         * 2    Internal
+         * 4    Active
+         * 5    Retired
+         */
         try (ResultSet rset = stm.executeQuery
-             ("select * from RD_tblDisease where StatusID=4 and isSpanish=0 "
+             ("select * from RD_tblDisease where "
+              +"StatusID in (4,5) and "
+              +"isSpanish=0 "
               //+"and DiseaseID=6507"
               //+"and isRare = 1"
               );
@@ -758,13 +775,23 @@ public class GARDEntityFactory extends EntityRegistry {
             ObjectMapper mapper = new ObjectMapper ();
             //ps.println("[");
 
+            PrintWriter pw = new PrintWriter (new FileWriter ("gard-diseases-latest.txt"));
+            pw.println("DiseaseID\tName\tStatus\tSynonyms");
             for (; rset.next(); ++count) {
                 long id = rset.getLong("DiseaseID");
                 String name = rset.getString("DiseaseName");
+                int statid = rset.getInt("StatusID");
                 
                 Map<String, Object> data = gard.instrument(id);
                 data.put("name", name);
                 data.put("is_rare", rset.getInt("isRare") == 1);
+                String status = "";
+                switch (statid) {
+                case 4: status = "Active"; break;
+                case 5: status = "Retired"; break;
+                }
+                if (status != null)
+                    data.put("status", status);
                 
                 List orgs = (List)data.remove("organizations");
                 data.put("organizations", mapper.writeValueAsString(orgs));
@@ -792,7 +819,15 @@ public class GARDEntityFactory extends EntityRegistry {
                 data.put("organizations", orgs);
                 //if (count > 0) ps.print(",");
                 //ps.print(mapper.writeValueAsString(data));
+                pw.println(id+"\t"+name+"\t"+status+"\t"
+                           +Util.toSet(data.get("synonyms")).stream()
+                           .collect(Collectors.joining("|")));
             }
+
+            pw.println(15000+"\tLIG4 syndrome\tActive\tLigase 4 syndrome|DNA ligase IV deficiency");
+            pw.println(15001+"\tVEXAS syndrome\tActive\tvacuoles, E1 enzyme, X-linked, autoinflammatory, somatic syndrome|VEXAS");
+            pw.println(15002+"\tCleaveage-resistant RIPK1-induced autoinflammatory (CRIA) syndrome\tActive\tcleavage-resistant RIPK1-induced autoinflammatory syndrome|CRIA syndrome|AIEFL");
+            pw.close();
             //ps.println("]");
             //ps.close();
             

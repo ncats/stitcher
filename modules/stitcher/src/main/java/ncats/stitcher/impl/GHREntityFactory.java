@@ -170,7 +170,8 @@ public class GHREntityFactory extends EntityRegistry {
                     db = value.replaceAll("\\s", "_").toUpperCase();
                     switch (db) {
                     case "GTR": db = "UMLS"; break;
-                    case "SNOMED_CT": db = "SNOMEDCT_US"; break;
+                    case "SNOMED_CT": case "SNOMED CT":
+                        db = "SNOMEDCT_US"; break;
                     case "ICD-10-CM": db = "ICD10CM"; break;
                     }
                 }
