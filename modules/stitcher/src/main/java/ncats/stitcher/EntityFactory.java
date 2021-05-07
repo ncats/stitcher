@@ -2500,10 +2500,11 @@ public class EntityFactory implements Props, AutoCloseable {
         path.push(node);
         for (Relationship rel : node.getRelationships(dir, keys)) {
             Set sources = Util.toSet(rel.getProperty(SOURCE, null));
-            if (sources.contains(node.getProperty(SOURCE))) {
-                Node xn = rel.getOtherNode(node);
-                if (path.indexOf(xn) < 0)
-                    traversal (xn, path, paths, seen, dir, keys);
+            Node xn = rel.getOtherNode(node);            
+            if (sources.contains(node.getProperty(SOURCE))
+                && sources.contains(xn.getProperty(SOURCE))
+                && path.indexOf(xn) < 0) {
+                traversal (xn, path, paths, seen, dir, keys);
             }
         }
         

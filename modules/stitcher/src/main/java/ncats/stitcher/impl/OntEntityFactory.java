@@ -1487,6 +1487,11 @@ public class OntEntityFactory extends EntityRegistry {
             data.put("equivalentTo", svals.keySet().toArray(new String[0]));
         }
 
+        if ("MONDO:0007201".equals(data.get("notation"))) {
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>\n"+or);
+            logger.info("++++++++++++++++++++++++++\n"+Util.toString(data));
+        }
+
         Entity ent = register (sigh (data));
         if (or.props.isEmpty() && or.axioms.isEmpty()) {
             // transient entity

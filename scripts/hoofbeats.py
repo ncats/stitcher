@@ -352,7 +352,7 @@ class DiseaseUpdate:
         self.drugs()
         self.evidence()
         self.related_diseases()
-        print(json.dumps(self.d, indent=2))
+        #print(json.dumps(self.d, indent=2))
 
     def commit(self):
         headers = {
@@ -527,21 +527,28 @@ SELECT Id FROM Feature__c where External_ID__c = '%s'
                     get_sfdc_id)
 
     def set_id(self, f, keyf, t, keyt, postfn = None):
-        lut = {
-            keyt(x): x['Id']
-            for x in list(filter(
-                    lambda x: x['attributes']['type']==t, self.sd))}
-        notfound = []
-        for x in self.d[f]:
-            key = keyf(x)
-            if key in lut:
-                x['Id'] = lut[key]
-                if postfn != None:
-                   postfn(x)
-            else:
-                print('%s: key %s not found for %s; treating as new' % (
-                    self.term, key, f), file=sys.stderr)
-                notfound.append(key)
+        notfound = []        
+        try:
+            lut = {
+                keyt(x): x['Id']
+                for x in list(filter(
+                        lambda x: x['attributes']['type']==t, self.sd))}
+            
+            for x in self.d[f]:
+                key = keyf(x)
+                if key in lut:
+                    x['Id'] = lut[key]
+                    if postfn != None:
+                        postfn(x)
+                else:
+                    print('%s: key %s not found for %s; treating as new' % (
+                        self.term, key, f), file=sys.stderr)
+                    notfound.append(key)
+            
+        except KeyError:
+            print('** warning: %s: KeyError for type %s in %s!' % (
+                self.term, t, f), file=sys.stderr)
+
         return notfound
 
     @staticmethod
@@ -549,8 +556,16 @@ SELECT Id FROM Feature__c where External_ID__c = '%s'
         return '/'.join(kargs).lower()
 
 
-def update_diseases(file, include = None):
-    with open(file, 'r') as f:
+def update_disease(d, f):
+    du = DiseaseUpdate(d)
+    du.instrument()
+    r = du.commit()
+    print('### %s...%s' % (d['term']['curie'], r.status_code), file=sys.stderr)
+    if 200 == r.status_code:
+        print(json.dumps(r.json(), indent=2), file=f)
+    
+def update_diseases(file, out, include = None):
+    with open(file, 'r') as f, open(out, 'w') as o:
         curies = {}
         if include != None:
             for c in include:
@@ -559,11 +574,9 @@ def update_diseases(file, include = None):
         if isinstance(data, list):
             for d in data:
                 if len(curies) == 0 or d['term']['curie'] in curies:
-                    du = DiseaseUpdate(d)
-                    du.instrument()
+                    update_disease(d, o)
         else:
-            du = DiseaseUpdate(data)
-            du.instrument()
+            update_disease(data, o)
             
 def fetch_term(term):
 #    print('fetching terms...%s' % term)
@@ -670,8 +683,12 @@ if __name__ == '__main__':
         
     if args.type == 'disease':
         if args.update:
-            print('-- updating...%s' % args.ARG, file=sys.stderr)
-            update_diseases(args.ARG, args.curies)
+            file = args.ARG
+            pos = file.index('.')
+            out = (file[0:pos] if pos > 0 else '') + '.out'
+            print('-- updating...%s => output...%s' % (file, out),
+                  file=sys.stderr)
+            update_diseases(file, out, args.curies)
         elif args.reload:
             print('-- reloading...%s' % args.ARG[0], file=sys.stderr)
             reload_disease(args.ARG)
