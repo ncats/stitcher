@@ -2,9 +2,8 @@
 
 import os
 import sys
-import cookielib
-import urllib
-import urllib2
+import http.cookiejar
+import urllib.request as urllib2
 import json
 import time
 import argparse
@@ -13,9 +12,6 @@ import base64
 from tqdm import tqdm
 import re
 
-# check that the python version is correct (need 2)
-if sys.version_info[0] > 2:
-    raise "Must be using Python 2! Aborting."
 
 #get a default directory with data files for this script
 def getScriptsDataDir():
@@ -85,11 +81,11 @@ ports_patt = "^[0-9]{4}$"
 if site_arg in switcher:
     site = switcher[site_arg]
 elif re.search(ports_patt, str(site_arg)):
-    site = "http://localhost:%s/" % site_arg
+    site = f"http://localhost:{site_arg}/"
 else:
     site = site_arg
 
-print "Querying stitcher instance at %s..." % site
+print(f"Querying stitcher instance at {site}...")
 
 #create output directory if missing
 if not os.path.exists(outdir):
@@ -97,7 +93,7 @@ if not os.path.exists(outdir):
 
 date = time.strftime("%Y-%m-%d", time.gmtime())
 
-cookies = cookielib.CookieJar()
+cookies = http.cookiejar.CookieJar()
 
 opener = urllib2.build_opener(
     urllib2.HTTPRedirectHandler(),
@@ -155,16 +151,16 @@ def approvedStitches(approved, stitch):
 
     appr = ''
     apprType = ''
-    if stitch.has_key('highestPhase'):
+    if 'highestPhase' in stitch:
         for event in stitch['events']:
             if event['id'] == stitch['highestPhase']:
                 if event['kind'] in ['USApprovalOTC', 'USApprovalRx', 'USWithdrawn', 'USPreviouslyMarketed']:
                     appr = stitch['highestPhase']
                     apprType = event['kind']
     if appr != '':
-        if stitch.has_key('initiallyMarketedUS') and stitch['initiallyMarketedUS'] != "null":
+        if 'initiallyMarketedUS' in stitch and stitch['initiallyMarketedUS'] != "null":
             appr = stitch['initiallyMarketedUS']
-        elif stitch.has_key('initiallyMarketed') and stitch['initiallyMarketed'] != "null":
+        elif 'initiallyMarketed' in stitch and stitch['initiallyMarketed'] != "null":
             appr = stitch['initiallyMarketed']
 
         parent = stitch['sgroup']['parent']
@@ -391,7 +387,7 @@ def iterateStitches(funcs, substances = 0):
     if substances < 1:
         substances = get_max_subs()
 
-    for skip in tqdm(xrange(0, substances, top), ncols=50):
+    for skip in tqdm(range(0, substances, top), ncols=50):
         obj = get_site_obj(top, skip)
 
         if obj is not None:
@@ -425,7 +421,7 @@ def get_max_subs():
     sys.stderr.write("Trying to guess the max number of pages to navigate...\n")
 
     while max - min > 100:
-        guess = max/2 + min/2
+        guess = int(max/2 + min/2)
         obj = get_site_obj(1, guess)
 
         # if not contents object present, reduce page number
@@ -450,13 +446,13 @@ def getRootNode(stitch):
     parent = stitch['sgroup']['parent']
     for node in stitch['sgroup']['members']:
         if node['node'] == parent:
-            if node.has_key('stitches') and node['stitches'].has_key('R_activeMoiety'):
+            if 'stitches' in node and 'R_activeMoiety' in node['stitches']:
                 if isinstance(node['stitches']['R_activeMoiety'], list):
                     if len(node['stitches']['R_activeMoiety']) == 1:
                         am = node['stitches']['R_activeMoiety'][0]
                 else:
                     am = node['stitches']['R_activeMoiety']
-            if not node.has_key('id'):
+            if 'id' not in node:
                 root = node['name']
             else:
                 root = node['id']
@@ -464,13 +460,13 @@ def getRootNode(stitch):
                 am = ""
     while len(am) > 0:
         for node in stitch['sgroup']['members']:
-            if node.has_key('id') and node['id'] == am:
-                if node.has_key('stitches') and node['stitches'].has_key('R_activeMoiety'):
+            if 'id' in node and node['id'] == am:
+                if 'stitches' in node and 'R_activeMoiety' in node['stitches']:
                     if isinstance(node['stitches']['R_activeMoiety'], list):
                         am = node['stitches']['R_activeMoiety'][0]
                     else:
                         am = node['stitches']['R_activeMoiety']
-                if not node.has_key('id'):
+                if 'id' not in node:
                     root = node['name']
                 else:
                     root = node['id']
@@ -701,14 +697,16 @@ if __name__ == "__main__":
     # ranchoShouldBeApproved: A list of all drugs with UNIIs, G-SRS, and Rancho names
     # that should have a condition with an "Approved" Highest Phase in RCAP, but don't
 
-    tests = [nmeClashes,
-             nmeClashes2,
-             PMEClashes,
-             activemoietyClashes,
-             uniiClashes,
-             findOrphans,
+    tests = [
+            #  nmeClashes,
+            #  nmeClashes2,
+            #  PMEClashes,
+            #  activemoietyClashes,
+            #  uniiClashes,
+            #  findOrphans,
              approvedStitches,
-             ranchoShouldBeApproved]
+            #  ranchoShouldBeApproved
+             ]
 
     headers = {"nmeClashes": ["UNII -- UNII PT",
                               "Stitch",
