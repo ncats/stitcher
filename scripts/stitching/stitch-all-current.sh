@@ -15,9 +15,6 @@ echo $(date) > $log
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/ruili.conf"
 #echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, May 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-05-06.json"
-echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/withdrawn.conf"
 echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
@@ -26,6 +23,9 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, April 2020\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, May 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-05-06.json"
+echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
 echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
