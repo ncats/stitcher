@@ -372,9 +372,12 @@ public class HoofBeats {
         }
     }
 
-    static class SubClassOf {
+    static class Specialty {
         final Map<String, String> parents = new HashMap<>();
-        SubClassOf (EntityFactory ef, String source, String... concepts) {
+        final String curie;
+        Specialty (EntityFactory ef, String curie,
+                    String source, String... concepts) {
+            this.curie = curie;
             for (String s : concepts) {
                 ef.cypher(row -> {
                         long id = (Long)row.get("id");
@@ -395,7 +398,7 @@ public class HoofBeats {
                 
             }
             
-            //logger.info(">>>> SubClassOf..."+parents);
+            //logger.info(">>>> Specialty..."+parents);
         }
 
         public String getClass (String id) {
@@ -516,7 +519,7 @@ public class HoofBeats {
     final ObjectMapper mapper = new ObjectMapper ();
     final Map<String, String> hpCategories = new HashMap<>();
     final Map<String, HP_Type[]> hpTypes = new HashMap<>();
-    final Map<String, SubClassOf[]> specialties = new HashMap<>();
+    final Map<String, Specialty[]> specialties = new HashMap<>();
 
     class OrphanetGenes implements NeighborVisitor {
         ArrayNode genes;
@@ -780,13 +783,7 @@ public class HoofBeats {
                 else {
                     HP_Type[] types = getHpTypes (hpid);
                     for (HP_Type t : types) {
-                        switch (t) {
-                        case Symptom:
-                        case Progression: // <-- really?
-                            phenotypes.add(createSymptomNode
-                                           (xe, hpid, props));
-                            break;
-                            
+                        switch (t) {                            
                         case Inheritance:
                             inheritance.add
                                 (createNode
@@ -800,7 +797,15 @@ public class HoofBeats {
                         case Mortality:
                             mortality.add(createNode (xe, hpid));
                             break;
+
+                            //case Symptom:
+                            //case Progression: // <-- really?
+                        default:
+                            phenotypes.add(createSymptomNode
+                                           (xe, hpid, props));
+                            break;
                         }
+                        
                         Set<Entity> ents = phenos.get(t);
                         if (ents == null)
                             phenos.put(t, ents = new HashSet<>());
@@ -1092,8 +1097,12 @@ public class HoofBeats {
 
             if (gardSummaries.containsKey(id)) {
                 Map<String, String> d = gardSummaries.get(id);
-                term.put("label", d.get("DiseaseName"));
-                term.put("description", d.get("SummaryText"));
+                String name = d.get("DiseaseName");
+                term.put("label", name);
+                String text = d.get("SummaryText");
+                if (text != null)
+                    text = text.replaceAll("DiseaseName", name);
+                term.put("description", text);
                 term.put("description_curie", id);
                 term.put("description_URL", term.get("url").asText());
             }
@@ -1494,18 +1503,16 @@ public class HoofBeats {
                 allents.addAll(set);
             }
 
-            Map<String, Set<String>> tags = new LinkedHashMap<>();
+            Map<String, String> tags = new LinkedHashMap<>();
             for (Entity e : allents) {
                 String id = getString (e.payload("notation"));
-                for (Map.Entry<String, SubClassOf[]> me
+                for (Map.Entry<String, Specialty[]> me
                          : specialties.entrySet()) {
-                    for (SubClassOf sub : me.getValue()) {
+                    for (Specialty sub : me.getValue()) {
                         String clz = sub.getClass(id);
                         if (null != clz) {
-                            Set<String> curies = tags.get(me.getKey());
-                            if (curies == null)
-                                tags.put(me.getKey(), curies = new TreeSet<>());
-                            curies.add(clz);
+                            tags.put(me.getKey(), sub.curie);
+                            break;
                         }
                     }
                 }
@@ -1528,15 +1535,15 @@ public class HoofBeats {
                     }
                 }
                 if (!curies.isEmpty())
-                    tags.put("Pediatrics", curies);
+                    tags.put("Pediatrics", "GARD:S020");
             }
 
-            for (Map.Entry<String, Set<String>> me : tags.entrySet()) {
+            for (Map.Entry<String, String> me : tags.entrySet()) {
                 ObjectNode node = newJsonObject ();
-                node.put("curie", me.getValue().stream()
-                         .collect(Collectors.joining(";")));
+                node.put("curie", me.getValue());
                 node.put("label", me.getKey());
                 node.put("category", "Disease Ontology");
+                node.put("tag_sfdc_id", "");
                 nodes.add(node);
             }
             
@@ -1615,69 +1622,69 @@ public class HoofBeats {
         }
 
         try {
-            specialties.put("Genetics", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0003847")
+            specialties.put("Genetics", new Specialty[]{
+                    new Specialty (ef, "GARD:S001", "S_MONDO", "MONDO:0003847")
                 });
-            specialties.put("Chromosomal Anomaly", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0019040")
+            specialties.put("Chromosomal Anomaly", new Specialty[]{
+                    new Specialty (ef, "GARD:S002", "S_MONDO", "MONDO:0019040")
                 });
-            specialties.put("Cancer", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0023370")
+            specialties.put("Cancer", new Specialty[]{
+                    new Specialty (ef, "GARD:S003", "S_MONDO", "MONDO:0023370")
                 });
-            specialties.put("Autoimmune", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0007179",
+            specialties.put("Autoimmune", new Specialty[]{
+                    new Specialty (ef, "GARD:S004", "S_MONDO", "MONDO:0007179",
                                     "MONDO:0019751")
                 });
-            specialties.put("Cardiology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005267")
+            specialties.put("Cardiology", new Specialty[]{
+                    new Specialty (ef, "GARD:S005", "S_MONDO", "MONDO:0005267")
                 });
-            specialties.put("Dermatology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005093")
+            specialties.put("Dermatology", new Specialty[]{
+                    new Specialty (ef, "GARD:S006", "S_MONDO", "MONDO:0005093")
                 });
-            specialties.put("Endocrine", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005151")
+            specialties.put("Endocrine", new Specialty[]{
+                    new Specialty (ef, "GARD:S007", "S_MONDO", "MONDO:0005151")
                 });
-            specialties.put("Gastroenterology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0004335")
+            specialties.put("Gastroenterology", new Specialty[]{
+                    new Specialty (ef, "GARD:S008", "S_MONDO", "MONDO:0004335")
                 });
-            specialties.put("Hematology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005570")
+            specialties.put("Hematology", new Specialty[]{
+                    new Specialty (ef, "GARD:S009", "S_MONDO", "MONDO:0005570")
                 });
-            specialties.put("Immunology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005046")
+            specialties.put("Immunology", new Specialty[]{
+                    new Specialty (ef, "GARD:S010", "S_MONDO", "MONDO:0005046")
                 });
-            specialties.put("Infectious Disease", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005550")
+            specialties.put("Infectious Disease", new Specialty[]{
+                    new Specialty (ef, "GARD:S011", "S_MONDO", "MONDO:0005550")
                 });
-            specialties.put("Nephrology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005240")
+            specialties.put("Nephrology", new Specialty[]{
+                    new Specialty (ef, "GARD:S012", "S_MONDO", "MONDO:0005240")
                 });
-            specialties.put("Neurology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005071"),
-                    new SubClassOf (ef, "S_HP", "HP:0001298", "HP:0012759",
-                                    "HP:0001250")
+            specialties.put("Neurology", new Specialty[]{
+                    new Specialty (ef, "GARD:S013", "S_MONDO", "MONDO:0005071"),
+                    new Specialty (ef, "GARD:S013", "S_HP", "HP:0001298",
+                                   "HP:0012759", "HP:0001250")
                 });
-            specialties.put("Oncology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0023370"),
-                    new SubClassOf (ef, "S_HP", "HP:0002664")
+            specialties.put("Oncology", new Specialty[]{
+                    new Specialty (ef, "GARD:S014", "S_MONDO", "MONDO:0023370"),
+                    new Specialty (ef, "GARD:S014", "S_HP", "HP:0002664")
                 });
-            specialties.put("Ophthalmology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0024458")
+            specialties.put("Ophthalmology", new Specialty[]{
+                    new Specialty (ef, "GARD:S015", "S_MONDO", "MONDO:0024458")
                 });
-            specialties.put("Psychiatry", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0002025"),
-                    new SubClassOf (ef, "S_HP", "HP:0000729", "HP:0100851",
-                                    "HP:0031466")
+            specialties.put("Psychiatry", new Specialty[]{
+                    new Specialty (ef, "GARD:S016", "S_MONDO", "MONDO:0002025"),
+                    new Specialty (ef, "GARD:S016", "S_HP", "HP:0000729",
+                                   "HP:0100851", "HP:0031466")
                 });
-            specialties.put("Pulmonology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005087")
+            specialties.put("Pulmonology", new Specialty[]{
+                    new Specialty (ef, "GARD:S017", "S_MONDO", "MONDO:0005087")
                 });
-            specialties.put("Rheumatology", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO", "MONDO:0005554")
+            specialties.put("Rheumatology", new Specialty[]{
+                    new Specialty (ef, "GARD:S018", "S_MONDO", "MONDO:0005554")
                 });
-            specialties.put("Vascular Medicine", new SubClassOf[]{
-                    new SubClassOf (ef, "S_MONDO",  "MONDO:0018882")
-                });            
+            specialties.put("Vascular Medicine", new Specialty[]{
+                    new Specialty (ef, "GARD:S019", "S_MONDO",  "MONDO:0018882")
+                });
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "specialties failed", ex);
@@ -1780,6 +1787,9 @@ public class HoofBeats {
                 types = new HP_Type[]{ HP_Type.Symptom };
             }
             else {
+                if (found.size() > 1) {
+                    found.remove(HP_Type.Lab);
+                }
                 types = found.toArray(new HP_Type[0]);
             }
             hpTypes.put(id, types);
