@@ -4,6 +4,7 @@ LUT = {}
 API = {}
 GENES = {}
 PHENOTYPES = {}
+TAGS = {}
 DISEASES = {}
 TOKEN = ''
 
@@ -302,6 +303,8 @@ class DiseaseUpdate:
             self.d = d
         # salesforce version of d                   
         self.sd = self.fetch_sf_disease(self.term)
+        # changes as compared with the version in salesforce
+        self.changes = []
                          
     @staticmethod
     def query(q):
@@ -352,6 +355,7 @@ class DiseaseUpdate:
         self.drugs()
         self.evidence()
         self.related_diseases()
+        self.tags()
         #print(json.dumps(self.d, indent=2))
 
     def commit(self):
@@ -387,6 +391,7 @@ FROM GARD_Disease_Category__c where GARD_Disease__c = '%s'
                 else:
                     x['Id'] = ''
                     x['category_sfdc_id'] = ''
+                    self.changes.append(x)
 
     def synonyms(self):
         self.set_id('synonyms', lambda x: self.key(x['curie'], x['label']),
@@ -487,11 +492,14 @@ SELECT Id FROM Feature__c where External_ID__c = '%s'
                 else:
                     print('%s: phenotype not found in salesforce!'
                           % x['curie'], file=sys.stderr)
-            x['phenotype_sfdc_id'] = sfdc
-            
+            if sfdc != None:
+                x['phenotype_sfdc_id'] = sfdc
+
+        #print(json.dumps(self.d['phenotypes'], indent=2), file=sys.stderr)
         self.set_id('phenotypes', lambda x: x['label'],
                     'GARD_Disease_Feature__c', lambda x: x['HPO_Name__c'],
                     get_sfdc_id)
+        #print(json.dumps(self.d['phenotypes'], indent=2), file=sys.stderr)
 
     def drugs(self):
         self.set_id('drugs', lambda x: x['curie'], 'GARD_Disease_Drug__c',
@@ -526,46 +534,108 @@ SELECT Id FROM Feature__c where External_ID__c = '%s'
                     'Related_Disease__c', lambda x: x['Related_Disease_ID__c'],
                     get_sfdc_id)
 
+    def tags(self):
+        def get_sfdc_id(x):
+            sfdc = None
+            if x['curie'] in TAGS:
+                sfdc = TAGS[x['curie']]
+                
+            if sfdc == None:
+                data = self.query(
+                    "select Id from Tag__c where Unique_Identifier__c='%s'"
+                    % x['curie'])
+                if data != None:
+                    TAGS[x['curie']] = sfdc = data['Id']
+                else:
+                    print('%s: tag not found in salesforce 🙄!' % x['curie'],
+                          file=sys.stderr)
+            x['tag_sfdc_id'] = sfdc
+            
+        def keyf(x):
+            try:
+                return self.key(x['category'], x['label'])
+            except KeyError:
+                print('KeyError in %s' % x, file=sys.stderr)
+                traceback.print_exc()
+                
+        def keyt(x):
+            try:
+                return self.key(x['Tag_Category__c'], x['Tag_Name__c'])
+            except KeyError:
+                print('KeyError in %s' % x, file=sys.stderr)
+                trackeback.print_exc()
+                
+        self.set_id('tags', keyf, 'GARD_Disease_Tag__c', keyt, get_sfdc_id)
+
     def set_id(self, f, keyf, t, keyt, postfn = None):
-        notfound = []        
         try:
             lut = {
                 keyt(x): x['Id']
                 for x in list(filter(
                         lambda x: x['attributes']['type']==t, self.sd))}
-            
-            for x in self.d[f]:
-                key = keyf(x)
-                if key in lut:
-                    x['Id'] = lut[key]
+
+            if lut:
+                seen = set()
+                values = list()
+                dups = 0
+                for x in self.d[f]:
+                    key = keyf(x)
+                    if key in lut:
+                        id = lut[key]
+                        if id not in seen:
+                            x['Id'] = id
+                            values.append(x)
+                            seen.add(id)
+                        else:
+                            print('%s: warning: duplicate key found: %s (%s)'
+                                  % (self.term, key, id), file=sys.stderr)
+                            dups = dups + 1
+                    else:
+                        print('%s: key "%s" not found for "%s"; treating as new'
+                              % (self.term, key, f), file=sys.stderr)
+                        self.changes.append(key)
+                        values.append(x)
+                        
                     if postfn != None:
                         postfn(x)
-                else:
-                    print('%s: key %s not found for %s; treating as new' % (
-                        self.term, key, f), file=sys.stderr)
-                    notfound.append(key)
+
+                    #print(json.dumps(x, indent=2), file=sys.stderr)
+
+                if dups > 0:
+                    # update the field if there are dups
+                    self.d[f] = values
+                    
+            elif self.d[f]:
+                print('%s: no data for "%s" in salesforce; treating as new' % (
+                    self.term, f), file=sys.stderr)
             
         except KeyError:
             print('** warning: %s: KeyError for type %s in %s!' % (
                 self.term, t, f), file=sys.stderr)
-
-        return notfound
 
     @staticmethod
     def key(*kargs):
         return '/'.join(kargs).lower()
 
 
-def update_disease(d, f):
+def update_disease(d, f, e):
     du = DiseaseUpdate(d)
     du.instrument()
     r = du.commit()
-    print('### %s...%s' % (d['term']['curie'], r.status_code), file=sys.stderr)
+    print('### %s...%s' % (
+        d['term']['curie'], r.status_code), file=sys.stderr)
     if 200 == r.status_code:
         print(json.dumps(r.json(), indent=2), file=f)
+    else:
+        err = {
+            'term': du.term,
+            'status': r.status_code,
+            'mesg': r.json()
+        }
+        print(json.dumps(err, indent=2), file=e)
     
-def update_diseases(file, out, include = None):
-    with open(file, 'r') as f, open(out, 'w') as o:
+def update_diseases(file, out, err, include = None):
+    with open(file, 'r') as f, open(out, 'w') as o, open(err, 'w') as e:
         curies = {}
         if include != None:
             for c in include:
@@ -574,9 +644,9 @@ def update_diseases(file, out, include = None):
         if isinstance(data, list):
             for d in data:
                 if len(curies) == 0 or d['term']['curie'] in curies:
-                    update_disease(d, o)
+                    update_disease(d, o, e)
         else:
-            update_disease(data, o)
+            update_disease(data, o, e)
             
 def fetch_term(term):
 #    print('fetching terms...%s' % term)
@@ -593,14 +663,82 @@ def fetch_term(term):
 
 def browse():
     headers = {
-        'Authorization': 'Bearer %s' % TOKEN
+        'Authorization': 'Bearer %s' % TOKEN,
+        'X-PrettyPrint': '1'
     }
-    r = requests.get(API['browse'], headers = headers)
+    q = API['query']+"?q=SELECT Id,Name,DiseaseID__c FROM GARD_Disease__c WHERE DiseaseID__c >= 'GARD:0000001' AND DiseaseID__c < 'GARD:0000010' ORDER BY DiseaseID__c"
+    q = API['query']+"?q=SELECT DiseaseID__c, (SELECT Feature__r.HPO_Feature_Type__c FROM GARD_Disease_Features__r) FROM GARD_Disease__c where Id='a05t0000001XKBfAAO'"
+    #q = API['objects']
+    r = requests.get(q, headers = headers)
     if 200 == r.status_code:
         print (json.dumps(r.json(), indent=2))
     else:
-        print ('%s: returns status code %d' % (
-            API['browse'], r.status_code), file=sys.stderr)
+        print ('%s: returns status code %d\n%s' % (
+            API['browse'], r.status_code, json.dumps(r.json(),indent=2)),
+               file=sys.stderr)
+
+class DiseaseSummary:
+    def __init__(self):
+        self.headers = {
+            'Authorization': 'Bearer %s' % TOKEN
+        }
+        
+        q = API['query']+'?q=SELECT COUNT() FROM GARD_Disease__c WHERE DiseaseID__c != NULL'
+        r = requests.get(q, headers = self.headers)
+        mesg = r.json()
+        
+        self.diseases = dict()
+        if 200 != r.status_code:
+            print("** can't get disease count: %d\n%s" % (
+                r.status_code, json.dumps(mesg, indent=2)))
+            return
+
+        total = mesg['totalSize']
+        print ('fetching %d diseases...' % total, file=sys.stderr)
+        id = cnt = 0
+        batch = 200
+        while cnt < total:
+            q = API['query']+"""?q=SELECT Id,DiseaseID__c 
+FROM GARD_Disease__c 
+WHERE DiseaseID__c >= 'GARD:%07d' AND DiseaseID__c < 'GARD:%07d' 
+ORDER BY DiseaseID__c""" % (id, id+batch)
+            #print(q)
+            r = requests.get(q, headers = self.headers)
+            data = r.json()
+            if 200 == r.status_code:
+                cnt = cnt + data['totalSize']
+                for d in data['records']:
+                    self.diseases[d['Id']] = d['DiseaseID__c']
+            else:
+                print('** error: query "%s" returns %d!' % (
+                    q, r.status_code))
+                break
+            id = id + batch
+
+        #print(json.dumps(diseases, indent=2))
+        if len(self.diseases) != cnt:
+            print('** warning: expecting %d disease(s) but instead got %d!' % (
+                cnt, len(self.diseases)), file=sys.stderr)
+
+    def count_phenotype_types(self):
+        types = dict()
+        for (id, curie) in self.diseases.items():
+            q = API['query']+"""?q=SELECT DiseaseID__c, 
+(SELECT Feature__r.HPO_Feature_Type__c FROM GARD_Disease_Features__r) 
+FROM GARD_Disease__c where Id='%s'""" % id
+            r = requests.get(q, headers = self.headers)
+            data = r.json()['records'][0]
+            if 200 == r.status_code:
+                print('%s: %s' % (curie, json.dumps(data, indent=2)))
+                features = data['GARD_Disease_Features__r']
+                if None != features:
+                    for f in features['records']:
+                        for t in f['Feature__r']['HPO_Feature_Type__c'].split(';'):
+                            if t not in types:
+                                types[t] = set()
+                            types[t].add(curie)
+        for (t, curies) in types.items():
+            print('%s: %d' % (t, len(curies)))
 
 def query(q):
     headers = {
@@ -647,8 +785,8 @@ if __name__ == '__main__':
                         help='Skip specified number of records in load')
     parser.add_argument('-o', '--output', default='.',
                         help='Output path (default .)')
-    parser.add_argument('-u', '--update', action='store_true',
-                        help='Update diseases via syncing with salesforce api')
+    parser.add_argument('-u', '--update', action='store_true', default=True,
+                        help='Update diseases via syncing with salesforce API (preferred)')
     parser.add_argument('ARG', nargs='?', default=[],
                         help="Input arguments either as terms or file")
     if len(sys.argv) == 1:
@@ -686,9 +824,10 @@ if __name__ == '__main__':
             file = args.ARG
             pos = file.index('.')
             out = (file[0:pos] if pos > 0 else '') + '.out'
-            print('-- updating...%s => output...%s' % (file, out),
-                  file=sys.stderr)
-            update_diseases(file, out, args.curies)
+            err = (file[0:pos] if pos > 0 else '') + '.err'
+            print('-- updating...%s => output...%s error...%s' % (
+                file, out, err), file=sys.stderr)
+            update_diseases(file, out, err, args.curies)
         elif args.reload:
             print('-- reloading...%s' % args.ARG[0], file=sys.stderr)
             reload_disease(args.ARG)
@@ -710,6 +849,8 @@ if __name__ == '__main__':
     elif args.type == 'term':
         fetch_term(args.ARG)
     elif args.type == 'browse':
-        browse()
+        #browse()
+        ds = DiseaseSummary()
+        ds.count_phenotype_types()
     elif args.type == 'query':
         query(args.ARG)
