@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+
 import os
+import io
 import sys
 import time
 import json
 import string
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zipfile
 import gzip
 import numpy
@@ -70,7 +73,7 @@ def getMainDir():
     return curr
 
 def resolveName(name): # returns empty string if resolver can't do anything with this name
-    if name in resolverCache.keys():
+    if name in list(resolverCache.keys()):
         return resolverCache[name]
 
     try:
@@ -98,21 +101,21 @@ def resolveNameTripod(name):
     #        return r[0]['response']
     #else:
 
-    request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib2.quote(name)+"$\""
+    request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib.parse.quote(name)+"$\""
     response = "{\"total\":0}"
     try:
-        response = urllib2.urlopen(request).read()
+        response = urllib.request.urlopen(request).read()
     except:
         response
     r = json.loads(response)
     if int(r['total']) > 0:
         for i in range(0, int(r['total'])):
-            if r['content'][i].has_key('_approvalIDDisplay'):
+            if '_approvalIDDisplay' in r['content'][i]:
                 if unii == '':
                     unii = r['content'][i]['_approvalIDDisplay']
                 elif unii != r['content'][i]['_approvalIDDisplay']:
                     raise ValueError("conflicting UNIIs returned:"+name+":"+resolverCache[name]+":"+request)
-            elif r['content'][i].has_key('approvalID'):
+            elif 'approvalID' in r['content'][i]:
                 if unii == '':
                     unii = r['content'][i]['approvalID']
                 elif unii != r['content'][i]['approvalID']:
@@ -148,7 +151,7 @@ def parseIngred(ing, uniiPT, uniiALL, missing):
                 if len(match) == 10:
                     ingreds.append(match)
                 else:
-                    if not missing.has_key(si):
+                    if si not in missing:
                         sys.stderr.write("Ingredient does not map to UNII:"+si+"\t"+NDA+"\n")
                         missing[si] = []
                     missing[si].append(NDA)
@@ -198,7 +201,7 @@ def apprDateRegression(prods):
     window = 10000
     dataxs = dict()
     datays = dict()
-    for prod in prods.keys():
+    for prod in list(prods.keys()):
         date = prods[prod][-2]
         if date != '':
             ts = time.mktime(time.strptime(date, "%Y-%m-%d"))
@@ -210,10 +213,10 @@ def apprDateRegression(prods):
                 kind2 = kind+str(2*int(float(appl)/window+0.5))
                 #if appl < 5000:
                 #    print appl, kind1, kind2
-                if not dataxs.has_key(kind1):
+                if kind1 not in dataxs:
                     dataxs[kind1] = []
                     datays[kind1] = []
-                if not dataxs.has_key(kind2):
+                if kind2 not in dataxs:
                     dataxs[kind2] = []
                     datays[kind2] = []
                 dataxs[kind1].append(appl)
@@ -222,7 +225,7 @@ def apprDateRegression(prods):
                 datays[kind2].append(ts)
 
     models = dict()
-    for kind in dataxs.keys():
+    for kind in list(dataxs.keys()):
         #print kind, len(dataxs[kind])
         if len(dataxs[kind]) > 20:
             regr = numpy.poly1d(numpy.polyfit(dataxs[kind], datays[kind], 1))
@@ -230,7 +233,7 @@ def apprDateRegression(prods):
     figs = ['NDA', 'BLA', 'ANDA']
     for figt in figs:
         fig, ax = plt.subplots()
-        for kind in models.keys():
+        for kind in list(models.keys()):
             if kind[0:len(figt)] == figt:
                 range = int(kind[len(figt):])
                 ax.scatter(dataxs[kind],datays[kind])
@@ -243,14 +246,14 @@ def apprDateRegression(prods):
         fig.tight_layout()
         plt.savefig(figt+'.png')
 
-    for prod in prods.keys():
+    for prod in list(prods.keys()):
         date = prods[prod][-2]
         source = prods[prod][-1]
         kind = prods[prod][-4]
         appl = int(prods[prod][0][0:6])
         kind = kind+str(int(2.*float(appl)/window+0.5))
         if kind[0:3] == 'NDA' and (date == '' or (date == '1982-01-01' and source == 'OrangeBook')):
-            if models.has_key(kind):
+            if kind in models:
                 pred = models[kind](appl)
                 pred = time.strftime("%Y-%m-%d", time.gmtime(pred))
                 if date == '1982-01-01' and source == 'OrangeBook':
@@ -309,7 +312,7 @@ def writeInitApp(outfp, unii, early, earlyDate, myunii):
             method = "Literature"
             
         for otherunii in activeMoiety[unii]:
-            if UNII2prods.has_key(otherunii):
+            if otherunii in UNII2prods:
                 for prod in UNII2prods[otherunii]:
                     entry = prods[prod]
                     if entry[0] == early[0]:
@@ -318,24 +321,24 @@ def writeInitApp(outfp, unii, early, earlyDate, myunii):
     #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
     #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
     #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
-    comment = early[0].decode('latin-1').encode('ascii', 'replace')
+    comment = early[0]# .decode('latin-1').encode('ascii', 'replace')
     outline = myunii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
     outfp.write(outline)
 
 def readUniiFile(maindir):
     uniifile = maindir+"/temp/UNIIs-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+uniifile + " " + getUNIIZipURL()
-    print syscall
+    print(syscall)
 
     if not os.path.exists(uniifile):
         os.system(syscall)
     
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
-    fp = zfp.open(names[-1], 'r')
+    fp = io.TextIOWrapper(zfp.open(names[-1], 'r'))
     line = fp.readline()
 
-    if line[:-2].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME" and line[:-2].upper() != "NAME\tTYPE\tUNII\tPT":
+    if line[:-1].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME" and line[:-1].upper() != "NAME\tTYPE\tUNII\tPT":
         raise ValueError('Problem reading UNII file:'+line)
 
     line = fp.readline()
@@ -343,7 +346,7 @@ def readUniiFile(maindir):
     uniiALL = dict()
 
     while line != "":
-        sline = line[:-2].split("\t")
+        sline = line[:-1].split("\t")
         if len(sline) < 4:
             raise ValueError('Problem reading UNII fileline:'+line)
         uniiPT[sline[3]] = sline[2]
@@ -351,7 +354,7 @@ def readUniiFile(maindir):
             sline[0] = sline[0][:-14]
         uniiALL[sline[0]] = sline[2]
         line = fp.readline()
-    print "UNIIs in memory:", len(uniiPT), len(uniiALL)
+    print("UNIIs in memory:", len(uniiPT), len(uniiALL))
     return uniiPT, uniiALL
 
 def writeCBERBLAs(fpout, uniiPT, uniiALL):
@@ -367,13 +370,13 @@ def writeCBERBLAs(fpout, uniiPT, uniiALL):
 
     cberBLAs = dict()
     w = re.compile('\w+')
-    fp = open(getMainDir()+"/scripts/data/User Fee Billable Biologic Products and Potencies Approved Under Section 351 of PHS  Act.txt", "r")
+    fp = open(getMainDir()+"/scripts/data/User Fee Billable Biologic Products and Potencies Approved Under Section 351 of PHS  Act.txt", "r", encoding='cp1252')
     data = readTabFP(fp)
     fp.close()
     #print data['header']
     for item in data['table']:
         if len(item) < 10:
-            print item
+            print(item)
             sys.exit()
         for i in range(len(item)):
             if len(item[i]) > 2 and item[i][0] == '"' and item[i][-1] == '"':
@@ -421,9 +424,9 @@ def writeCBERBLAs(fpout, uniiPT, uniiALL):
         for entry in cberBLAs[unii]:
             fpout.write(entry)
 
-    initUniis = cberBLAs.keys()
+    initUniis = list(cberBLAs.keys())
     
-    licTxt = open(getMainDir()+"/scripts/data/LicEstablishList.txt", "r").readlines()
+    licTxt = open(getMainDir()+"/scripts/data/LicEstablishList.txt", "r", encoding='cp1252').readlines()
     url = "https://www.fda.gov/media/76356/download"
     
     idregex = re.compile('\d\d\d\d\s')
@@ -435,7 +438,7 @@ def writeCBERBLAs(fpout, uniiPT, uniiALL):
         id = idmatch.group(0)[:-1]
         name = licTxt[i][len(id)+1:-1]
         if re.search(dateregex, name):
-            print "problem with name", name
+            print("problem with name", name)
             sys.exit()
         #print id, name
         address = ''
@@ -477,7 +480,7 @@ def writeCBERBLAs(fpout, uniiPT, uniiALL):
                         cberBLAs[unii].append(entry)
                     fpout.write(entry)
             elif prod[0] == prod[1]:
-                print "Something very wrong"
+                print("Something very wrong")
                 sys.exit()
 
 if __name__=="__main__":
@@ -486,14 +489,14 @@ if __name__=="__main__":
 
     drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
-    print syscall
+    print(syscall)
 
     if not os.path.exists(drugsAtfdafile):
         os.system(syscall)
 
     obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+obfile + " " + getOBZipURL()
-    print syscall
+    print(syscall)
     if not os.path.exists(obfile):
         os.system(syscall)
 
@@ -512,7 +515,7 @@ if __name__=="__main__":
     uniiPT, uniiALL = readUniiFile(maindir)
 
     zfp = zipfile.ZipFile(drugsAtfdafile, 'r')
-    fp = zfp.open('Products.txt', 'r')
+    fp = io.TextIOWrapper(zfp.open('Products.txt', 'r'))
     #ApplNo\tProductNo\tForm\tStrength\tReferenceDrug\tDrugName\tActiveIngredient\tReferenceStandard
     #0       1          2     3         4              5         6                 7
     line = fp.readline()
@@ -525,7 +528,7 @@ if __name__=="__main__":
 
     missing = dict()
     while line != "":
-        sline = line[:-2].split("\t")
+        sline = line[:-1].split("\t")
         if len(sline) < 4:
             raise ValueError('Problem reading Products file2:'+line)
         NDA = sline[0]+"/"+sline[1]
@@ -537,7 +540,7 @@ if __name__=="__main__":
             status = 'Discontinued FR'
             strength = strength[:strength.find(" **")]
         for ingred in parseIngred(sline[6], uniiPT, uniiALL, missing):
-            if not UNII2prods.has_key(ingred):
+            if ingred not in UNII2prods:
                 UNII2prods[ingred] = []
             UNII2prods[ingred].append(NDA)
         prods[NDA] = [NDA, prodName, form, strength, status]
@@ -549,7 +552,7 @@ if __name__=="__main__":
     fp = open(missingUNIIsfile, 'w')
     m2 = []
 
-    for key in missing.keys():
+    for key in list(missing.keys()):
         m2.append([len(missing[key]), key, missing[key][0]])
     m2.sort()
     m2.reverse()
@@ -559,10 +562,10 @@ if __name__=="__main__":
         fp.write(str(item[0])+"\t"+item[1]+"\t"+item[2]+"\n")
     fp.close()
 
-    print "Prods in memory:", len(prods)
+    print("Prods in memory:", len(prods))
 
     # read in marketing status
-    fp = zfp.open('MarketingStatus.txt', 'r')
+    fp = io.TextIOWrapper(zfp.open('MarketingStatus.txt', 'r'))
     markt = readTabFP(fp)
     fp.close()
     sl = dict()
@@ -575,13 +578,13 @@ if __name__=="__main__":
     for entry in markt['table']:
         key = entry[1]+"/"+entry[2]
         status = sl[entry[0]]
-        if prods.has_key(key) and prods[key][-1] != 'Discontinued FR':
+        if key in prods and prods[key][-1] != 'Discontinued FR':
             prods[key][-1] = status
         #else:
         #    print key, status
 
     # read in sponsor and application type
-    fp = zfp.open('Applications.txt', 'r')
+    fp = io.TextIOWrapper(zfp.open('Applications.txt', 'r'))
     appInfo = readTabFP(fp)
     fp.close()
 
@@ -591,8 +594,8 @@ if __name__=="__main__":
     for entry in appInfo['table']:
         apps[entry[0]] = entry
 
-    for key in prods.keys():
-        if apps.has_key(key[0:6]):
+    for key in list(prods.keys()):
+        if key[0:6] in apps:
             prods[key].append(apps[key[0:6]][1])
             prods[key].append(apps[key[0:6]][3])
         else:
@@ -600,7 +603,7 @@ if __name__=="__main__":
             prods[key].append('')
 
     # read in submission dates
-    fp = zfp.open('Submissions.txt', 'r')
+    fp = io.TextIOWrapper(zfp.open('Submissions.txt', 'r'), encoding='cp1252')
     submDates = readTabFP(fp)
     fp.close()
     #ApplNo	SubmissionClassCodeID	SubmissionType	SubmissionNo	SubmissionStatus	SubmissionStatusDate	SubmissionsPublicNotes	ReviewPriority
@@ -608,13 +611,13 @@ if __name__=="__main__":
     subm = dict()
 
     for entry in submDates['table']:
-        if not subm.has_key(entry[0]):
+        if entry[0] not in subm:
             subm[entry[0]] = entry[5][0:10]
         elif subm[entry[0]] > entry[5][0:10]:
             subm[entry[0]] = entry[5][0:10]
 
-    for key in prods.keys():
-        if subm.has_key(key[0:6]):
+    for key in list(prods.keys()):
+        if key[0:6] in subm:
             prods[key].append(subm[key[0:6]])
             prods[key].append('Drugs@FDA')
         else:
@@ -625,7 +628,7 @@ if __name__=="__main__":
 
     # read in Orange Book products
     zfp = zipfile.ZipFile(obfile, 'r')
-    fp = zfp.open('products.txt', 'r')
+    fp = io.TextIOWrapper(zfp.open('products.txt', 'r'))
     obprods = readTabFP(fp, True, '~')
     fp.close()
 
@@ -656,15 +659,15 @@ if __name__=="__main__":
         for ingred in parseIngred(entry[0], uniiPT, uniiALL, missing):
             if appl not in prods:
                 prods[appl] = [appl, entry[2], entry[1], entry[4], status, appTypes[entry[5]], entry[3], date, 'OrangeBook']   #['072437/001', 'FENOPROFEN CALCIUM', 'CAPSULE;ORAL', 'EQ 200MG BASE', 'Discontinued', 'ANDA', 'PAR PHARM', '1988-08-22', 'Drugs@FDA']
-                print "added orange book prod:", prods[appl]
-            if not UNII2prods.has_key(ingred):
+                print("added orange book prod:", prods[appl])
+            if ingred not in UNII2prods:
                 UNII2prods[ingred] = []
                 #raise ValueError('Ingredient from Orange Book not found in products:'+ingred)
             if appl not in UNII2prods[ingred]:
                 UNII2prods[ingred].append(appl)
                 #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred)
 
-        if prods.has_key(appl):
+        if appl in prods:
             # I've verified manually that these differences are not important
             #stop = -1
             #if prods[appl][1] != entry[2].strip():
@@ -694,8 +697,8 @@ if __name__=="__main__":
             #    print entry
             #    sys.exit()
         else:
-            print appl
-            print entry
+            print(appl)
+            print(entry)
             raise ValueError('Product in Orange Book not found in products:'+appl)
 
     #prods has format: key="NDA/prodno" : [0:NDA/prodno, 1:Prod name, 2:Form;Doseage, 3:Strength, 4:Availability (Prescription; Over-the-counter; Discontinued), 5:Appl type (NDA), 6:Sponsor, 7:Marketing startDate, 8: Marketing startDate ref]
@@ -717,7 +720,7 @@ if __name__=="__main__":
             date = time.strftime("%Y-%m-%d", ts)
             if date[0:4] != year:
                 date = year + date[4:]
-        dateRef = entry[8].decode('latin-1').encode('ascii', 'replace')
+        dateRef = entry[8]# .decode('latin-1').encode('ascii', 'replace')
         product = entry[1]
         sponsor = entry[7]
         appNo = entry[6]
@@ -732,10 +735,10 @@ if __name__=="__main__":
         appType = entry[5]
         prod = [appNo, product, '', '', '', appType, sponsor, date, dateRef]
         prods[appNo] = prod
-        if not UNII2prods.has_key(unii):
+        if unii not in UNII2prods:
             UNII2prods[unii] = []
         UNII2prods[unii].append(appNo)
-    for prod in prods.keys():
+    for prod in list(prods.keys()):
         if prod[0:6] in fdaNMEdates:
             nmeDate = fdaNMEdates[prod[0:6]]
             date = prods[prod][-2]
@@ -765,7 +768,7 @@ if __name__=="__main__":
         if method == 'PREDICTED':
             appPredDate[appl] = date
 
-    for prod in prods.keys():
+    for prod in list(prods.keys()):
         if prod[0:6] in appPredDate:
             pred = appPredDate[prod[0:6]]
             date = prods[prod][-2]
@@ -779,21 +782,21 @@ if __name__=="__main__":
     activeMoiety = dict()
     with gzip.open( gsrsDumpfile, 'rb') as fp:
         line = fp.readline()
-        while line != "":
-            r = json.loads(unicode(line, errors='ignore'))
+        while line != b'':
+            r = json.loads(str(line, errors='ignore'))
             addrel = 0
             for rel in r['relationships']:
                 if rel['type'] == 'ACTIVE MOIETY':
                     addrel = 1
-                    if not activeMoiety.has_key(rel['relatedSubstance']['approvalID']):
+                    if rel['relatedSubstance']['approvalID'] not in activeMoiety:
                         activeMoiety[rel['relatedSubstance']['approvalID']] = []
                     activeMoiety[rel['relatedSubstance']['approvalID']].append(r['approvalID'])
             if addrel == 0:
-                if not activeMoiety.has_key(r['approvalID']):
+                if r['approvalID'] not in activeMoiety:
                     activeMoiety[r['approvalID']] = []
                 activeMoiety[r['approvalID']].append(r['approvalID'])
             line = fp.readline()
-    print "read unii dump file"
+    print("read unii dump file")
 
     # validate against previous approvalYears file
     appYrs = readTabFile(appYrsfile)
@@ -806,14 +809,14 @@ if __name__=="__main__":
         match = 5
         if method == 'PREDICTED':
             early = [getTimeStamp(), 'Not available']
-            if not activeMoiety.has_key(unii): # active moiety was recently updated
-                for key in activeMoiety.keys():
+            if unii not in activeMoiety: # active moiety was recently updated
+                for key in list(activeMoiety.keys()):
                     for item in activeMoiety[key]:
                         if item == unii:
                             unii = key
 
             for otherunii in activeMoiety[unii]:
-                if UNII2prods.has_key(otherunii):
+                if otherunii in UNII2prods:
                     for prod in UNII2prods[otherunii]:
                         entry2 = prods[prod]
 
@@ -825,34 +828,34 @@ if __name__=="__main__":
 
             if date < early[-2]:
                 for otherunii in activeMoiety[unii]:
-                    if UNII2prods.has_key(otherunii):
+                    if otherunii in UNII2prods:
                         for prod in UNII2prods[otherunii]:
                             if prod[0:6] == appl:
                                 match = 4 # appl is in list and startDate doesn't work
                 if match == 5:
-                    for prod in prods.keys():
+                    for prod in list(prods.keys()):
                         if prod[0:6] == appl:
                             match = 1 # appl exists and wasn't mapped to this unii
             if match > 1:
-                print date, unii, method, appl
+                print(date, unii, method, appl)
 
-                print activeMoiety[unii]
+                print(activeMoiety[unii])
 
                 for otherunii in activeMoiety[unii]:
-                    if UNII2prods.has_key(otherunii):
+                    if otherunii in UNII2prods:
                         for prod in UNII2prods[otherunii]:
-                            print otherunii, prod, prods[prod]
+                            print(otherunii, prod, prods[prod])
 
-                for prod in prods.keys():
+                for prod in list(prods.keys()):
                     if prod[0:6] == appl:
-                        print prod, prods[prod]
+                        print(prod, prods[prod])
 
-                for otherunii in UNII2prods.keys():
+                for otherunii in list(UNII2prods.keys()):
                     for key in UNII2prods[otherunii]:
                         if key[0:6] == appl:
-                            print appl, otherunii
+                            print(appl, otherunii)
 
-                print early
+                print(early)
                 raise ValueError('Tyler had other info here:'+appl)
 
     #print UNII2prods['PV2WI7495P']
@@ -872,7 +875,7 @@ if __name__=="__main__":
     #outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
     #fperr = open(outfile2, 'w')
     #fperr.write(header)
-    for unii in activeMoiety.keys():
+    for unii in list(activeMoiety.keys()):
         # early = [getTimeStamp(), '']
         # earlyDate = getTimeStamp()
         #
@@ -896,12 +899,12 @@ if __name__=="__main__":
         earlyDate = getTimeStamp()
 
         for otherunii in activeMoiety[unii]:
-            if UNII2prods.has_key(otherunii):
+            if otherunii in UNII2prods:
                 for prod in UNII2prods[otherunii]:
                     entry = prods[prod]
 
                     akey = entry[0][0:6]
-                    if not early.has_key(akey):
+                    if akey not in early:
                         early[akey] = entry
                     else: # merge records
                         if early[akey][-2] == '' or (entry[-2] != '' and early[akey][-2] > entry[-2]):
@@ -923,10 +926,10 @@ if __name__=="__main__":
                         early[akey][-5] = entry[-5]
 
 
-        for key in early.keys():
+        for key in list(early.keys()):
             myunii = unii
             for otherunii in activeMoiety[unii]:
-                if UNII2prods.has_key(otherunii):
+                if otherunii in UNII2prods:
                     for prod in UNII2prods[otherunii]:
                         akey = prods[prod][0][0:6]
                         if akey == key:
@@ -978,18 +981,18 @@ if __name__=="__main__":
             
     # write out all products data
     prod2UNIIs = dict()
-    for unii in UNII2prods.keys():
+    for unii in list(UNII2prods.keys()):
         for prod in UNII2prods[unii]:
-            if not prod2UNIIs.has_key(prod):
+            if prod not in prod2UNIIs:
                 prod2UNIIs[prod] = []
             prod2UNIIs[prod].append(unii)
 
     UNII2pt = dict()
 
-    for key in resolverCache.keys():
+    for key in list(resolverCache.keys()):
         UNII2pt[resolverCache[key]] = key
 
-    for key in uniiPT.keys():
+    for key in list(uniiPT.keys()):
         UNII2pt[uniiPT[key]] = key
 
     productsfile = maindir+"/temp/products-"+getTimeStamp()+".txt"
@@ -998,15 +1001,15 @@ if __name__=="__main__":
     header = 'NDA\tProduct\tForm;Route\tStrength\tStatus\tAppl Type\tSponsor\tDate\tDate Ref\tUNIIs\tIngredients\n'
     fp.write(header)
     
-    for prod in prods.keys():
+    for prod in list(prods.keys()):
         uniis = []
-        if prod2UNIIs.has_key(prod): # ingreds that don't have uniis
+        if prod in prod2UNIIs: # ingreds that don't have uniis
             uniis = prod2UNIIs[prod]
         uniilist = '; '.join(uniis)
         ingreds = []
         for unii in uniis:
-            if not UNII2pt.has_key(unii):
-                print unii, uniilist, prod
+            if unii not in UNII2pt:
+                print(unii, uniilist, prod)
                 sys.exit()
             ingreds.append(UNII2pt[unii])
         ingredlist = '; '.join(ingreds)
