@@ -2993,7 +2993,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1921	amylopectin, unspecified source	amylopectin, unspecified source	4XO4QFV777					https://catalog.hathitrust.org/Record/100163146		
 1921	amylose, unspecified source	amylose, unspecified source	7TDQ74Y18L					https://catalog.hathitrust.org/Record/100163146		
 1921	melatonin	melatonin	JL5DK93RCL					https://catalog.hathitrust.org/Record/100163146		
-1921	amobarbital	amobarbital	GWH6IJ239E					https://catalog.hathitrust.org/Record/100163146		
+1923	amobarbital	amobarbital	GWH6IJ239E					https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2424120/
 1921	methylphenobarbital	methylphenobarbital	5NC67NU76B					https://catalog.hathitrust.org/Record/100163146		
 1921	calcium pentobarbital	calcium pentobarbital	32I9YOC576					https://catalog.hathitrust.org/Record/100163146		
 1921	bioflavonoid	bioflavonoid	BD70459I50					https://catalog.hathitrust.org/Record/100163146		
