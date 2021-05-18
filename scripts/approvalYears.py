@@ -207,7 +207,7 @@ def getMainDir():
     return curr
 
 def resolveName(name): # returns empty string if resolver can't do anything with this name
-    if name in list(resolverCache.keys()):
+    if name in resolverCache.keys():
         return resolverCache[name]
 
     try:
@@ -358,7 +358,7 @@ def apprDateRegression(prods):
     window = 10000
     dataxs = dict()
     datays = dict()
-    for prod in list(prods.keys()):
+    for prod in prods.keys():
         date = prods[prod][-2]
         if date != '':
             ts = time.mktime(time.strptime(date, "%Y-%m-%d"))
@@ -382,7 +382,7 @@ def apprDateRegression(prods):
                 datays[kind2].append(ts)
 
     models = dict()
-    for kind in list(dataxs.keys()):
+    for kind in dataxs.keys():
         #print kind, len(dataxs[kind])
         if len(dataxs[kind]) > 20:
             regr = numpy.poly1d(numpy.polyfit(dataxs[kind], datays[kind], 1))
@@ -390,7 +390,7 @@ def apprDateRegression(prods):
     figs = ['NDA', 'BLA', 'ANDA']
     for figt in figs:
         fig, ax = plt.subplots()
-        for kind in list(models.keys()):
+        for kind in models.keys():
             if kind[0:len(figt)] == figt:
                 range = int(kind[len(figt):])
                 ax.scatter(dataxs[kind],datays[kind])
@@ -403,7 +403,7 @@ def apprDateRegression(prods):
         fig.tight_layout()
         plt.savefig(figt+'.png')
 
-    for prod in list(prods.keys()):
+    for prod in prods.keys():
         date = prods[prod][-2]
         source = prods[prod][-1]
         kind = prods[prod][-4]
@@ -797,7 +797,7 @@ if __name__=="__main__":
     fp = open(missingUNIIsfile, 'w')
     m2 = []
 
-    for key in list(missing.keys()):
+    for key in missing.keys():
         m2.append([len(missing[key]), key, missing[key][0]])
     m2.sort()
     m2.reverse()
@@ -839,7 +839,7 @@ if __name__=="__main__":
     for entry in appInfo['table']:
         apps[entry[0]] = entry
 
-    for key in list(prods.keys()):
+    for key in prods.keys():
         if key[0:6] in apps:
             prods[key].append(apps[key[0:6]][1])
             prods[key].append(apps[key[0:6]][3])
@@ -861,7 +861,7 @@ if __name__=="__main__":
         elif subm[entry[0]] > entry[5][0:10]:
             subm[entry[0]] = entry[5][0:10]
 
-    for key in list(prods.keys()):
+    for key in prods.keys():
         if key[0:6] in subm:
             prods[key].append(subm[key[0:6]])
             prods[key].append('Drugs@FDA')
@@ -983,7 +983,7 @@ if __name__=="__main__":
         if unii not in UNII2prods:
             UNII2prods[unii] = []
         UNII2prods[unii].append(appNo)
-    for prod in list(prods.keys()):
+    for prod in prods.keys():
         if prod[0:6] in fdaNMEdates:
             nmeDate = fdaNMEdates[prod[0:6]]
             date = prods[prod][-2]
@@ -1013,7 +1013,7 @@ if __name__=="__main__":
         if method == 'PREDICTED':
             appPredDate[appl] = date
 
-    for prod in list(prods.keys()):
+    for prod in prods.keys():
         if prod[0:6] in appPredDate:
             pred = appPredDate[prod[0:6]]
             date = prods[prod][-2]
@@ -1055,7 +1055,7 @@ if __name__=="__main__":
         if method == 'PREDICTED':
             early = [getTimeStamp(), 'Not available']
             if unii not in activeMoiety: # active moiety was recently updated
-                for key in list(activeMoiety.keys()):
+                for key in activeMoiety.keys():
                     for item in activeMoiety[key]:
                         if item == unii:
                             unii = key
@@ -1078,7 +1078,7 @@ if __name__=="__main__":
                             if prod[0:6] == appl:
                                 match = 4 # appl is in list and startDate doesn't work
                 if match == 5:
-                    for prod in list(prods.keys()):
+                    for prod in prods.keys():
                         if prod[0:6] == appl:
                             match = 1 # appl exists and wasn't mapped to this unii
             if match > 1:
@@ -1091,11 +1091,11 @@ if __name__=="__main__":
                         for prod in UNII2prods[otherunii]:
                             print(otherunii, prod, prods[prod])
 
-                for prod in list(prods.keys()):
+                for prod in prods.keys():
                     if prod[0:6] == appl:
                         print(prod, prods[prod])
 
-                for otherunii in list(UNII2prods.keys()):
+                for otherunii in UNII2prods.keys():
                     for key in UNII2prods[otherunii]:
                         if key[0:6] == appl:
                             print(appl, otherunii)
@@ -1120,7 +1120,7 @@ if __name__=="__main__":
     #outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
     #fperr = open(outfile2, 'w')
     #fperr.write(header)
-    for unii in list(activeMoiety.keys()):
+    for unii in activeMoiety.keys():
         # early = [getTimeStamp(), '']
         # earlyDate = getTimeStamp()
         #
@@ -1171,7 +1171,7 @@ if __name__=="__main__":
                         early[akey][-5] = entry[-5]
 
 
-        for key in list(early.keys()):
+        for key in early.keys():
             myunii = unii
             for otherunii in activeMoiety[unii]:
                 if otherunii in UNII2prods:
@@ -1226,7 +1226,7 @@ if __name__=="__main__":
             
     # write out all products data
     prod2UNIIs = dict()
-    for unii in list(UNII2prods.keys()):
+    for unii in UNII2prods.keys():
         for prod in UNII2prods[unii]:
             if prod not in prod2UNIIs:
                 prod2UNIIs[prod] = []
@@ -1234,10 +1234,10 @@ if __name__=="__main__":
 
     UNII2pt = dict()
 
-    for key in list(resolverCache.keys()):
+    for key in resolverCache.keys():
         UNII2pt[resolverCache[key]] = key
 
-    for key in list(uniiPT.keys()):
+    for key in uniiPT.keys():
         UNII2pt[uniiPT[key]] = key
 
     productsfile = maindir+"/temp/products-"+getTimeStamp()+".txt"
@@ -1246,7 +1246,7 @@ if __name__=="__main__":
     header = 'NDA\tProduct\tForm;Route\tStrength\tStatus\tAppl Type\tSponsor\tDate\tDate Ref\tUNIIs\tIngredients\n'
     fp.write(header)
     
-    for prod in list(prods.keys()):
+    for prod in prods.keys():
         uniis = []
         if prod in prod2UNIIs: # ingreds that don't have uniis
             uniis = prod2UNIIs[prod]
