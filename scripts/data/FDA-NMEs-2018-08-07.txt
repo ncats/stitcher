@@ -2326,6 +2326,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1928	Pitocin	oxytocin	1JQS135EYN	10-20-28				https://books.google.com/books?id=AymgAAAAMAAJ&lpg=PA514&ots=Sv2C9092O9&dq=pitocin%201928&pg=PA514#v=onepage&q=pitocin%201928&f=false		
 1928	Pyridium	phenazopyridine hydrochloride	0EWG668W17					https://www.ncbi.nlm.nih.gov/pubmed/982458		
 1929	secobarbital	secobarbital	1P7H87IN75					https://archive.org/details/newnonofficialre39coun		
+1928	Ephetonine	ephedrine hydrochloride	NLJ6390P1Z				Merck	https://www.google.com/books/edition/American_Journal_of_Pharmacy/NEAfAQAAIAAJ?hl=en&gbpv=1&bsq=ephetonine&dq=ephetonine&printsec=frontcover		
 1929	ephedrine sulfate	ephedrine sulfate	U6X61U5ZEG				Lilly	https://archive.org/details/newnonofficialre39coun		
 1929	Sandoptal	butalbital	KHS0AZ4JVK				Sandoz	https://books.google.com/books?id=i9BQAAAAYAAJ&q=SANDOPTAL&dq=SANDOPTAL&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwj_i7-Hg_TmAhVDU98KHX8dCOAQ6AEwAHoECAYQAg		
 1929	Metrazol	pentylenetetrazol	WM5Z385K7T				Knoll	https://books.google.com/books?id=2QJtAAAAMAAJ&q=metrazol&dq=metrazol&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwiTueXIhv_mAhVOpFkKHSgHAgUQ6AEwAHoECAAQAg		
@@ -2349,6 +2350,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1934	helium	helium	206GF3GB41					https://journals.sagepub.com/doi/abs/10.3181/00379727-32-7724P		
 1934	Proluton	progesterone	4G7DS2Q64Y					https://archive.org/details/newnonofficialre39coun		
 1934	Neosynephrine	phenylephrine	1WS297W6MV					https://books.google.com/books?id=kcVEAQAAMAAJ&newbks=1&newbks_redir=0&dq=phenylephrine%201934&pg=PA760#v=onepage&q=phenylephrine%201934&f=false		
+1934	Aminophyllin-Dubin	aminophyllin	27Y3KJK423				Dubin	https://jamanetwork.com/journals/JAMA/articlepdf/250878/jama_102_23_011.pdf		
 1935	trichloroethylene	trichloroethylene	290YE8AR51					https://archive.org/details/newnonofficialre39coun		
 1935	Paredrine	hydroxyamphetamine	FQR280JW2N	4-17-35				https://trademarks.justia.com/713/72/paredrine-71372217.html
 1937	Dexedrine	dextroamphetamine sulfate	JJ768O327N				Smith Kline French	https://web.archive.org/web/20091219120223/http://www.medic8.com/medicines/Dexedrine.html		
@@ -3053,7 +3055,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	HASAMAL ACETAMINOPHEN	acetaminophen	362O9ITL9D	12-30-61	NDA	2-354	ARNAR STONE	https://www.govinfo.gov/content/pkg/FR-1972-12-23/pdf/FR-1972-12-23.pdf
 1961	HASAMAL PHENACETIN	phenacetin	ER0CTH01H9	12-30-61	NDA	2-354	ARNAR STONE	https://www.govinfo.gov/content/pkg/FR-1972-12-23/pdf/FR-1972-12-23.pdf
 1961	NAPENTAL SODIUM PENTOBARBITAL	sodium pentobarbital	NJJ0475N0S	12-30-61	NDA	2-368	BEECHAM LABS	https://archive.org/details/federalregister37gunit/page/n1047?q=NAPENTAL
-1961	AMINOPHYLLIN AMINOPHYLLIN	aminophyllin	27Y3KJK423	12-30-61	NDA	2-385	SEARLE	https://books.google.ru/books?id=uo0QFvym_90C&pg=PA327&lpg=PA327&dq=AMINOPHYLLIN+oral+SEARLE&source=bl&ots=EzhmknZuYX&sig=WviJgvWisDJlikrd07OJbPzpojc&hl=ru&sa=X&ved=2ahUKEwiIgt-087_fAhXpwYsKHU44B_sQ6AEwAXoECAkQAQ#v=onepage&q=AMINOPHYLLIN%20oral%20SEARLE&f=false|https://archive.org/details/delawarestatemed19unse/page/108?q=AMINOPHYLLIN+SEARLE
+1939	AMINOPHYLLIN AMINOPHYLLIN	aminophyllin	27Y3KJK423		NDA	2-385	SEARLE	https://books.google.ru/books?id=uo0QFvym_90C&pg=PA327&lpg=PA327&dq=AMINOPHYLLIN+oral+SEARLE&source=bl&ots=EzhmknZuYX&sig=WviJgvWisDJlikrd07OJbPzpojc&hl=ru&sa=X&ved=2ahUKEwiIgt-087_fAhXpwYsKHU44B_sQ6AEwAXoECAkQAQ#v=onepage&q=AMINOPHYLLIN%20oral%20SEARLE&f=false|https://archive.org/details/delawarestatemed19unse/page/108?q=AMINOPHYLLIN+SEARLE
 1961	POTASSIUM THIOCYANATE	potassium thiocyanate	TM7213864A	12-30-61	NDA	2-411	LILLY	
 1961	SODIUM THIOCYANATE	sodium thiocyanate	5W0K9HKA05	12-30-61	NDA	1-616	Smith-Dorsey Company	
 1961	NOV PONT W/NEOCOBEFRIN MEPIVACAINE HYDROCHLORIDE	mepivacaine hydrochloride	4VFX2L7EM5	12-30-61	NDA	2-604	COOKE-WAITE	
