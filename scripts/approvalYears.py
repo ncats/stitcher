@@ -11,8 +11,6 @@ import zipfile
 import gzip
 import numpy
 import re
-#import matplotlib.pyplot as plt
-#from scipy.interpolate import interp1d
 
 resolverCache = dict()
 resolverCache["PEMETREXED SODIUM"] = "2PKU919BA9"
@@ -36,6 +34,18 @@ resolverCache["FAM-TRASTUZUMAB DERUXTECAN-NXKI"] = "5384HK7574"
 
 cberReplace = dict()
 cberReplace['MUROMANAB-CD3'] = ['JGA39ICE2V']
+cberReplace['SIMETHICONE'] = ['92RU3N3Y1O', 'ETJ7Z6XBU4']
+cberReplace['CONJUGATED ESTROGENS/MEDROXYPROGESTERONE ACETATE'] = ['IU5QR144QX', 'C2QI4IOI2G']
+cberReplace['LAMIVUDINE, NEVIRAPINE, AND STAVUDINE'] = ['2T8Q726O95', '99DK7FVK1H', 'BO9LE4QFZF']
+cberReplace['IRBESARTAN: HYDROCHLOROTHIAZIDE'] = ['J0E2756Z7N', '0J48LPH2TH']
+cberReplace['LINAGLIPTIN AND METFORMIN HYDROCHLORIDE'] = ['3X29ZEJ4R2', '786Z46389E']
+cberReplace['TECHNETIUM TC99M ALBUMIN AGGREGATED'] = ['Z8E46IA45W']
+cberReplace['ALOGLIPTIN AND METFORMIN HYDROCHLORIDE'] = ['JHC049LO86', '786Z46389E']
+cberReplace['SAXAGLIPTIN HYDROCHLORIDE DIHYDRATE AND DAPAGLIFLOZIN'] = ['4N19ON48ZN', '1ULL0QJ8UC']
+cberReplace['GALLIUM GA-68 PSMA-11'] = ['ZJ0EKR6M10']
+cberReplace['ELAGOLIX SODIUM,ESTRADIOL,NORETHINDRONE ACETATE'] = ['5948VUI423', '4TI98Z838E', 'T18F433X4S']
+cberReplace['GABAPENTIN ENCARBIL'] = ['75OCL1SPBQ']
+cberReplace['CARBON DIOIDE'] = ['142M471B3J']
 cberReplace['MENINGOCOCCAL POLYSACCHARIDE VACCINE, GROUPS A, C, Y, AND W-135 COMBINED'] = ['1I86B47NY4', '837RU6905N', 'CBZ4BH7TJ1', '9F8QQ6EER1']
 cberReplace['MENINGOCOCCAL POLYSACCHARIDE VACCINE, GROUPS A AND C COMBINED'] = ['1I86B47NY4', '837RU6905N']
 cberReplace['MENINGOCOCCAL POLYSACCHARIDE VACCINE, GROUP A'] = ['1I86B47NY4']
@@ -148,18 +158,6 @@ cberReplace['VENOMS, WASP VENOM PROTEIN'] = ['987GS3GJZX', 'L0L5D5D9BQ', 'AKT0E6
 cberReplace['VENOMS, YELLOW JACKET VENOM PROTEIN'] = ['8SH7583MUK', 'V34908RT03', 'Q79PS8P34R', 'D7974DM2EJ', 'S125N1F5X5']
 cberReplace['ZOSTER VACCINE LIVE'] = ['GPV39ZGD8C', '059QF0KO0R']
 cberReplace['ZOSTER VACCINE RECOMBINANT, ADJUVANTED'] = ['COB9FF6I46']
-cberReplace['SIMETHICONE'] = ['92RU3N3Y1O', 'ETJ7Z6XBU4']
-cberReplace['CONJUGATED ESTROGENS/MEDROXYPROGESTERONE ACETATE'] = ['IU5QR144QX', 'C2QI4IOI2G']
-cberReplace['LAMIVUDINE, NEVIRAPINE, AND STAVUDINE'] = ['2T8Q726O95', '99DK7FVK1H', 'BO9LE4QFZF']
-cberReplace['IRBESARTAN: HYDROCHLOROTHIAZIDE'] = ['J0E2756Z7N', '0J48LPH2TH']
-cberReplace['LINAGLIPTIN AND METFORMIN HYDROCHLORIDE'] = ['3X29ZEJ4R2', '786Z46389E']
-cberReplace['TECHNETIUM TC99M ALBUMIN AGGREGATED'] = ['Z8E46IA45W']
-cberReplace['ALOGLIPTIN AND METFORMIN HYDROCHLORIDE'] = ['JHC049LO86', '786Z46389E']
-cberReplace['SAXAGLIPTIN HYDROCHLORIDE DIHYDRATE AND DAPAGLIFLOZIN'] = ['4N19ON48ZN', '1ULL0QJ8UC']
-cberReplace['GALLIUM GA-68 PSMA-11'] = ['ZJ0EKR6M10']
-cberReplace['ELAGOLIX SODIUM,ESTRADIOL,NORETHINDRONE ACETATE'] = ['5948VUI423', '4TI98Z838E', 'T18F433X4S']
-cberReplace['GABAPENTIN ENCARBIL'] = ['75OCL1SPBQ']
-cberReplace['CARBON DIOIDE'] = ['142M471B3J']
 
 def getTimeStamp():
     ts = time.gmtime()
@@ -352,75 +350,6 @@ def readTabFP(fp, header = True, delim = '\t'):
             data['table'][i].append('')
 
     return data
-
-def apprDateRegression(prods):
-    applimit = 200000
-    window = 10000
-    dataxs = dict()
-    datays = dict()
-    for prod in prods.keys():
-        date = prods[prod][-2]
-        if date != '':
-            ts = time.mktime(time.strptime(date, "%Y-%m-%d"))
-            source = prods[prod][-1]
-            kind = prods[prod][-4]
-            appl = int(prods[prod][0][0:6])
-            if appl < applimit and (date != '1982-01-01' or source != 'OrangeBook'):
-                kind1 = kind+str(2*int(float(appl)/window)+1)
-                kind2 = kind+str(2*int(float(appl)/window+0.5))
-                #if appl < 5000:
-                #    print appl, kind1, kind2
-                if kind1 not in dataxs:
-                    dataxs[kind1] = []
-                    datays[kind1] = []
-                if kind2 not in dataxs:
-                    dataxs[kind2] = []
-                    datays[kind2] = []
-                dataxs[kind1].append(appl)
-                datays[kind1].append(ts)
-                dataxs[kind2].append(appl)
-                datays[kind2].append(ts)
-
-    models = dict()
-    for kind in dataxs.keys():
-        #print kind, len(dataxs[kind])
-        if len(dataxs[kind]) > 20:
-            regr = numpy.poly1d(numpy.polyfit(dataxs[kind], datays[kind], 1))
-            models[kind] = regr
-    figs = ['NDA', 'BLA', 'ANDA']
-    for figt in figs:
-        fig, ax = plt.subplots()
-        for kind in models.keys():
-            if kind[0:len(figt)] == figt:
-                range = int(kind[len(figt):])
-                ax.scatter(dataxs[kind],datays[kind])
-                #print range, range*window/2, (range+1)*window/2
-                xp = numpy.linspace((range-1)*window/2+window/4, range*window/2+window/4, 100)
-                yp = models[kind](xp)
-                ax.plot(xp, yp)
-        plt.ylim(-1500000000,2000000000)
-        plt.xlim(-window,applimit+window)
-        fig.tight_layout()
-        plt.savefig(figt+'.png')
-
-    for prod in prods.keys():
-        date = prods[prod][-2]
-        source = prods[prod][-1]
-        kind = prods[prod][-4]
-        appl = int(prods[prod][0][0:6])
-        kind = kind+str(int(2.*float(appl)/window+0.5))
-        if kind[0:3] == 'NDA' and (date == '' or (date == '1982-01-01' and source == 'OrangeBook')):
-            if kind in models:
-                pred = models[kind](appl)
-                pred = time.strftime("%Y-%m-%d", time.gmtime(pred))
-                if date == '1982-01-01' and source == 'OrangeBook':
-                    if pred < '1982-01-01':
-                        prods[prod][-2] = pred
-                        prods[prod][-1] = 'PREDICTED'
-                elif date == '':
-                    prods[prod][-2] = pred
-                    prods[prod][-1] = 'PREDICTED'
-    return prods
 
 def writeInitApp(outfp, unii, early, earlyDate, myunii):
     date = ''
@@ -738,10 +667,6 @@ if __name__=="__main__":
     if not os.path.exists(purpleBookfile):
         os.system(syscall)
 
-    appYrsfile = maindir+"/scripts/data/approvalYears.txt"
-    if not os.path.exists(appYrsfile):
-        raise ValueError("Can't read PREDICTED approvals from prior file: "+appYrsfile)
-
     gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
@@ -913,34 +838,15 @@ if __name__=="__main__":
                 #raise ValueError('Product number from Orange Book unexpectedly mapped to unii:'+appl+":"+ingred)
 
         if appl in prods:
-            # I've verified manually that these differences are not important
-            #stop = -1
-            #if prods[appl][1] != entry[2].strip():
-            #    stop = 0
-            #if prods[appl][2] != entry[1]:
-            #    stop = 1
-            #if prods[appl][3] != entry[4]:
-            #    stop = 2
             if prods[appl][4] != status and status == 'Discontinued FR':
                 prods[appl][4] = status
-            #elif prods[appl][4] != status:
-            #    stop = 3
             if prods[appl][5] == '':
                 prods[appl][5] = appTypes[entry[5]]
-            #elif prods[appl][5] != appTypes[entry[5]]:
-            #    stop = 4
             if prods[appl][6] == '':
                 prods[appl][6] = entry[3].strip()
-            #elif prods[appl][6] != entry[3].strip():
-            #    stop = 5
             if prods[appl][7] == '' or prods[appl][7] > date:
                 prods[appl][7] = date
                 prods[appl][8] = 'OrangeBook'
-            #if stop > -1:
-            #    print stop, appl, prods[appl][stop]
-            #    print prods[appl]
-            #    print entry
-            #    sys.exit()
         else:
             print(appl)
             print(entry)
@@ -992,36 +898,10 @@ if __name__=="__main__":
                 prods[prod][-2] = nmeDate[0]
                 prods[prod][-1] = nmeDate[1]
             elif nmeDate[0] < date: # we should go back and curate these!
-                #print "different dates:",startDate, nmeDate, prods[prod]
+                #print("different dates:",date, nmeDate, prods[prod])
+                # curated 5/18/2021 with 1e7b841d
                 prods[prod][-2] = nmeDate[0]
                 prods[prod][-1] = nmeDate[1]
-
-    # TOO MUCH TROUBLE
-    # fix 1982-01-01 OrangeBook dates with regression
-    #prods = apprDateRegression(prods)
-
-    # use predicted apprv startDate from previous approvalYears file
-    appYrs = readTabFile(appYrsfile)
-    appPredDate = dict()
-
-    for entry in appYrs['table']:
-        unii = entry[0]
-        ts = time.strptime(entry[5], "%m/%d/%Y")
-        date = time.strftime("%Y-%m-%d", ts)
-        method = entry[6]
-        appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
-        if method == 'PREDICTED':
-            appPredDate[appl] = date
-
-    for prod in prods.keys():
-        if prod[0:6] in appPredDate:
-            pred = appPredDate[prod[0:6]]
-            date = prods[prod][-2]
-            method = prods[prod][-1]
-            if date == '' or (date == '1982-01-01' and method == 'OrangeBook') or pred < date: # these should be further curated!
-                prods[prod][-2] = pred
-                prods[prod][-1] = 'PREDICTED'
-                #print prods[prod]
 
     # get active moieties from tyler's dump file
     activeMoiety = dict()
@@ -1043,103 +923,13 @@ if __name__=="__main__":
             line = fp.readline()
     print("read unii dump file")
 
-    # validate against previous approvalYears file
-    appYrs = readTabFile(appYrsfile)
-    for entry in appYrs['table']:
-        unii = entry[0]
-        ts = time.strptime(entry[5], "%m/%d/%Y")
-        date = time.strftime("%Y-%m-%d", ts)
-        method = entry[6]
-        appl = entry[4][entry[4].find(' ')-6:entry[4].find(' ')]
-        match = 5
-        if method == 'PREDICTED':
-            early = [getTimeStamp(), 'Not available']
-            if unii not in activeMoiety: # active moiety was recently updated
-                for key in activeMoiety.keys():
-                    for item in activeMoiety[key]:
-                        if item == unii:
-                            unii = key
-
-            for otherunii in activeMoiety[unii]:
-                if otherunii in UNII2prods:
-                    for prod in UNII2prods[otherunii]:
-                        entry2 = prods[prod]
-
-                        if entry2[-2] != '' and entry2[-2] < early[-2]:
-                            early = entry2
-
-            if date == early[-2] or date > early[-2]:
-                match = 0 # startDate is the same or earlier
-
-            if date < early[-2]:
-                for otherunii in activeMoiety[unii]:
-                    if otherunii in UNII2prods:
-                        for prod in UNII2prods[otherunii]:
-                            if prod[0:6] == appl:
-                                match = 4 # appl is in list and startDate doesn't work
-                if match == 5:
-                    for prod in prods.keys():
-                        if prod[0:6] == appl:
-                            match = 1 # appl exists and wasn't mapped to this unii
-            if match > 1:
-                print(date, unii, method, appl)
-
-                print(activeMoiety[unii])
-
-                for otherunii in activeMoiety[unii]:
-                    if otherunii in UNII2prods:
-                        for prod in UNII2prods[otherunii]:
-                            print(otherunii, prod, prods[prod])
-
-                for prod in prods.keys():
-                    if prod[0:6] == appl:
-                        print(prod, prods[prod])
-
-                for otherunii in UNII2prods.keys():
-                    for key in UNII2prods[otherunii]:
-                        if key[0:6] == appl:
-                            print(appl, otherunii)
-
-                print(early)
-                raise ValueError('Tyler had other info here:'+appl)
-
-    #print UNII2prods['PV2WI7495P']
-    #for unii in activeMoiety['6Y24O4F92S']:
-    #    #for unii in activeMoiety['PV2WI7495P']:
-    #    if unii in UNII2prods:
-    #        for prod in UNII2prods[unii]:
-    #            print prods[prod]
-
     # write out new approval years file
     outfile =  maindir+"/data/approvalYears-"+getTimeStamp()+".txt"
     fp = open(outfile, 'w')
-    #header = "UNII\tApproval\tYear\tUnknown\tComment\tDate\tDate Method\n"
     header = "UNII\tApproval_Year\tDate\tDate_Method\tApp_Type\tApp_No\tSponsor\tProduct\tUrl\tactive\tComment\n"
     fp.write(header)
 
-    #outfile2 =  maindir+"/temp/additionalWithdrawn-"+getTimeStamp()+".txt"
-    #fperr = open(outfile2, 'w')
-    #fperr.write(header)
     for unii in activeMoiety.keys():
-        # early = [getTimeStamp(), '']
-        # earlyDate = getTimeStamp()
-        #
-        # for otherunii in activeMoiety[unii]:
-        #     if UNII2prods.has_key(otherunii):
-        #         for prod in UNII2prods[otherunii]:
-        #             entry = prods[prod]
-        #
-        #             if entry[-2] < "1938-08-01":
-        #                 writeInitApp(fp, unii, entry, entry[-2])
-        #             elif entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
-        #                 if early[-1] == '' or (entry[-2] != '' and not entry[-2] > early[-2]):
-        #                     early = entry
-        #             elif early[-1] == '':
-        #                 early = entry
-        #
-        #             if entry[-2] != '' and entry[-2] < earlyDate and entry[-2] > "1938-08-01":
-        #                 earlyDate = entry[-2]
-        #
         early = dict()
         earlyDate = getTimeStamp()
 
@@ -1154,14 +944,6 @@ if __name__=="__main__":
                     else: # merge records
                         if early[akey][-2] == '' or (entry[-2] != '' and early[akey][-2] > entry[-2]):
                             early[akey] = entry
-
-                    #if entry[-2] < "1938-08-01":
-                    #    early[entry[-1]] = entry
-                    #elif entry[-1] == 'Drugs@FDA' or entry[-1] == 'OrangeBook':
-                    #    if not early.has_key(entry[-5]) or (entry[-2] != '' and not entry[-2] > early[entry[-5]][-2]):
-                    #        early[entry[-5]] = entry
-                    #elif not early.has_key(entry[-5]):
-                    #    early[entry[-5]] = entry
 
                     if entry[-2] != '' and entry[-2] < earlyDate and entry[-2] > "1938-08-01":
                         earlyDate = entry[-2]
@@ -1183,43 +965,6 @@ if __name__=="__main__":
             if early[key][-2] != '' and early[key][-2][0:4] == earlyDate[0:4] and early[key][-2] > earlyDate:
                 early[key][-2] = earlyDate
             writeInitApp(fp, unii, early[key], early[key][-2], myunii)
-            # date = earlyDate[5:7]+"/"+earlyDate[8:]+"/"+earlyDate[0:4]
-            # year = date[-4:]
-            # method = early[-1]
-            # apptype = early[-4]
-            # appsponsor = early[-3]
-            # product = early[-8]
-            # appno = ''
-            # appurl = ''
-            # active = "true"
-            # outfp = fp
-            #
-            # if len(early[0]) > 6 and early[0][6] == '/' or early[-1].find('https://www.accessdata.fda.gov/') > -1:
-            #     appno = early[0][0:6]
-            #
-            #     if method == "PREDICTED":
-            #         year = "[Approval Date Uncertain] "+year
-            #
-            #     appurl = "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo="+appno
-            # else:
-            #     #outfp = fperr
-            #     active = "false"
-            #     if method.find('OB NME Appendix 1950-') > -1:
-            #         appno = early[0][0:6]
-            #
-            #     for otherunii in activeMoiety[unii]:
-            #         if UNII2prods.has_key(otherunii):
-            #             for prod in UNII2prods[otherunii]:
-            #                 entry = prods[prod]
-            #                 if entry[0] == early[0]:
-            #                     unii = otherunii
-            #
-            # #comment = apptype+'|'+appno+'|'+appsponsor+'|'+product+'|'+appurl+'|'
-            # #comment = comment + early[0].decode('latin-1').encode('ascii', 'replace')
-            # #outline = unii+"\tApproval Year\t"+year+"\t\t"+comment+"\t"+date+"\t"+method+"\n"
-            # comment = early[0].decode('latin-1').encode('ascii', 'replace')
-            # outline = unii+"\t"+year+"\t"+date+"\t"+method+"\t"+apptype+"\t"+appno+"\t"+appsponsor+"\t"+product+"\t"+appurl+"\t"+active+"\t"+comment+"\n"
-            # outfp.write(outline)
 
     # write out additional CBER BLAs
     writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fp, uniiPT, uniiALL)

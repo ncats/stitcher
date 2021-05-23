@@ -578,7 +578,7 @@ public class Util {
             mol.setName(unii.asText());
         }
         else {
-            logger.warning("No UNII found!");
+            logger.warning("No UNII found! " + node.get("uuid").asText());
         }
                     
         JsonNode names = node.get("names");
@@ -645,10 +645,13 @@ public class Util {
             for (int i = 0; i < rels.size(); ++i) {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
-                String id = n.get("relatedSubstance")
-                        .get("approvalID").asText();
-                if (sb.length() > 0) sb.append("\n");
-                sb.append(type+"|"+id);
+                if (n.has("relatedSubstance") && n.get("relatedSubstance").has("approvalID")) {
+                    // alternative definitions do not have an approvalID
+                    String id = n.get("relatedSubstance")
+                            .get("approvalID").asText();
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(type + "|" + id);
+                }
             }
 
             mol.setProperty("relationships", sb.toString());
@@ -668,7 +671,7 @@ public class Util {
             map.put("UNII", unii.asText());
         }
         else {
-            logger.warning("No UNII found!");
+            logger.warning("No UNII found! " + node.get("uuid").asText());
         }
 
         JsonNode cls = node.get("substanceClass");
@@ -741,14 +744,17 @@ public class Util {
             for (int i = 0; i < rels.size(); ++i) {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
-                String id = n.get("relatedSubstance")
-                        .get("approvalID").asText();
-                Object val = map.get("relationships");
-                if (val != null)
-                    val = Util.merge(val, type+"|"+id);
-                else
-                    val = type+"|"+id;
-                map.put("relationships", val);
+                if (n.has("relatedSubstance") && n.get("relatedSubstance").has("approvalID")) {
+                    // alternative definitions do not have an approvalID
+                    String id = n.get("relatedSubstance")
+                            .get("approvalID").asText();
+                    Object val = map.get("relationships");
+                    if (val != null)
+                        val = Util.merge(val, type + "|" + id);
+                    else
+                        val = type + "|" + id;
+                    map.put("relationships", val);
+                }
             }
         }
 

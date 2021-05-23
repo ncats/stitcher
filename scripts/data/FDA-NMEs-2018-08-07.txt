@@ -28,6 +28,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1941	Monocaine Formate	butethamine formate	N7626F65HF				Novocol	DeHaen 1940-1975 NMEs		
 1941	Ceepryn	cetylpyridinium chloride	D9OM4SK49P				Merrell	DeHaen 1940-1975 NMEs		
 1941	Diethylstilbestrol	diethylstilbestrol	731DCA35BT				Various Mfrs.	DeHaen 1940-1975 NMEs		
+1941	Stilbestrol	diethylstilbestrol	731DCA35BT		NDA	4-056	Bristol Myers Squibb	DeHaen 1940-1975 NMEs		
 1941	Synkayvite	menadiol sodium diphosphate	2OVL75B30W				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1941	Metandren	methyltestosterone	V9EFU16ZIF				Ciba	DeHaen 1940-1975 NMEs		
 1941	Neo-Hombreol M	methyltestosterone	V9EFU16ZIF				Roche-Organon (H.La Roche; Organon)	DeHaen 1940-1975 NMEs		
@@ -42,7 +43,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1941	Sulfadiazine	sulfadiazine	0N7609K889	08-11-41	NDA	4-054	Lederle	DeHaen 1940-1975 NMEs		
 1941	Sulfaguanidine	sulfaguanidine	15XQ8043FN				Lederle	DeHaen 1940-1975 NMEs		
 1941	Glucophylline	theophylline meglumine	1442U7XKHA				Abbott	DeHaen 1940-1975 NMEs		
-1941	Pitressin Tannate	vasopressin tannate	4R069M4O1P				Parke-Davis	DeHaen 1940-1975 NMEs		
+1941	Pitressin Tannate	vasopressin tannate	4R069M4O1P		NDA	3-402	Parke-Davis	DeHaen 1940-1975 NMEs		
 1941	Synkamin	vitamin K5	KKP97T7O0X		NDA	3-472	Parke-Davis	https://books.google.com/books?id=vvHnAAAAMAAJ&q=synkamin&dq=synkamin		
 1942	Pavatrine	2-diethylaminoethyl 9-fluorenecarboxylate	23AHS3XR5K				Searle	DeHaen 1940-1975 NMEs		
 1942	Phosphaljel	aluminum phosphate	F92V3S521O				Wyeth	DeHaen 1940-1975 NMEs		
@@ -52,7 +53,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1942	Premarin	"estrogenic substances, conjugated"		05-08-42	NDA	4-782	Ayerst	DeHaen 1940-1975 NMEs		
 1942	Nethamine	etafedrine HCl	Y134VQ304Y				Merrell (MerrellNational)	DeHaen 1940-1975 NMEs		
 1939	Heparin	heparin sodium	ZZ45AB24CA	02-09-39	NDA	0-552	Upjohn; Various Mfrs.	DeHaen 1940-1975 NMEs		
-1942	Paredrine HBr	hydroxyamphetamine HBr	59IG47SZ0E		NDA	0-004	Smith Kline & French	DeHaen 1940-1975 NMEs		
+1938	Paredrine HBr	hydroxyamphetamine HBr	59IG47SZ0E		NDA	0-004	Smith Kline & French	DeHaen 1940-1975 NMEs		
 1942	Privine HCl	naphazoline HCl	MZ1131787D				Ciba	DeHaen 1940-1975 NMEs		
 1942	Sulfasuxidine	succinylsulfathiazole	RSS8647O4S				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
 1941	Sulfadiazine Sodium	sulfadiazine sodium	84CS1P306F	08-11-41	NDA	4-054 Lederle	DeHaen 1940-1975 NMEs		
@@ -171,7 +172,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1948	Pentaquine Phosphate	pentaquine phosphate	9B8SN90ODH				Abbott	DeHaen 1940-1975 NMEs		
 1948	Trimeton	pheniramine maleate	NYW905655B				Schering	DeHaen 1940-1975 NMEs		
 1948	Thalamyd	phthalylsulfacetamide	24PUW23GRX				Schering	DeHaen 1940-1975 NMEs		
-1948	Neo-Antergan	pyrilamine maleate	R35D29L3ZA				Merck	DeHaen 1940-1975 NMEs		
+1948	Neo-Antergan	pyrilamine maleate	R35D29L3ZA		NDA	6-290	Merck	DeHaen 1940-1975 NMEs		
 1948	Presidon	pyrithyldione	8AB20823CK				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1948	Sodium Aminosalicylate	sodium aminosalicylate	T9ZKL3TNQF				Various Mfrs.	DeHaen 1940-1975 NMEs		
 1948	Neohetramine HCl	thonzylamine HCl	6K9YKD48Y4				Nepera (Warner/ Chilcolt)	DeHaen 1940-1975 NMEs		
@@ -189,7 +190,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1951	Chloromycetin	chloramphenicol	66974FR9Q1	06-01-51	NDA	50-156	Parke-Davis	DeHaen 1940-1975 NMEs		
 1949	Perazil	chlorcyclizine HCl	NPB7A7874U				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
 1950	Chlor-Trimeton	chlorpheniramine maleate	V1Q0O9OJ9Z	08-15-50	NDA	7-638	Schering	DeHaen 1940-1975 NMEs		
-1949	Eurax	crotamiton	D6S4O4XD0H		NDA	9-112	Geigy	DeHaen 1940-1975 NMEs		
+1955	Eurax	crotamiton	D6S4O4XD0H	04-29-55	NDA	9-112	Geigy	DeHaen 1940-1975 NMEs		
 1949	Cobione	cyanocobalamin	P6YC3EG204				Merck	DeHaen 1940-1975 NMEs		
 1950	Hetrazan	diethylcarbamazine citrate	OS1Z389K8S	11-13-50	NDA	6-459	Lederle	DeHaen 1940-1975 NMEs		
 1949	Dramamine	dimenhydrinate	JB937PER5C				Searle	DeHaen 1940-1975 NMEs		
@@ -215,7 +216,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1949	Pyrrolazote	pyrathiazine HCl	X0SMC42Q5O				Upjohn	DeHaen 1940-1975 NMEs		
 1949	Carmethose	sodium carboxymethylcellulose	K679OBS311				Ciba	DeHaen 1940-1975 NMEs		
 1949	Gantrisin	sulfisoxazole	740T4C525W		NDA	9-182	Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
-1949	Gantrisin Diolaminel	sulfisoxazole diolamine	30S4B46J8B				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
+1949	Gantrisin Diolaminel	sulfisoxazole diolamine	30S4B46J8B		NDA	6-917	Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1949	Gantrisin Ointment 	sulfisoxazole diolamine	30S4B46J8B				Alcon	DeHaen 1940-1975 NMEs		
 1949	Artane	trihexyphenidyl HCl	AO61G82577	05-13-49	NDA	6-773	Lederle	DeHaen 1940-1975 NMEs		
 1949	Pyribenzamine Citrate	tripelennamine citrate	30OC46A3J9				Ciba	DeHaen 1940-1975 NMEs		
@@ -231,12 +232,12 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1950	Levophed	Norepinephrine Bitartrate	ZW81GF408B	07-13-50	NDA	7-513	Breon	OB NME Appendix 1950-1985		
 1950	Chloromycetin	Chloramphenicol	66974FR9Q1	12-08-50	NDA	60-591	Warner-Lambert	OB NME Appendix 1950-1993		
 1950	Trigesic	acetaminophen	362O9ITL9D				Squibb	DeHaen 1940-1975 NMEs		
-1950	Veriloid	alkavervir	4I27BB349X				Riker	DeHaen 1940-1975 NMEs		
-1950	Camoquin HCl	amodiaquine hydrochloride	K6PW2S574L				Parke-Davis	DeHaen 1940-1975 NMEs		
+1950	Veriloid	alkavervir	4I27BB349X		NDA	7-336	Riker	DeHaen 1940-1975 NMEs		
+1950	Camoquin HCl	amodiaquine hydrochloride	K6PW2S574L		NDA	6-441	Parke-Davis	DeHaen 1940-1975 NMEs		
 1950	Profetamine	amphetamine phosphate	163DO59R3J				Strasenburgh (Pennwalt)	DeHaen 1940-1975 NMEs		
 1950	Odolex	chlorophyllin	1D276TYV9O				Walker (MerrellNational)	DeHaen 1940-1975 NMEs		
 1950	Choline Gluconate Solution	choline gluconate	2M607MGJ8U				Commercial Solvents	DeHaen 1940-1975 NMEs		
-1950	Syncurine	decamethonium bromide	55C6RK944K				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
+1950	Syncurine	decamethonium bromide	55C6RK944K		NDA	6-931	Burroughs Wellcome	DeHaen 1940-1975 NMEs		
 1950	Mecostrin Chloride	dimethyl tubocurarine chloride	15BE4G33H2				Squibb	DeHaen 1940-1975 NMEs		
 1950	Kutrol	epidermal growth factor (Pregnant Mares' Urine Extract uroanthelone)					Parke-Davis	DeHaen 1940-1975 NMEs		
 1950	Tromexan	ethyl biscoumacetate	08KL644731				Geigy	DeHaen 1940-1975 NMEs		
@@ -290,7 +291,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1951	Thiomerin	mercaptomerin	58TLO7I2HN				Wyeth	DeHaen 1940-1975 NMEs		
 1951	Methostanl	methandriol	5730Z864KG		NDA	8-736	Schering	DeHaen 1940-1975 NMEs		
 1951	Stenediol	methandriol	5730Z864KG		NDA	7-630	Organon	DeHaen 1940-1975 NMEs		
-1951	Mycifradin	neomycin sulfate	057Y626693				Upjohn	DeHaen 1940-1975 NMEs		
+1951	Mycifradin	neomycin sulfate	057Y626693		NDA	7-837	Upjohn	DeHaen 1940-1975 NMEs		
 1951	Neotropine	neotropine	NX9B3335J1				Warner (Warner/ Chilcott)	DeHaen 1940-1975 NMEs		
 1951	Compenamine	penicillin G 1-ephenamine	AF5F3C86Z1				Commercial Solvents	DeHaen 1940-1975 NMEs		
 1951	Bicillin	penicillin G benzathine	RIT82F58GK	11-22-51	NDA	50-126	Wyeth	DeHaen 1940-1975 NMEs		
@@ -325,11 +326,11 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1952	Balarsen	arsthinol	QNT09A162Y				Endo	DeHaen 1940-1975 NMEs		
 1952	Pamabrom	bromotheophylline	FZG87K1MQ6				Brayten	DeHaen 1940-1975 NMEs		
 1952	Dibuline Sulfate	dibutoline sulfate	1W7R63X54A				Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
-1952	Ilotycin	erythromycin	63937KV33D				Lilly	DeHaen 1940-1975 NMEs		
-1952	Erythrocin Stearate	erythromycin stearate	LXW024X05M				Abbott	DeHaen 1940-1975 NMEs		
+1952	Ilotycin	erythromycin	63937KV33D		NDA	8-582	Lilly	DeHaen 1940-1975 NMEs		
+1952	Erythrocin Stearate	erythromycin stearate	LXW024X05M		NDA	9-283	Abbott	DeHaen 1940-1975 NMEs		
 1952	Depo-Estradiol Cypionate	estradiol cypionate	7E1DV054LO				Upjohn	DeHaen 1940-1975 NMEs		
 1952	Methium Chloride	hexamethonium chloride	TIV4Q933FU				Warner /Chilcott	DeHaen 1940-1975 NMEs		
-1952	Cyclaine	hexylcaine HCl	V00NQ7SDYI				Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
+1952	Cyclaine	hexylcaine HCl	V00NQ7SDYI		NDA	8-472	Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
 1952	Hydrocortone	hydrocortisone	WI4X0X7BPJ	08-05-52	NDA	8-506	Merck	DeHaen 1940-1975 NMEs		
 1951	Hydrocortone Acetate	hydrocortisone acetate	3X7931PO74	12-21-51	NDA	8-228	Merck	DeHaen 1940-1975 NMEs		
 1952	Cobroxin	indian cobra venom	ZZ4AG7L7VM				"Hynson, Westcott & Dunning"	DeHaen 1940-1975 NMEs		
@@ -343,10 +344,10 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1952	Panthoderm	panthenol	WV9CM0O67Z				U.S. Vitamin (USV)	DeHaen 1940-1975 NMEs		
 1952	Neo-Penil	penethamate hydriodide	GA14AS9QOK				Smith Kline & French	DeHaen 1940-1975 NMEs		
 1952	Depo-Cer-0-Cillin	penicillin O 2-chloroprocaine	O3NVO08Z59				Upjohn	DeHaen 1940-1975 NMEs		
-1952	Hedulin	phenindione	5M7Y6274ZE				Walker (MerrellNational)	DeHaen 1940-1975 NMEs		
+1952	Hedulin	phenindione	5M7Y6274ZE		NDA	8-767	Walker (MerrellNational)	DeHaen 1940-1975 NMEs		
 1952	Regitine Mesylate	phentolamine mesylate	Y7543E5K9T	01-30-52	NDA	8-278	Ciba	DeHaen 1940-1975 NMEs		
 1952	Bristamin	phenyltoloxamine citrate	8UE48MJH8M				Bristol	DeHaen 1940-1975 NMEs		
-1952	Primaquine Phosphate	primaquine phosphate	H0982HF78B		NDA	14-860	Winthrop	DeHaen 1940-1975 NMEs		
+1952	Primaquine Phosphate	primaquine phosphate	H0982HF78B	01-23-52	NDA	8-316	Winthrop	DeHaen 1940-1975 NMEs		
 1952	Pyronil	pyrrobutamine phosphate	6B6107K1Q6				Lilly	DeHaen 1940-1975 NMEs		
 1953	Apresoline HCl	hydralazine HCl	FD171B778Y	01-15-53	NDA	8-303	Ciba	OB NME Appendix 1950-1985		
 1953	Daraprim	pyrimethamine	Z3614QOX8W	01-23-53	NDA	8-578	Burroughs Wellcome	OB NME Appendix 1950-1985		
@@ -419,7 +420,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1953	Tricoloid Sulfate	tricyclamol methosulfate	L0BB45WX6F				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
 1953	Melamine	trolnitrate phosphate	13330D1K2A				Leeming	DeHaen 1940-1975 NMEs		
 1953	Triton	tyloxapol	Y27PUL9H56				Winthrop	DeHaen 1940-1975 NMEs		
-1953	Viocin Sulfate	viomycin sulfate	LKO141R05V				Pfizer	DeHaen 1940-1975 NMEs		
+1953	Viocin Sulfate	viomycin sulfate	LKO141R05V		ANDA	61-086	Pfizer	DeHaen 1940-1975 NMEs		
+1953	Vinactane	viomycin sulfate	LKO141R05V		NDA	50-188	Ciba	https://books.google.com/books?id=XoCrfgjuud0C&pg=PA560&lpg=PA560&dq=vinactane+1953&source=bl&ots=Zaa0BM1EvT&sig=ACfU3U3a5z91PNnXG65dqM4Q_GFd-EcjRg&hl=en&sa=X&ved=2ahUKEwiwhYjI7NrwAhVNGFkFHe08DVkQ6AEwEHoECBEQAw#v=onepage&q=vinactane%201953&f=false		
 1953	Bifacton	vitamin b12	P6YC3EG204				Organon	DeHaen 1940-1975 NMEs		
 1953	Bifacton	intrinsic factor	70BT6OQT2Q				Organon	DeHaen 1940-1975 NMEs		
 1953	Bantron	lobeline	D0P25S3P81				Campana	https://books.google.com/books?id=jnNcM95kPBUC&lpg=PA870&ots=JU-AyJuyNH&dq=bantron%20gazette&pg=PA870#v=onepage&q=bantron%20gazette&f=false		
@@ -452,18 +454,18 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1954	Ilidar	azapetine phosphate	0N2U15U85W				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1954	Thorazine	chlorpromazine HCl	9WP59609J6				Smith Kline & French	DeHaen 1940-1975 NMEs		
 1954	Sterosan	chlorquinaldol	D6VHC87LLS				Geigy	DeHaen 1940-1975 NMEs		
-1954	Unitensen Tannate	cryptenamine tannates	98881NCP5R				"Jrwin, Neisler (Mallinckrodt)"	DeHaen 1940-1975 NMEs		
+1954	Unitensen Tannate	cryptenamine tannates	98881NCP5R		NDA	9-217	"Irwin, Neisler (Mallinckrodt)"	DeHaen 1940-1975 NMEs		
 1954	Marezine	cyclizine lactate	861R00J986				Burroughs Wellcome	DeHaen 1940-1975 NMEs		
-1954	Ilotycin Ethylcarbonate	erythromycin ethylcarbonate	D2JUE6GD5A				Lilly	DeHaen 1940-1975 NMEs		
-1954	Ilotycin Gluceptate	erythromycin gluceptate	2AY21R0U64				Lilly	DeHaen 1940-1975 NMEs		
-1954	Erythrocin	erythromycin lactobionate	33H58I7GLQ				Abbott	DeHaen 1940-1975 NMEs		
+1954	Ilotycin Ethylcarbonate	erythromycin ethylcarbonate	D2JUE6GD5A		NDA	9-037	Lilly	DeHaen 1940-1975 NMEs		
+1954	Ilotycin Gluceptate	erythromycin gluceptate	2AY21R0U64		NDA	9-145	Lilly	DeHaen 1940-1975 NMEs		
+1954	Erythrocin	erythromycin lactobionate	33H58I7GLQ		NDA	9-195	Abbott	DeHaen 1940-1975 NMEs		
 1954	Delestrogen	estradiol valerate	OKG364O896	07-15-54	NDA	9-402	Squibb	DeHaen 1940-1975 NMEs		
 1955	Florinef	fludrocortisone acetate	V47IF0PVH4	08-18-55	NDA	10-060	Sharp & Dohme (MSD)	DeHaen 1940-1975 NMEs		
 1953	Hydroxystilbamidine isethionate	hydroxystilbamidine isethionate	0163PVD2QZ	12-22-53	NDA	9-166	Merrell (MerrellNational)	DeHaen 1940-1975 NMEs		
 1954	Lente Iletin II (pork)	insulin zinc					Lilly	DeHaen 1940-1975 NMEs		
 1954	Tolseram	mephenesin carbamate	PAD6SXB23N				Squibb	DeHaen 1940-1975 NMEs		
 1954	Skopolate	methscopolamine nitrate	K0813KQM3V				Pennwalt	DeHaen 1940-1975 NMEs		
-1954	Mycostatin	nystatin	BDF1O1C72E				Squibb	DeHaen 1940-1975 NMEs		
+1954	Mycostatin	nystatin	BDF1O1C72E		NDA	9-451	Squibb	DeHaen 1940-1975 NMEs		
 1954	Compocillin	penicillin G hydrabamine	667Y1107D3				Abbott	DeHaen 1940-1975 NMEs		
 1954	Compocillin-V	penicillin phenoxymethyl hydrabamine	8T7T79P87L				Abbott	DeHaen 1940-1975 NMEs		
 1954	Monodral	penthienate bromide	MA4DVZ926O				Winthrop	DeHaen 1940-1975 NMEs		
@@ -498,10 +500,10 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1955	Chymar	chymotrypsin	BVS505O332		NDA	11-837	Armour	DeHaen 1940-1975 NMEs		
 1955	Cortrophin-Zinc	corticotropin zinc hydroxide	K0U68Q2TXA	07-29-55	NDA	9-854	Organon	DeHaen 1940-1975 NMEs		
 1955	Synatan	dextroamphetamine tannate	500Y9JV943				"Irwin, Neisler (Mallinckrodt)"	DeHaen 1940-1975 NMEs		
-1955	Stilphostrol	diethylstilbestrol diphosphate	A0E0NMA80F				Ames	DeHaen 1940-1975 NMEs		
+1955	Stilphostrol	diethylstilbestrol diphosphate	A0E0NMA80F		NDA	10-010	Ames	DeHaen 1940-1975 NMEs		
 1955	Glarubin	glaucarubin	EH6H7VS52J				Massengill	DeHaen 1940-1975 NMEs		
 1955	Medomin	heptabarbital	V10R70ML23				Geigy	DeHaen 1940-1975 NMEs		
-1955	Cortef Fluid	hydrocortisone cypionate	4XDY25L70B		NDA	9-866	Upjohn	DeHaen 1940-1975 NMEs		
+1955	Cortef Fluid	hydrocortisone cypionate	4XDY25L70B	05-10-55	NDA	9-900	Upjohn	DeHaen 1940-1975 NMEs		
 1955	Solu-Cortef	hydrocortisone sodium succinate	50LQB69S1Z	04-27-55	NDA	9-866	Upjohn	DeHaen 1940-1975 NMEs		
 1955	Hydrocortone TBA	hydrocortisone tert-butylacetate	FXJ67LWZ4S				Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1955	Arlidin	nylidrin HCl	EC69E3PW7E				Arlington-Funk (USV)	DeHaen 1940-1975 NMEs		
@@ -558,7 +560,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1956	Hydeltra TBA	prednisolone tebutate	1V7A1U282K	07-25-56	NDA	10-562	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1957	Compazine Ethanedisulfonate	prochlorperazine edisylate	PG20W5VQZS	04-08-57	NDA	10-742	Smith Kline & French	DeHaen 1940-1975 NMEs		
 1956	Compazine Maleate	prochlorperazine maleate	I1T8O1JTL6	10-23-56	NDA	10-571	Smith Kline & French	DeHaen 1940-1975 NMEs		
-1956	Vanquin	pyrvinium chloride	MT7O310S39		NDA	9-582	Parke-Davis	DeHaen 1940-1975 NMEs		
+1955	Vanquin	pyrvinium chloride	MT7O310S39		NDA	9-582	Parke-Davis	DeHaen 1940-1975 NMEs		
 1956	Releasin	relaxin	2BD5112J0I				Warner/Chilcott	DeHaen 1940-1975 NMEs		
 1956	Moderil	rescinnamine	Q6W1F7DJ2D	10-31-56	NDA	10-686	Pfizer	DeHaen 1940-1975 NMEs		
 1956	Cytellin	sitosterols	G7V636VTDY				Lilly	DeHaen 1940-1975 NMEs		
@@ -599,7 +601,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1957	Argivine	arginine HCl	F7LTH1E20Y				Gray	DeHaen 1940-1975 NMEs		
 1957	Suavitil	benactyzine HCl	26R628272Q				Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1957	Maxukal	calcium quinate gluconate	KWI1NH797Q				Breon	DeHaen 1940-1975 NMEs		
-1957	Diuril	chlorothiazide	77W477J15H		NDA	11-870	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1957	Lipmul	cottonseed oil	H3E878020N				Upjohn	DeHaen 1940-1975 NMEs		
 1957	Doroavac	DEOXYRIBONUCLEASE I BOVINE	0BE71HM000				Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1957	llopan	dexpanthenol	1O6C93RI7Z				Warren-Teed	DeHaen 1940-1975 NMEs		
@@ -628,13 +629,13 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1958	Tessalon	benzonatate	5P4DHS6ENR	02-10-58	NDA	11-210	Ciba	OB NME Appendix 1950-1985		
 1958	Paraflex	chlorzoxazone	H0DE420U8G	02-12-58	NDA	11-300	McNeil	OB NME Appendix 1950-1993		
 1958	Fluotbane	halothane	UQT9G45D1P	03-12-58	NDA	11-338	Ayerst	OB NME Appendix 1950-1985		
-1958	Actidil	triprolidine hydrochloride	NG7A104R3J	04-14-58	NDA	11-110	Burroughs Wellcome	OB NME Appendix 1950-1985		
+1958	Actidil	triprolidine hydrochloride	YAN7R5L890	04-14-58	NDA	11-110	Burroughs Wellcome	OB NME Appendix 1950-1985		
 1958	Kayexalate	Sodium Polystyrene Sulfonate	1699G8679Z	06-05-58	NDA	11-287	Breon	OB NME Appendix 1950-1985		
 1958	Kerid	Triethanolamine Oleate	DZ7P3IE35F	06-25-58	NDA	11-340	Purdue Frederick	OB NME Appendix 1950-1993		
 1958	TKO/Entrin	Diethylamine Salicylate	5V7PT38BJU	06-27-58	NDA	11-233	Modern	OB NME Appendix 1950-1993		
 1958	TKO/Entrin	Triethylamine	VOU728O6AY	06-27-58	NDA	11-233	Modern	OB NME Appendix 1950-1993		
 1958	Daranide	dichlorphenamide	VVJ6673MHY	07-22-58	NDA	11-366	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
-1958	Lyovac Diuril	chlorothiazide sodium	SN86FG7N2K	09-04-58	NDA	11-145	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
+1958	Diuril	chlorothiazide sodium	SN86FG7N2K	09-04-58	NDA	11-145	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
 1958	Cyclospasmol	cyclandelate	4139O1OAY2	10-06-58	NDA	11-544	Ives-Cameron (Ives)	OB NME Appendix 1950-1985		
 1958	Diabinese	chlorpropamide	WTM2C3IL2X	10-28-58	NDA	11-641	Pfizer	OB NME Appendix 1950-1985		
 1958	Decadron	dexamethasone	7S5I7G3JQL	10-30-58	NDA	11-664	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
@@ -653,11 +654,11 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1958	Cothera	dimethoxanate HCl	N5I6SR31GJ				Ayerst	DeHaen 1940-1975 NMEs		
 1958	Delvex	dithiazanine iodide	8OEC3RA07X				Lilly	DeHaen 1940-1975 NMEs		
 1958	Bradosol Bromide	domiphen bromide	R4CY19YS7C				Ciba	DeHaen 1940-1975 NMEs		
-1958	Ilosone	erythromycin estolate	XRJ2P631HP				Lilly	DeHaen 1940-1975 NMEs		
-1958	Erythrocin Ethylsuccinate	erythromycin ethylsuccinate	1014KSJ86F				Abbott	DeHaen 1940-1975 NMEs		
+1958	Ilosone	erythromycin estolate	XRJ2P631HP		NDA	12-008	Lilly	DeHaen 1940-1975 NMEs		
+1958	Erythrocin Ethylsuccinate	erythromycin ethylsuccinate	1014KSJ86F		NDA	9-110	Abbott	DeHaen 1940-1975 NMEs		
 1958	Furoxone	furazolidone	5J9CPU3RE0				Eaton	DeHaen 1940-1975 NMEs		
-1958	Vistaril	hydroxyzine pamoate	M20215MUFR				Plizer	DeHaen 1940-1975 NMEs		
-1958	Kantrex	kanamycin sulfate	J80EX28SMQ				Bristol	DeHaen 1940-1975 NMEs		
+1958	Vistaril	hydroxyzine pamoate	M20215MUFR		NDA	11-459	Pfizer	DeHaen 1940-1975 NMEs		
+1958	Kantrex	kanamycin sulfate	J80EX28SMQ		NDA	11-503	Bristol	DeHaen 1940-1975 NMEs		
 1958	Quiactin	oxanamide	050271194T				Merrell (MerrellNational)	DeHaen 1940-1975 NMEs		
 1958	Neutrapen	penicillinase	CS8NMQ5AOE		NDA	11-224	SchenLabs (Riker)	DeHaen 1940-1975 NMEs		
 1957	Liquamar	phenprocoumon	Q08SIO485D	12-30-57	NDA	11-228	Organon	DeHaen 1940-1975 NMEs		
@@ -667,7 +668,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1958	Madribon	sulfadimethoxine	30CPC5LDEX				Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
 1958	Singoserp	syrosingopine	PPG46JF0EG				Ciba	DeHaen 1940-1975 NMEs		
 1958	Cyclamycin	triacetyloleandomycin	C4DZ64560D				Wyeth	DeHaen 1940-1975 NMEs		
-1958	TAO	triacetyloleandomycin	C4DZ64560D				Roerig (Pfizer)	DeHaen 1940-1975 NMEs		
+1958	TAO	triacetyloleandomycin	C4DZ64560D		NDA	50-332	Roerig (Pfizer)	DeHaen 1940-1975 NMEs		
 1958	Kenalog	triamcinolone acetonide	F446C597KA		NDA	11-600	Squibb	DeHaen 1940-1975 NMEs		
 1958	Murel	valethamate bromide	6XFR940M2A				Ayerst	DeHaen 1940-1975 NMEs		
 1958	Vancocin	vancomycin HCl	71WO621TJD	11-14-58	NDA	11-520	Lilly	DeHaen 1940-1975 NMEs		
@@ -715,7 +716,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1959	Actasal	choline salicylate	KD510K1IQW				Purdue Frederick	DeHaen 1940-1975 NMEs		
 1959	Declomycin	demeclocycline	5R5W9ICI6O				Lederle	DeHaen 1940-1975 NMEs		
 1959	Decadron Phos. Opthalmic Sol.	dexamethasone sodium phosphate	AI9376Y64P	09-02-59	NDA	11-984	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
-1959	Disomer	dexbrompheniramine maleate	BPA9UT29BS				White (Schering)	DeHaen 1940-1975 NMEs		
+1959	Disomer	dexbrompheniramine maleate	BPA9UT29BS		NDA	11-814	White (Schering)	DeHaen 1940-1975 NMEs		
 1959	Tepanil	diethylpropion HCl	19V2PL39NG	08-14-59	NDA	11-673	National (MerrellNational)	DeHaen 1940-1975 NMEs		
 1959	Surfak	dioctyl calcium sulfosuccinate	6K7YS503HC				Lloyd Bros. (Hoechst-Roussel)	DeHaen 1940-1975 NMEs		
 1959	Endrate	edetate disodium	7FLD91C86K		NDA	11-355	Abbott	DeHaen 1940-1975 NMEs		
@@ -742,7 +743,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1959	Pheny-PAS-Tebamin	phenyl aminosalicylate	52936SIP7V				Purdue Frederick	DeHaen 1940-1975 NMEs		
 1959	Mornidine	pipamazine	653552FH1N				Searle	DeHaen 1940-1975 NMEs		
 1959	Sycotrol	pipethanate HCl	07OS4SZ89Z				Reed & Carnrick	DeHaen 1940-1975 NMEs		
-1959	Caytine	protokylol HCl	7U7O8Q48IO				Lakeside (MerrellNational)	DeHaen 1940-1975 NMEs		
+1959	Caytine	protokylol HCl	7U7O8Q48IO		NDA	11-469	Lakeside (MerrellNational)	DeHaen 1940-1975 NMEs		
 1959	Povan	pyrvinium pamoate	310X6S84LW				Parke-Davis	DeHaen 1940-1975 NMEs		
 1959	Syntetrin	rolitetracycline	GH9IW85221				Bristol	DeHaen 1940-1975 NMEs		
 1959	Aristocort Diacetate	triamcinolone diacetate	A73MM2Q32P	03-12-59	NDA	11-685	Lederle	DeHaen 1940-1975 NMEs		
@@ -869,10 +870,11 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1962	Ananase	bromelains	U182GP2CF3				Rorer	DeHaen 1940-1975 NMEs		
 1962	Papase	papain	A236A06Y32				Warner/Chilcott	DeHaen 1940-1975 NMEs		
 1962	Coly-Mycin S	colistin sulfate	WP15DXU577		NDA	50-355	Warner/Chilcott	DeHaen 1940-1975 NMEs		
-1962	AlphaRedisol	hydroxocobalamin	Q40X8H422O				Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
+1954	Sytobex	hydroxocobalamin	Q40X8H422O		NDA	7-085	Warner Chilcott	https://www.google.com/books/edition/Hospital_Management/Xq7nAAAAMAAJ?hl=en&gbpv=1&bsq=sytobex&dq=sytobex&printsec=frontcover		
+1962	AlphaRedisol	hydroxocobalamin	Q40X8H422O		NDA	80-778	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1962	Hexanicotol	inositol niacinate	A99MK953KZ				Philadelphia Labs (Delta)	DeHaen 1940-1975 NMEs		
 1962	Deca-Durabolin	nandrolone decanoate	H45187T098	10-05-62	NDA	13-132	Organon	DeHaen 1940-1975 NMEs		
-1962	Prostaphlin	oxacillin sodium	4TWD2995UP		NDA	50-118	Bristol	DeHaen 1940-1975 NMEs		
+1962	Prostaphlin	oxacillin sodium	G0V6C994Q5		NDA	50-118	Bristol	DeHaen 1940-1975 NMEs		
 1962	Reneal	phytate sodium	88496G1ERL				Squibb	DeHaen 1940-1975 NMEs		
 1962	Theratuss	pipazethate HCl	757GN3W2CZ		NDA	12-820	Squibb	DeHaen 1940-1975 NMEs		
 1962	Sonilyn	sulfachlorpyridazine	P78D9P90C0		NDA	13-141	Mallinckrodt	DeHaen 1940-1975 NMEs		
@@ -880,6 +882,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1962	Clysodrast	bisacodyl tannex	T0I8L1B7J6				Barnes-Hind	DeHaen 1940-1975 NMEs		
 1963	Proketazine	carphenazine maleate	0HX1Z0A2MC	01-29-63	NDA	12-768	Wyeth	OB NME Appendix 1950-1985		
 1963	Eutonyl	pargyline HCl	W70V6I2OMY	02-14-63	NDA	13-448	Abbott	OB NME Appendix 1950-1985		
+1965	Eutron	pargyline HCl	W70V6I2OMY	09-22-65	NDA	16-047	Abbott	https://books.google.com/books?id=2bQ3QPA4tyoC&pg=PA13837&lpg=PA13837&dq=eutron+abbott+1964&source=bl&ots=y8MP8-8sG4&sig=ACfU3U0U4qJLWaqrpcojj3dlWQCUmj79lQ&hl=en&sa=X&ved=2ahUKEwjl3JPY7drwAhWSMVkFHTZuDCoQ6AEwD3oECBIQAw#v=onepage&q=eutron%20abbott%201964&f=false		
 1961	Synalar	fluocinolone acetonide	0CD5FD6S2M	05-12-61	NDA	12-787	Syntex	https://books.google.com/books?id=hyP66jAwX2kC&newbks=1&newbks_redir=0&vq=fluocinolone%20nda&dq=fluocinolone%20nda&pg=PA542#v=snippet&q=fluocinolone%20nda&f=false		
 1961	Cordran	fluandrenolide	8EUL29XUQT				Lilly	https://books.google.com/books?id=ZiiU-iiF1K8C&newbks=1&newbks_redir=0&dq=hydroxyphenamate&pg=PA367#v=onepage&q=hydroxyphenamate&f=false		
 1963	Safeguard	cloflucarban	I5ZZY3DC5G	03-26-63	NDA	13-568	Procter & Gamble	OB NME Appendix 1950-1993		
@@ -890,6 +893,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1963	Flagyl	metronidazole	140QMO216E	07-18-63	NDA	12-623	Searle	OB NME Appendix 1950-1985		
 1959	Humorsol	demecarium bromide	61D5V4OKTP	08-05-59	NDA	11-860	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
 1963	Duphaston	dydrogesterone	90I02KLE8K	08-07-63	NDA	12-985	Philips Roxane	OB NME Appendix 1950-1985		
+1968	Gynorest	dydrogesterone	90I02KLE8K		NDA	17-388	Mead Johnson	https://www.google.com/books/edition/The_Journal_of_Clinical_Pharmacology_and/C0RPAQAAIAAJ?hl=en&gbpv=1&bsq=gynorest+1969&dq=gynorest+1969&printsec=frontcover		
 1963	Anhydron	cyclothiazide	P71U09G5BW	08-20-63	NDA	13-157	Lilly	OB NME Appendix 1950-1985		
 1963	Mucomyst	acetylcysteine	WYQ7N0BPYC	09-14-63	NDA	13-601	Mead Johnson	OB NME Appendix 1950-1985		
 1963	Valium	diazepam	Q3JTX2Q7TU	11-15-63	NDA	13-263	Hoffmann-La Roche	OB NME Appendix 1950-1985		
@@ -901,7 +905,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1962	Aldomet	methyl dopa	M4R0H12F6M	12-20-62	NDA	13-400	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1962	Aldomet	methyldopate HCl	7PX435DN5A	12-20-62	NDA	13-401	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1963	Solu Rutin	morpholinoethylrutin	TKW5C324NM				Philadelphia Labs (Delta)	DeHaen 1940-1975 NMEs		
-1964	Virac	Undecoylium Chloride-Iodide	614OI1Z5WI	01-15-64	NDA	11-914	Ruson	OB NME Appendix 1950-1985		
+1964	Virac	Undecoylium Chloride-Iodide	614OI1Z5WI	11-15-64	NDA	11-914	Ruson	OB NME Appendix 1950-1985		
 1964	Alkeran	melphalan	Q41OR9510P	01-17-64	NDA	14-691	Burroughs Wellcome	OB NME Appendix 1950-1985		
 1964	Negram	Nalidixic Acid	ZU4275277R	03-06-64	NDA	14-214	Winthrop Sterling	OB NME Appendix 1950-1985		
 1964	Prolopam Chloride	pralidoxime chloride	38X7XS076H	03-11-64	NDA	14-134	Campbell (Ayerst)	OB NME Appendix 1950-1985		
@@ -921,7 +925,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1964	Cosmegen	dactinomycin	1CC1JFE158	12-10-64	NDA	60-467	Merck Sharp & Dohme	OB NME Appendix 1950-1993		
 1964	Dymelor	acetohexamide	QGC8W08I6I	12-23-64	NDA	13-378	Lilly	OB NME Appendix 1950-1985		
 1964	Lincocin	lincomycin HCl	M6T05Z2B68	12-29-64	NDA	50-316	Upjohn	OB NME Appendix 1950-1993		
-1964	Akrinol	acrisorcin	2U918O4BEV				Schering	DeHaen 1940-1975 NMEs		
+1964	Akrinol	acrisorcin	2U918O4BEV		NDA	12-470	Schering	DeHaen 1940-1975 NMEs		
 1964	Candeptin	candicidin	48N2IYJ202				Julius Schmid	DeHaen 1940-1975 NMEs		
 1964	Kellin	cephalothin sodium	C22G6EYP8B				Lilly	DeHaen 1940-1975 NMEs		
 1964	Norpramin	desipramine HCl	1Y58DO4MY1	11-20-64	NDA	14-399	Lakeside (MerrellNational)	DeHaen 1940-1975 NMEs		
@@ -946,7 +950,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1965	Celestone Soluspan	betamethasone acetate	TI05AO53L7	03-03-65	NDA	14-602	Schering	DeHaen 1940-1975 NMEs		
 1965	C-Quens	chlormadinone acetate	0SY050L61N	04-29-65	NDA	16-048	Lilly	DeHaen 1940-1975 NMEs		
 1964	Cuemid	cholestyramine resin	4B33BGI082	10-15-64	NDA	13-412	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
-1965	Tegopen	cloxacillin sodium	65LCB00B4Y				Bristol	DeHaen 1940-1975 NMEs		
+1965	Tegopen	cloxacillin sodium	65LCB00B4Y		NDA	50-192	Bristol	DeHaen 1940-1975 NMEs		
 1966	Oracon	dimethisterone	K4MZ02M175	06-07-66			Mead Johnson	DeHaen 1940-1975 NMEs		
 1965	Jectofer	iron sorbitex					Astra	DeHaen 1940-1975 NMEs		
 1965	Quaalude	methaqualone	7ZKH8MQW6T				Rorer	DeHaen 1940-1975 NMEs		
@@ -972,7 +976,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1965	Omnipen	ampicillin anhydrous	7C782967RD	12-17-65	NDA	60-624	Wyeth	DeHaen 1940-1975 NMEs		
 1966	Serc	betahistine hydrochloride	49K58SMZ7U				Unimed More	DeHaen 1940-1975 NMEs		
 1966	Garamycio	gentamicin sulfate	8X7386QRLV				Schering	DeHaen 1940-1975 NMEs		
-1966	Rondomycin	methacycline HCl	9GJ0N7ZAP0				Pfizer	DeHaen 1940-1975 NMEs		
+1966	Rondomycin	methacycline HCl	9GJ0N7ZAP0		NDA	60-641	Pfizer	DeHaen 1940-1975 NMEs		
 1967	Edecrin	ethacrynic acid	M5DP350VZV	01-10-67	NDA	16-092	Merck Sharp & Dohme	OB NME Appendix 1950-1985		
 1967	Clomid	clomiphene citrate	1B8447E7YI	02-01-67	NDA	16-131	Merrell (MerrellNational)	OB NME Appendix 1950-1985		
 1967	Atromid-S	clofibrate	HPN91K7FU3	02-08-67	NDA	16-099	Ayerst	OB NME Appendix 1950-1985		
@@ -1001,8 +1005,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1967	Edecrin Lyovac Sodium	ethacrynate sodium	K41MYV7MPM	01-10-67	NDA	16-093	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
 1967	Prolixin Enanthate	fluphenazine enanthate	QSB34YF0W9	03-15-67	NDA	16-110	Squibb	DeHaen 1940-1975 NMEs		
 1967	Hiprex	methenamine hippurate	M329791L57				Riker	DeHaen 1940-1975 NMEs		
-1968	lnnovar	Droperidol	O9U0F09D5X	01-31-68	NDA	16-049	Janssen	OB NME Appendix 1950-1985		
-1968	lnnovar	Fentanyl Citrate	MUN5LYG46H	01-31-68	NDA	16-049	Janssen	OB NME Appendix 1950-1985		
+1968	Innovar	Droperidol	O9U0F09D5X	01-31-68	NDA	16-049	Janssen	OB NME Appendix 1950-1985		
+1968	Innovar	Fentanyl Citrate	MUN5LYG46H	01-31-68	NDA	16-049	Janssen	OB NME Appendix 1950-1985		
 1968	Tegretol	carbamazepine	33CM23913M	03-11-68	NDA	16-608	Geigy	OB NME Appendix 1950-1985		
 1968	Imuran	azathioprine	MRK240IY2L	03-20-68	NDA	16-324	Burroughs Wellcome	OB NME Appendix 1950-1985		
 1968	Desferal	deferoxamine mesylate	V9TKO7EO6K	04-01-68	NDA	16-267	Ciba	OB NME Appendix 1950-1985		
@@ -1141,7 +1145,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1974	Perchloracap	Potassium Perchlorate	42255P5X4D	11-21-74	NDA	17-551	Mall inckrodt	OB NME Appendix 1950-1985		
 1974	Halog	halcinonide	SI86V6QNEG	11-27-74	NDA	17-556	Squibb	OB NME Appendix 1950-1985		
 1974	Larotid	amoxicillin	804826J2HU	12-08-74	NDA	50-460	Hoffmann-La Roche	DeHaen 1940-1975 NMEs		
-1974	Emete-con	benzquinamide	0475EA27Q3	03-12-74	NDA	16-820	Roerig	DeHaen 1940-1975 NMEs		
+1974	Emete-con	benzquinamide hydrochloride	3221WFM86J	03-12-74	NDA	16-818	Roerig	DeHaen 1940-1975 NMEs		
 1974	Anspor	cephradine	F1BC02I72W	10-01-74	NDA	61-859	Smith Kline & French	DeHaen 1940-1975 NMEs		
 1974	Catapres	clonidine HCl	W76I6XXF06	09-03-74	NDA	17-407	Boehringer lngelheim	DeHaen 1940-1975 NMEs		
 1973	Decadron-LA	dexamethasone acetate	E2287TKU04	09-06-73	NDA	16-675	Merck Sharp & Dohme	DeHaen 1940-1975 NMEs		
@@ -1331,7 +1335,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1983	Trasicor	Oxprenolol Hydrochloride	F4XSI7SNIU	12-28-83	NDA	18-166	Ciba Geigy	OB NME Appendix 1950-1985		
 1983	Chymex	Bentiromide	239IF5W61J	12-29-83	NDA	18-366	Adria	OB NME Appendix 1950-1985		
 1984	Nicorette	Nicotine Resin Complex	6M3C89ZY6R	01-13-84	NDA	18-612	Dow	OB NME Appendix 1950-1985		
-1984	Normodyne	Labetalol Hydrochloride	1GEV3BAW9J	03-01-84	NDA	18-686	Schering	OB NME Appendix 1950-1985		
+1984	Normodyne	Labetalol Hydrochloride	1GEV3BAW9J	08-01-84	NDA	18-686	Schering	OB NME Appendix 1950-1985		
 1984	Norcuron	Vercuronium Bromide	FA2DM6879K	04-30-84	NDA	18-776	Organon	OB NME Appendix 1950-1985		
 1984	Micronase	Glyburide	SX6K58TVWC	05-01-84	NDA	17-498	Upjohn	OB NME Appendix 1950-1985		
 1984	Sufenta	Sufentanil Citrate	S9ZFX8403R	05-04-84	NDA	19-050	Janssen	OB NME Appendix 1950-1985		
@@ -1352,7 +1356,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1984	Nephroflow	"Iodohippurate Sodium, I-123"	4NW20GFQ7H	12-28-84	NDA	18-289	Medi-Physics	OB NME Appendix 1950-1985		
 1984	Merital	Nomifensine Maleate	76S8CUH5MR	12-31-84	NDA	18-224	Hoechst Roussel	OB NME Appendix 1950-1985		
 1984	Modrastane	TriloStane	L0FPV48Q5R	12-31-84	NDA	18-719	Sterling Winthrop	OB NME Appendix 1950-1985		
-1985	Fortaz	Ceftazidime	9M416Z9QNR	01-19-85	NDA	50-578	Glaxo	OB NME Appendix 1950-1993		
+1985	Fortaz	Ceftazidime	9M416Z9QNR	07-19-85	NDA	50-578	Glaxo	OB NME Appendix 1950-1993		
 1985	Lupron	Leuprolide Acetate	37JNS02E7V	04-09-85	NDA	19-010	Tap	OB NME Appendix 1950-1993		
 1985	Seldane	Terfenadine	7BA5G9Y06Q	05-08-85	NDA	18-949	Dow	OB NME Appendix 1950-1993		
 1985	Ridaura	Auranofin	3H04W2810V	05-24-85	NDA	18-689	Smith Kline & French	OB NME Appendix 1950-1993		
@@ -1499,7 +1503,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1990	Floxin	Ofloxacin	A4P49JAZ9H	12-28-90	NDA	19-735	R W Johnson	OB NME Appendix 1950-1993		
 1990	Geref	Sermorelin Acetate	00IBG87IQW	12-28-90	NDA	19-863	Serono	OB NME Appendix 1950-1993		
 1990	Rev-Eyes	Dapiprazole Hydrochloride	DS9UJN1I0X	12-31-90	NDA	19-849	Angelini	OB NME Appendix 1950-1993		
-1990	Actimmune	Interferon gamma-1b	21K6M2I7AG	12-22-90	BLA	103-836		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=103836		
+1990	Actimmune	Interferon gamma-1b	21K6M2I7AG	12-20-90	BLA	103-836		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=103836		
 1991	Zofran	Ondansetron Hydrochloride	2999F27MAD	01-04-91	NDA	20-007	Glaxo	OB NME Appendix 1950-1993		
 1991	Ganite	Gallium Nitrate	VRA0C6810N	01-17-91	NDA	19-961	Fujisawa	OB NME Appendix 1950-1993		
 1991	Altace	Ramipril	L35JN3I7SJ	01-28-91	NDA	19-901	Hoechst-Roussel	OB NME Appendix 1950-1993		
@@ -1949,7 +1953,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 2005	Tygacil	Tigecycline	70JE2N95KR	06-15-05	NDA	21-821		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21821		
 2005	Levemir	Insulin Detemir	4FT78T86XV	06-16-05	NDA	21-536		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21536		
 2005	Aptivus	Tipranavir	ZZT404XD09	06-22-05	NDA	21-814		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21814		
-2005	Exjade	Deferasirox	V8G4MOF2V9	07-07-05	NDA	21-882		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21882		
+2005	Exjade	Deferasirox	V8G4MOF2V9	11-02-05	NDA	21-882		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21882		
 2005	Rozerem	Ramelteon	901AS54I69	07-22-05	NDA	21-782		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21782		
 2005	Nevanac	Nepafenac	0J9L7J6V8C	08-19-05	NDA	21-862		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21862		
 2005	Increlex	Mecasermin [rDNA Origin]	7GR9I2683O	08-30-05	NDA	21-839		https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=21839		
@@ -2327,6 +2331,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1928	Pitocin	oxytocin	1JQS135EYN	10-20-28				https://books.google.com/books?id=AymgAAAAMAAJ&lpg=PA514&ots=Sv2C9092O9&dq=pitocin%201928&pg=PA514#v=onepage&q=pitocin%201928&f=false		
 1928	Pyridium	phenazopyridine hydrochloride	0EWG668W17					https://www.ncbi.nlm.nih.gov/pubmed/982458		
 1929	secobarbital	secobarbital	1P7H87IN75					https://archive.org/details/newnonofficialre39coun		
+1928	Ephetonine	ephedrine hydrochloride	NLJ6390P1Z				Merck	https://www.google.com/books/edition/American_Journal_of_Pharmacy/NEAfAQAAIAAJ?hl=en&gbpv=1&bsq=ephetonine&dq=ephetonine&printsec=frontcover		
 1929	ephedrine sulfate	ephedrine sulfate	U6X61U5ZEG				Lilly	https://archive.org/details/newnonofficialre39coun		
 1929	Sandoptal	butalbital	KHS0AZ4JVK				Sandoz	https://books.google.com/books?id=i9BQAAAAYAAJ&q=SANDOPTAL&dq=SANDOPTAL&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwj_i7-Hg_TmAhVDU98KHX8dCOAQ6AEwAHoECAYQAg		
 1929	Metrazol	pentylenetetrazol	WM5Z385K7T				Knoll	https://books.google.com/books?id=2QJtAAAAMAAJ&q=metrazol&dq=metrazol&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwiTueXIhv_mAhVOpFkKHSgHAgUQ6AEwAHoECAAQAg		
@@ -2350,6 +2355,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1934	helium	helium	206GF3GB41					https://journals.sagepub.com/doi/abs/10.3181/00379727-32-7724P		
 1934	Proluton	progesterone	4G7DS2Q64Y					https://archive.org/details/newnonofficialre39coun		
 1934	Neosynephrine	phenylephrine	1WS297W6MV					https://books.google.com/books?id=kcVEAQAAMAAJ&newbks=1&newbks_redir=0&dq=phenylephrine%201934&pg=PA760#v=onepage&q=phenylephrine%201934&f=false		
+1934	Aminophyllin-Dubin	aminophyllin	27Y3KJK423				Dubin	https://jamanetwork.com/journals/JAMA/articlepdf/250878/jama_102_23_011.pdf		
 1935	trichloroethylene	trichloroethylene	290YE8AR51					https://archive.org/details/newnonofficialre39coun		
 1935	Paredrine	hydroxyamphetamine	FQR280JW2N	4-17-35				https://trademarks.justia.com/713/72/paredrine-71372217.html
 1937	Dexedrine	dextroamphetamine sulfate	JJ768O327N				Smith Kline French	https://web.archive.org/web/20091219120223/http://www.medic8.com/medicines/Dexedrine.html		
@@ -3012,7 +3018,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1921	potassium aspartate	potassium aspartate	OC4598NZEQ					https://catalog.hathitrust.org/Record/100163146		
 1938	KOAGAMIN SH ETHYL OXALATE	ethyl oxalate	860M3ZWF6J	08-01-38	NDA	0-001	CHATHAM	https://doi.org/10.1016/S0003-0465(15)33532-1
 1938	KOAGAMIN SH ETHYL MALONATE	ethyl malonate	53A58PA183	08-01-38	NDA	0-001	CHATHAM	https://doi.org/10.1016/S0003-0465(15)33532-1
-1938	PAREDRINE TAB	hydroxyamphetamine	FQR280JW2N	12-31-38	NDA	0-004	SKF	https://books.google.ru/books?id=51ozlZRBvQwC&pg=PA46&lpg=PA46&dq=PAREDRINE+tab&source=bl&ots=9_R4nMYQp0&sig=0fshU-EA4aDQlKRBm3IWha1tnmE&hl=ru&sa=X&ved=2ahUKEwiAkvW38rPfAhXBDiwKHVzQCfUQ6AEwA3oECAMQAQ#v=onepage&q=PAREDRINE%20tab&f=false
 1939	RINOFEDS EPHEDRINE HYDROCHLORIDE	ephedrine hydrochloride	NLJ6390P1Z	03-16-39	NDA	0-016	BROEMMEL	https://archive.org/details/federalregister37funit/page/n783?q=RINOFEDS
 1939	RINOFEDS ATROPINE SULFATE	atropine sulfate	03J5ZE7KA5	03-16-39	NDA	0-016	BROEMMEL	https://archive.org/details/federalregister37funit/page/n783?q=RINOFEDS
 1939	RINOFEDS PENTOBARBITAL	pentobarbital	I4744080IR	03-16-39	NDA	0-016	BROEMMEL	https://archive.org/details/federalregister37funit/page/n783?q=RINOFEDS
@@ -3047,15 +3052,15 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	ENZO-CAL	benzocaine	U3RSY48JW5	12-30-61	NDA	1-726	CROOKES-BANNERS	
 1961	PHENOBARB THEOCALCIN THEOBROMINE CALCIUM SALICYLATE	theobromine calcium salicylate	N5ZZ1LY24G	12-30-61	NDA	1-730	KNOLL	https://www.govinfo.gov/content/pkg/FR-1972-12-23/pdf/FR-1972-12-23.pdf
 1961	MAXITATE	mannitol hexanitrate	99AU28W1G9	12-30-61	NDA	1-786	PENNWALT	https://www.govinfo.gov/content/pkg/FR-1977-08-26/pdf/FR-1977-08-26.pdf
-1961	MENADIONE 5MG	vitamin K3	723JX6CXY5	12-30-61	NDA	2-139	LILLY	https://archive.org/details/pubmed-PMC3854242/page/n3?q=MENADIONE
+1940	MENADIONE	vitamin K3	723JX6CXY5		NDA	2-139	LILLY	https://archive.org/details/pubmed-PMC3854242/page/n3?q=MENADIONE
 1941	NEGATAN	negatol	6I19M5GB0G		NDA	2-238	LILLY	https://www.govinfo.gov/content/pkg/FR-1972-07-27/pdf/FR-1972-07-27.pdf
-1961	PROLOID 1 1/2GR	thyroglobulin	NN2P9VPL7M	12-30-61	NDA	2-245	WC	https://www.govinfo.gov/content/pkg/FR-1977-12-02/pdf/FR-1977-12-02.pdf
+1940	PROLOID 1 1/2GR	thyroglobulin	NN2P9VPL7M		NDA	2-245	Warner Chilcott	https://www.govinfo.gov/content/pkg/FR-1977-12-02/pdf/FR-1977-12-02.pdfhttps://books.google.com/books?id=yZakTrxwU0MC&pg=PA916&lpg=PA916&dq=PROLOID+thyroglobulin+1940&source=bl&ots=V0z-p85f86&sig=ACfU3U2u9dfD_LEPcomDlS6mQ8sFTNQBww&hl=en&sa=X&ved=2ahUKEwiThIP-89rwAhUgFVkFHVgwCIsQ6AEwDnoECBQQAw#v=onepage&q=PROLOID%20thyroglobulin%201940&f=false
 1961	INULIN, PURIFIED	inulin	JOS53KRJ01	12-30-61	NDA	2-282	ARNAR STONE	https://books.google.ru/books?id=kRbaBwAAQBAJ&pg=PA36&lpg=PA36&dq=INULIN+ARNAR+STONE&source=bl&ots=YUIhInjQc2&sig=ywjqpiDuLiDfMFfCshSuYaCAeVw&hl=ru&sa=X&ved=2ahUKEwiT5JC88cLfAhUyw4sKHSDaCQkQ6AEwAHoECAQQAQ#v=onepage&q=INULIN%20ARNAR%20STONE&f=false
 1961	DELVINAL	vinbarbital	7NZH2C1T6O	12-30-61	NDA	2-313	MSD	https://archive.org/details/CNSDepressants/page/n3?q=DELVINAL
 1961	HASAMAL ACETAMINOPHEN	acetaminophen	362O9ITL9D	12-30-61	NDA	2-354	ARNAR STONE	https://www.govinfo.gov/content/pkg/FR-1972-12-23/pdf/FR-1972-12-23.pdf
 1961	HASAMAL PHENACETIN	phenacetin	ER0CTH01H9	12-30-61	NDA	2-354	ARNAR STONE	https://www.govinfo.gov/content/pkg/FR-1972-12-23/pdf/FR-1972-12-23.pdf
 1961	NAPENTAL SODIUM PENTOBARBITAL	sodium pentobarbital	NJJ0475N0S	12-30-61	NDA	2-368	BEECHAM LABS	https://archive.org/details/federalregister37gunit/page/n1047?q=NAPENTAL
-1961	AMINOPHYLLIN AMINOPHYLLIN	aminophyllin	27Y3KJK423	12-30-61	NDA	2-385	SEARLE	https://books.google.ru/books?id=uo0QFvym_90C&pg=PA327&lpg=PA327&dq=AMINOPHYLLIN+oral+SEARLE&source=bl&ots=EzhmknZuYX&sig=WviJgvWisDJlikrd07OJbPzpojc&hl=ru&sa=X&ved=2ahUKEwiIgt-087_fAhXpwYsKHU44B_sQ6AEwAXoECAkQAQ#v=onepage&q=AMINOPHYLLIN%20oral%20SEARLE&f=false|https://archive.org/details/delawarestatemed19unse/page/108?q=AMINOPHYLLIN+SEARLE
+1939	AMINOPHYLLIN AMINOPHYLLIN	aminophyllin	27Y3KJK423		NDA	2-385	SEARLE	https://books.google.ru/books?id=uo0QFvym_90C&pg=PA327&lpg=PA327&dq=AMINOPHYLLIN+oral+SEARLE&source=bl&ots=EzhmknZuYX&sig=WviJgvWisDJlikrd07OJbPzpojc&hl=ru&sa=X&ved=2ahUKEwiIgt-087_fAhXpwYsKHU44B_sQ6AEwAXoECAkQAQ#v=onepage&q=AMINOPHYLLIN%20oral%20SEARLE&f=false|https://archive.org/details/delawarestatemed19unse/page/108?q=AMINOPHYLLIN+SEARLE
 1961	POTASSIUM THIOCYANATE	potassium thiocyanate	TM7213864A	12-30-61	NDA	2-411	LILLY	
 1961	SODIUM THIOCYANATE	sodium thiocyanate	5W0K9HKA05	12-30-61	NDA	1-616	Smith-Dorsey Company	
 1961	NOV PONT W/NEOCOBEFRIN MEPIVACAINE HYDROCHLORIDE	mepivacaine hydrochloride	4VFX2L7EM5	12-30-61	NDA	2-604	COOKE-WAITE	
@@ -3069,9 +3074,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	CYCLOPAL AND ASPIRIN CYCLOPENTOBARBITAL	cyclopentobarbital	2230XWG55Q	12-30-61	NDA	2-898	UPJOHN	https://kundoc.com/pdf-gut-decompression-with-hyperbaric-oxygen-.html|https://www.govinfo.gov/content/pkg/CFR-2001-title21-vol5/xml/CFR-2001-title21-vol5-chapI-subchapD.xml|https://www.uniprix.com/en/drug-lexicon/1325/aspirin
 1961	CYCLOPAL AND ASPIRIN ACETYLSALICYLIC ACID (ASPIRIN)	acetylsalicylic acid	R16CO5Y76E	12-30-61	NDA	2-898	UPJOHN	https://kundoc.com/pdf-gut-decompression-with-hyperbaric-oxygen-.html|https://www.govinfo.gov/content/pkg/CFR-2001-title21-vol5/xml/CFR-2001-title21-vol5-chapI-subchapD.xml|https://www.uniprix.com/en/drug-lexicon/1325/aspirin
 1961	DROXOLAN	deoxycholic acid	005990WHZZ	12-30-61	NDA	3-044	TILDEN YATES	https://www.govinfo.gov/content/pkg/FR-1975-03-24/pdf/FR-1975-03-24.pdf
-1961	ORETON METHYL 10MG	methyltestosterone	V9EFU16ZIF	12-30-61	NDA	3-158	SCHERING	https://www.drugs.com/sfx/oreton-methyl-side-effects.html
+1940	Oreton Methyl	methyltestosterone	V9EFU16ZIF		NDA	3-158	SCHERING	https://books.google.com/books?id=jpBjXBCWw74C&pg=PA52556&lpg=PA52556&dq=NDA+3-240+FR&source=bl&ots=jFGYFmg991&sig=ACfU3U03FRaQOr6kgSLztWhXU-rnIGDLmw&hl=en&sa=X&ved=2ahUKEwjM2t6Gz9rwAhUsF1kFHSF_A4YQ6AEwBHoECAoQAw#v=onepage&q=NDA%203-240%20FR&f=false
+1940	Metandren	methyltestosterone	V9EFU16ZIF		NDA	3-240	Ciba	https://books.google.com/books?id=jpBjXBCWw74C&pg=PA52556&lpg=PA52556&dq=NDA+3-240+FR&source=bl&ots=jFGYFmg991&sig=ACfU3U03FRaQOr6kgSLztWhXU-rnIGDLmw&hl=en&sa=X&ved=2ahUKEwjM2t6Gz9rwAhUsF1kFHSF_A4YQ6AEwBHoECAoQAw#v=onepage&q=NDA%203-240%20FR&f=false
 1961	METROPINE METHYLATROPINE NITRATE	methylatropine nitrate	Q48D9J47K2	12-30-61	NDA	3-265	PENWALT	https://www.govinfo.gov/content/pkg/FR-1977-03-22/pdf/FR-1977-03-22.pdf
-1961	PITRESSIN TANNATE-OIL	vasopressin tannate	4R069M4O1P	12-30-61	NDA	3-402	PD	https://www.govinfo.gov/content/pkg/FR-1998-09-25/pdf/98-25638.pdf
 1961	VINOBEL	belladonna root	6MW97Q6E8M	12-30-61	NDA	3-429	MERRELL	https://www.govinfo.gov/content/pkg/FR-1970-11-07/pdf/FR-1970-11-07.pdf
 1961	DRISDOL	ergocalciferol	VS041H42XC	12-30-61	NDA	3-444	WINTHROP	https://books.google.com/books?id=gqT7zJGcZ54C&pg=PA16125&lpg=PA16125&dq=ATAV+cole+drug&source=bl&ots=xJ8w3rxuWG&sig=ACfU3U2Cr8t8SwdqlSkFRHLawu9lvhFp3A&hl=en&sa=X&ved=2ahUKEwiaioL2y4rmAhWlo1kKHbXeBjAQ6AEwDXoECAsQAQ#v=onepage&q=ATAV%20cole%20drug&f=false
 1961	ATROPINE & PHENOBARB ATROPINE	atropine	7C0697DR9I	12-30-61	NDA	3-452	COLE	https://archive.org/details/drugusers00unit/page/n127?q=ATROPINE+%26+PHENOBARBITAL
@@ -3103,7 +3108,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	CREMOSUXIDINE KAOLIN	kaolin	24H4NWX5CO	12-30-61	NDA	4-687	MSD	https://www.govinfo.gov/content/pkg/FR-1972-12-27/pdf/FR-1972-12-27.pdf|https://www.govinfo.gov/content/pkg/FR-1970-07-22/pdf/FR-1970-07-22.pdf
 1961	CREMOSUXIDINE PECTIN	pectin	89NA02M4RX	12-30-61	NDA	4-687	MSD	https://www.govinfo.gov/content/pkg/FR-1972-12-27/pdf/FR-1972-12-27.pdf|https://www.govinfo.gov/content/pkg/FR-1970-07-22/pdf/FR-1970-07-22.pdf
 1961	PREMARIN 0.3 MG	conjugated estrogens	IU5QR144QX	12-30-61	NDA	4-782	AYERST	https://www.govinfo.gov/content/pkg/FR-1998-12-17/pdf/98-33453.pdf
-1961	CEROSAL SALICYLIC ACID	salicylic acid	O414PZ4LPZ	12-30-61	NDA	4-837	KAHLENBERG	https://archive.org/details/federalregister36gunit?q=CEROSAL
+1941	CEROSAL SALICYLIC ACID	salicylic acid	O414PZ4LPZ		NDA	4-837	KAHLENBERG	https://archive.org/details/federalregister36gunit?q=CEROSAL
 1941	CEROSAL CEROUS SALICYLATE	cerous salicylate	0001H6R5H1		NDA	4-837	KAHLENBERG	https://archive.org/details/federalregister36gunit?q=CEROSAL
 1961	PARBEXIN DEXPANTHENOL	dexpanthenol	1O6C93RI7Z	12-30-61	NDA	4-895	SMP	https://www.govinfo.gov/content/pkg/FR-1972-07-27/pdf/FR-1972-07-27.pdf
 1961	DEMEROL	meperidine hydrochloride	N8E7F7Q170	12-30-61	NDA	5-010	WINTHROP	https://www.rxlist.com/demerol-drug.htm
@@ -3121,20 +3126,19 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	SULFAMERAZINE	sulfamerazine	UR1SAB295F	12-30-61	NDA	5-301	MSD	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035201/fr035201.pdf
 1943	MERCUHYDRIN	methoxyhydroxymercuripropylsuccinylurea	LJ423706OE		NDA	5-307	MERRELL	https://trademarks.justia.com/715/44/mercuhydrin-71544742.html|https://pubs.acs.org/doi/abs/10.1021/jo01151a023?journalCode=joceah
 1961	PENICILLIN G SOD	penicillin g sodium	YS5LY7JF4N	12-30-61	NDA	5-316	UPJOHN	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035146/fr035146.pdf
-1961	PANTOPAQUE	iophendylate	2990I809YH	12-30-61	NDA	5-319	LAFAYETTE	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
-1961	DICUMAROL	bishydroxycoumarin	7QID3E7BG7	12-30-61	NDA	5-509	LILLY	https://www.govinfo.gov/content/pkg/FR-1977-12-02/pdf/FR-1977-12-02.pdf
+1944	PANTOPAQUE	iophendylate	2990I809YH	04-14-44	NDA	5-319	LAFAYETTE	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
 1961	SPECIAL GELATINE	gelatine	2G86QN327L	12-30-61	NDA	5-554	KNOX GELATINE	https://www.govinfo.gov/content/pkg/FR-1977-12-02/pdf/FR-1977-12-02.pdf
 1945	CARBRITAL CARBROMAL	carbromal	0Y299JY9V3		NDA	5-595	PARKE-DAVIS	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
 1961	PROMIN	glucosulfone sodium	I6RLN7D44F	12-30-61	NDA	5-596	PD	https://www.drugfuture.com/chemdata/glucosulfone-sodium.html|https://pdfs.semanticscholar.org/ff37/3ce84dbcc6c449e86eff2dc8a26c0a459cc1.pdf
 1961	MEONINE	methionine	AE28F7PNPL	12-30-61	NDA	5-597	IVES	https://www.govinfo.gov/content/pkg/FR-1970-01-10/pdf/FR-1970-01-10.pdf
 1961	SODIUM AMINOHIPPURATE	aminohippurate sodium	SUO3KVS1O9	12-30-61	NDA	5-619	MSD	https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2002/05619s16ltr.pdf
-1961	MANNITOL	mannitol	3OWL53L36A	12-30-61	NDA	5-620	MSD	https://www.govinfo.gov/content/pkg/FR-1999-06-10/pdf/99-14656.pdf
+1955	MANNITOL	mannitol	3OWL53L36A		NDA	5-620	Merck	https://www.google.com/books/edition/The_Dispensatory_of_the_United_States_of/wfsjAQAAMAAJ?hl=en&gbpv=1&bsq=mannitol
 1961	OTOMIDE UREA	urea	8W8T17847W	12-30-61	NDA	5-623	WHITE	https://www.govinfo.gov/content/pkg/FR-1972-02-12/pdf/FR-1972-02-12.pdf
 1961	OTOMIDE CHLOROBUTANOL	chlorobutanol	HM4YQM8WRC	12-30-61	NDA	5-623	WHITE	https://www.govinfo.gov/content/pkg/FR-1972-02-12/pdf/FR-1972-02-12.pdf
 1961	SULFEL CALCIUM CARBONATE	calcium carbonate	H0G9379FGK	12-30-61	NDA	5-625	VALE	https://www.govinfo.gov/content/pkg/FR-1968-11-06/pdf/FR-1968-11-06.pdf
 1961	TUBOCURARINE CHLORIDE TUBOCURARINE CHLORIDE	tubocurarine chloride	900961Z8VR	12-30-61	NDA	5-657	SQUIBB	https://www.govinfo.gov/content/pkg/FR-1970-08-26/pdf/FR-1970-08-26.pdf
 1961	MALGLYN DIHYDROXYALUMINUM AMINOACETATE	dihydroxyaluminum aminoacetate	DO250MG0W6	12-30-61	NDA	5-668	BRAYTEN	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
-1961	VERTAVIS	veratrum viride	197B3Q7T5Q	12-30-61	NDA	5-691	NEISLER	https://www.govinfo.gov/content/pkg/FR-1973-01-30/pdf/FR-1973-01-30.pdf
+1951	VERTAVIS	veratrum viride	197B3Q7T5Q		NDA	5-691	NEISLER	https://www.jstor.org/stable/4467922
 1961	PROFENIL	alverine citrate	9JFB58YK1E	12-30-61	NDA	5-695	SYNTEX	https://www.govinfo.gov/content/pkg/FR-1975-11-11/pdf/FR-1975-11-11.pdf
 1961	LAURON 50MG/CC	aurothioglycanide	2A9D34A16M	12-30-61	NDA	5-714	ENDO	https://www.govinfo.gov/content/pkg/FR-1972-02-12/pdf/FR-1972-02-12.pdf
 1961	PENICILLIN PENICILLIN G POTASSIUM	penicillin g potassium	VL775ZTH4C	12-30-61	NDA	5-740	LILLY	https://www.govinfo.gov/content/pkg/FR-1972-01-12/pdf/FR-1972-01-12.pdf
@@ -3163,7 +3167,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	FOLVRON FERROUS SULFATE	ferrous sulfate	39R4TAN1VT	12-30-61	NDA	6-012	LEDERLE	https://www.federalregister.gov/documents/2006/06/16/E6-9440/merck-and-co-inc-et-al-withdrawal-of-approval-of-65-new-drug-applications-and-52-abbreviated-new|https://search-tec.com/clinical-trials/companies/lederle/?drug-single=6012-3
 1961	METHERGINE	methylergonovine maleate	IR84JPZ1RK	12-30-61	NDA	6-035	SANDOZ	https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2004/06035slr072ltr.pdf
 1961	MEPRANE DIPROPIONATE	promethestrol dipropionate	X84U53950P	12-30-61	NDA	6-042	R&C	http://lib3.dss.go.th/fulltext/scan_ebook/j.or_chem_1959_v24_n4.pdf
-1961	DIASONE SODIUM	sulfoxone sodium	57OWB0Q221	12-30-61	NDA	6-044	ABBOTT	https://www.drugfuture.com/chemdata/sulfoxone-sodium.html|http://newdruginformation.com/Diasone_Sodium.htm
 1961	SODUXIN	sodium succinate	U16QOD6C4E	12-30-61	NDA	6-046	BREWER	https://www.govinfo.gov/content/pkg/FR-1970-03-27/pdf/FR-1970-03-27.pdf
 1961	BEROCCA-C D-BIOTIN	d-biotin	6SO6U10H04	12-30-61	NDA	6-071	ROCHE	https://www.govinfo.gov/content/pkg/FR-1972-07-27/pdf/FR-1972-07-27.pdf
 1946	TOPOCIDE DDT	ddt	CIW5S16655		NDA	6-087	LILLY	https://archive.org/details/mississippidocto26unse/page/n295?q=TOPOCIDE
@@ -3199,13 +3202,12 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	PRISCOLINE	tolazoline	CHH9H12AQ3	12-30-61	NDA	6-403	CIBA	https://pink.pharmaintelligence.informa.com/PS007110/CIBAs-PRISCOLINE-TOLAZOLINE-IS-DESIEFFECTIVE-IN-NEONATES
 1961	DECAPRYN 12.5MG	doxylamine succinate	V9BI9B5YI2	12-30-61	NDA	6-412	MERRELL	https://www.govinfo.gov/content/pkg/FR-2005-03-04/html/05-4158.htm
 1961	OCTIN	isometheptene	Y7L24THH6T	12-30-61	NDA	6-420	KNOLL	https://archive.org/details/MedicalNewsLetter19491216/page/n5?q=OCTIN
-1961	CAMOQUIN HYDROCHLORIDE	amodiaquine  hydrochloride	K6PW2S574L	12-30-61	NDA	6-441	PD	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
 1961	ANTISTINE	antazoline	DHA8014SS1	12-30-61	NDA	6-456	CIBA	https://www.karger.com/Article/Pdf/159644
 1961	HETRAZAN	diethylcarbamazine  citrate	OS1Z389K8S	12-30-61	NDA	6-459	LEDERLE	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
-1961	PROTAMINE SULF 10MG/CC	protamine sulfate	0DE9724IHC	12-30-61	NDA	6-460	LILLY	https://search-tec.com/clinical-trials/companies/lilly/?drug-single=6460-2
+1950	PROTAMINE SULF 10MG/CC	protamine sulfate	0DE9724IHC		NDA	6-460	LILLY	https://www.google.com/books/edition/The_Dispensatory_of_the_United_States_of/wfsjAQAAMAAJ
 1961	TRIMETON	pheniramine maleate	NYW905655B	12-30-61	NDA	6-461	SCHERING	https://www.govinfo.gov/content/pkg/FR-1977-09-02/pdf/FR-1977-09-02.pdf
-1961	CALCIUM GLUCEPTATE	calcium gluceptate	L11651398J	12-30-61	NDA	6-470	LILLY	https://search-tec.com/clinical-trials/companies/lilly/?drug-single=6470-1
-1961	LACTATED POTASSIC SALI POTASSIUM CHLORIDE	potassium chloride	660YQ98I10	12-30-61	NDA	6-472	BAXTER DON	https://www.govinfo.gov/content/pkg/FR-1970-08-26/pdf/FR-1970-08-26.pdf
+1961	CALCIUM GLUCEPTATE	calcium gluceptate	L11651398J	12-30-61	NDA	6-470	LILLY	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=006470
+1961	LACTATED POTASSIC SALT POTASSIUM CHLORIDE	potassium chloride	660YQ98I10	12-30-61	NDA	6-472	BAXTER DON	https://www.govinfo.gov/content/pkg/FR-1970-08-26/pdf/FR-1970-08-26.pdf
 1961	BACITRACIN BACITRACIN	bacitracin	58H6RWO52I	12-30-61	NDA	6-483	UPJOHN	https://www.govinfo.gov/content/pkg/FR-1970-06-24/pdf/FR-1970-06-24.pdf
 1961	GANTRISIN 0.5GM	sulfisoxazole	740T4C525W	12-30-61	NDA	6-525	ROCHE	https://www.govinfo.gov/content/pkg/FR-1997-01-09/pdf/97-524.pdf
 1961	URETHAN 325MG	urethane	3IN71E75Z5	12-30-61	NDA	6-535	LILLY	https://www.govinfo.gov/content/pkg/FR-1970-08-21/pdf/FR-1970-08-21.pdf
@@ -3234,10 +3236,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	DIBULINE SULFATE	dibutoline sulfate	1W7R63X54A	12-30-61	NDA	6-856	MSD	https://archive.org/details/southdakotajourn8195sout/page/n221?q=DIBULINE+SULFATE
 1961	RONIACOL	nicotinyl tartrate	5G605ZIE90	12-30-61	NDA	6-902	ROCHE	https://www.govinfo.gov/content/pkg/FR-1984-09-12/pdf/FR-1984-09-12.pdf
 1961	MILIBIS GLYCOBIARSOL	glycobiarsol	E3U8347QWJ	12-30-61	NDA	6-903	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1999-06-10/pdf/99-14656.pdf
-1961	NORISODRINE	isoproterenol sulfate	925FX3X776	12-30-61	NDA	6-905	ABBOTT	"Approved Drug Products with Therapeutic Evaluations" (1995), page 392, retrieved from: https://books.google.ru/books?id=uo0QFvym_90C
 1961	CHLOR-TRIMETON CHLORPHENIRAMINE MALEATE	chlorpheniramine maleate	V1Q0O9OJ9Z	12-30-61	NDA	6-921	SCHERING	https://www.govinfo.gov/content/pkg/FR-1977-09-02/pdf/FR-1977-09-02.pdf
-1961	EURAX CROTAMITON	crotamiton	D6S4O4XD0H	12-30-61	NDA	6-927	GEIGY	https://archive.org/details/MCMSV23195304/page/n5?q=EURAX
-1961	SYNCURINE	decamethonium  bromide	55C6RK944K	12-30-61	NDA	6-931	BW	https://www.govinfo.gov/content/pkg/FR-1970-08-26/pdf/FR-1970-08-26.pdf
+1961	EURAX CROTAMITON	crotamiton	D6S4O4XD0H	07-06-49	NDA	6-927	GEIGY	https://archive.org/details/MCMSV23195304/page/n5?q=EURAX
 1961	PERAZIL	chlorcyclizine hydrochloride	NPB7A7874U	12-30-61	NDA	6-947	BW	Federal Register v.41 (1976), page 432, retrieved from: https://books.google.ru/books?id=STE4AQAAMAAJ
 1961	BALARSEN ARSTHINOL	arsthinol	QNT09A162Y	12-30-61	NDA	6-969	ENDO	Federal Register v.36 (1971), page 9342, retrieved from: https://books.google.ru/books?hl=ru&id=qN35kyoUpWcC
 1961	CYSTOKON	acetrizoate sodium	5GF4B2I1DD	12-30-61	NDA	6-990	MALLINCKRODT	https://www.drugfuture.com/chemdata/acetrizoate-sodium.html
@@ -3249,7 +3249,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	TRIGESIC W/CODINE CODEINE	codeine	Q830PW7520	12-30-61	NDA	7-289	SQUIBB	Federal Register v.38 (1973), page 3210, retrieved from: https://books.google.ru/books?id=SX7Ct8ve05YC
 1961	TERRAMYCIN OXYTETRACYCLINE	oxytetracycline	X20I9EN955	12-30-61	NDA	7-322	PFIZER	https://www.govinfo.gov/content/pkg/FR-1970-09-02/pdf/FR-1970-09-02.pdf
 1961	PRONESTYL 10MG/CC	procainamide hydrochloride	SI4064O0LX	12-30-61	NDA	7-335	SQUIBB	https://www.govinfo.gov/content/pkg/FR-2009-02-11/pdf/E9-2901.pdf
-1961	VERILOID	alkavervir	4I27BB349X	12-30-61	NDA	7-336	RIKER	https://www.govinfo.gov/content/pkg/FR-1973-01-30/pdf/FR-1973-01-30.pdf|https://www.drugpatentwatch.com/p/generic-api/alkavervir
 1961	NUCODAN OXYCODONE HYDROCHLORIDE	oxycodone hydrochloride	C1ENJ2TE6C	12-30-61	NDA	7-337	ENDO	Federal Register v. 40 (1975), page 17868, retrieved from: https://books.google.ru/books?id=UGhzt0-ApCwC
 1961	NUCODAN OXYCODONE TEREPHTHALATE	oxycodone terephthalate	M04XWV43UF	12-30-61	NDA	7-337	ENDO	Federal Register v. 40 (1975), page 17868, retrieved from: https://books.google.ru/books?id=UGhzt0-ApCwC
 1961	NUCODAN HOMATROPINE TEREPHTHALATE	homatropine terephthalate	UWG9VR2QJC	12-30-61	NDA	7-337	ENDO	Federal Register v. 40 (1975), page 17868, retrieved from: https://books.google.ru/books?id=UGhzt0-ApCwC
@@ -3301,7 +3300,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	TERRAMYCIN OXYTETRACYCLINE HYDROCHLORIDE	oxytetracycline hydrochloride	4U7K4N52ZM	12-30-61	NDA	8-103	PFIZER	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034177/fr034177.pdf
 1961	CALCIUM LEUCOVORIN	calcium folinate	RPR1R4C0P4	12-30-61	NDA	8-107	LEDERLE	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036111/fr036111.pdf
 1961	PASARA CALCIUM	calcium aminosalicylate	9VF16M7FWU	12-30-61	NDA	8-108	BARNES-HIND	https://www.govinfo.gov/content/pkg/FR-1969-09-26/pdf/FR-1969-09-26.pdf
-1961	PRANTAL DIPHEMANIL METHYLSULFATE	diphemanil methylsulfate	W2ZG23MGYI	12-30-61	NDA	8-114	SCHERING	https://archive.org/details/MCMSV29195903/page/n15?q=PRANTAL
 1961	TRYPTAR 125,000 UNITS	trypsin	GV54A213NN	12-30-61	NDA	8-135	ARMOUR PHARM	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035121/fr035121.pdf
 1952	STRONTOLAC	strontium lactate trihydrate	0COI7YHD9Q	06-25-52	NDA	8-167	WYETH	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035243/fr035243.pdf
 1961	BENOQUIN OINTMENT	monobenzone	9L2KA76MG5	12-30-61	NDA	8-173	ELDER	https://cdn.loc.gov/service/ll/fedreg/fr040/fr040056/fr040056.pdf
@@ -3316,8 +3314,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	APRESOLINE	hydralazine hydrochloride	FD171B778Y	12-30-61	NDA	8-303	CIBA	https://cdn.loc.gov/service/ll/fedreg/fr041/fr041182/fr041182.pdf
 1961	CO-PYRONIL PYRROBUTAMINE PHOSPHATE	pyrrobutamine phosphate	6B6107K1Q6	12-30-61	NDA	8-305	DISTA PRODUCTS	Co-Pyronil Pulvules and Pediatric |  |  Pulvules containing pyrrobutamine |  |  phosphate and cyclopentamine |  |  https://www.govinfo.gov/content/pkg/FR-1983-01-07/pdf/FR-1983-01-07.pdf|Jones, J.M. "Physicians' Desk Reference" (1979), page 800, retrieved from: https://books.google.ru/books?id=hKZKAQAAIAAJ
 1961	PHENERGAN EXP W CODEIN CODEINE PHOSPHATE	codeine phosphate	GSL05Y1MN6	12-30-61	NDA	8-306	WYETH	https://www.govinfo.gov/content/pkg/FR-2011-03-03/pdf/2011-4702.pdf
-1961	PRIMAQUINE PHOSPHATE PRIMAQUINE  PHOSPHATE	primaquine phosphate	H0982HF78B	12-30-61	NDA	8-316	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
-1961	BUTAZOLIDIN ALKA 100MG	phenylbutazone	GN5P7K3T8S	12-30-61	NDA	8-319	GEIGY	https://cdn.loc.gov/service/ll/fedreg/fr038/fr038022/fr038022.pdf
+1952	PRIMAQUINE PHOSPHATE PRIMAQUINE  PHOSPHATE	primaquine phosphate	H0982HF78B	01-23-52	NDA	8-316	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
 1961	GEMONIL	metharbital	02OS7K758T	12-30-61	NDA	8-322	ABBOTT	https://www.govinfo.gov/content/pkg/FR-1970-08-26/pdf/FR-1970-08-26.pdf
 1961	Methischol	racemethionine	73JWT2K6T3	12-30-61	NDA	8-326	USV Pharmaceutical	https://www.govinfo.gov/content/pkg/FR-2013-11-06/html/2013-26491.htm
 1953	BACULIN	diiodohydroxyquin	63W7IE88K8		NDA	8-327	AMFRE GRANT	Federal Register v.40 (1975), page 12698, retrieved from: https://books.google.ru/books?id=Bs7A91z1w6sC
@@ -3337,7 +3334,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	DEXTRAN 6 PCT	dextran 75	JY83SHX053	12-30-61	NDA	8-564	PHARMACHEM	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034066/fr034066.pdf
 1961	DARAPRIM	pyrimethamine	Z3614QOX8W	12-30-61	NDA	8-578	BW	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
 1961	VALLESTRIL 20 MG	methallenestril	XL025389JS	12-30-61	NDA	8-579	SEARLE	https://www.govinfo.gov/content/pkg/FR-1998-12-17/pdf/98-33453.pdf
-1961	ILLOTYCIN	erythromycin	63937KV33D	12-30-61	NDA	8-582	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035169/fr035169.pdf
 1961	RAV NOV W/LEVOPHED PROPOXYCAINE HYDROCHLORIDE	propoxycaine hydrochloride	K490D39G46	12-30-61	NDA	8-592	COOKE-WAITE	https://archive.org/details/State-Dept-cable-1976-199722?q=RAV+NOV+with+LEVOPHED |  | https://www.healthdictionary.info/Ravocaine_and_novocain_with_neo-cobefrin.htm |  | 
 1961	MONICHOL POLYSORBATE 80	polysorbate 80	6OZP39ZG8H	12-30-61	NDA	8-597	IVES	https://www.govinfo.gov/content/pkg/FR-1970-01-10/pdf/FR-1970-01-10.pdf
 1961	MONICHOL INOSITOL	inositol	4L6452S749	12-30-61	NDA	8-597	IVES	https://www.govinfo.gov/content/pkg/FR-1970-01-10/pdf/FR-1970-01-10.pdf
@@ -3361,7 +3357,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	TRIPLE HORMONE Estradiol	estradiol	4TI98Z838E	12-30-61	NDA	8-808	TAYLOR DRUG	https://books.google.com/books?id=5HC9y4UuGLwC&newbks=1&newbks_redir=0&dq=triple%20hormone%208-808&pg=PA3147#v=onepage&q=triple%20hormone%208-808&f=false		
 1961	TRIPLE HORMONE PREGNENOLONE	pregnenolone	73R90F7MQ8	12-30-61	NDA	8-808	TAYLOR DRUG	https://books.google.com/books?id=5HC9y4UuGLwC&newbks=1&newbks_redir=0&dq=triple%20hormone%208-808&pg=PA3147#v=onepage&q=triple%20hormone%208-808&f=false		
 1961	TRIPLE HORMONE MELATONIN	melatonin	JL5DK93RCL	12-30-61	NDA	8-808	TAYLOR DRUG	https://books.google.com/books?id=5HC9y4UuGLwC&newbks=1&newbks_redir=0&dq=triple%20hormone%208-808&pg=PA3147#v=onepage&q=triple%20hormone%208-808&f=false		
-1961	UNITENSEN AQUEOUS	cryptenamine tannates	98881NCP5R	12-30-61	NDA	8-814	NEISLER	https://books.google.com/books?id=_J2ti4EkYpkC&pg=PA1143&lpg=PA1143&dq=UNITENSEN+neisler&source=bl&ots=N6lyKcDQpv&sig=ACfU3U2JQFmK4k-RWkb4mg6ClgRnRe1Y8g&hl=en&sa=X&ved=2ahUKEwj2o9fKk4rmAhXjzVkKHasODtsQ6AEwAHoECAgQAQ#v=onepage&q=UNITENSEN%20neisler&f=false
 1961	PERCORTEN PIVALATE/SUS	desoxycorticosterone pivalate	16665T4A2X	12-30-61	NDA	8-822	CIBA	https://www.govinfo.gov/content/pkg/FR-1970-10-15/pdf/FR-1970-10-15.pdf
 1961	STEROSAN	chlorquinaldol	D6VHC87LLS	12-30-61	NDA	8-836	GEIGY	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035166/fr035166.pdf
 1961	RAUDIXIN	rauwolfia serpentina	H192N84N1G	12-30-61	NDA	8-842	SQUIBB	https://cdn.loc.gov/service/ll/fedreg/fr041/fr041152/fr041152.pdf
@@ -3372,7 +3367,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	MILONTIN	phensuximide	6WVL9C355G	12-30-61	NDA	8-855	PD	https://www.govinfo.gov/content/pkg/FR-1970-08-26/pdf/FR-1970-08-26.pdf
 1961	ELORINE CHLORIDE TRICYCLAMOL CHLORIDE	tricyclamol chloride	QYH21J350Z	12-30-61	NDA	8-868	LILLY	https://www.govinfo.gov/content/pkg/FR-1977-03-22/pdf/FR-1977-03-22.pdf
 1961	ELORINE CHLORIDE TRICYCLAMOL METHOSULFATE	tricyclamol methosulfate	L0BB45WX6F	12-30-61	NDA	8-868	LILLY	https://www.govinfo.gov/content/pkg/FR-1977-03-22/pdf/FR-1977-03-22.pdf
-1961	DICURIN PROCAINE PROCAINE MERETHOXYLLINE	procaine merethoxylline	O77D636VYN	12-30-61	NDA	8-869	LILLY	http://www.reference.md/files/DI/DICURIN%20PROCAINE.html|https://trademarks.justia.com/716/49/dicurin-procaine-71649005.html
 1961	HEXAMETHONIUM CHLORIDE HEXAMETHONIUM CHLORIDE	hexamethonium chloride	TIV4Q933FU	12-30-61	NDA	8-881	NYSCO	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037152/fr037152.pdf
 1961	OPHTHAINE	proparacaine hydrochloride	U96OL57GOY	12-30-61	NDA	8-883	SQUIBB	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034173/fr034173.pdf
 1961	PROVELL MALEATE PROTOVERATRINE A MALEATE	protoveratrine A maleate	I207Y1N7M6	12-30-61	NDA	8-886	LILLY	https://www.govinfo.gov/content/pkg/FR-1973-01-30/pdf/FR-1973-01-30.pdf
@@ -3386,7 +3380,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	QUERTINE	quercetin	9IKM0I5T1E	12-30-61	NDA	8-936	ABBOTT	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035129/fr035129.pdf
 1961	DIAMOX TABLETS	acetazolamide	O3FX965V0I	12-30-61	NDA	8-943	LEDERLE	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037143/fr037143.pdf
 1961	PAGITANE HYDROCHLORIDE	cycrimine hydrochloride	9RB4L4K895	12-30-61	NDA	8-951	LILLY	https://archive.org/details/DTIC_AD0295628/page/n131?q=PAGITANE|https://archive.org/details/southdakotajourn7195sout/page/n93?q=PAGITANE
-1961	CLISTIN CARBINOXAMINE MALEATE	carbinoxamine maleate	02O55696WH	12-30-61	NDA	8-955	MCNEIL	https://www.federalregister.gov/documents/2006/06/09/E6-9033/carbinoxamine-products-enforcement-action-dates
 1961	ARFONAD	trimethaphan camsylate	8W556014K9	12-30-61	NDA	8-983	ROCHE	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036120/fr036120.pdf
 1961	LUTREXIN 3000UNITS	lututrin	U76BW7BQCY	12-30-61	NDA	8-986	HWD	https://cdn.loc.gov/service/ll/fedreg/fr033/fr033102/fr033102.pdf
 1961	SALPIX POVIDONE	povidone	FZ989GH94E	12-30-61	NDA	9-008	ORTHO	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
@@ -3398,6 +3391,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	PARSIDOL	ethopropazine	7WI4P02YN1	12-30-61	NDA	9-078	WC	https://archive.org/details/medjournalDec1957uoft/page/42?q=PARSIDOL
 1961	ANTEPAR	piperazine citrate	63KP7FXF2I	12-30-61	NDA	9-102	BW	https://books.google.ru/books?id=RwraBwAAQBAJ&pg=PA119&lpg=PA119&dq=ANTEPAR+Burroughs+Wellcome retrieved from Geographic Medicine for the Practitioner |  | By Kenneth S. Warren, Adel A.F. Mahmoud, p.119
 1961	PYRALINE HCL 2MG	diphenylpyraline hydrochloride	G9FU7F1E87	12-30-61	NDA	9-132	NOPCO	https://www.govinfo.gov/content/pkg/FR-1977-09-02/pdf/FR-1977-09-02.pdf
+1961	Hispril	diphenylpyraline hydrochloride	G9FU7F1E87	12-30-61	NDA	11-945	GSK	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=011945
 1961	THORAZINE 10MG	chlorpromazine hydrochloride	9WP59609J6	12-30-61	NDA	9-149	SKF	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036065/fr036065.pdf
 1961	RAULIN	reserpine	8B1QWR724A	12-30-61	NDA	9-150	KEY	https://cdn.loc.gov/service/ll/fedreg/fr041/fr041152/fr041152.pdf
 1961	TOLSERAM 0.5GMTAB	mephenesin carbamate	PAD6SXB23N	12-30-61	NDA	9-157	SQUIBB	https://www.govinfo.gov/content/pkg/FR-1970-06-25/pdf/FR-1970-06-25.pdf
@@ -3412,8 +3406,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	COUMADIN 2MG	sodium warfarin	6153CWM0CL	12-30-61	NDA	9-218	ENDO	https://www.govinfo.gov/content/pkg/FR-1977-12-02/pdf/FR-1977-12-02.pdf
 1961	ILIDAR	azapetine phosphate	0N2U15U85W	12-30-61	NDA	9-225	ROCHE	"Pharmaceutical Manufacturing Encyclopedia" (2013), page 473, retrieved from: https://books.google.ru/books?id=_J2ti4EkYpkC|https://www.govinfo.gov/content/pkg/FR-1980-04-25/pdf/FR-1980-04-25.pdf
 1961	CO-PYRONIL PYRROBUTAMINE NAPHTHALENE DISULFONATE	pyrrobutamine naphthalene disulfonate	144X0H6HW6	12-30-61	NDA	9-234	DISTA PRODUCTS	https://www.govinfo.gov/content/pkg/FR-1983-01-07/pdf/FR-1983-01-07.pdf
-1961	PROGESTERONE	progesterone	4G7DS2Q64Y	12-30-61	NDA	9-238	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036175/fr036175.pdf
-1961	CHOLEDYL 100 MG	oxtriphylline	3K045XR58X	12-30-61	NDA	9-268	WC	https://www.govinfo.gov/content/pkg/FR-1974-09-26/pdf/FR-1974-09-26.pdf
+1950	PROGESTERONE	progesterone	4G7DS2Q64Y		NDA	9-238	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036175/fr036175.pdf
 1961	CEDILANID-D	deslanoside	YGY317RK75	12-30-61	NDA	9-282	SANDOZ	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037145/fr037145.pdf
 1961	CENTRINE/PHENOBARBITAL AMINOPENTAMIDE HYDROGEN SULFATE	aminopentamide hydrogen sulfate	20P9NI883O	12-30-61	NDA	9-288	BRISTOL LABS	doi.org/10.1080/00325481.1954.11712282 |  | 
 1961	VIBAZINE 50MG	buclizine hydrochloride	58FQD093NU	12-30-61	NDA	9-295	PFIZER	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036046/fr036046.pdf
@@ -3422,7 +3415,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	AMBENYL EXPECTORANT CODEINE SULFATE	codeine sulfate	11QV9BS0CB	12-30-61	NDA	9-319	PD	https://www.govinfo.gov/content/pkg/FR-2011-03-03/pdf/2011-4702.pdf
 1961	AMBENYL EXPECTORANT POTASSIUM GUAIACOLSULFONATE	potassium guaiacolsulfonate	TTK33Z47F1	12-30-61	NDA	9-319	PD	https://www.govinfo.gov/content/pkg/FR-2011-03-03/pdf/2011-4702.pdf
 1961	AMBENYL EXPECTORANT MENTHOL	menthol	L7T10EIP3A	12-30-61	NDA	9-319	PD	https://www.govinfo.gov/content/pkg/FR-2011-03-03/pdf/2011-4702.pdf
-1961	ILOTYCIN GLUCEPTATE ERYTHROMYCIN GLUCEPTATE	erythromycin gluceptate	2AY21R0U64	12-30-61	NDA	9-320	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035169/fr035169.pdf
 1961	CHOLOGRAFIN MEGLUMINE	iodipamide meglumine	X064O0Y1A4	12-30-61	NDA	9-321	SQUIBB	https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/009321s028lbl.pdf
 1961	HISTALOG	betazole hydrochloride	66ABP6C83F	12-30-61	NDA	9-344	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036129/fr036129.pdf
 1961	PERANDREN PHPNYL 50MG	testosterone phenylacetate	WAD1QAK81D	12-30-61	NDA	9-349	CIBA	
@@ -3440,6 +3432,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	PIPTAL-PHB PIPENZOLATE BROMIDE	pipenzolate bromide	JPX41DUS2B	12-30-61	NDA	9-427	LAKESIDE	https://books.google.ru/books?id=Duh84rKbf0gC&pg=PA158&lpg=PA158&dq=PIPTAL-PHB+lakeside&source=bl&ots=53wYYRBL6g&sig=7pqO6d5s7Uh32hb5wRWAWDEwPhM&hl=ru&sa=X&ved=2ahUKEwjOt-rL4brfAhWop4sKHaGZBnUQ6AEwBnoECAkQAQ#v=onepage&q=PIPTAL-PHB%20lakeside&f=false|https://books.google.ru/books?id=szDnBwAAQBAJ&pg=PA85&lpg=PA85&dq=PIPTAL-PHB+lakeside&source=bl&ots=CvuwHrw2La&sig=Wf52Ma5Fk6GT18IEhr7tgQiiPwY&hl=ru&sa=X&ved=2ahUKEwjOt-rL4brfAhWop4sKHaGZBnUQ6AEwB3oECAQQAQ#v=onepage&q=PIPTAL-PHB%20lakeside&f=false
 1961	NESACAINE 1 PERCENT	chloroprocaine hydrochloride	LT7Z1YW11H	12-30-61	NDA	9-435	PENNWALT	https://cdn.loc.gov/service/ll/fedreg/fr044/fr044143/fr044143.pdf
 1961	MYCOSTATIN NYSTATIN	nystatin	BDF1O1C72E	12-30-61	NDA	9-451	SQUIBB	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037139/fr037139.pdf
+1961	NYSTAFORM	nystatin	BDF1O1C72E	12-30-61	NDA	50-235	BAYER	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=050235
 1961	HYDROCORTONE-T B A	hydrocortisone butylacetate	FXJ67LWZ4S	12-30-61	NDA	9-465	MSD	Federal Register v.42 (1977), page 11894, retrieved from: https://books.google.ru/books?id=teu5z1rVPfcC
 1961	ARVYNOL 250 MG	ethchlorvynol	6EIM3851UZ	12-30-61	NDA	9-472	PFIZER	https://www.govinfo.gov/content/pkg/FR-1971-11-16/pdf/FR-1971-11-16.pdf
 1961	EDTA PLATELET PK JP I DISODIUM EDETATE	disodium edetate	7FLD91C86K	12-30-61	NDA	9-480	FENWAL	https://cdn.loc.gov/service/ll/fedreg/fr033/fr033104/fr033104.pdf
@@ -3499,11 +3492,10 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	STERISIL	hexetidine	852A84Y8LS	12-30-61	NDA	10-189	WC	https://www.govinfo.gov/content/pkg/FR-1972-07-27/pdf/FR-1972-07-27.pdf
 1955	Mantomide	chlorbetamide	3S489RFX0J		NDA	10-118	Winthrop	https://cdn.loc.gov/service/ll/fedreg/fr039/fr039153/fr039153.pdf
 1961	PONTALIN	chlorbetamide	3S489RFX0J	12-30-61	NDA	10-201	WINTHROP	https://cdn.loc.gov/service/ll/fedreg/fr039/fr039153/fr039153.pdf
-1961	METIMYD PREDNISOLONE ACETATE	prednisolone acetate	8B2807733D	12-30-61	NDA	10-210	SCHERING	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037145/fr037145.pdf
+1965	METIMYD PREDNISOLONE ACETATE	prednisolone acetate	8B2807733D	06-23-65	NDA	10-210	SCHERING	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037145/fr037145.pdf
 1961	INVERSINE	mecamylamine hydrochloride	4956DJR58O	12-30-61	NDA	10-251	MSD	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036120/fr036120.pdf
 1961	SEROMYCIN CYCLOSERINE	cycloserine	95IK5KI84Z	12-30-61	NDA	10-279	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034173/fr034173.pdf
 1961	ALBAMYCIN NOVOBIOCIN SODIUM	novobiocin sodium	Q9S9NQ5YIY	12-30-61	NDA	10-303	UPJOHN	https://www.federalregister.gov/documents/2011/01/19/2011-1000/determination-that-albamycin-novobiocin-sodium-capsule-250-milligrams-was-withdrawn-from-sale-for
-1961	DELALUTIN	hydroxyprogesterone caproate	276F2O42F5	12-30-61	NDA	10-347	SQUIBB	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036175/fr036175.pdf
 1961	SPARINE PROMAZINE HYDROCHLORIDE	promazine hydrochloride	U16EOR79U4	12-30-61	NDA	10-348	WYETH	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036065/fr036065.pdf
 1961	CYTOMEL 5MCG	liothyronine sodium	GCA9VV7D2N	12-30-61	NDA	10-379	SKF	https://www.accessdata.fda.gov/drugsatfda_docs/anda/2009/090097Orig1s000.pdf
 1961	PABIRIN AC AMINOBENZOIC ACID	aminobenzoic acid	TL2TJE8QTX	12-30-61	NDA	10-387	DORSEY	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035061/fr035061.pdf
@@ -3514,12 +3506,13 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	SCOPALAMINE 7.5MG	scopolamine	DL48G20X8X	12-30-61	NDA	10-404	RICHLYN	https://archive.org/details/in.ernet.dli.2015.51361/page/n195?q=SCOPALAMINE
 1961	VIOFORM-HC MILD IODOCHLORHYDROXYQUIN	iodochlorhydroxyquin	7BHQ856EJ5	12-30-61	NDA	10-412	CIBA	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037119/fr037119.pdf
 1961	BENZAPAS	calcium benzoylpas	595178KF31	12-30-61	NDA	10-413	DORSEY	https://www.govinfo.gov/content/pkg/FR-1969-09-26/pdf/FR-1969-09-26.pdf
-1961	XYLOCAINE 10MG/ML EPINEPHRINE BITARTRATE	epinephrine bitartrate	30Q7KI53AK	12-30-61	NDA	10-418	ASTRA	
+1961	XYLOCAINE W/ EPINEPHRINE	epinephrine bitartrate	30Q7KI53AK	12-30-61	NDA	10-418	ASTRA	
 1961	LORFAN	levallorphan tartrate	U0VSF7HTN0	12-30-61	NDA	10-423	ROCHE	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036069/fr036069.pdf
 1961	PRELUDIN	phenmetrazine hydrochloride	6U85YRT588	12-30-61	NDA	10-460	BOEHRINGER	https://www.govinfo.gov/content/pkg/FR-1999-09-22/html/99-24595.htm
 1961	NICOZOL W/ RESERPINE NICOTINIC ACID	nicotinic acid	2679MF687A	12-30-61	NDA	10-508	NYSCO	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034163/fr034163.pdf
 1961	LERITINE 25MG/AMPUL	anileridine phosphate	3584484N8V	12-30-61	NDA	10-520	MSD	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036161/fr036161.pdf
 1961	BRONKODYL PHENYLPROPANOLAMINE HYDROCHLORIDE	phenylpropanolamine hydrochloride	8D5I63UE1Q	12-30-61	NDA	10-547	PRL	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037145/fr037145.pdf
+1981	TRIAMINIC-12 PHENYLPROPANOLAMINE HYDROCHLORIDE	phenylpropanolamine hydrochloride	8D5I63UE1Q	07-23-81	NDA	18-115	Dorsey	https://www.google.com/books/edition/Innovation_and_Patent_Law_Reform/hsgHAAAAIAAJ?hl=en&gbpv=1&dq=NDA+18-115&pg=RA2-PA1393-IA11&printsec=frontcover
 1961	BRONKODYL GLYCERYL GUAIACOLATE	glyceryl guaiacolate	495W7451VQ	12-30-61	NDA	10-547	PRL	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037145/fr037145.pdf
 1961	MATROMYCIN 250MG	troleandomycin	C4DZ64560D	12-30-61	NDA	10-551	PFIZER	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037119/fr037119.pdf
 1961	MAGNACORT	hydrocortamate hydrochloride	9QM8U7R83W	12-30-61	NDA	10-554	PFIZER	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036082/fr036082.pdf
@@ -3530,8 +3523,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1955	TERGEMIST POTASSIUM IODIDE	potassium iodide	1C4QK22F9J		NDA	10-577	ABBOTT	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034242/fr034242.pdf
 1961	LERITINE	anileridine hydrochloride	915Q054DLC	12-30-61	NDA	10-585	MSD	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036161/fr036161.pdf
 1961	CELONTIN	methsuximide	0G76K8X6C0	12-30-61	NDA	10-596	PARKE-DAVIS	https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2001/10596s9s12ltr.pdf
-1961	TRAL/PHENOBARBITAL HEXOCYCLIUM METHYLSULFATE	hexocyclium methylsulfate	84OPZ2Q0VB	12-30-61	NDA	10-599	ABBOTT	https://books.google.ru/books?id=Duh84rKbf0gC&pg=PA204&lpg=PA204&dq=TRAL+with+PHENOBARBITAL+abbott&source=bl&ots=53wYYRDK19&sig=TrsiE7nQDJbrEgim27V-HhUB2Vs&hl=ru&sa=X&ved=2ahUKEwiCh8u66LrfAhULs4sKHe92DwIQ6AEwBnoECAIQAQ#v=onepage&q=TRAL%20with%20PHENOBARBITAL%20abbott&f=false |  | https://archive.org/details/b19974760M4973/page/n17?q=TRAL+FILMTAB |  | 
-1961	TRAL/PHENOBARBITAL ERYTHROCIN	erythrocin	33H58I7GLQ	12-30-61	NDA	10-599	ABBOTT	https://books.google.ru/books?id=Duh84rKbf0gC&pg=PA204&lpg=PA204&dq=TRAL+with+PHENOBARBITAL+abbott&source=bl&ots=53wYYRDK19&sig=TrsiE7nQDJbrEgim27V-HhUB2Vs&hl=ru&sa=X&ved=2ahUKEwiCh8u66LrfAhULs4sKHe92DwIQ6AEwBnoECAIQAQ#v=onepage&q=TRAL%20with%20PHENOBARBITAL%20abbott&f=false |  | https://archive.org/details/b19974760M4973/page/n17?q=TRAL+FILMTAB |  | 
 1961	HALOTESTIN 10MG	fluoxymesterone	9JU12S4YFY	12-30-61	NDA	10-611	UPJOHN	https://www.drugs.com/pro/halotestin.html
 1961	ROLICTON	amisometradine	30973N61ZF	12-30-61	NDA	10-634	SEARLE	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035201/fr035201.pdf
 1961	HYDELTRASOL PREDNISOLONE SODIUM PHOSPHATE	prednisolone sodium phosphate	IV021NXA9J	12-30-61	NDA	10-639	MSD	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036205/fr036205.pdf
@@ -3575,19 +3566,16 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	SALCORT DELTA 1MG/TAB CALCIUM ASCORBATE	calcium ascorbate	183E4W213W	12-30-61	NDA	11-023	BEECHAM LABS	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035061/fr035061.pdf
 1961	CARDRASE 125MG	ethoxzolamide	Z52H4811WX	12-30-61	NDA	11-047	UPJOHN	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037143/fr037143.pdf
 1961	METICORTELONE PREDNISOLONE SODIUM SUCCINATE	prednisolone sodium succinate	8223RR9DWF	12-30-61	NDA	11-061	SCHERING	Federal Register v.42 (1977), page lxxxii, retrieved from: https://books.google.ru/books?id=QTQ4AQAAMAAJ
-1961	ACTIDIL TRIPROLIDINE HYDROCHLORIDE	triprolidine hydrochloride	YAN7R5L890	12-30-61	NDA	11-110	BW	https://www.accessdata.fda.gov/drugsatfda_docs/anda/pre96/85888_Brompheniramine_Corres.pdf
 1961	VESPRIN TRIFLUPROMAZINE HYDROCHLORIDE	triflupromazine hydrochloride	9E75N4A5HM	12-30-61	NDA	11-123	SQUIBB	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036065/fr036065.pdf
 1961	COMPAZINE.2.5 MG PROCHLORPERAZINE	prochlorperazine	YHP6YLT61T	12-30-61	NDA	11-127	SKF	https://search-tec.com/clinical-trials/companies/glaxosmithkline/?drug-single=11127-3|https://search-tec.com/clinical-trials/companies/glaxosmithkline/?drug-single=11127-2|https://search-tec.com/clinical-trials/companies/glaxosmithkline/?drug-single=11127-1
 1961	SOLFO-SERPINE COLLOIDAL SULFUR	colloidal sulfur	70FD1KFU70	12-30-61	NDA	11-139	POYTHRESS	https://cdn.loc.gov/service/ll/fedreg/fr038/fr038007/fr038007.pdf
-1961	DIURIL CHLOROTHIAZIDE SODIUM	chlorothiazide sodium	SN86FG7N2K	12-30-61	NDA	11-145	MSD	https://www.govinfo.gov/content/pkg/FR-1972-07-26/pdf/FR-1972-07-26.pdf
 1961	MEDROL 16MG	methylprednisolone	X4W7ZR7023	12-30-61	NDA	11-153	UPJOHN	Federal Register v.42 (1977), page 11889, retrieved from: https://books.google.ru/books?id=teu5z1rVPfcC
-1961	ARISTOCORT 1MG	triamcinolone	1ZK20VI6TY	12-30-61	NDA	11-161	LEDERLE	https://www.govinfo.gov/content/pkg/FR-2009-02-11/html/E9-2901.htm
 1961	COMBID ISOPROPAMIDE	isopropamide	8B9I31H724	12-30-61	NDA	11-162	SKF	Camp N.M. "US Army Psychiatry in the Vietnam War" (2015), page 224, retrieved from: https://books.google.ru/books?id=YYtxnhZdOvsC|Federal Register v.43 (1978), page 109, retrieved from: https://books.google.ru/books?id=YDo4AQAAMAAJ
 1961	FUNGIZONE AMPHOTERICIN B	amphotericin b	7XU7A7DROE	12-30-61	NDA	11-163	SQUIBB	https://www.govinfo.gov/content/pkg/FR-1969-12-19/pdf/FR-1969-12-19.pdf
 1961	COTHERA	dimethoxanate hydrochloride	N5I6SR31GJ	12-30-61	NDA	11-174	AYERST	https://books.google.ru/books?id=_J2ti4EkYpkC&pg=PA1332&lpg=PA1332&dq=COTHERA+AYERST retrieved from Pharmaceutical Manufacturing Encyclopedia, 3rd EditionBy William Andrew Publishing, p.1323|https://www.drugfuture.com/chemdata/dimethoxanate.html|https://tandfonline.com/doi/abs/10.1080/00325481.1958.11692007?journalCode=ipgm20
 1961	ALUDROX SA AMBUTONIUM BROMIDE	ambutonium bromide	9J8YA3ZT14	12-30-61	NDA	11-183	WYETH	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
 1961	ALUDROX SA MAGNESIUM HYDROXIDE	magnesium hydroxide	NBZ3QY004S	12-30-61	NDA	11-183	WYETH	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
-1961	DEPINAR SUSPENSION TANNIC ACID	tannic acid	28F9E0DJY6	12-30-61	NDA	11-208	ARMOUR	https://search-tec.com/clinical-trials/companies/armour-pharm/?drug-single=11208-1
+1960	DEPINAR SUSPENSION TANNIC ACID	tannic acid	28F9E0DJY6		NDA	11-208	ARMOUR	https://search-tec.com/clinical-trials/companies/armour-pharm/?drug-single=11208-1
 1961	TES_«ALON 100 MG	benzonatate	5P4DHS6ENR	12-30-61	NDA	11-210	CIBA	https://search-tec.com/clinical-trials/companies/pfizer/?drug-single=11210-1
 1961	DEPROL BENACTYZINE	benactyzine	595EG71R3F	12-30-61	NDA	11-226	WALLACE	https://books.google.ru/books?id=H5zKN4Bk_gsC&pg=PA54&lpg=PA54&dq=DEPROL+WALLACE retrieved from Litt's Pocketbook of Drug Eruptions and Interactions |  | By Jerome Z. Litt, p.54
 1961	LIQUAMAR	phenprocoumon	Q08SIO485D	12-30-61	NDA	11-228	ORGANON	https://www.govinfo.gov/content/pkg/FR-1977-12-02/pdf/FR-1977-12-02.pdf
@@ -3615,7 +3603,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	DEANER 100MG	deanol acetamidobenzoate	JSQ17GL1CN	12-30-61	NDA	11-417	RIKER	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035095/fr035095.pdf
 1961	DELVEX	dithiazanine  iodide	8OEC3RA07X	12-30-61	NDA	11-440	LILLY	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
 1959	TACE 25 MG ERGONOVINE	ergonovine	WH41D8433D		NDA	11-444	MERRELL	https://www.govinfo.gov/content/pkg/FR-1998-12-17/pdf/98-33453.pdf
-1961	VISTARIL CAPSULES 25MG	hydroxyzine pamoate	M20215MUFR	12-30-61	NDA	11-459	PFIZER	https://cdn.loc.gov/service/ll/fedreg/fr044/fr044024/fr044024.pdf
 1961	TRANCOPAL 100MG	chlormezanone	GP568V9G19	12-30-61	NDA	11-467	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1970-06-25/pdf/FR-1970-06-25.pdf
 1961	CAYTINE	protokylol	8Y5Y4EEO2V	12-30-61	NDA	11-469	LAKESIDE	https://archive.org/details/in.ernet.dli.2015.71950/page/n909?q=CAYTINE
 1961	SYNALGOS DC DIHYDROCODEINE  BITARTRATE	dihydrocodeine  bitartrate	8LXS95BSA9	12-30-61	NDA	11-483	IVES	https://www.govinfo.gov/content/pkg/FR-1970-01-10/pdf/FR-1970-01-10.pdf
@@ -3638,7 +3625,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	SINGOSERP	syrosingopine	PPG46JF0EG	12-30-61	NDA	11-565	CIBA	https://cdn.loc.gov/service/ll/fedreg/fr042/fr042171/fr042171.pdf
 1961	LEVANIL 300MG	ectylurea	1U73ZZU4JK	12-30-61	NDA	11-577	UPJOHN	https://www.govinfo.gov/content/pkg/FR-1970-06-25/pdf/FR-1970-06-25.pdf
 1961	RITONIC DIBASIC CALCIUM PHOSPHATE	dibasic calcium phosphate	L11K75P92J	12-30-61	NDA	11-591	CIBA	https://www.govinfo.gov/content/pkg/FR-1969-09-12/pdf/FR-1969-09-12.pdf
-1961	KENALOG TRIAMCINOLONE ACETONIDE	triamcinolone acetonide	F446C597KA	12-30-61	NDA	11-600	SQUIBB	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036082/fr036082.pdf
 1961	DARICON 10MG	oxyphencyclimine hydrochloride	GWO1432WOU	12-30-61	NDA	11-612	PFIZER	https://www.govinfo.gov/content/pkg/FR-1999-09-22/pdf/99-24595.pdf
 1961	IONAMIN 15	phentermine	C045TQL4WP	12-30-61	NDA	11-613	STRASENBURGH	https://www.govinfo.gov/content/pkg/FR-1970-08-08/pdf/FR-1970-08-08.pdf
 1961	D B I	phenformin hydrochloride	91XC93EU03	12-30-61	NDA	11-624	CIBA	https://www.govinfo.gov/content/pkg/FR-1968-10-31/pdf/FR-1968-10-31.pdf
@@ -3650,18 +3636,15 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	CARDIOQUIN	quinidine polygalacturonate	H0C54E9D68	12-30-61	NDA	11-642	PURDUE	https://www.accessdata.fda.gov/drugsatfda_docs/nda/99/11-642s012_Cardioquin.cfm
 1961	BETAPRONE	beta-propiolactone	6RC3ZT4HB0	12-30-61	NDA	11-657	FELLOWS	https://archive.org/details/ERIC_ED146049/page/n43?q=BETAPRONE
 1961	PHENERGAN INVERT SUGAR	invert sugar	ED959S6ACY	12-30-61	NDA	11-659	TRAVENOL	https://archive.org/details/b19974760M7058/page/n39?q=PHENERGAN |  | https://www.govinfo.gov/content/pkg/FR-1972-04-04/pdf/FR-1972-04-04.pdf |  | 
-1961	DECADRON DEXAMETHASONE	dexamethasone	7S5I7G3JQL	12-30-61	NDA	11-664	MSD	https://search-tec.com/clinical-trials/companies/merck/?drug-single=11664-1
 1961	TEPANIL DIETHYLPROPION HCL	diethylpropion HCl	19V2PL39NG	12-30-61	NDA	11-673	NATIONAL DRUG	https://www.federalregister.gov/documents/2003/08/18/03-20949/eli-lilly-and-co-et-al-withdrawal-of-approval-of-80-new-drug-applications-and-75-abbreviated-new
 1961	TRIBURON TRICLOBISONIUM CHLORIDE	triclobisonium chloride	VF26809LZJ	12-30-61	NDA	11-675	ROCHE	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035166/fr035166.pdf
 1961	PENTOTHAL	thiopental sodium	49Y44QZL70	12-30-61	NDA	11-679	ABBOTT	https://www.govinfo.gov/content/pkg/FR-2001-08-16/pdf/01-20605.pdf
 1961	THIO-TEPA 15MG	thiotepa (n,n_,n__-triethylenethiophosphoramide)	905Z5W3GKH	12-30-61	NDA	11-683	LEDERLE	https://www.govinfo.gov/content/pkg/FR-1970-05-13/pdf/FR-1970-05-13.pdf|https://www.drugbank.ca/drugs/DB04572
-1961	ARISTOCORT TRIAMCINOLONE DIACETATE	triamcinolone diacetate	A73MM2Q32P	12-30-61	NDA	11-685	LEDERLE	Federal Register v.42 (1977), page lxxxii, retrieved from: https://books.google.ru/books?id=QTQ4AQAAMAAJ
 1961	PHENY-PAS-TEBAMIN	phenylaminosalicylate	52936SIP7V	12-30-61	NDA	11-695	PURDUE	https://www.govinfo.gov/content/pkg/FR-1969-09-26/pdf/FR-1969-09-26.pdf
 1961	COTHERA COMPOUND	dimethoxanate	1E3KG5FWDB	12-30-61	NDA	11-706	AYERST	"Pharmaceutical Manufacturing Encyclopedia" (2013), page 1332, rerieved from: https://books.google.ru/books?id=_J2ti4EkYpkC
 1961	NUMORPHAN OXYMORPHONE HYDROCHLORIDE	oxymorphone hydrochloride	5Y2EI94NBC	12-30-61	NDA	11-707	ENDO	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036161/fr036161.pdf
 1961	NEPTAZINE	methazolamide	W733B0S9SD	12-30-61	NDA	11-721	LEDERLE	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037143/fr037143.pdf
 1961	GERONIAZOL SODIUM NICOTINATE	sodium nicotinate	3ZX78B4Q2L	12-30-61	NDA	11-742	PRL	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034163/fr034163.pdf
-1961	OXYLONE	fluorometholone	SV0CSG527L	12-30-61	NDA	11-748	UPJOHN	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036082/fr036082.pdf
 1961	PROLIXIN FLUPHENAZINE HYDROCHLORIDE	fluphenazine hydrochloride	ZOU145W1XL	12-30-61	NDA	11-751	SQUIBB	https://www.govinfo.gov/content/pkg/FR-1970-11-28/pdf/FR-1970-11-28.pdf
 1961	BETADINE VAGINAL GEL	povidone-iodine	85H0HZU99M	12-30-61	NDA	11-754	PURDUE	https://www.govinfo.gov/content/pkg/FR-1972-07-08/pdf/FR-1972-07-08.pdf
 1961	DEPO-MEDROL	methylprednisolone acetate	43502P7F0P	12-30-61	NDA	11-757	UPJOHN	https://search-tec.com/clinical-trials/companies/pharmacia-and-upjohn/?drug-single=11757-1
@@ -3699,15 +3682,15 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	SALURON HYDROFLUMETHIAZIDE	hydroflumethiazide	501CFL162R	12-30-61	NDA	11-949	BRISTOL LABS	https://www.govinfo.gov/content/pkg/FR-1972-07-26/pdf/FR-1972-07-26.pdf
 1961	TACARYL 3.6MG	methdilazine hydrochloride	T0GSO02UEZ	12-30-61	NDA	11-950	MEAD JOHNSON	https://www.govinfo.gov/content/pkg/FR-1997-11-28/html/97-31214.htm
 1961	DACTIL-OB HESPERIDIN  COMPLEX	hesperidin  complex	E750O06Y6O	12-30-61	NDA	11-957	LAKESIDE	https://www.govinfo.gov/content/pkg/FR-1968-11-20/pdf/FR-1968-11-20.pdf
+1961	TPN	tyrosine	42HK56048U	12-30-61	NDA	8-378	Intl Minerals	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=008378
 1961	MARPLAN	isocarboxazid	34237V843T	12-30-61	NDA	11-961	ROCHE	https://www.federalregister.gov/documents/2004/04/16/04-8658/isocarboxazid-drugs-for-human-use-drug-efficacy-study-implementation-revocation-of-exemption|https://www.accessdata.fda.gov/drugsatfda_docs/appletter/1998/11961ltr.pdf
 1961	PHOSPHOLINE IODIDE12.5	echothiophate iodide	BA9QH3P00T	12-30-61	NDA	11-963	AYERST	https://doi.org/10.1002/cpt196675620
-1961	POVAN PYRVINIUM  PAMOATE	pyrvinium  pamoate	310X6S84LW	12-30-61	NDA	11-964	PD	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
+1959	POVAN PYRVINIUM PAMOATE	pyrvinium pamoate	310X6S84LW		NDA	11-964	PD	https://www.govinfo.gov/content/pkg/FR-1971-08-07/pdf/FR-1971-08-07.pdf
 1961	DECADRON DEXAMETHASONE SODIUM PHOSPHATE	dexamethasone sodium phosphate	AI9376Y64P	12-30-61	NDA	11-977	MSD	https://cdn.loc.gov/service/ll/fedreg/fr041/fr041158/fr041158.pdf
 1961	POLANIL DEXCHLORPHENIRAMINE MALEATE	dexchlorpheniramine maleate	B10YD955QW	12-30-61	NDA	11-988	SCHERING	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035169/fr035169.pdf
 1961	AKINETON 2MG	biperiden HCl	K35N76CUHF	12-30-61	NDA	12-003	KNOLL	https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2001/12003s18s19s20s21ltr.pdf
 1930	Abasine	acetylcarbromal	E47C56IGOY				Winthrop	https://books.google.com/books?id=x37ObY0aPWYC&lpg=PA1647&ots=YkzjWFWnVd&dq=Abasine%20drugs&pg=PA1619#v=onepage&q=Abasine&f=false		
 1961	AMRIL ACETYLCARBROMAL	acetylcarbromal	E47C56IGOY	12-30-61	NDA	12-004	AMFRE GRANT	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034186/fr034186.pdf
-1961	POWDALATOR-ES ERYTHROMYCIN ETHYLSUCCINATE	erythromycin ethylsuccinate	1014KSJ86F	12-30-61	NDA	12-005	ABBOTT	https://www.govinfo.gov/content/pkg/FR-1970-05-16/pdf/FR-1970-05-16.pdf|https://www.japha.org/article/S0003-0465(16)31170-3/pdf
 1961	ALLECUR 40MG	clemizole hydrochloride	85W6I13D8M	12-30-61	NDA	12-024	ROERIG	https://www.govinfo.gov/content/pkg/FR-1973-03-19/pdf/FR-1973-03-19.pdf
 1961	CENASERT IMPROVED METHYLBENZETHONIUM CHLORIDE	methylbenzethonium chloride	WOA57K8S5V	12-30-61	NDA	12-028	CENTRAL PHARCA	https://www.govinfo.gov/content/pkg/FR-1972-07-08/pdf/FR-1972-07-08.pdf
 1961	GLUTAVENE	sodium glutamate	W81N5U6R6U	12-30-61	NDA	12-036	TILDEN YATES	https://www.govinfo.gov/content/pkg/FR-1973-12-05/pdf/FR-1973-12-05.pdf
@@ -3736,13 +3719,12 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	Entoquel Syrup	thihexinol methylbromide	03CPZ5439O	02-09-61	NDA	12-620	White	https://books.google.com/books?id=pm9KAQAAIAAJ&lpg=PA470&ots=aA7IeOI1kb&dq=cyverine%20suspended&pg=PA470#v=onepage&q=cyverine%20suspended&f=false		
 1961	DIANABOL 5MG	nandrolone phenpropionate	KF7Z9K2T3W	12-30-61	NDA	12-226	CIBA	https://search-tec.com/clinical-trials/companies/organon-usa-inc/?drug-single=11891-1
 1961	RAUTRAX IMPROVED POTASSIUM CHLORIDE	potassium chloride	660YQ98I10	12-30-61	NDA	12-244	SQUIBB	https://www.govinfo.gov/content/pkg/FR-1976-04-06/pdf/FR-1976-04-06.pdf
+1961	POTASSIUM CHLORIDE	potassium chloride	660YQ98I10	12-30-61	NDA	7-865	LILLY	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=007865
 1961	PLEGINE	phendimetrazine tartrate	6985IP0T80	12-30-61	NDA	12-248	AYERST	https://www.govinfo.gov/content/pkg/FR-2000-09-13/html/00-23477-Filed.htm
 1961	LIBRUM 10MG	chlordiazepoxide hydrochloride	MFM6K1XWDK	12-30-61	NDA	12-249	ROCHE PRODUCTS	Federal Register v.41 (1976), page 27768, retrieved from: https://books.google.ru/books?hl=ru&id=HjqiI0mzQXcC
 1961	TINDAL	acetophenazine maleate	3P5HNU5JTC	12-30-61	NDA	12-254	SCHERING	https://www.govinfo.gov/content/pkg/FR-1970-11-28/pdf/FR-1970-11-28.pdf
-1961	ALPHADROL	fluprednisolone	9H05937G3X	12-30-61	NDA	12-259	UPJOHN	https://search-tec.com/clinical-trials/companies/pharmacia-and-upjohn/?drug-single=12259-2
 1961	NAQUIVAL TRICHLORMETHIAZIDE	trichlormethiazide	Q58C92TUN0	12-30-61	NDA	12-265	SCHERING	https://cdn.loc.gov/service/ll/fedreg/fr038/fr038024/fr038024.pdf
 1961	HYGROTON 25 MG	chlorthalidone	Q0MQD1073Q	12-30-61	NDA	12-283	USV	Federal Register v.44 (1979), page 54125, retrieved from: https://books.google.ru/books?id=yYXZbbrbu5gC
-1961	SYNTOCINON	oxytocin	1JQS135EYN	12-30-61	NDA	12-285	SANDOZ	https://www.govinfo.gov/content/pkg/FR-1968-06-19/pdf/FR-1968-06-19.pdf|https://www.govinfo.gov/content/pkg/FR-1997-08-07/pdf/97-20871.pdf
 1961	ALVODINE PIMINODINE ESYLATE	piminodine esylate	2C29WCQ951	12-30-61	NDA	12-288	WINTHROP	https://cdn.loc.gov/service/ll/fedreg/fr036/fr036161/fr036161.pdf
 1961	PAPASE	proteolytic enzymes extracted from carica papaya	A236A06Y32	12-30-61	NDA	12-293	WC	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035123/fr035123.pdf
 1961	ISMELIN	guanethidine sulfate	8AQ60474G9	12-30-61	NDA	12-329	CIBA	Federal Register v.43 (1978), page 49567, retrieved from: https://books.google.ru/books?id=E1gI3lMjo5AC
@@ -3773,10 +3755,8 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	ENDURON	methyclothiazide	L3H46UAC61	12-30-61	NDA	12-524	ABBOTT	https://search-tec.com/clinical-trials/companies/abbvie/?drug-single=12524-1
 1961	TANDEARIL TABLETS	oxyphenbutazone	H806S4B3NS	12-30-61	NDA	12-542	GEIGY	Federal Register v.42 (1977), page 39140, retrieved from: https://books.google.ru/books?id=zK4lCxwjCIkC
 1961	ANALEXIN PHENYRAMIDOL SALICYLATE	phenyramidol salicylate	H670S81Z1V	12-30-61	NDA	12-584	MALLINCKRODT	https://www.govinfo.gov/content/pkg/FR-1969-02-14/pdf/FR-1969-02-14.pdf
-1961	CELESTONE BETAMETHASONE	betamethasone	9842X06Q6M	12-30-61	NDA	12-657	SCHERING	https://search-tec.com/clinical-trials/companies/schering/?drug-single=12657-3
 1961	SPARTASE POTASSIUM ASPARTATE	potassium aspartate	OC4598NZEQ	12-30-61	NDA	12-663	WYETH	https://patents.google.com/patent/US3904765A/en|https://www.govinfo.gov/content/pkg/FR-1971-07-23/pdf/FR-1971-07-23.pdf
 1961	SPARTASE MAGNESIUM ASPARTATE	magnesium aspartate	R17X820ROL	12-30-61	NDA	12-663	WYETH	https://patents.google.com/patent/US3904765A/en|https://www.govinfo.gov/content/pkg/FR-1971-07-23/pdf/FR-1971-07-23.pdf
-1961	VELBAN	vinblastine sulfate	N00W22YO2B	12-30-61	NDA	12-665	LILLY	https://search-tec.com/clinical-trials/companies/lilly/?drug-single=12665-1
 1961	OMNI-TUSS CHLORPHENIRAMINE	chlorpheniramine	3U6IO1965U	12-30-61	NDA	12-666	PENNWALT	"Forensic Toxicology: Controlled Substances and Dangerous Drugs" (2012), page 175, retrieved from: https://books.google.ru/books?id=szDnBwAAQBAJ
 1961	OMNI-TUSS GUAIACOL CARBONATE	guaiacol carbonate	Q71XPQ6R29	12-30-61	NDA	12-666	PENNWALT	"Forensic Toxicology: Controlled Substances and Dangerous Drugs" (2012), page 175, retrieved from: https://books.google.ru/books?id=szDnBwAAQBAJ
 1961	ELAVIL AMITRIPTYLINE HYDROCHLORIDE	amitriptyline hydrochloride	26LUD4JO9K	12-30-61	NDA	12-703	MSD	https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2003/12703slr093,12704slr046ltr.pdf
@@ -3785,9 +3765,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	ANADROL	nandrolone decanoate	H45187T098	12-30-61	NDA	12-733	SYNTEX LABS	https://search-tec.com/clinical-trials/companies/aspen-global-inc/?drug-single=13132-1
 1961	TOLDEX PHENYLTOLOXAMINE CITRATE	phenyltoloxamine citrate	8UE48MJH8M	12-30-61	NDA	12-735	DOW PHARM	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035169/fr035169.pdf
 1961	WILPO	phentermine hydrochloride	0K2I505OTV	12-30-61	NDA	12-737	DORSEY	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=012737
-1961	LIBRAX CLIDINIUM BROMIDE	clidinium bromide	91ZQW5JF1Z	09-01-66	NDA	12-750	ROCHE	https://search-tec.com/clinical-trials/companies/valeant-pharms/?drug-single=12750-1
+1966	LIBRAX CLIDINIUM BROMIDE	clidinium bromide	91ZQW5JF1Z	09-01-66	NDA	12-750	ROCHE	https://search-tec.com/clinical-trials/companies/valeant-pharms/?drug-single=12750-1
 1961	HALDRONE	paramethasone acetate	8X50N88ZDP	12-30-61	NDA	12-772	LILLY	Federal Register v.42 (1977), page 11889, retrieved from: https://books.google.ru/books?id=teu5z1rVPfcC
-1961	QUINIDEX	quinidine sulfate	J13S2394HE	12-30-61	NDA	12-796	ROBINS	https://www.rxlist.com/quinidex-drug.htm|https://www.govinfo.gov/content/pkg/FR-2007-11-07/pdf/E7-21886.pdf
+1962	QUINIDEX	quinidine sulfate	J13S2394HE	02-21-62	NDA	12-796	ROBINS	https://www.rxlist.com/quinidex-drug.htm|https://www.govinfo.gov/content/pkg/FR-2007-11-07/pdf/E7-21886.pdf
 1961	ESTOMUL BISMUTH ALUMINATE	bismuth aluminate	JB5Y63JDHJ	12-30-61	NDA	12-830	RIKER	https://www.govinfo.gov/content/pkg/FR-1972-11-29/pdf/FR-1972-11-29.pdf
 1961	ESTOMUL MAGNESIUM OXIDE	magnesium oxide	3A3U0GI71G	12-30-61	NDA	12-830	RIKER	https://www.govinfo.gov/content/pkg/FR-1972-11-29/pdf/FR-1972-11-29.pdf
 1961	ESTOMUL MAGNESIUM CARBONATE	magnesium carbonate	0E53J927NA	12-30-61	NDA	12-830	RIKER	https://www.govinfo.gov/content/pkg/FR-1972-11-29/pdf/FR-1972-11-29.pdf
@@ -3797,13 +3777,10 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1962	HYTRAST IOPYDONE	iopydone	J6B56XB19T		NDA	13-106	FOUGERA	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
 1962	HYTRAST IOPYDOL	iopydol	T4661K682A		NDA	13-106	FOUGERA	https://www.govinfo.gov/content/pkg/FR-1971-06-18/pdf/FR-1971-06-18.pdf#page=1
 1962	DYNACAINE W/EPINEPH PYRROCAINE	pyrrocaine	9D47L94CPW		NDA	13-239	GRAHAM CHEM	http://www.profmlotfy.com/352746827|https://archive.org/details/federalregister36cunit/page/n455?q=DYNACAINE
-1961	DUO-MEDIHALER PHENYLEPHRINE BITARTRATE	phenylephrine bitartrate	27O3Q5ML57	12-30-61	NDA	13-296	RIKER	https://search-tec.com/clinical-trials/companies/3m/?drug-single=13296-1
+1962	DUO-MEDIHALER PHENYLEPHRINE BITARTRATE	phenylephrine bitartrate	27O3Q5ML57		NDA	13-296	RIKER	https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5278812/
 1962	Angio Conray	sodium iothalamate	KDN276D83N		NDA	13-319	MALLINCKRODT	https://cdn.loc.gov/service/ll/fedreg/fr042/fr042161/fr042161.pdf
 1961	OXYTOCIN BUCCAL	oxytocin citrate	1573L6WJ8U	12-30-61	NDA	13-508	PARKE-DAVIS	Federal Register v.46 (1981), page 31072, retrieved from: https://books.google.ru/books?id=wi455Aj-SlQC
-1961	ARISTOSPAN 20MG/ML	triancinolone hexacetonide	I7GT1U99Y9	12-30-61	NDA	16-466	LEDERLE	Federal Register v.42 (1977), page 11894, retrieved from: https://books.google.ru/books?id=teu5z1rVPfcC
-1961	DECADRON-LA	dexamethasone acetate	E2287TKU04	12-30-61	NDA	16-675	MSD	https://search-tec.com/clinical-trials/companies/merck/?drug-single=16675-1
-1952	Fiorinal	butalbital	KHS0AZ4JVK		NDA	17-534	SANDOZ	https://www.japha.org/article/S0095-9561(16)32937-1/pdf
-1961	CELESTONE BETAMETHASONE SODIUM PHOSPHATE	betamethasone sodium phosphate	7BK02SCL3W	12-30-61	NDA	17-561	SCHERING	"Approved Drug Products with Therapeutic Equivalence Evaluations - FDA Orange Book 29th Edition" (2009), page cdlxv, retrieved from: https://books.google.ru/books?id=1zR4DAAAQBAJ
+1952	Fiorinal	butalbital	KHS0AZ4JVK		NDA		SANDOZ	https://www.japha.org/article/S0095-9561(16)32937-1/pdf
 1961	BIOZYME-HC NEOMYCIN PALMITATE	neomycin palmitate	3I9J454G9F	12-30-61	NDA	50-015	ARMOUR PHARM	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035201/fr035201.pdf
 1961	STAPHCILLIN	sodium methicillin	NBQ410S76Y	12-30-61	NDA	50-117	BRISTOL LABS	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035146/fr035146.pdf
 1961	COMPOCILLIN VK PHENOXYMETHYL PENICILLIN	phenoxymethyl penicillin	Z61I075U2W	12-30-61	NDA	50-123	ABBOTT	https://www.govinfo.gov/content/pkg/FR-1972-03-30/pdf/FR-1972-03-30.pdf
@@ -3832,7 +3809,6 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1963	POLYCLINE W/TRIPLE SUL CALCIUM TETRACYCLINE	calcium tetracycline	9ON2SH59JS		NDA	50-282	BRISTOL LABS	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034062/fr034062.pdf
 1961	ALBAMYCIN-T CALCIUM NOVOBIOCIN	calcium novobiocin	RHW5BU180N	12-30-61	NDA	50-288	UPJOHN	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034093/fr034093.pdf
 1953	BIOMYDRIN W/HC THONZONIUM BROMIDE	thonzonium bromide	JI2B19CR0R		NDA	50-351	BW	https://cdn.loc.gov/service/ll/fedreg/fr038/fr038153/fr038153.pdf
-1961	ILOSONE ADULT125MG/PUL	erythromycin estolate	XRJ2P631HP	12-30-61	NDA	50-365	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr044/fr044234/fr044234.pdf
 1961	RO-CILLIN PENICILLIN V POTASSIUM	penicillin v potassium	146T0TU1JB	12-30-61	NDA	60-011	ROWELL	https://accp1.onlinelibrary.wiley.com/doi/pdf/10.1002/j.1552-4604.1973.tb00072.x
 1961	DURYCIN F.A. 400/0.5 PENICILLIN G	penicillin g	Q42T66VG0C	12-30-61	NDA	60-034	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034062/fr034062.pdf
 1961	KECTIL DIHYDROSTREPTOMYCIN SULFATE	dihydrostreptomycin sulfate	T7D4876IUE	12-30-61	NDA	60-067	BRISTOL LABS	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035128/fr035128.pdf
@@ -3840,11 +3816,9 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	NOVAHISTINE/PENICILLIN POTASSIUM PENICILLIN G	potassium penicillin g	VL775ZTH4C	12-30-61	NDA	60-068	DOW PHARM	https://www.govinfo.gov/content/pkg/FR-1969-09-12/pdf/FR-1969-09-12.pdf
 1961	AURACORT PRAMOXINE HYDROCHLORIDE	pramoxine hydrochloride	88AYB867L5	12-30-61	NDA	60-080	PRL	https://cdn.loc.gov/service/ll/fedreg/fr037/fr037126/fr037126.pdf
 1961	STREPTOMAGMAATTAPULGTE DIHYDROSTREPTOMYCIN SULFATE	dihydrostreptomycin sulfate	T7D4876IUE	12-30-61	NDA	60-119	WYETH	https://cdn.loc.gov/service/ll/fedreg/fr035/fr035128/fr035128.pdf
-1961	ERYTHROCIN 100MG	erythromycin stearate	LXW024X05M	12-30-61	NDA	60-359	ABBOTT	https://cdn.loc.gov/service/ll/fedreg/fr041/fr041182/fr041182.pdf
 1961	COMYCIN TETRACYCLINE PHOSPHATE COMPLEX	tetracycline phosphate complex	6B7BK5H33B	12-30-61	NDA	60-425	UPJOHN	
 1961	TERRAMYCIN OXYTETRACYCLINE CALCIUM	oxytetracycline calcium	C8MRZ07FDV	12-30-61	NDA	60-595	PFIZER	https://search-tec.com/clinical-trials/companies/pfizer/?drug-single=60595-1
 1961	TAIN CARBASPIRIN CALCIUM	carbaspirin calcium	73J0P7720Y	12-30-61	NDA	60-779	DORSEY	https://www.govinfo.gov/content/pkg/FR-1969-09-12/pdf/FR-1969-09-12.pdf
-1959	RETROPAQUE	methiodal sodium	3880P18UBM		NDA	61-019	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1970-01-14/pdf/FR-1970-01-14.pdf
-1961	ILOTYCIN ETHYL CARBNTE ERYTHROMYCIN ETHYLCARBONATE	erythromycin ethylcarbonate	D2JUE6GD5A	12-30-61	NDA	61-181	LILLY	https://cdn.loc.gov/service/ll/fedreg/fr034/fr034186/fr034186.pdf
-1961	ALBAMYCIN T NOVOBIOCIN	novobiocin	17EC19951N	12-30-61	NDA	90-236	UPJOHN	https://books.google.com/books?id=PBg-AQAAIAAJ&q=ALBAMYCIN+T&dq=ALBAMYCIN+T&hl=en&newbks=1&newbks_redir=0&sa=X&ved=2ahUKEwiw56Dew4rmAhVPmuAKHZi8AnkQ6AEwAnoECAEQAg
+1959	RETROPAQUE	methiodal sodium	3880P18UBM		NDA	12-010	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1970-01-14/pdf/FR-1970-01-14.pdf
+1964	ALBAMYCIN T NOVOBIOCIN	novobiocin	17EC19951N	09-04-64	NDA	50-339	UPJOHN	https://www.federalregister.gov/documents/2011/01/19/2011-1000/determination-that-albamycin-novobiocin-sodium-capsule-250-milligrams-was-withdrawn-from-sale-for
 1965	Silodrate	silodrate anhydrous	59110L5W24	12-30-65			Mallinckrodt	https://www.google.com/books/edition/American_Journal_of_Hospital_Pharmacy/ub4hAQAAMAAJ?hl=en&gbpv=1&bsq=SILODRATE
