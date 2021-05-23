@@ -402,7 +402,9 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
                     keyCount = Array.getLength(moietyKeys);
                     // prodrugs sometimes has 2 active moieties, ignore self one e.g. 54K37P50KH
                     Object unii = source.get(I_UNII);
-                    if (unii.getClass().isArray() && Array.getLength(unii) == 1)
+                    if (unii == null)
+                        unii = "unknown";
+                    else if (unii.getClass().isArray() && Array.getLength(unii) == 1)
                         unii = Array.get(unii, 0);
                     else if (unii.getClass().isArray())
                         unii = "unknown";
