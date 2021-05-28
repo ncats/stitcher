@@ -6,4 +6,4 @@ bibtex bmc_article
 xelatex bmc_article
 ```
 
-You might have to run the command a couple of times to resolve references.
+You might have to run the command a couple of times to resolve references. If you're using MacTeX, `xelatex` lives under `/Library/TeX/texbin`, so make sure this path is in your `PATH` environment.
