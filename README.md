@@ -204,6 +204,6 @@ Scripts for Recent Approval Data from FDA
 =========================================
 
 cd scripts
-python approvalYears.py   [requires python 2.7]
+python approvalYears.py   [requires python 3+]
 in the /data folder, there should now be a file like approvalYears-2020-12-14.txt. If acceptable, update the filename reference in /data/conf/ob.conf to point to this new file.
 
