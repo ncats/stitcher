@@ -125,11 +125,12 @@ def approvedStitches(approved, stitch):
         #sys.exit()
     return approved
 
-def highestStatus(approved, stitch, full=False):
+def highestStatus(approved, stitch, full=True):
     status = 'Other'
     url = ''
     startDate = ''
     prod = ''
+    approvalAppId = ''
     if stitch.has_key('highestPhase'):
         status = stitch['highestPhase']
         for event in stitch['events']:
@@ -139,6 +140,8 @@ def highestStatus(approved, stitch, full=False):
                     url = event['URL']
                 if 'startDate' in event:
                     startDate = event['startDate']
+                if 'approvalAppId' in event:
+                    approvalAppId = event['approvalAppId']
                 prod = event['id']
     parent = stitch['sgroup']['parent']
     rank = stitch['rank']
@@ -156,6 +159,7 @@ def highestStatus(approved, stitch, full=False):
             name = getName(stitch)
     entry = [name, status, stitch['id'], rank]
     if full:
+        entry.append(approvalAppId)
         entry.append(prod)
         entry.append(startDate)
         entry.append(url)
@@ -167,7 +171,7 @@ def nmeStitches(stitch2nmes, stitch, nmelist):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, April 2020':
+        if node['source'] == 'G-SRS, May 2021':
             if node['id'] in nmelist:
                 entries.append(node['id'])
     if len(entries) > 1:
@@ -214,7 +218,7 @@ def activemoietyClashes(stitch2ams, stitch):
     key = stitch['id']
     entries = []
     for node in stitch['sgroup']['members']:
-        if node['source'] == 'G-SRS, April 2020':
+        if node['source'] == 'G-SRS, May 2021':
             if node['stitches'].has_key('R_activeMoiety'):
                 if isinstance(node['stitches']['R_activeMoiety'], list) and len(node['stitches']['R_activeMoiety']) > 1 and node['id'] in node['stitches']['R_activeMoiety']:
                     for item in node['stitches']['R_activeMoiety']:
@@ -462,7 +466,7 @@ if __name__=="__main__":
     testHeaders['uniiClashes'] = '\nuniiClashes\tUNII\tPN\tStitch Node 1\tStitch Node 2\tetc.'
     testHeaders['findOrphans'] = '\nfindOrphans\tSource|Status\tIngredient\tSource\tStatus'
     testHeaders['approvedStitches'] = '\napprovedStitches\tUNII\tUNII PN\tYear\tStitch\tStitch Rank\tNode PN\tNode UNII\tUNII PN\tStatus'
-    testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tNode PN\tStatus\tStitch\tStitch Rank'
+    testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tNode PN\tStatus\tStitch\tStitch Rank\tAppId\tEventId\tproduct\tURL'
 
     # initialize list of NMEs
     nmeList = open("../../data/approvalYears-2020-07-23.txt", "r").readlines()

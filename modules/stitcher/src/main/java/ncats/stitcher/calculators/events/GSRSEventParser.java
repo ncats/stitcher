@@ -5,10 +5,14 @@ import java.util.Map;
 
 public class GSRSEventParser extends EventParser {
     public GSRSEventParser() {
-        super ("G-SRS, April 2020");
+        super ("G-SRS, May 2021");
     }
 
     public void produceEvents(Map<String, Object> payload) {
+        if (payload.get("UNII") == null) {
+            // alternative definitions and subconcepts do not get UNIIs
+            return;
+        }
         String unii = getFirstEntry(payload.get("UNII"));
         for (String type: types.keySet()) {
             if (payload.containsKey(type)) {
