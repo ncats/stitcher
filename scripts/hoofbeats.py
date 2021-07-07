@@ -729,14 +729,16 @@ FROM GARD_Disease__c where Id='%s'""" % id
             r = requests.get(q, headers = self.headers)
             data = r.json()['records'][0]
             if 200 == r.status_code:
-                print('%s: %s' % (curie, json.dumps(data, indent=2)))
+                print('%s: %s' % (curie, curie))#json.dumps(data, indent=2)))
                 features = data['GARD_Disease_Features__r']
                 if None != features:
                     for f in features['records']:
-                        for t in f['Feature__r']['HPO_Feature_Type__c'].split(';'):
-                            if t not in types:
-                                types[t] = set()
-                            types[t].add(curie)
+                        for t in f['Feature__r'][
+                                'HPO_Feature_Type__c'].split(';'):
+                            k = t.strip()
+                            if k not in types:
+                                types[k] = set()
+                            types[k].add(curie)
         for (t, curies) in types.items():
             print('%s: %d' % (t, len(curies)))
 

@@ -90,6 +90,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             .add(T_Keyword, "type")
             .add(T_Keyword, "species")
             .add(T_Keyword, "interpretations")
+            .add(T_Keyword, "consequences")
             ;
     }
 
@@ -97,15 +98,27 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         XPath xpath = XPathFactory.newInstance().newXPath();        
         Element vcv = doc.getDocumentElement();
 
+        String type = vcv.getAttribute("VariationType");
+        String record = "./InterpretedRecord/"
+            +(type.equalsIgnoreCase("haplotype") ? "Haplotype/":"");
+        
+        NodeList values = (NodeList)xpath.evaluate
+            (record+"SimpleAllele/FunctionalConsequence",
+             vcv, XPathConstants.NODESET);
+        Set<String> funcs = new TreeSet<>();
+        for (int i = 0; i < values.getLength(); ++i) {
+            Element func = (Element)values.item(i);
+            funcs.add(func.getAttribute("Value"));
+        }
+        
         if (LITERATURE_ONLY) {
             NodeList nodes = (NodeList)xpath.evaluate
                 ("//InterpretedRecord/ClinicalAssertionList/ClinicalAssertion/ClinVarAccession[@SubmitterName=\"OMIM\"]", vcv, XPathConstants.NODESET);
-            if (0 == nodes.getLength())
+            if (0 == nodes.getLength() && funcs.isEmpty())
                 return null;
         }
 
-        Map<String, Object> data = new LinkedHashMap<>();
-        String type = vcv.getAttribute("VariationType");
+        Map<String, Object> data = new LinkedHashMap<>();        
         data.put("id", Long.parseLong(vcv.getAttribute("VariationID")));
         data.put("accession", vcv.getAttribute("Accession"));
         data.put("name", vcv.getAttribute("VariationName"));
@@ -125,11 +138,9 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             Date date = df.parse(value);
             data.put("updated", date.getTime());
         }
-        
-        NodeList values = (NodeList)xpath.evaluate
-            ("./InterpretedRecord/"
-             +(type.equalsIgnoreCase("haplotype") ? "Haplotype/":"")
-             +"SimpleAllele/GeneList/Gene", vcv, XPathConstants.NODESET);
+
+        values = (NodeList)xpath.evaluate
+            (record+"SimpleAllele/GeneList/Gene", vcv, XPathConstants.NODESET);
         Set<String> genes = new TreeSet<>();
         Set<String> generefs = new TreeSet<>();
         Set<Integer> alleles = new TreeSet<>();
@@ -158,6 +169,19 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("gene_count", genes.size());
         data.put("genesymbols", genes.toArray(new String[0]));
         data.put("alleles", alleles.toArray(new Integer[0]));
+
+        values = (NodeList)xpath.evaluate(record+"SimpleAllele/ProteinChange",
+                                          vcv, XPathConstants.NODESET);
+        Set<String> proteins = new TreeSet<>();
+        for (int i = 0; i < values.getLength(); ++i) {
+            Element protein = (Element)values.item(i);
+            proteins.add(protein.getTextContent());
+        }
+        if (!proteins.isEmpty())
+            data.put("proteins", proteins.toArray(new String[0]));
+        
+        if (!funcs.isEmpty())
+            data.put("consequences", funcs.toArray(new String[0]));
 
         List<String> rcv = new ArrayList<>();
         values = (NodeList)xpath.evaluate
