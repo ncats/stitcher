@@ -418,6 +418,11 @@ public class EntityRegistry extends EntityFactory {
                     }
                     add (mapper, property);
                 }
+                else if (cf.hasPath("prefix")) {
+                    PrefixStitchKeyMapper mapper = new PrefixStitchKeyMapper
+                        (key, (String)cf.getValue("prefix").unwrapped());
+                    add (mapper, property);
+                }
                 else { // treat this as normal stitch key
                     add (key, property);
                 }

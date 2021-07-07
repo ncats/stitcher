@@ -119,6 +119,9 @@ public class HoofBeats {
         }
         public int hashCode () { return name.hashCode(); }
         public String toString () { return name; }
+        public boolean sourceOf (Entity e) {
+            return e.is(name);
+        }
     }
     
     static final Set<Source> SOURCES = new TreeSet<>();
@@ -405,6 +408,40 @@ public class HoofBeats {
             return parents.get(id);
         }
     }
+
+    static class Category {
+        final Map<Long, Object> categories = new TreeMap<>();
+        final EntityFactory ef;
+        Category (EntityFactory ef, String source, String...curies) {
+            for (String curie : curies) {
+                ef.cypher(row -> {
+                        long id = (Long) row.get("id");
+                        String label = (String) row.get("label");
+                        String notation = (String) row.get("notation");
+                        categories.put(id, new String[]{notation, label});
+                        return true;
+                    }, "match (d)-[:PAYLOAD]->(n:`"+source
+                    +"`) where d.notation='"+curie
+                    +"' return id(n) as id, d.label as label, "
+                    +"d.notation as notation");
+            }
+            this.ef = ef;
+        }
+
+        public int categorize (Entity e, BiConsumer<String, String> consumer) {
+            int ncats = 0;
+            for (Entity[] parents : ef.parents(e.getId(), R_subClassOf)) {
+                for (Entity p : parents) {
+                    String[] cat = (String[])categories.get(p.getId());
+                    if (cat != null) {
+                        consumer.accept(cat[0], cat[1]);
+                        ++ncats;
+                    }
+                }
+            }
+            return ncats;
+        }
+    }
     
     // lookup of GR short id to book id
     static final Map<String, String> GENEREVIEWS = new HashMap<>();
@@ -445,6 +482,18 @@ public class HoofBeats {
                 return s;
         //logger.log(Level.SEVERE, "BOGUS SOURCE: "+name);
         return null;
+    }
+
+    static Source getSource (Entity e) {
+        for (Source s : SOURCES)
+            if (s.sourceOf(e))
+                return s;
+        return null;
+    }
+
+    static String getId (Entity e) {
+        Source s = getSource (e);
+        return s != null ? s.curie(e) : null;
     }
 
     static String escape (String s) {
@@ -979,8 +1028,12 @@ public class HoofBeats {
         final Set<Entity> genes = new LinkedHashSet<>();
         final Set<Entity> phenotypes = new LinkedHashSet<>();
         final Set<Entity> drugs = new LinkedHashSet<>();
+
+        final GARDOntology gardOnt;
+        GARDOntology.GARDClass gardClass;
         
-        DiseaseComponent (long[] comp) {
+        DiseaseComponent (GARDOntology gardOnt, long[] comp) {
+            this.gardOnt = gardOnt;
             component = ef.component(comp);
             // partition entities into data sources
             Map<Source, Set<Entity>> map = new TreeMap<>();
@@ -1037,48 +1090,64 @@ public class HoofBeats {
         }
         
         JsonNode toJson () {
-            ObjectNode disease = null;
+            ObjectNode disease = mapper.createObjectNode();
             if (gard != null && gard.length > 0) {
-                disease = mapper.createObjectNode();            
                 disease.put("term", doTerm ());
-                disease.put("disease_categories", doDiseaseCategories ());
-                disease.put("synonyms", doSynonyms ());
-                disease.put("external_identifiers", doExternalIdentifiers ());
-
-                Map<HP_Type, Set<Entity>> phenos = new HashMap<>();
-                phenos.put(HP_Type.Inheritance, new HashSet<>());
-                phenos.put(HP_Type.Onset, new HashSet<>());
-                
-                ArrayNode inheritance =
-                    (ArrayNode) doInheritance (phenos.get(HP_Type.Inheritance));
-                ArrayNode onset = (ArrayNode) doAgeAtOnset
-                    (phenos.get(HP_Type.Onset));
-                ArrayNode mortality = (ArrayNode) doAgeAtDeath ();
-                ArrayNode phenotypes = (ArrayNode) doPhenotypes
-                    (inheritance, onset, mortality, phenos);
-                disease.put("inheritance", inheritance);
-                disease.put("age_at_onset", onset);
-                disease.put("age_at_death", mortality);
-                
-                disease.put("diagnosis", doDiagnoses ());
-                disease.put("epidemiology", doEpidemiology ());
-                disease.put("genes", doGenes ());
-                disease.put("phenotypes", phenotypes);
-                disease.put("drugs", doDrugs ());
-                disease.put("evidence", doEvidence ());
-                disease.put("related_diseases", doRelatedDiseases ());
-                disease.put("tags", doTags (phenos));
-
-                try {
-                    logger.info("#################\n"
-                                +mapper.writerWithDefaultPrettyPrinter()
-                                .writeValueAsString(disease));
-                }
-                catch (Exception ex) {
-                    ex.printStackTrace();
-                }
             }
+
+            disease.put("disease_categories", doDiseaseCategories ());
+            disease.put("synonyms", doSynonyms ());
+            disease.put("external_identifiers", doExternalIdentifiers ());
+            
+            Map<HP_Type, Set<Entity>> phenos = new HashMap<>();
+            phenos.put(HP_Type.Inheritance, new HashSet<>());
+            phenos.put(HP_Type.Onset, new HashSet<>());
+            
+            ArrayNode inheritance =
+                (ArrayNode) doInheritance (phenos.get(HP_Type.Inheritance));
+            ArrayNode onset = (ArrayNode) doAgeAtOnset
+                (phenos.get(HP_Type.Onset));
+            ArrayNode mortality = (ArrayNode) doAgeAtDeath ();
+            ArrayNode phenotypes = (ArrayNode) doPhenotypes
+                (inheritance, onset, mortality, phenos);
+            disease.put("inheritance", inheritance);
+            disease.put("age_at_onset", onset);
+            disease.put("age_at_death", mortality);
+            
+            disease.put("diagnosis", doDiagnoses ());
+            disease.put("epidemiology", doEpidemiology ());
+            disease.put("genes", doGenes ());
+            disease.put("phenotypes", phenotypes);
+            disease.put("drugs", doDrugs ());
+            disease.put("evidence", doEvidence ());
+            disease.put("related_diseases", doRelatedDiseases ());
+            disease.put("tags", doTags (phenos));
+
+            if (!disease.has("term")) {
+                logger.info("#################\n"+jsonString (disease));
+                if (phenotypes.size() > 0
+                    || inheritance.size() > 0
+                    || disease.get("genes").size() > 0
+                    || disease.get("epidemiology").size() > 0) {
+                    logger.info(":::::: NEW DISEASE FOR COMPONENT "
+                                +entities.size()+"="+entities.keySet()
+                                +" "+component);
+                }
+                disease = null;                
+            }
+            
             return disease;
+        }
+
+        String jsonString (Object obj) {
+            try {
+                return mapper.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(obj);
+            }
+            catch (Exception ex) {
+                logger.log(Level.SEVERE, "Can't write json", ex);
+            }
+            return "";
         }
 
         JsonNode doTerm () {
@@ -1118,12 +1187,20 @@ public class HoofBeats {
             else if (instrumentTerm (term, "S_DOID",
                                      "IAO_0000115", "notation"))
                 ;
+
+            gardClass =
+                gardOnt.createDisease(id, term.get("url").asText())
+                .addLabel(term.get("label").asText())
+                ;
             
             JsonNode desc = term.get("description");
             if (desc != null && desc.isNull()) {
                 term.remove("description");
                 term.remove("description_curie");
                 term.remove("description_URL");
+            }
+            else if (desc != null) {
+                gardClass.addDescription(desc.asText());
             }
             
             return term;
@@ -1153,12 +1230,17 @@ public class HoofBeats {
             Entity[] ents = get ("S_MONDO");
             if (ents != null && ents.length > 0) {
                 for (Entity e : ents) {
+                    /*
                     String mondo = getString (e.payload("notation"));
                     ef.cypher(row -> {
                             cats.put((String)row.get("notation"),
                                      (String)row.get("label"));
                             return true;
                         }, String.format(MONDO_CATEGORY_FMT, mondo));
+                    */
+                    mondoCategory.categorize(e, (notation, label) -> {
+                            cats.put(notation, label);
+                        });
                 }
             }
 
@@ -1174,12 +1256,14 @@ public class HoofBeats {
         }
         
         JsonNode doSynonyms () {
-            ArrayNode synonyms = mapper.createArrayNode();            
-            for (Entity e : gard) {
-                ObjectNode syn = newJsonObject ();
-                syn.put("curie", getString (e.payload("gard_id")));
-                syn.put("label", getString (e.payload("name"), 0));
-                synonyms.add(syn);
+            ArrayNode synonyms = mapper.createArrayNode();
+            if (gard != null) {
+                for (Entity e : gard) {
+                    ObjectNode syn = newJsonObject ();
+                    syn.put("curie", getString (e.payload("gard_id")));
+                    syn.put("label", getString (e.payload("name"), 0));
+                    synonyms.add(syn);
+                }
             }
 
             Map<String, Set<String>> syns = new TreeMap<>();
@@ -1225,11 +1309,18 @@ public class HoofBeats {
                                 +syns.size());
                 }
                 */
-                
+
                 for (String s : synlist) {
                     ObjectNode syn = newJsonObject ();
                     syn.put("curie", curie);
                     syn.put("label", s);
+                    if (gardClass != null) {
+                        if (curie.startsWith("GARD")) {
+                            gardClass.addSynonym(s);
+                        }
+                        else { // add axiom here for this source?
+                        }
+                    }
                     synonyms.add(syn);
                 }
             }
@@ -1554,12 +1645,68 @@ public class HoofBeats {
     Map<String, String> ghrUrls = new HashMap<>();
     Map<String, Map<String, String>> gardSummaries = new HashMap<>();
     Map<String, JsonNode> hpInheritance = new HashMap<>();
+    Category mondoCategory;
 
-    final JsonNode EMPTY_JSON;
+    final GARDOntology gardOnt;
 
-    public HoofBeats (EntityFactory ef) {
+    public HoofBeats (EntityFactory ef) throws Exception {
         this.ef = ef;
-        this.EMPTY_JSON = newJsonObject ();
+        loadGARDSummaries ();
+        loadHpInheritance ();
+        setupSpecialties ();
+        downloadGHRUrls ();
+
+        mondoCategory = new Category (ef, "S_MONDO", new String[]{
+                "MONDO:0003900", "MONDO:0021147", "MONDO:0045024",
+                "MONDO:0024297", "MONDO:0045028", "MONDO:0000839",
+                "MONDO:0024236", "MONDO:0021178", "MONDO:0021166",
+                "MONDO:0005550", "MONDO:0003847", "MONDO:0020683",
+                "MONDO:0002254", "MONDO:0002025", "MONDO:0020012",
+                "MONDO:0021669", "MONDO:0024575", "MONDO:0002409",
+                "MONDO:0004995", "MONDO:0004335", "MONDO:0021145",
+                "MONDO:0024458", "MONDO:0005151", "MONDO:0005570",
+                "MONDO:0005046", "MONDO:0002051", "MONDO:0002081",
+                "MONDO:0005071", "MONDO:0005087", "MONDO:0002118",
+                "MONDO:0100120", "MONDO:0005135", "MONDO:0019751",
+                "MONDO:0007179", "MONDO:0004992", "MONDO:0024674",
+                "MONDO:0024882", "MONDO:0021058", "MONDO:0100120",
+                "MONDO:0005135", "MONDO:0019052", "MONDO:0044970",
+                "MONDO:0005365", "MONDO:0019512", "MONDO:0005267",
+                "MONDO:0005385", "MONDO:0015111", "MONDO:0005020",
+                "MONDO:0006858", "MONDO:0002356", "MONDO:0002332",
+                "MONDO:0004298", "MONDO:0002263", "MONDO:0005047",
+                "MONDO:0003150", "MONDO:0005328", "MONDO:0002135",
+                "MONDO:0021084", "MONDO:0001941", "MONDO:0005495",
+                "MONDO:0015514", "MONDO:0005154", "MONDO:0100070",
+                "MONDO:0002356", "MONDO:0001223", "MONDO:0003393",
+                "MONDO:0003240", "MONDO:0002280", "MONDO:0001531",
+                "MONDO:0002245", "MONDO:0003804", "MONDO:0003225",
+                "MONDO:0044348", "MONDO:0017769", "MONDO:0005271",
+                "MONDO:0009453", "MONDO:0003778", "MONDO:0005093",
+                "MONDO:0024255", "MONDO:0006607", "MONDO:0006615",
+                "MONDO:0019296", "MONDO:0005218", "MONDO:0005172",
+                "MONDO:0023603", "MONDO:0002602", "MONDO:0005560",
+                "MONDO:0005027", "MONDO:0005559", "MONDO:0002320",
+                "MONDO:0005287", "MONDO:0019117", "MONDO:0020010",
+                "MONDO:0005395", "MONDO:0003620", "MONDO:0100081",
+                "MONDO:0000270", "MONDO:0005275", "MONDO:0000376",
+                "MONDO:0004867", "MONDO:0005240", "MONDO:0006026",
+                "MONDO:0020059", "MONDO:0007254", "MONDO:0008170",
+                "MONDO:0001657", "MONDO:0006517", "MONDO:0021063",
+                "MONDO:0005575", "MONDO:0008903", "MONDO:0002120",
+                "MONDO:0005206", "MONDO:0002898", "MONDO:0004950",
+                "MONDO:0001627", "MONDO:0006999", "MONDO:0044872",
+                "MONDO:0003441", "MONDO:0019956", "MONDO:0020640",
+                "MONDO:0020067", "MONDO:0001835", "MONDO:0001071",
+                "MONDO:0000437", "MONDO:0005258", "MONDO:0017713",
+                "MONDO:0016054", "MONDO:0018075", "MONDO:0008449",
+                "MONDO:0019716", "MONDO:0002561", "MONDO:0020121"
+            });
+
+        gardOnt = new GARDOntology ();
+    }
+
+    void loadGARDSummaries () {
         try {
             File file = new File ("GARD_Summaries.tsv");
             if (file.exists()) {
@@ -1585,7 +1732,9 @@ public class HoofBeats {
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't load GARD synonyms whitelist!", ex);
         }
+    }
 
+    void loadHpInheritance () {
         try {
             Map<String, JsonNode> hpmap = new HashMap<>();
             ef.cypher(row -> {
@@ -1620,7 +1769,9 @@ public class HoofBeats {
             logger.log(Level.SEVERE,
                        "Can't retrieve HPO inheritance data!", ex);
         }
+    }
 
+    void setupSpecialties () {
         try {
             specialties.put("Genetics", new Specialty[]{
                     new Specialty (ef, "GARD:S001", "S_MONDO", "MONDO:0003847")
@@ -1689,35 +1840,33 @@ public class HoofBeats {
         catch (Exception ex) {
             logger.log(Level.SEVERE, "specialties failed", ex);
         }
-        
+    }
+
+    void downloadGHRUrls () {
         try {
-            downloadGHRUrls ();
+            logger.info("## downloading GHR gene mappings...");
+            URL url = new URL
+                ("https://medlineplus.gov/download/ghr-summaries.xml");
+            DocumentBuilder builder = DocumentBuilderFactory
+                .newInstance().newDocumentBuilder();
+            Element root = builder.parse(url.openStream()).getDocumentElement();
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            NodeList nodes = (NodeList) xpath.evaluate
+                ("//summaries/health-condition-summary/"
+                 +"related-gene-list/related-gene",
+                 root, XPathConstants.NODESET);
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                Element n = (Element)nodes.item(i);
+                String gene = xpath.evaluate("./gene-symbol", n);
+                String page = xpath.evaluate("./ghr-page", n);
+                //logger.info("..."+gene+" => "+page);
+                ghrUrls.put(gene, page);
+            }
+            logger.info("## "+ghrUrls.size()+" GHR gene URLs mapped!");
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't download GHR urls!", ex);
         }
-    }
-
-    void downloadGHRUrls () throws Exception {
-        logger.info("## downloading GHR gene mappings...");
-        URL url = new URL
-            ("https://medlineplus.gov/download/ghr-summaries.xml");
-        DocumentBuilder builder = DocumentBuilderFactory
-            .newInstance().newDocumentBuilder();
-        Element root = builder.parse(url.openStream()).getDocumentElement();
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        NodeList nodes = (NodeList) xpath.evaluate
-            ("//summaries/health-condition-summary/"
-             +"related-gene-list/related-gene",
-             root, XPathConstants.NODESET);
-        for (int i = 0; i < nodes.getLength(); ++i) {
-            Element n = (Element)nodes.item(i);
-            String gene = xpath.evaluate("./gene-symbol", n);
-            String page = xpath.evaluate("./ghr-page", n);
-            //logger.info("..."+gene+" => "+page);
-            ghrUrls.put(gene, page);
-        }
-        logger.info("## "+ghrUrls.size()+" GHR gene URLs mapped!");
     }
 
     ObjectNode newJsonObject () {
@@ -1911,10 +2060,26 @@ public class HoofBeats {
     
     public void beats (String outfile) throws IOException {
         ef.stitches((source, target, values) -> {
-                logger.info(source.getId()+": "+source.labels()
-                            +" <=> "+target.getId()+": "
-                            +target.labels()+" "+values);
-                uf.union(source.getId(), target.getId());
+                Source src1 = getSource (source);
+                Source src2 = getSource (target);
+                if (src1 != null && src2 != null) {
+                    logger.info(src1.curie(source)+" ["+src1.name+":"
+                                +source.getId()+"] "
+                                +" <=> "+src2.curie(target)+" ["
+                                +src2.name+":"+target.getId()+"]..."
+                                +Util.toString(values));
+                }
+                else if (src1 != null) {
+                    logger.warning("** Node "+target.getId()
+                                   +" is not a known source: "
+                                   + target.labels());
+                }
+                else { // src2 != null
+                    logger.warning("** Node "+source.getId()
+                                   +" is not a known source: "
+                                   + source.labels());
+                }
+                uf.union(source.getId(), target.getId());                
             }, R_exactMatch, R_equivalentClass);
 
         File file = new File (outfile);
@@ -1929,7 +2094,7 @@ public class HoofBeats {
         logger.info("**** "+components.length+" components!");
     }
 
-    public int writeJson (String base) throws IOException {
+    public int writeJson (String base) throws Exception {
         try (PrintStream diseases = new PrintStream (new FileOutputStream
                                                      (base+"_diseases.json"));
              PrintStream genes = new PrintStream (new FileOutputStream
@@ -1953,7 +2118,7 @@ public class HoofBeats {
     }
     
     public int writeJson (PrintStream ps, PrintStream gps, PrintStream pps,
-                          PrintStream dps) throws IOException {
+                          PrintStream dps) throws Exception {
         ef.stitches((source, target, values) -> {
                 /*
                 logger.info(source.getId()+": "+source.labels()
@@ -2002,7 +2167,7 @@ public class HoofBeats {
         long[][] components = uf.components();
         logger.info("###### "+components.length+" components! ########");
         for (long[] comp : components) {
-            DiseaseComponent dc = new DiseaseComponent (comp);
+            DiseaseComponent dc = new DiseaseComponent (gardOnt, comp);
             JsonNode json = dc.toJson();
             if (json != null) {
                 //if (count > 0) ps.print(",");
@@ -2072,7 +2237,10 @@ public class HoofBeats {
         logger.info("######## "+genes.size()+" genes!");
         logger.info("######## "+phenotypes.size()+" phenotypes!");
         logger.info("######## "+drugs.size()+" drugs!");
-        
+
+        try (FileWriter fw = new FileWriter ("gard.owl")) {
+            gardOnt.write(fw);
+        }
         return count;
     }
 
@@ -2149,6 +2317,12 @@ public class HoofBeats {
         ps.println("        \"Chromosome_Location__c\": \""+locus+"\",");
         ps.println("        \"Gene_Identifier__c\": \""+id+"\"");
         ps.print  ("    }");
+
+        gardOnt.createGene(id, "http://identifiers.org/"
+                           +id.toLowerCase().replaceAll(":", "/"))
+            .addLabel(sym)
+            .addDescription(name)
+            ;
     }
 
     void writePhenotypes (String id, Entity[] phenotypes)
@@ -2194,6 +2368,12 @@ public class HoofBeats {
         ps.println("        \"External_ID__c\": \""
                    +getString (e.payload("notation"))+"\"");
         ps.print("    }");
+
+        gardOnt.createPhenotype
+            (hpid, "http://purl.obolibrary.org/obo/"+hpid.replaceAll(":", "_"))
+            .addLabel(getString (e.payload("label")))
+            .addDescription(getString (e.payload("IAO_0000115")))
+            ;
     }
 
     void writeDrugs (String id, Entity[] drugs) throws IOException {
@@ -2222,6 +2402,10 @@ public class HoofBeats {
         ps.println("        \"Drug_Synonyms__c\": \""
                    +getString (syns.toArray(new String[0]), 0)+"\"");
         ps.print  ("    }");
+
+        gardOnt.createDrug(unii, "https://drugs.ncats.io/drug/"+unii)
+            .addLabel(getString (e.payload("CompoundName")))
+            ;
     }
 
     void writeEntities (String file, Entity[] entities,

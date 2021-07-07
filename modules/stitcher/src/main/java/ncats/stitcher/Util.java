@@ -1250,4 +1250,22 @@ public class Util {
         }
         return true;
     }
+
+    static public void main (String[] argv) throws Exception {
+        if (argv.length == 0) {
+            System.out.println("Usage: Util FILE...");
+            System.exit(1);
+        }
+
+        for (String a : argv) {
+            try (BufferedReader br = new BufferedReader (new FileReader (a))) {
+                for (String line; (line = br.readLine()) != null; ) {
+                    Object data = fromJson (line);
+                }
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 }
