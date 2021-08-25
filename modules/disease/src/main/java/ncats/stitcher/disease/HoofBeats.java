@@ -676,6 +676,18 @@ public class HoofBeats {
             }
         }
 
+        OMIMGenes (final PrintStream ps) {
+            this.genes = mapper.createArrayNode();
+            ef.cypher(row -> {
+                    Entity e = ef.getEntity((Long)row.get("id"));
+                    instrument (e);
+                    return true;
+                }, "match (d)-[:PAYLOAD]->(n:S_OMIM:T028) "
+                +"where d.MIMTYPE ='1' return id(n) as id");
+            writeEntities (ps, neighbors, new HashSet<>(),
+                           HoofBeats.this::writeGene);
+        }
+
         void instrument (Entity e) {
             // get hgnc from ogg
             e.neighbors((id, xe, key, reversed, props) -> {
@@ -691,25 +703,27 @@ public class HoofBeats {
                         if (node.has("curie")
                             && !hgnc.contains(node.get("curie").asText())) {
                             // add only if we don't already have this hgnc
-                            node.put("source_curie",
-                                     getString (curent.payload("notation")));
-                            node.put("source_label",
-                                     getString (curent.payload("label")));
-                            // ogg's label is the gene symbol
-                            node.put("gene_symbol",
-                                     getString (xe.payload("label")));
-                            /*
-                            node.put("association_type",
-                                     getString (curent.payload
-                                                ("MIMTYPEVALUE")));
-                            */
-                            node.put("association_type",
-                                     "Role in the phenotype of");
-                            node.put("source_validation",
-                                     getString (curent.payload
-                                                ("MIMTYPEMEANING")));
-                            node.put("gene_sfdc_id", "");
-                            genes.add(node);
+                            if (curent != null) {
+                                node.put("source_curie",
+                                         getString (curent.payload("notation")));
+                                node.put("source_label",
+                                         getString (curent.payload("label")));
+                                // ogg's label is the gene symbol
+                                node.put("gene_symbol",
+                                         getString (xe.payload("label")));
+                                /*
+                                  node.put("association_type",
+                                  getString (curent.payload
+                                  ("MIMTYPEVALUE")));
+                                */
+                                node.put("association_type",
+                                         "Role in the phenotype of");
+                                node.put("source_validation",
+                                         getString (curent.payload
+                                                    ("MIMTYPEMEANING")));
+                                node.put("gene_sfdc_id", "");
+                                genes.add(node);
+                            }
                             neighbors.add(xe);
                         }
                     }
@@ -816,6 +830,19 @@ public class HoofBeats {
                     e.neighbors(this, R_hasPhenotype);
                 }
             }
+        }
+
+        HPOPhenotypes (final PrintStream ps) {
+            this.phenos = null;
+            ef.cypher(row -> {
+                    Entity e = ef.getEntity((Long)row.get("id"));
+                    neighbors.add(e);
+                    return true;
+                }, "match (d)-[:PAYLOAD]->(n:S_HP) "
+                +"where d.hasOBONamespace='human_phenotype' "
+                +"return id(n) as id");
+            writeEntities (ps, neighbors, new HashSet<>(),
+                           HoofBeats.this::writePhenotype);
         }
 
         public boolean visit (long id, Entity xe, StitchKey key,
@@ -2099,10 +2126,21 @@ public class HoofBeats {
                                                      (base+"_diseases.json"));
              PrintStream genes = new PrintStream (new FileOutputStream
                                                   (base+"_genes.json"));
+             PrintStream allgenes = new PrintStream (new FileOutputStream
+                                                     (base+"_allgenes.json"));
+             PrintStream allpheno = new PrintStream (new FileOutputStream
+                                                     (base+"_allpheno.json"));
              PrintStream phenotypes = new PrintStream
              (new FileOutputStream (base+"_phenotypes.json"));
              PrintStream drugs = new PrintStream (new FileOutputStream
                                                   (base+"_drugs.json"))) {
+            allgenes.print("[");
+            allpheno.print("[");
+            OMIMGenes omim = new OMIMGenes (allgenes);
+            HPOPhenotypes pheno = new HPOPhenotypes (allpheno);
+            allgenes.println("]\n}]");
+            allpheno.println("]\n}]");
+            
             return writeJson (diseases, genes, phenotypes, drugs);
         }
     }

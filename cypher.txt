@@ -262,3 +262,8 @@ and not exists(a.deprecated)
 and not (n)<-[:R_subClassOf]-(:S_MONDO)
 with distinct labels(m) as t, count(distinct n) as cnt unwind t as Label
 return Label, sum(cnt) as Count order by Label
+
+
+# monogenic disease, gene, association type (if available),
+#   and associated phenotype count
+match p=(d)-[:PAYLOAD]->(n:S_OMIM:T047)-[:I_CODE]-(:`S_MONOGENIC DISEASE`)-[e:I_GENE]-(m:S_ORDO_ORPHANET)<-[:PAYLOAD]-(z) where d.MIMTYPE='3' and (n)-[:I_GENE]-(m) optional match (n)-[i:R_hasPhenotype]->(:S_HP)<-[:PAYLOAD]-(y) where i.DatabaseID = d.notation optional match q=(n)-[:R_equivalentClass|:R_exactMatch]-(:S_MONDO)-[:R_equivalentClass|:R_exactMatch]-(o:S_ORDO_ORPHANET)-[a:R_rel{name:'disease_associated_with_gene'}]->(m) optional match r=(x)-[:PAYLOAD]->(o) return distinct d.notation as OMIM_ID, d.label as OMIM_Disease, x.notation as Orpha_ID, x.label as Orpha_Disease,e.value as Gene, a.DisorderGeneAssociationType as Type,a.DisorderGeneAssociationValidationStatus as Status, count(y) as Phenotypes order by Gene, OMIM_ID
