@@ -7,6 +7,7 @@ cache="cache=hash.db"
 orphclass="orphanet_classifications"
 orpha="orpha"
 hpo="hpo"
+monogenic="data/conf/monogenic.conf"
 # medgen if available
 medgen="medgen"
 #clinvar if available
@@ -93,6 +94,10 @@ if test -e $hpo/phenotype.hpoa; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.HPOEntityFactory $out $hpo/phenotype.hpoa"
 fi
 
+if test -e $monogenic; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $out $monogenic"
+fi
+
 #load additional orphanet relationships if available
 #if test -d $orphclass; then
 #    sbt stitcher/"runMain ncats.stitcher.impl.OrphanetClassificationEntityFactory $out $orphclass"
@@ -138,6 +143,9 @@ fi
 if test -f $ppi; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.PPIEntityFactory $out $ppi"
 fi
+
+# tcrd/pharos
+sbt $opts stitcher/"runMain ncats.stitcher.impl.TCRDEntityFactory $out jdbc:mysql://tcrd.ncats.io/tcrd660"
 
 # make sure these are loaded after medgen
 owl_last="go-plus.owl.gz efo.owl.gz mondo.owl.gz CIDO.owl.gz"

@@ -48,9 +48,9 @@ data_sources = {
         'name': 'Orphanet',
         'cons': 'not exists({X}.symbol) and not exists({X}.reason_for_obsolescence)'
     },
-#    'S_GHR': {
-#        'name': 'GHR'
-#    },
+    'S_GHR': {
+        'name': 'GHR'
+    },
 #    'S_HP': {
 #        'name': 'HPO'
 #    },
@@ -159,19 +159,20 @@ match (n:S_GARD)-[e1:N_Name|:I_CODE]-(m:S_MONDO)-[e2:N_Name|:I_CODE]-(o:S_ORDO_O
             series.append([ds1['name'], ds2['name']])
             data.append((d[s1] + d[s2])/2)
             #print(json.dumps(d, indent=2))
-        query = 'match (a:`%s`' % s1
-        if 'labels' in ds1:
-            for l in ds1['labels']:
-                query += ':`%s`' % l
-        query += ')<-[:PAYLOAD]-(d) where not a:TRANSIENT'
-        if 'cons' in ds1:
-            query += ' and ' + ds1['cons'].format(X='d')
-        for r in session.run(query+' return count(distinct a) as count'):
-            series.append([ds1['name']])
-            data.append(r['count'])
+
+#        query = 'match (a:`%s`' % s1
+#        if 'labels' in ds1:
+#            for l in ds1['labels']:
+#                query += ':`%s`' % l
+#        query += ')<-[:PAYLOAD]-(d) where not a:TRANSIENT'
+#        if 'cons' in ds1:
+#            query += ' and ' + ds1['cons'].format(X='d')
+#        for r in session.run(query+' return count(distinct a) as count'):
+#            series.append([ds1['name']])
+#            data.append(r['count'])
 
     D = from_memberships(series, data=data)
-    plot(D)#, orientation='vertical', show_counts='%d')
+    plot(D, show_counts='%d')#, orientation='vertical'
     pyplot.show()
     
     return mat

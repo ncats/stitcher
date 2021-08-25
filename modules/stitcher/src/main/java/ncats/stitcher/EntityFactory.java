@@ -2507,11 +2507,42 @@ public class EntityFactory implements Props, AutoCloseable {
                 traversal (xn, path, paths, seen, dir, keys);
             }
         }
-        
-        if (!seen.contains(path.peek())) {
-            paths.add(path.toArray(new Node[0]));
-            for (Node n : path)
-                seen.add(n);
+
+        Node last = path.peek();
+        if (!seen.contains(last)) {
+            Set<Node> branches = new HashSet<>();
+            for (Relationship rel : last.getRelationships(dir, keys)) {
+                Set sources = Util.toSet(rel.getProperty(SOURCE, null));
+                Node xn = rel.getOtherNode(last);
+                if (sources.contains(last.getProperty(SOURCE))
+                    && sources.contains(xn.getProperty(SOURCE)))
+                    branches.add(xn);
+            }
+            
+            if (!branches.isEmpty()) {
+                //logger.info(last.getId()+" has branches "+branches);
+                List<Node[]> newpaths = new ArrayList<>();
+                for (Node[] p : paths) {
+                    for (int i = 0; i < p.length && !branches.isEmpty(); ++i) {
+                        if (branches.remove(p[i])) {
+                            for (int j = i; j >= 0; --j)
+                                path.push(p[j]);
+                            newpaths.add(path.toArray(new Node[0]));
+                            seen.addAll(path);
+                            for (int j = i; j >= 0; --j)
+                                path.pop();
+                        }
+                    }
+                    
+                    if (branches.isEmpty())
+                        break;
+                }
+                paths.addAll(newpaths);
+            }
+            else {
+                seen.addAll(path);                
+                paths.add(path.toArray(new Node[0]));
+            }
         }
         path.pop();
     }
@@ -2697,11 +2728,20 @@ public class EntityFactory implements Props, AutoCloseable {
                         String cypher) {
         try (Transaction tx = gdb.beginTx();
              Result result = gdb.execute(cypher)) {
+            long rows = 0;
             while (result.hasNext()) {
                 Map<String, Object> row = result.next();
-                if (!func.apply(row)) {
-                    break;
+                try {
+                    if (!func.apply(row)) {
+                        break;
+                    }
                 }
+                catch (Throwable t) {
+                    logger.log(Level.SEVERE,
+                               "Exception encountered during transaction!", t);
+                }
+                if (++rows % 1000l == 0l)
+                    tx.success();
             }
             tx.success();
         }
