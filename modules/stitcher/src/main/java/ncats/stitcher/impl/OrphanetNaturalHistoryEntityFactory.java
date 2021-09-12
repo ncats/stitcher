@@ -146,6 +146,7 @@ public class OrphanetNaturalHistoryEntityFactory extends OrphanetEntityFactory {
                     break;
                     
                 case "OrphaNumber":
+                case "OrphaCode":
                     if (!"".equals(value)) {
                         Integer orpha = Integer.parseInt(value);
                         switch (parent) {

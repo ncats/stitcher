@@ -111,8 +111,8 @@ if test -e $orpha/en_product9_ages.xml; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetNaturalHistoryEntityFactory $out $orpha/en_product9_ages.xml"
 fi
 
-if test -e $orpha/en_product4_HPO.xml; then
-    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4_HPO.xml"
+if test -e $orpha/en_product4.xml; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4.xml"
 fi
 
 # load disease-gene association; the associations in the owl file aren't up to date

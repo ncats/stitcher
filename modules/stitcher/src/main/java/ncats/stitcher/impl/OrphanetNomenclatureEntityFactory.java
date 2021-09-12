@@ -143,6 +143,7 @@ public class OrphanetNomenclatureEntityFactory extends OrphanetEntityFactory {
                     break;
                     
                 case "OrphaNumber":
+                case "OrphaCode":
                     if (!"".equals(value)) {
                         Integer orpha = Integer.parseInt(value);
                         switch (parent) {
