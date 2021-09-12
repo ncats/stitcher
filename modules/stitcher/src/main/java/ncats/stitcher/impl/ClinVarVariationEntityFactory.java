@@ -40,7 +40,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(ClinVarVariationEntityFactory.class.getName());
 
-    static final boolean LITERATURE_ONLY = true;
+    static final boolean LITERATURE_ONLY = false;
 
     class ClinVarVariationParser implements BiConsumer<XmlStream, byte[]> {
         final DocumentBuilder builder;
@@ -56,8 +56,10 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             try {
                 Document doc = builder.parse(new ByteArrayInputStream (xml));
                 Entity ent = register (xs, doc, xml);
-                if (ent != null)
-                    ++count;
+                if (ent != null) {
+                    if (++count > 4000)
+                        xs.setDone(true);
+                }
             }
             catch (Exception ex) {
                 logger.log(Level.SEVERE,
@@ -111,12 +113,11 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             funcs.add(func.getAttribute("Value"));
         }
         
-        if (LITERATURE_ONLY) {
-            NodeList nodes = (NodeList)xpath.evaluate
-                ("//InterpretedRecord/ClinicalAssertionList/ClinicalAssertion/ClinVarAccession[@SubmitterName=\"OMIM\"]", vcv, XPathConstants.NODESET);
-            if (0 == nodes.getLength() && funcs.isEmpty())
-                return null;
-        }
+        NodeList nodes = (NodeList)xpath.evaluate
+            ("//InterpretedRecord/ClinicalAssertionList/ClinicalAssertion/ClinVarAccession[@SubmitterName=\"OMIM\"]", vcv, XPathConstants.NODESET);
+        boolean omim = nodes.getLength() > 0;
+        if (LITERATURE_ONLY && !omim)
+            return null;
 
         Map<String, Object> data = new LinkedHashMap<>();        
         data.put("id", Long.parseLong(vcv.getAttribute("VariationID")));
@@ -266,6 +267,9 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("interpretations", interpretations.toArray(new String[0]));
         data.put("conditions", conditions.toArray(new String[0]));
         data.put("condition_count", conditionCount);
+
+        if (!LITERATURE_ONLY && !interpretations.contains("Pathogenic"))
+            return null;
 
         Entity ent = register (data);
         if (ent != null) {

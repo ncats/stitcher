@@ -156,7 +156,7 @@ public class OrphanetPrevalenceEntityFactory extends OrphanetEntityFactory {
                              +pd.prevalences.size()+" prevalence(s)");
                     }
                 }
-                else if (OrphaNumber.equals(qn)) {
+                else if (OrphaNumber.equals(qn) || OrphaCode.equals(qn)) {
                     if (Disorder.equals(pn))
                         pd.orphaNumber = Integer.parseInt(value);
                 }
