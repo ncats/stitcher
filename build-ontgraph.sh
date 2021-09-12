@@ -4,6 +4,8 @@ opts='-mem 16384'
 version="v`date +%Y%m%d`"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
+
+owl_path="owl-202109"
 orphclass="orphanet_classifications"
 orpha="orpha"
 hpo="hpo"
@@ -15,6 +17,7 @@ clinvar="clinvar/ClinVarVariationRelease_00-latest.xml.gz"
 genereviews="gene_NBK1116"
 #this might be too much right now
 ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
+
 
 ###########################
 ##### DON'T MESS BELOW
@@ -37,21 +40,21 @@ owl="doid.owl.gz \
    bto.owl.gz \
    clo.owl.gz \
    cl.owl.gz \
-   ddiem.owl.gz \
    uberon.owl.gz \
-   geno.owl.gz \
+   geno.owl \
    ogg.owl.gz \
+   ogg-base.owl \
+   ogg-CoV.owl \
    pw.owl.gz \
    mp.owl.gz \
    oae.owl.gz \
-   rxno.owl.gz \
    ogms.owl \
    pato.owl.gz \
    RXNORM.ttl.gz \
    ATC.ttl \
    fma.owl.gz \
-   COVIDCRFRAPID.owl"
-owl_path="owl-202002"
+   COVID.owl.gz"
+
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
 
