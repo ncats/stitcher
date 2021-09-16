@@ -1232,7 +1232,9 @@ public class OntEntityFactory extends EntityRegistry {
             }
         }
         else if (ontology.props.get("title") != null
-                 && "mondo.owl".equals(ontology.resource.getLocalName())) {
+                 && ("mondo.owl".equals(ontology.resource.getLocalName())
+                     || ontology.props.get("title").toString()
+                     .toLowerCase().contains("mondo"))) {
             for (String x : xrefs) {
                 String u = x.toUpperCase();
                 // these are not stitch identifiers 🙄
@@ -1487,10 +1489,12 @@ public class OntEntityFactory extends EntityRegistry {
             data.put("equivalentTo", svals.keySet().toArray(new String[0]));
         }
 
+        /*
         if ("MONDO:0007201".equals(data.get("notation"))) {
             logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>\n"+or);
             logger.info("++++++++++++++++++++++++++\n"+Util.toString(data));
         }
+        */
 
         Entity ent = register (sigh (data));
         if (or.props.isEmpty() && or.axioms.isEmpty()) {
