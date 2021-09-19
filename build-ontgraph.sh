@@ -26,6 +26,7 @@ ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 # make sure MONDO is last in disease ontologies
 owl="doid.owl.gz \
    hp.owl.gz \
+   go.owl.gz \
    MEDLINEPLUS.ttl.gz \
    MESH.ttl.gz \
    OMIM.ttl.gz \
@@ -45,6 +46,7 @@ owl="doid.owl.gz \
    ogg.owl.gz \
    ogg-base.owl \
    ogg-CoV.owl \
+   pr.owl.gz \
    pw.owl.gz \
    mp.owl.gz \
    oae.owl.gz \
@@ -71,6 +73,9 @@ sbt $opts stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
 #load NORD
 sbt $opts stitcher/"runMain ncats.stitcher.impl.NORDEntityFactory $out"
 
+#load ChEBI
+sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.owl.gz"
+
 # load ontologies
 #sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
 for f in $owl_files; do
@@ -82,9 +87,6 @@ done
 #    omim_credentials=`cat omim-credentials.txt`
 #    sbt stitcher/"runMain ncats.stitcher.impl.OMIMUpdateEntityFactory $out $omim_credentials"
 #fi
-
-#load ChEBI
-sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.owl.gz"
 
 #load rancho
 sbt $opts stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/rancho-disease-drug_2018-12-18_13-30.txt"
