@@ -84,6 +84,7 @@ public class GTREntityFactory extends EntityRegistry {
         setNameField ("name");
         add (N_Name, "diseases")
             .add(I_CODE, "xrefs")
+            .add(I_GENE, "genes")
             .add(T_Keyword, "mechanism")
             .add(T_Keyword, "type")
             .add(T_Keyword, "purposes")
@@ -108,47 +109,72 @@ public class GTREntityFactory extends EntityRegistry {
         
         Set<String> diseases = new TreeSet<>();
         Set<String> xrefs = new TreeSet<>();
+        Set<String> genes = new TreeSet<>();
+        
         values = (NodeList)xpath.evaluate
-            ("./ClinVarSet/ClinVarAssertion/TraitSet/Trait[@Type=\"Disease\"]",
-             gtr, XPathConstants.NODESET);
+            ("./ClinVarSet/ClinVarAssertion", gtr, XPathConstants.NODESET);
         for (int i = 0; i < values.getLength(); ++i) {
-            Element trait = (Element)values.item(i);
-            NodeList names = (NodeList)xpath.evaluate
-                ("./Name", trait, XPathConstants.NODESET);
-            for (int j = 0; j < names.getLength(); ++j)
-                diseases.add(((Element)names.item(j)).getTextContent());
-            NodeList nl = (NodeList)xpath.evaluate
-                ("./XRef", trait, XPathConstants.NODESET);
-            for (int j = 0; j < nl.getLength(); ++j) {
-                Element xref = (Element)nl.item(j);
-                String db = xref.getAttribute("DB");
-                String id = xref.getAttribute("ID");
-                String xf = null;
-                switch (db) {
-                case "OMIM": xf = "OMIM:"+id; break;
-                case "Orphanet": xf = "ORPHA:"+id; break;
-                case "MedGen":
-                    if (id.startsWith("CN"))
-                        xf = "MEDGEN:"+id;
-                    else
-                        xf = "UMLS:"+id;
-                    break;
-                case "Human Phenotype Ontology":
-                case "MONDO":
-                    xf = id;
-                    break;
-                case "Office of Rare Diseases":
-                    xf = String.format("GARD:%1%07d", Integer.parseInt(id));
-                    break;
+            Element cva = (Element)values.item(i);
+            NodeList traits = (NodeList)xpath.evaluate
+                ("./TraitSet/Trait[@Type=\"Disease\"]",
+                 cva, XPathConstants.NODESET);
+            for (int k = 0; k < traits.getLength(); ++k) {
+                Element trait = (Element)traits.item(k);
+                NodeList names = (NodeList)xpath.evaluate
+                    ("./Name", trait, XPathConstants.NODESET);
+                for (int j = 0; j < names.getLength(); ++j)
+                    diseases.add(((Element)names.item(j)).getTextContent());
+                NodeList nl = (NodeList)xpath.evaluate
+                    ("./XRef", trait, XPathConstants.NODESET);
+                for (int j = 0; j < nl.getLength(); ++j) {
+                    Element xref = (Element)nl.item(j);
+                    String db = xref.getAttribute("DB");
+                    String id = xref.getAttribute("ID");
+                    String xf = null;
+                    switch (db) {
+                    case "OMIM": xf = "OMIM:"+id; break;
+                    case "Orphanet": xf = "ORPHA:"+id; break;
+                    case "MedGen":
+                        if (id.startsWith("CN"))
+                            xf = "MEDGEN:"+id;
+                        else
+                            xf = "UMLS:"+id;
+                        break;
+                    case "Human Phenotype Ontology":
+                    case "MONDO":
+                        xf = id;
+                        break;
+                    case "Office of Rare Diseases":
+                        xf = String.format("GARD:%1$07d", Integer.parseInt(id));
+                        break;
+                    }
+                    if (xf != null)
+                        xrefs.add(xf);
                 }
-                if (xf != null)
-                    xrefs.add(xf);
+            }
+            NodeList measures = (NodeList)xpath.evaluate
+                ("./MeasureSet/Measure[@Type=\"Gene\"]",
+                 cva, XPathConstants.NODESET);
+            for (int k = 0; k < measures.getLength(); ++k) {
+                Element measure = (Element)measures.item(k);
+                String gene = xpath.evaluate
+                    ("./Symbol[@Type=\"Preferred\"]", measure);
+                if (!"".equals(gene)) {
+                    genes.add(gene);
+                }
+                NodeList nl = (NodeList)xpath.evaluate
+                    ("./XRef[@DB=\"OMIM\"]", measure, XPathConstants.NODESET);
+                for (int j = 0; j < nl.getLength(); ++j) {
+                    xrefs.add("OMIM:"+((Element)nl.item(j)).getAttribute("ID"));
+                }
             }
         }
         if (!diseases.isEmpty())
             data.put("diseases", diseases.toArray(new String[0]));
         if (!xrefs.isEmpty())
             data.put("xrefs", xrefs.toArray(new String[0]));
+        if (!genes.isEmpty())
+            data.put("genes", genes.toArray(new String[0]));
 
         values = (NodeList)xpath.evaluate
             ("./Indications", gtr, XPathConstants.NODESET);
