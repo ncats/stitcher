@@ -46,7 +46,6 @@ owl="doid.owl.gz \
    ogg.owl.gz \
    ogg-base.owl \
    ogg-CoV.owl \
-   pr.owl.gz \
    pw.owl.gz \
    mp.owl.gz \
    oae.owl.gz \

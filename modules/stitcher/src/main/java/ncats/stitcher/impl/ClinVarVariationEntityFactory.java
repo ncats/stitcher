@@ -98,6 +98,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         setIdField ("id");
         setNameField ("name");
         add (I_GENE, "genes")
+            .add(I_CODE, "tests")
             .add(T_Keyword, "type")
             .add(T_Keyword, "species")
             .add(T_Keyword, "interpretations")
@@ -214,6 +215,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
              vcv, XPathConstants.NODESET);
         List<Map> interps = new ArrayList<>();
         Set<String> conditions = new TreeSet<>();
+        Set<String> tests = new TreeSet<>();
         int conditionCount = 0;
         for (int i = 0; i < values.getLength(); ++i) {
             Element elm = (Element)values.item(i);
@@ -314,7 +316,9 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
                     String db = g.getAttribute("DB");
                     if (db.indexOf("GTR") > 0) {
                         if (gtr > 0) line.append(",");
-                        line.append(g.getAttribute("ID"));
+                        String t = g.getAttribute("ID");
+                        line.append(t);
+                        tests.add(t);
                         ++gtr;
                     }
                 }
@@ -343,10 +347,12 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("conditions", conditions.toArray(new String[0]));
         data.put("condition_count", conditionCount);
 
-        if (!LITERATURE_ONLY && !interpretations.contains("Pathogenic"))
+        if (!interpretations.contains("Pathogenic")
+            && !omim && tests.isEmpty())
             return null;
+        data.put("tests", tests.toArray(new String[0]));
 
-        Entity ent = register (data);
+        Entity ent = null;//register (data);
         if (ent != null) {
             logger.info("++++++ "+String.format("%1$6d ", xs.getCount())
                         +data.get("accession")+": genes="+genes
