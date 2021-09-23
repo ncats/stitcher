@@ -215,7 +215,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
              vcv, XPathConstants.NODESET);
         List<Map> interps = new ArrayList<>();
         Set<String> conditions = new TreeSet<>();
-        Set<String> tests = new TreeSet<>();
+        Set<String> gtrtests = new TreeSet<>();
         int conditionCount = 0;
         for (int i = 0; i < values.getLength(); ++i) {
             Element elm = (Element)values.item(i);
@@ -318,7 +318,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
                         if (gtr > 0) line.append(",");
                         String t = g.getAttribute("ID");
                         line.append(t);
-                        tests.add(t);
+                        gtrtests.add(t);
                         ++gtr;
                     }
                 }
@@ -348,9 +348,9 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("condition_count", conditionCount);
 
         if (!interpretations.contains("Pathogenic")
-            && !omim && tests.isEmpty())
+            && !omim && gtrtests.isEmpty())
             return null;
-        data.put("tests", tests.toArray(new String[0]));
+        data.put("tests", gtrtests.toArray(new String[0]));
 
         Entity ent = null;//register (data);
         if (ent != null) {
