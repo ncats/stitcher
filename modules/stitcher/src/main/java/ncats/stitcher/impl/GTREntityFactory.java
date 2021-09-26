@@ -51,7 +51,8 @@ public class GTREntityFactory extends EntityRegistry {
                 Document doc = builder.parse(new ByteArrayInputStream (xml));
                 Entity ent = register (xs, doc, xml);
                 if (ent != null) {
-                    //if (++count > 1000)
+                    ++count;
+                    //if (count > 1000)
                     //  xs.setDone(true);
                 }
             }
@@ -120,12 +121,11 @@ public class GTREntityFactory extends EntityRegistry {
                  cva, XPathConstants.NODESET);
             for (int k = 0; k < traits.getLength(); ++k) {
                 Element trait = (Element)traits.item(k);
-                NodeList names = (NodeList)xpath.evaluate
-                    ("./Name", trait, XPathConstants.NODESET);
+                NodeList names = trait.getElementsByTagName("Name");
                 for (int j = 0; j < names.getLength(); ++j)
                     diseases.add(((Element)names.item(j)).getTextContent());
-                NodeList nl = (NodeList)xpath.evaluate
-                    ("./XRef", trait, XPathConstants.NODESET);
+                                
+                NodeList nl = trait.getElementsByTagName("XRef");
                 for (int j = 0; j < nl.getLength(); ++j) {
                     Element xref = (Element)nl.item(j);
                     String db = xref.getAttribute("DB");
@@ -151,6 +151,15 @@ public class GTREntityFactory extends EntityRegistry {
                     if (xf != null)
                         xrefs.add(xf);
                 }
+                
+                if (xrefs.contains("MONDO:0003847")
+                    || xrefs.contains("C0019247")) { // bail out
+                    logger.warning
+                        ("*** skipping "+accession+": "+data.get("name"));
+                    return null;
+                }
+
+                System.err.print('.');
             }
             NodeList measures = (NodeList)xpath.evaluate
                 ("./MeasureSet/Measure[@Type=\"Gene\"]",
@@ -195,9 +204,10 @@ public class GTREntityFactory extends EntityRegistry {
 
         Entity ent = register (data);
         if (ent != null) {
-            logger.info("++++++ "+String.format("%1$6d ", xs.getCount())
+            logger.info("++++++ "+ String.format("%1$6d ", xs.getCount())
                         +data.get("accession")+": "+data.get("name")
-                        +" xrefs="+xrefs.size());
+                        +" xrefs="+xrefs.size()+" diseases="
+                        +diseases.size()+" genes="+genes.size());
         }
         return ent;
     }
