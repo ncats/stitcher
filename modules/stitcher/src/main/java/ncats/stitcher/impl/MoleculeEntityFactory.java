@@ -65,11 +65,13 @@ public class MoleculeEntityFactory extends EntityRegistry {
 
     public Entity _register (final Molecule mol) {
         String idval =  null;
+        String SOURCE = getDataSource().getName();
+
         // add unique identifier to node (source is already present as label?)
         if (idField != null) {
             idval = mol.getProperty(idField);
         }
-
+       
         Entity ent = Entity._getEntity(_createNode ());
         DefaultPayload payload = new DefaultPayload (getDataSource ());
 
@@ -182,7 +184,7 @@ public class MoleculeEntityFactory extends EntityRegistry {
             mapValues (ent, values);
         }
 
-        // now store all original properties..
+        // now store all original properties...
         for (int i = 0; i < mol.getPropertyCount(); ++i) {
             String prop = mol.getPropertyKey(i);
             String value = mol.getProperty(prop);
@@ -190,19 +192,27 @@ public class MoleculeEntityFactory extends EntityRegistry {
             if (value != null && !payload.has(prop)) {
                 List<String> values = new ArrayList<String>();
                 int max = 0;
-                for (String s : value.split("\n")) {
-                    String v = s.trim();
-                    int len = v.length();
-                    if (len > 0) {
-                        if (len > max) {
-                            max = len;
+
+                // FRDB source does not have properties with a newline separator
+                if (SOURCE.startsWith("FRDB")) {
+                    values.add(value);
+                } else {
+                    for (String s : value.split("\n")) {
+                        String v = s.trim();
+                        int len = v.length();
+                        if (len > 0) {
+                            if (len > max) {
+                                max = len;
+                            }
+                            values.add(v);
                         }
-                        values.add(v);
                     }
                 }
+
                 // don't index if the string content is too long
-                if (!values.isEmpty())
+                if (!values.isEmpty()) {
                     payload.put(prop, values.toArray(new String[0]), max < 100);
+                }
             }
             properties.add(prop);
         }
