@@ -9,9 +9,9 @@ curr_time=$(date +%s)
 
 echo $(date) > $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, July 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-07-29.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, July 2021\" cache=data/hash.db data/test/frdb_test_olaparib.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, May 2021\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2021-05-02.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, May 2021\" cache=data/hash.db data/test/dump-test-olaparib.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 #sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory stitchvTEST.db data/ob.conf"
@@ -22,6 +22,6 @@ echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt -mem 32000 stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-zip -r $dbzip $db
+#zip -r $dbzip $db
 
 echo $(date) >> $log
