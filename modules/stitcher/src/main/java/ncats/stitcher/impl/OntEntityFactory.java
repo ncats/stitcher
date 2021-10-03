@@ -33,6 +33,7 @@ public class OntEntityFactory extends EntityRegistry {
 
     static final int DEBUG = 0;
     static final String OBO_URI = "http://purl.obolibrary.org/obo/";
+    static final String ORPHA_URI = "http://www.orpha.net/ORDO/";
 
     /*
      * minimum length for xref
@@ -1481,17 +1482,7 @@ public class OntEntityFactory extends EntityRegistry {
                     if ("hasDbXref".equals(rn)
                         && Util.contained(ax.props.get("source"),
                                           "MONDO:equivalentTo")) {
-                        // sigh.. why doesn't mondo add a skos:equivalentClass?
-                        String val = v.toString().toUpperCase();
-                        if (val.startsWith("ORPHANET")) {
-                            // make sure we capture equivalentTo for orphanet
-                            int pos = val.indexOf(':');
-                            if (pos > 0) {
-                                svals.put("ORPHA"+val.substring(pos),
-                                          ax.props.get("source"));
-                            }
-                        }
-                        svals.put(val, ax.props.get("source"));
+                        svals.put(v.toString(), ax.props.get("source"));
                     }
                     data.put(rn, old != null ? Util.merge(old, v) : v);
                 }
@@ -1554,7 +1545,9 @@ public class OntEntityFactory extends EntityRegistry {
             attrs.put(Props.SOURCE, source.getKey());
             attrs.put(Props.NAME, "equivalentTo");
             for (Map.Entry<String, Object> me : svals.entrySet()) {
-                String uri = OBO_URI+me.getKey().replace(":", "_");
+                String cui = me.getKey().replace(":", "_");
+                String uri = (cui.startsWith("Orphanet")
+                              ? ORPHA_URI : OBO_URI)+cui;
                 attrs.put("_source", me.getValue());
                 for (Iterator<Entity> iter = find (Props.URI, uri);
                      iter.hasNext(); ) {
