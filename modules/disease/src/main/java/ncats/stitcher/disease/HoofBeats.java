@@ -1452,46 +1452,23 @@ public class HoofBeats {
         JsonNode doDiagnoses () {
             ArrayNode diagnoses = mapper.createArrayNode();
 
-            if (false) {
-                Entity[] ents = get ("S_MEDGEN");
-                if (ents != null && ents.length > 0) {
-                    for (Entity e : ents) {
-                        boolean hasGTR = false;
-                        for (Object source :
-                                 Util.toArray(e.payload("SOURCES"))) {
-                            if ("GTR".equals(source)) {
-                                hasGTR = true;
-                                break;
-                            }
-                        }
-                        
-                        if (hasGTR) {
-                            ObjectNode node = newJsonObject ();
-                            node.put("type", "GTR");
-                            node.put("curie", "MEDGEN:"+e.payload("CUI"));
-                            diagnoses.add(node);
-                        }
-                    }
-                }
-            }
-            
-            Entity[] ents = get ("S_GTR");
+            Entity[] ents = get ("S_MEDGEN");
             if (ents != null && ents.length > 0) {
-                final Set<String> medgen = new TreeSet<>();
                 for (Entity e : ents) {
+                    final Set<Entity> gtr = new TreeSet<>();
                     e.neighbors((id, xe, key, reversed, props) -> {
-                            if (xe.is("S_MEDGEN")) {
-                                medgen.add("MEDGEN:"+xe.payload("CUI"));
+                            if (xe.is("S_GTR")) {
+                                gtr.add(xe);
                             }
                             return true;
                         }, I_CODE);
-                }
-                
-                for (String id : medgen) {
-                    ObjectNode node = newJsonObject ();
-                    node.put("type", "GTR");
-                    node.put("curie", id);
-                    diagnoses.add(node);
+
+                    if (!gtr.isEmpty()) {
+                        ObjectNode node = newJsonObject ();
+                        node.put("type", "GTR");
+                        node.put("curie", "MEDGEN:"+e.payload("CUI"));
+                        diagnoses.add(node);
+                    }
                 }
             }
             
