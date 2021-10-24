@@ -1661,7 +1661,8 @@ public class HoofBeats {
                 ObjectNode node = newJsonObject ();
                 node.put("curie", me.getValue());
                 node.put("label", me.getKey());
-                node.put("category", "Disease Ontology");
+                //node.put("category", "Disease Ontology");
+                node.put("category", "Specialist");
                 node.put("tag_sfdc_id", "");
                 nodes.add(node);
             }
