@@ -34,6 +34,7 @@ public abstract class OrphanetEntityFactory extends EntityRegistry {
     static final QName ExpertLink = new QName (NS, "ExpertLink");
     static final QName DisorderType = new QName (NS, "DisorderType");
     static final QName OrphaNumber = new QName (NS, "OrphaNumber");
+    static final QName OrphaCode = new QName (NS, "OrphaCode");
     static final QName Name = new QName (NS, "Name");
 
     static class Term {

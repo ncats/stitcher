@@ -384,10 +384,10 @@ FROM GARD_Disease_Category__c where GARD_Disease__c = '%s'
                     }
                 }
             for x in self.d['disease_categories']:
-                c = categories[x['curie']]
-                if c != None:
-                    x['Id'] = c['Id']
-                    x['category_sfdc_id'] = c['category_sfdc_id']
+                curie = x['curie']
+                if curie in categories and categories[curie] != None:
+                    x['Id'] = categories[curie]['Id']
+                    x['category_sfdc_id'] = categories[curie]['category_sfdc_id']
                 else:
                     x['Id'] = ''
                     x['category_sfdc_id'] = ''
@@ -593,6 +593,7 @@ SELECT Id FROM Feature__c where External_ID__c = '%s'
                     else:
                         print('%s: key "%s" not found for "%s"; treating as new'
                               % (self.term, key, f), file=sys.stderr)
+                        print('=> %s' % lut, file=sys.stderr)
                         self.changes.append(key)
                         values.append(x)
                         

@@ -40,7 +40,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
     static final Logger logger =
         Logger.getLogger(ClinVarVariationEntityFactory.class.getName());
 
-    static final boolean LITERATURE_ONLY = true;
+    static final boolean LITERATURE_ONLY = false;
 
     class ClinVarVariationParser implements BiConsumer<XmlStream, byte[]> {
         final DocumentBuilder builder;
@@ -56,8 +56,10 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             try {
                 Document doc = builder.parse(new ByteArrayInputStream (xml));
                 Entity ent = register (xs, doc, xml);
-                if (ent != null)
-                    ++count;
+                if (ent != null) {
+                    //if (++count > 4000)
+                    //    xs.setDone(true);
+                }
             }
             catch (Exception ex) {
                 logger.log(Level.SEVERE,
@@ -68,6 +70,7 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
     }
 
     DateFormat df = new SimpleDateFormat ("yyyy-MM-dd");
+    PrintStream out;
 
     public ClinVarVariationEntityFactory(GraphDb graphDb) throws IOException {
         super (graphDb);
@@ -80,6 +83,14 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
     public ClinVarVariationEntityFactory (File dir) throws IOException {
         super (dir);
     }
+
+    @Override
+    public void shutdown () {
+        super.shutdown();
+        if (out != null) {
+            out.close();
+        }
+    }
     
     @Override
     protected void init () {
@@ -87,11 +98,18 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         setIdField ("id");
         setNameField ("name");
         add (I_GENE, "genes")
+            .add(I_CODE, "tests")
             .add(T_Keyword, "type")
             .add(T_Keyword, "species")
             .add(T_Keyword, "interpretations")
             .add(T_Keyword, "consequences")
             ;
+        try {
+            out = new PrintStream (new FileOutputStream ("clinvar_summary.txt"));
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     Entity register (XmlStream xs, Document doc, byte[] xml) throws Exception {
@@ -111,16 +129,16 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             funcs.add(func.getAttribute("Value"));
         }
         
-        if (LITERATURE_ONLY) {
-            NodeList nodes = (NodeList)xpath.evaluate
-                ("//InterpretedRecord/ClinicalAssertionList/ClinicalAssertion/ClinVarAccession[@SubmitterName=\"OMIM\"]", vcv, XPathConstants.NODESET);
-            if (0 == nodes.getLength() && funcs.isEmpty())
-                return null;
-        }
+        NodeList nodes = (NodeList)xpath.evaluate
+            ("//InterpretedRecord/ClinicalAssertionList/ClinicalAssertion/ClinVarAccession[@SubmitterName=\"OMIM\"]", vcv, XPathConstants.NODESET);
+        boolean omim = nodes.getLength() > 0;
+        if (LITERATURE_ONLY && !omim)
+            return null;
 
-        Map<String, Object> data = new LinkedHashMap<>();        
+        Map<String, Object> data = new LinkedHashMap<>();
+        String accession = vcv.getAttribute("Accession");
         data.put("id", Long.parseLong(vcv.getAttribute("VariationID")));
-        data.put("accession", vcv.getAttribute("Accession"));
+        data.put("accession", accession);
         data.put("name", vcv.getAttribute("VariationName"));
         data.put("type", type);
         data.put("version", Integer.parseInt(vcv.getAttribute("Version")));
@@ -191,15 +209,24 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             rcv.add(((Attr)values.item(i)).getValue());
         }
         data.put("RCV", rcv.toArray(new String[0]));
-
+        
         values = (NodeList)xpath.evaluate
             ("./InterpretedRecord/Interpretations/Interpretation",
              vcv, XPathConstants.NODESET);
         List<Map> interps = new ArrayList<>();
         Set<String> conditions = new TreeSet<>();
+        Set<String> gtrtests = new TreeSet<>();
         int conditionCount = 0;
         for (int i = 0; i < values.getLength(); ++i) {
             Element elm = (Element)values.item(i);
+
+            values = (NodeList) xpath.evaluate
+                ("./Description", elm, XPathConstants.NODESET);
+            String desc = "";
+            if (values.getLength() > 0) {
+                desc = ((Element)values.item(0)).getTextContent();
+            }
+            
             NodeList cites = (NodeList)xpath.evaluate
                 ("./Citation/ID[@Source=\"PubMed\"]",
                  elm, XPathConstants.NODESET);
@@ -212,9 +239,26 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
             Set<String> xrefs = new TreeSet<>();
             for (int j = 0; j < traits.getLength(); ++j) {
                 Element trait = (Element)traits.item(j);
+
+                StringBuilder line = new StringBuilder ();
+                for (String sym : genes) {
+                    if (line.length() > 0)
+                        line.append(",");
+                    line.append(sym);
+                }
+                
+                NodeList names = (NodeList) xpath.evaluate
+                    ("./Name/ElementValue[@Type=\"Preferred\"]",
+                     trait, XPathConstants.NODESET);
+                line.append("\t");                
+                if (names.getLength() > 0) {
+                    line.append(((Element)names.item(0)).getTextContent());
+                }
+                
                 NodeList refs = (NodeList)xpath.evaluate
                     ("./XRef", trait, XPathConstants.NODESET);
-                for (int k = 0; k < refs.getLength(); ++k) {
+                line.append("\t");
+                for (int k = 0, xid = 0; k < refs.getLength(); ++k) {
                     Element r = (Element)refs.item(k);
                     String db = r.getAttribute("DB");
                     String id = r.getAttribute("ID");
@@ -226,25 +270,61 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
                     }
                     System.out.println();
                     */
+                    String xf = null;
                     switch (db) {
                     case "Orphanet":
-                        xrefs.add("ORPHA:"+id);
+                        xf = "ORPHA:"+id;
                         break;
                     case "MedGen":
-                        xrefs.add("UMLS:"+id);
+                        xf = "UMLS:"+id;
                         break;
                     case "OMIM":
-                        xrefs.add("OMIM:"+id);
+                        xf = "OMIM:"+id;
                         break;
                     case "HP":
                     case "Human Phenotype Ontology":
-                        xrefs.add(id);
+                        xf = id;
                     break;
                     case "Office of Rare Diseases":
-                        xrefs.add(String.format
-                                  ("GARD:%1$07d", Integer.parseInt(id)));
+                        xf = String.format
+                            ("GARD:%1$07d", Integer.parseInt(id));
                         break;
                     }
+                    
+                    if (xf != null) {
+                        if (xid > 0)
+                            line.append(",");
+                        line.append(xf);
+                        xrefs.add(xf);
+                        ++xid;
+                    }
+                }
+
+                line.append("\t");
+                NodeList mech = (NodeList)xpath.evaluate
+                    ("./AttributeSet/Attribute[@Type=\"disease mechanism\"]",
+                     trait, XPathConstants.NODESET);
+                if (mech.getLength() > 0) {
+                    line.append(((Element)mech.item(0)).getTextContent());
+                }
+
+                line.append("\t");
+                NodeList tests = (NodeList)xpath.evaluate
+                    ("./AttributeSet/XRef", trait, XPathConstants.NODESET);
+                for (int k = 0, gtr = 0; k < tests.getLength(); ++k) {
+                    Element g = (Element)tests.item(k);
+                    String db = g.getAttribute("DB");
+                    if (db.indexOf("GTR") > 0) {
+                        if (gtr > 0) line.append(",");
+                        String t = g.getAttribute("ID");
+                        line.append(t);
+                        gtrtests.add(t);
+                        ++gtr;
+                    }
+                }
+
+                if ("Pathogenic".equals(desc)) {
+                    out.println(accession+"\t"+desc+"\t"+line);
                 }
                 
                 if ("Disease".equals(trait.getAttribute("Type"))) {
@@ -267,7 +347,12 @@ public class ClinVarVariationEntityFactory extends EntityRegistry {
         data.put("conditions", conditions.toArray(new String[0]));
         data.put("condition_count", conditionCount);
 
-        Entity ent = register (data);
+        if (!interpretations.contains("Pathogenic")
+            && !omim && gtrtests.isEmpty())
+            return null;
+        data.put("tests", gtrtests.toArray(new String[0]));
+
+        Entity ent = null;//register (data);
         if (ent != null) {
             logger.info("++++++ "+String.format("%1$6d ", xs.getCount())
                         +data.get("accession")+": genes="+genes

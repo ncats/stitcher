@@ -4,6 +4,8 @@ opts='-mem 16384'
 version="v`date +%Y%m%d`"
 out="ncatskg-$version.db"
 cache="cache=hash.db"
+
+owl_path="owl-202109"
 orphclass="orphanet_classifications"
 orpha="orpha"
 hpo="hpo"
@@ -16,6 +18,7 @@ genereviews="gene_NBK1116"
 #this might be too much right now
 ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 
+
 ###########################
 ##### DON'T MESS BELOW
 ###########################
@@ -23,6 +26,7 @@ ppi="ppi/BIOGRID-MV-Physical-3.5.172.mitab.txt.gz"
 # make sure MONDO is last in disease ontologies
 owl="doid.owl.gz \
    hp.owl.gz \
+   go.owl.gz \
    MEDLINEPLUS.ttl.gz \
    MESH.ttl.gz \
    OMIM.ttl.gz \
@@ -37,21 +41,21 @@ owl="doid.owl.gz \
    bto.owl.gz \
    clo.owl.gz \
    cl.owl.gz \
-   ddiem.owl.gz \
    uberon.owl.gz \
-   geno.owl.gz \
+   geno.owl \
    ogg.owl.gz \
+   ogg-base.owl \
+   ogg-CoV.owl \
    pw.owl.gz \
    mp.owl.gz \
    oae.owl.gz \
-   rxno.owl.gz \
    ogms.owl \
    pato.owl.gz \
    RXNORM.ttl.gz \
    ATC.ttl \
    fma.owl.gz \
-   COVIDCRFRAPID.owl"
-owl_path="owl-202002"
+   COVID.owl.gz"
+
 owl_files=`echo $owl | xargs printf " ${owl_path}/%s"`
 #echo $owl_files
 
@@ -68,6 +72,9 @@ sbt $opts stitcher/"runMain ncats.stitcher.impl.GHREntityFactory $out"
 #load NORD
 sbt $opts stitcher/"runMain ncats.stitcher.impl.NORDEntityFactory $out"
 
+#load ChEBI
+sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.owl.gz"
+
 # load ontologies
 #sbt -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $owl_files"
 for f in $owl_files; do
@@ -79,9 +86,6 @@ done
 #    omim_credentials=`cat omim-credentials.txt`
 #    sbt stitcher/"runMain ncats.stitcher.impl.OMIMUpdateEntityFactory $out $omim_credentials"
 #fi
-
-#load ChEBI
-sbt $opts -Djdk.xml.entityExpansionLimit=0 stitcher/"runMain ncats.stitcher.impl.OntEntityFactory $out $cache $owl_path/chebi.owl.gz"
 
 #load rancho
 sbt $opts stitcher/"runMain ncats.stitcher.impl.InxightEntityFactory $out $cache data/rancho-disease-drug_2018-12-18_13-30.txt"
@@ -111,8 +115,8 @@ if test -e $orpha/en_product9_ages.xml; then
     sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetNaturalHistoryEntityFactory $out $orpha/en_product9_ages.xml"
 fi
 
-if test -e $orpha/en_product4_HPO.xml; then
-    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4_HPO.xml"
+if test -e $orpha/en_product4.xml; then
+    sbt $opts stitcher/"runMain ncats.stitcher.impl.OrphanetHPOEntityFactory $out $orpha/en_product4.xml"
 fi
 
 # load disease-gene association; the associations in the owl file aren't up to date

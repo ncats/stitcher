@@ -1451,18 +1451,19 @@ public class HoofBeats {
 
         JsonNode doDiagnoses () {
             ArrayNode diagnoses = mapper.createArrayNode();
+
             Entity[] ents = get ("S_MEDGEN");
             if (ents != null && ents.length > 0) {
                 for (Entity e : ents) {
-                    boolean hasGTR = false;
-                    for (Object source : Util.toArray(e.payload("SOURCES"))) {
-                        if ("GTR".equals(source)) {
-                            hasGTR = true;
-                            break;
-                        }
-                    }
-                    
-                    if (hasGTR) {
+                    final Set<Entity> gtr = new TreeSet<>();
+                    e.neighbors((id, xe, key, reversed, props) -> {
+                            if (xe.is("S_GTR")) {
+                                gtr.add(xe);
+                            }
+                            return true;
+                        }, I_CODE);
+
+                    if (!gtr.isEmpty()) {
                         ObjectNode node = newJsonObject ();
                         node.put("type", "GTR");
                         node.put("curie", "MEDGEN:"+e.payload("CUI"));
@@ -1470,7 +1471,7 @@ public class HoofBeats {
                     }
                 }
             }
-
+            
             Set<Entity> newborn = new HashSet<>();
             for (Entity[] ez : entities.values()) {
                 for (Entity e : ez) {
@@ -1660,7 +1661,8 @@ public class HoofBeats {
                 ObjectNode node = newJsonObject ();
                 node.put("curie", me.getValue());
                 node.put("label", me.getKey());
-                node.put("category", "Disease Ontology");
+                //node.put("category", "Disease Ontology");
+                node.put("category", "Specialist");
                 node.put("tag_sfdc_id", "");
                 nodes.add(node);
             }

@@ -136,7 +136,7 @@ public class OrphanetHPOEntityFactory extends OrphanetEntityFactory {
                              +hd.phenotypes.size()+" phenotype(s)");
                     }
                 }
-                else if (OrphaNumber.equals(qn)) {
+                else if (OrphaNumber.equals(qn) || OrphaCode.equals(qn)) {
                     if (Disorder.equals(pn))
                         hd.orphaNumber = Integer.parseInt(value);
                 }

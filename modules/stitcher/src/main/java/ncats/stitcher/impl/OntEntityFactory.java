@@ -33,6 +33,7 @@ public class OntEntityFactory extends EntityRegistry {
 
     static final int DEBUG = 0;
     static final String OBO_URI = "http://purl.obolibrary.org/obo/";
+    static final String ORPHA_URI = "http://www.orpha.net/ORDO/";
 
     /*
      * minimum length for xref
@@ -91,12 +92,14 @@ public class OntEntityFactory extends EntityRegistry {
         final public String uri;
         final public String type;
         final public boolean anonymous;
+        final public boolean ignore;
         final public Map<String, Object> props = new TreeMap<>();
         final public Map<String, Object> links = new TreeMap<>();
         final public List<OntologyResource> axioms = new ArrayList<>();
         
         OntologyResource (Resource res) {
             String t = null;
+            boolean ignore = false;
             for (StmtIterator it = res.listProperties(); it.hasNext(); ) {
                 Statement stm = it.next();
                 Property prop = stm.getPredicate();
@@ -109,6 +112,11 @@ public class OntEntityFactory extends EntityRegistry {
                     }
                     Object old = links.get(pname);
                     links.put(pname, old != null ? Util.merge(old, r) : r);
+                    // pr taxon
+                    if ("RO_0002160".equals(pname)
+                        && !"NCBITaxon_9606".equals(r.getLocalName())) { 
+                        ignore = true;
+                    }
                 }
                 else {
                     switch (pname) {
@@ -182,6 +190,7 @@ public class OntEntityFactory extends EntityRegistry {
             this.uri = uri;
             this.type = t;
             this.resource = res;
+            this.ignore = ignore;
         }
 
         public int hashCode () { return resource.hashCode(); }
@@ -200,10 +209,11 @@ public class OntEntityFactory extends EntityRegistry {
         public boolean isOntology () {
             return "Ontology".equalsIgnoreCase(type);
         }
+        public boolean ignore () { return ignore; }
 
         public String toString () {
             StringBuilder sb = new StringBuilder ();
-            sb.append("> ");
+            sb.append((ignore ? "-":"+")+"> ");
             if (isClass()) sb.append(resource.getLocalName()+" "+uri);
             else if (isAxiom()) sb.append("Axiom "+resource.getId());
             else sb.append(type+" "+resource.toString());
@@ -1230,9 +1240,17 @@ public class OntEntityFactory extends EntityRegistry {
                 else if (comment.startsWith("Category=organism-gene")) {
                 }
             }
+            if (data.containsKey("has_gene_template")) {
+                for (Object v : Util.toArray(data.get("has_gene_template"))) {
+                    // HGNC
+                    data.put("P369", v.toString().replaceAll("_", ":"));
+                }
+            }
         }
         else if (ontology.props.get("title") != null
-                 && "mondo.owl".equals(ontology.resource.getLocalName())) {
+                 && ("mondo.owl".equals(ontology.resource.getLocalName())
+                     || ontology.props.get("title").toString()
+                     .toLowerCase().contains("mondo"))) {
             for (String x : xrefs) {
                 String u = x.toUpperCase();
                 // these are not stitch identifiers 🙄
@@ -1464,7 +1482,6 @@ public class OntEntityFactory extends EntityRegistry {
                     if ("hasDbXref".equals(rn)
                         && Util.contained(ax.props.get("source"),
                                           "MONDO:equivalentTo")) {
-                        // sigh.. why doesn't mondo add a skos:equivalentClass?
                         svals.put(v.toString(), ax.props.get("source"));
                     }
                     data.put(rn, old != null ? Util.merge(old, v) : v);
@@ -1487,10 +1504,12 @@ public class OntEntityFactory extends EntityRegistry {
             data.put("equivalentTo", svals.keySet().toArray(new String[0]));
         }
 
+        /*
         if ("MONDO:0007201".equals(data.get("notation"))) {
             logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>\n"+or);
             logger.info("++++++++++++++++++++++++++\n"+Util.toString(data));
         }
+        */
 
         Entity ent = register (sigh (data));
         if (or.props.isEmpty() && or.axioms.isEmpty()) {
@@ -1526,7 +1545,9 @@ public class OntEntityFactory extends EntityRegistry {
             attrs.put(Props.SOURCE, source.getKey());
             attrs.put(Props.NAME, "equivalentTo");
             for (Map.Entry<String, Object> me : svals.entrySet()) {
-                String uri = OBO_URI+me.getKey().replace(":", "_");
+                String cui = me.getKey().replace(":", "_");
+                String uri = (cui.startsWith("Orphanet")
+                              ? ORPHA_URI : OBO_URI)+cui;
                 attrs.put("_source", me.getValue());
                 for (Iterator<Entity> iter = find (Props.URI, uri);
                      iter.hasNext(); ) {
@@ -1829,7 +1850,7 @@ public class OntEntityFactory extends EntityRegistry {
             Resource res = iter.nextResource();
             OntologyResource or = new OntologyResource (res);
             logger.info("##############\n"+or);
-            if (or.isOntology()) {
+            if (or.isOntology() || or.ignore()) {
             }
             else if (or.isAxiom()) {
                 res = (Resource) or.links.get("annotatedSource");
@@ -1861,7 +1882,7 @@ public class OntEntityFactory extends EntityRegistry {
 
             if (false
                 && ("http://www.orpha.net/ORDO/Orphanet_1000".equals(or.uri)
-                    || resources.size() > 2000)
+                    || resources.size() > 10000)
                 ) {
                 //System.err.println(or);
                 break;

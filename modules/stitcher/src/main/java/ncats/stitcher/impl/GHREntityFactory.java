@@ -88,7 +88,7 @@ public class GHREntityFactory extends EntityRegistry {
         LinkedList<XMLEvent> stack = new LinkedList<>();        
         StringBuilder buf = new StringBuilder ();
         Map<String, Object> data = new TreeMap<>();
-        String db = null, key = null, textRole = null;
+        String db = null, key = null, textRole = null, gene = null;
         List<String> text = new ArrayList<>();
         List<String> xrefs = new ArrayList<>();
         List<String> syns = new ArrayList<>();
@@ -118,6 +118,8 @@ public class GHREntityFactory extends EntityRegistry {
                     xrefs.clear();
                 else if (SynonymList.equals(name))
                     syns.clear();
+                else if (RelatedGene.equals(name))
+                    gene = null;
             }
             else if (ev.isEndElement()) {
                 StartElement se = (StartElement) stack.pop();
@@ -153,6 +155,7 @@ public class GHREntityFactory extends EntityRegistry {
                     Object old = data.get("genes");
                     data.put("genes", old != null
                              ? Util.merge(old, value) : value);
+                    gene = value;
                 }
                 else if (Memo.equals(name)
                          && InheritancePattern.equals(parent.getName())) {
@@ -188,6 +191,10 @@ public class GHREntityFactory extends EntityRegistry {
                 else if (DbKeyList.equals(name)) {
                     //logger.info("+ xrefs "+xrefs);
                     data.put("xrefs", xrefs.toArray(new String[0]));
+                }
+                else if (RelatedGene.equals(parent.getName())) {
+                    if (Page.equals(name)) {
+                    }
                 }
                 // make sure this is last!
                 else if (HealthConditionSummary.equals(parent.getName())) {
