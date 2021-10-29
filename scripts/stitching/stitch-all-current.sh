@@ -24,7 +24,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, May 2021\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2021-05-02.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-07-29.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-10-19.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
