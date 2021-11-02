@@ -1,6 +1,13 @@
 Stitcher
 ========
 
+Software for the ingestion and semantic normalization of datasets. Stitcher employs entity resolution algorithms to partition entities within a given dataset into disjoint sets such that those within the same set are considered equivalent.  Thus, Stitcher is used to untangle a web of connections between entities from multiple sources, form clusters representing unique substances, and thereby locate the unified set of properties for each substance. At the last step, derived variables are computed by traversing the unified property set.
+
+A technical description of this approach can be found in https://github.com/ncats/stitcher/tree/master/paper
+
+Building Stitcher
+========
+
 This codebase is based on the latest version of the Play framework
 and as such it needs Java 8 to build. Modules are defined under
 ```modules```. The main Play app is defined in ```app```. To build the
