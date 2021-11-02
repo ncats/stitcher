@@ -667,7 +667,7 @@ if __name__=="__main__":
     if not os.path.exists(purpleBookfile):
         os.system(syscall)
 
-    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs'
+    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2021-05-02.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
@@ -909,17 +909,18 @@ if __name__=="__main__":
         line = fp.readline()
         while line != b'':
             r = json.loads(str(line, errors='ignore'))
-            addrel = 0
-            for rel in r['relationships']:
-                if rel['type'] == 'ACTIVE MOIETY':
-                    addrel = 1
-                    if rel['relatedSubstance']['approvalID'] not in activeMoiety:
-                        activeMoiety[rel['relatedSubstance']['approvalID']] = []
-                    activeMoiety[rel['relatedSubstance']['approvalID']].append(r['approvalID'])
-            if addrel == 0:
-                if r['approvalID'] not in activeMoiety:
-                    activeMoiety[r['approvalID']] = []
-                activeMoiety[r['approvalID']].append(r['approvalID'])
+            if 'approvalID' in r: #alternative definitions don't have approvalIDs
+                addrel = 0
+                for rel in r['relationships']:
+                    if rel['type'] == 'ACTIVE MOIETY':
+                        addrel = 1
+                        if rel['relatedSubstance']['approvalID'] not in activeMoiety:
+                            activeMoiety[rel['relatedSubstance']['approvalID']] = []
+                        activeMoiety[rel['relatedSubstance']['approvalID']].append(r['approvalID'])
+                if addrel == 0:
+                    if r['approvalID'] not in activeMoiety:
+                        activeMoiety[r['approvalID']] = []
+                    activeMoiety[r['approvalID']].append(r['approvalID'])
             line = fp.readline()
     print("read unii dump file")
 
