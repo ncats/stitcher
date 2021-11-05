@@ -2352,6 +2352,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1932	tetracaine	tetracaine	0619F35CGV					https://archive.org/details/newnonofficialre39coun		
 1933	hexobarbital	hexobarbital	AL8Z8K3P6S					https://archive.org/details/newnonofficialre39coun		
 1933	Prostigmin	neostigmine	3982TWQ96G					https://archive.org/details/newnonofficialre39coun		
+1933	Dinitrophenol	alpha-dinitrophenol	Q13SKS21MN					https://jamanetwork.com/journals/jama/article-abstract/244026		
 1933	piperocaine	piperocaine	F66XUI6GZL					https://archive.org/details/newnonofficialre39coun		
 1934	thiopental	thiopental	JI8Z5M7NA3					https://archive.org/details/newnonofficialre39coun		
 1934	helium	helium	206GF3GB41					https://journals.sagepub.com/doi/abs/10.3181/00379727-32-7724P		
