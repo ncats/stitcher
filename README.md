@@ -241,7 +241,7 @@ The 'value's are base64 encoded strings ... decoding them gives you json with th
 {"PrimaryPotencyType":"Unknown","PrimaryTargetType":"ChEMBL","PrimaryTargetUri":"https://www.ncbi.nlm.nih.gov/pubmed/16258853","PrimaryPotencyUri":"Unknown","PrimaryTargetId":"CHEMBL214","TargetPharmacology":"Agonist","id":"fd94203d21","PrimaryTargetLabel":"Serotonin 1a (5-HT1a) receptor"}
 ```
 
-To get the entire dataset, you can iterate over all entries in the stitcher API using 'top' and 'skip' for example:
+To get the entire dataset, you can iterate over all entries in the stitcher API using 'top' (must be <11) and 'skip' for example:
 
 https://stitcher.ncats.io/api/stitches/v1?top=10&skip=590 
 
