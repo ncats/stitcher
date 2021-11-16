@@ -55,7 +55,7 @@ gsrs_record=`sed $unii_line'q;d' "$gsrs_json"`
 out_file="$outdir/dump-public-$unii.gsrs"
 echo "Writing to file $out_file ..."
 
-echo $gsrs_record > "$gsrs_extract"
+echo "$gsrs_record" > "$gsrs_extract"
 
 
 gzip -c "$gsrs_extract" > "$out_file"
