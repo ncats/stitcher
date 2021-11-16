@@ -66,6 +66,9 @@ public class MoleculeEntityFactory extends EntityRegistry {
     public Entity _register (final Molecule mol) {
         String idval =  null;
         String SOURCE = getDataSource().getName();
+        // some properties can be concatenated via a separator
+        // see individual entity factories for each source
+        String valueSeparator = "\n"; 
 
         // add unique identifier to node (source is already present as label?)
         if (idField != null) {
@@ -193,19 +196,22 @@ public class MoleculeEntityFactory extends EntityRegistry {
                 List<String> values = new ArrayList<String>();
                 int max = 0;
 
-                // FRDB source does not have properties with a newline separator
+                // default separator is newline
+                // which is used to concatenate multiple properties during source parsing
+                // however some sources may contain newlines as properties
+                // TODO: check if Rancho resource works and review other sources
                 if (SOURCE.startsWith("FRDB")) {
-                    values.add(value);
-                } else {
-                    for (String s : value.split("\n")) {
-                        String v = s.trim();
-                        int len = v.length();
-                        if (len > 0) {
-                            if (len > max) {
-                                max = len;
-                            }
-                            values.add(v);
+                    valueSeparator = "SPECIALSEPARATOR";
+                } 
+
+                for (String s : value.split(valueSeparator)) {
+                    String v = s.trim();
+                    int len = v.length();
+                    if (len > 0) {
+                        if (len > max) {
+                            max = len;
                         }
+                        values.add(v);
                     }
                 }
 
