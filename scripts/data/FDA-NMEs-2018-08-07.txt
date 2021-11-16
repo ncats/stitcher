@@ -854,6 +854,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1961	Wilpo	phentermine hydrochloride	0K2I505OTV				Dorsey	DeHaen 1940-1975 NMEs		
 1961	Analexin Syrup	phenyramidol salicylate	H670S81Z1V				"Irwin, Neisler (Mallinckrodt)"	DeHaen 1940-1975 NMEs		
 1961	Panzalone	pregnenolone succinate	6LN4W6JJK6		NDA	12-191	Doak	DeHaen 1940-1975 NMEs		
+1961	Hypertensin	angiotensin amide	7WAL1X78KV	02-23-61	NDA	12-791	Novartis	https://www.accessdata.fda.gov/drugsatfda_docs/nda/2017/209360Orig1s000MedR.pdf		
 1962	Sansert	methysergide maleate	2U7H1466GH	02-12-62	NDA	12-516	Sandoz	OB NME Appendix 1950-1985		
 1962	Mellaril	thioridazine HCl	4WCI67NK8M	03-15-62	NDA	11-808	Sandoz	OB NME Appendix 1950-1985		
 1962	Syntocinon	oxytocin	1JQS135EYN	03-20-62	NDA	12-285	Sandoz	OB NME Appendix 1950-1985		
@@ -1292,6 +1293,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1981	Buprenex	Buprenorphine Hydrochloride	56W8MW3EN1	12-29-81	NDA	18-401	Norwich-Eaton	OB NME Appendix 1950-1985		
 1981	Pipracil	Piperacillin Sodium	M98T69Q7HP	12-29-81	NDA	50-545	Lederle	OB NME Appendix 1950-1985		
 1981	Procardia	Nifedipine	I9ZF7L6G2L	12-31-81	NDA	18-482	Pfizer	OB NME Appendix 1950-1985		
+1981	VZIG	HUMAN VARICELLA-ZOSTER IMMUNE GLOBULIN	33T61IWL27	02-01-81			MPHBL	https://www.cdc.gov/mmwr/preview/mmwrhtml/00000287.htm		
 1982	MPI Indium 111 DTPA	"Indium, In-111, Pentetate Disodium"	7UIT3ZGC8E	02-18-82	NDA	17-707	Medi-Physics	OB NME Appendix 1950-1985		
 1982	Hepatolite	"Technetium Tc-99m, Disofenin Kit"	QTJ2VIW97T	03-16-82	NDA	18-467	New England Nuclear	OB NME Appendix 1950-1985		
 1982	Zovirax	Acyclovir	X4HES1O11F	03-29-82	NDA	18-604	Burroughs Wellcome	OB NME Appendix 1950-1985		
@@ -2350,6 +2352,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1932	tetracaine	tetracaine	0619F35CGV					https://archive.org/details/newnonofficialre39coun		
 1933	hexobarbital	hexobarbital	AL8Z8K3P6S					https://archive.org/details/newnonofficialre39coun		
 1933	Prostigmin	neostigmine	3982TWQ96G					https://archive.org/details/newnonofficialre39coun		
+1933	Dinitrophenol	alpha-dinitrophenol	Q13SKS21MN					https://jamanetwork.com/journals/jama/article-abstract/244026		
 1933	piperocaine	piperocaine	F66XUI6GZL					https://archive.org/details/newnonofficialre39coun		
 1934	thiopental	thiopental	JI8Z5M7NA3					https://archive.org/details/newnonofficialre39coun		
 1934	helium	helium	206GF3GB41					https://journals.sagepub.com/doi/abs/10.3181/00379727-32-7724P		

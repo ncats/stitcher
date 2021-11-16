@@ -1,6 +1,13 @@
 Stitcher
 ========
 
+Software for the ingestion and semantic normalization of datasets. Stitcher employs entity resolution algorithms to partition entities within a given dataset into disjoint sets such that those within the same set are considered equivalent.  Thus, Stitcher is used to untangle a web of connections between entities from multiple sources, form clusters representing unique substances, and thereby locate the unified set of properties for each substance. At the last step, derived variables are computed by traversing the unified property set.
+
+A technical description of this approach can be found in https://github.com/ncats/stitcher/tree/master/paper
+
+Building Stitcher
+========
+
 This codebase is based on the latest version of the Play framework
 and as such it needs Java 8 to build. Modules are defined under
 ```modules```. The main Play app is defined in ```app```. To build the
@@ -181,6 +188,63 @@ https://stitcher.ncats.io/app/stitches/latest
 https://stitcher.ncats.io/app/stitches/latest/ + UNII  
 https://stitcher.ncats.io/app/stitches/latest/aspirin  
 https://stitcher.ncats.io/api/datasources  
+
+## Scraping Inxight target data
+
+The activity data is linked to the substance records using the UNII identifier.
+
+For example, the UNII for cannabidiol is 19GBJ60SN5 
+https://drugs.ncats.io/drug/19GBJ60SN5
+
+| Primary Target | Pharmacology | Condition | Potency |
+| ---- |---- | ---- | ---- |
+|Vanilloid receptor | Agonist || 3.2 µM [EC50] |
+|Dopamine D2 receptor | Partial Agonist || 11.0 nM [Ki] |
+|Glycine receptor subunit alpha-3 | Binding Agent |
+|G-protein coupled receptor 55 | Antagonist || 445.0 nM [IC50] |
+|Serotonin 1a (5-HT1a) receptor | Agonist |
+
+The target data can be found in the json at:
+
+https://stitcher.ncats.io/api/stitches/v1/19GBJ60SN5
+
+ -> sgroup / properties / Targets
+
+```json
+"Targets": [
+    {
+  "node": 345357,
+  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJVbmtub3duIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMTYyNTg4NTMiLCJQcmltYXJ5UG90ZW5jeVVyaSI6IlVua25vd24iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwyMTQiLCJUYXJnZXRQaGFybWFjb2xvZ3kiOiJBZ29uaXN0IiwiaWQiOiJmZDk0MjAzZDIxIiwiUHJpbWFyeVRhcmdldExhYmVsIjoiU2Vyb3RvbmluIDFhICg1LUhUMWEpIHJlY2VwdG9yIn0="
+},
+    {
+  "node": 345357,
+  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJVbmtub3duIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMjI1ODU3MzYiLCJQcmltYXJ5UG90ZW5jeVVyaSI6IlVua25vd24iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwxMDc1MDkyIiwiVGFyZ2V0UGhhcm1hY29sb2d5IjoiQmluZGluZyBBZ2VudCIsImlkIjoiZDY4ZGMxMzNkMSIsIlByaW1hcnlUYXJnZXRMYWJlbCI6IkdseWNpbmUgcmVjZXB0b3Igc3VidW5pdCBhbHBoYS0zIn0="
+},
+    {
+  "node": 345357,
+  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJFQzUwIiwiUHJpbWFyeVBvdGVuY3lWYWx1ZSI6IjMuMiIsIlByaW1hcnlUYXJnZXRUeXBlIjoiQ2hFTUJMIiwiUHJpbWFyeVRhcmdldFVyaSI6Imh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvcHVibWVkLzExNjA2MzI1IiwiUHJpbWFyeVBvdGVuY3lVcmkiOiJodHRwczovL3d3dy5uY2JpLm5sbS5uaWguZ292L3B1Ym1lZC8xMTYwNjMyNSIsIlByaW1hcnlQb3RlbmN5RGltZW5zaW9ucyI6IsK1TSIsIlByaW1hcnlUYXJnZXRJZCI6IkNIRU1CTDQ3OTQiLCJUYXJnZXRQaGFybWFjb2xvZ3kiOiJBZ29uaXN0IiwiaWQiOiI0Y2RiMTc0ZTZmIiwiUHJpbWFyeVRhcmdldExhYmVsIjoiVmFuaWxsb2lkIHJlY2VwdG9yIn0="
+},
+    {
+  "node": 345357,
+  "value": "eyJQcmltYXJ5UG90ZW5jeUNvbW1lbnQiOiJjYW5uYWJpZGlvbCBpbmhpYml0ZWQgdGhlIGJpbmRpbmcgb2YgcmFkaW8tZG9tcGVyaWRvbmUgd2l0aCBkaXNzb2NpYXRpb24gY29uc3RhbnRzIG9mIDEx4oCJbk0gYXQgZG9wYW1pbmUgRDJIaWdoIHJlY2VwdG9ycyBhbmQgMjgwMOKAiW5NIGF0IGRvcGFtaW5lIEQyTG93IHJlY2VwdG9ycywgaW4gdGhlIHNhbWUgYmlwaGFzaWMgbWFubmVyIGFzIGEgZG9wYW1pbmUgcGFydGlhbCBhZ29uaXN0IGFudGlwc3ljaG90aWMgZHJ1ZyBzdWNoIGFzIGFyaXBpcHJhem9sZS4iLCJQcmltYXJ5UG90ZW5jeVR5cGUiOiJLaSIsIlByaW1hcnlQb3RlbmN5VmFsdWUiOiIxMS4wIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMjc3NTQ0ODAiLCJQcmltYXJ5UG90ZW5jeVVyaSI6Imh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvcHVibWVkLzI3NzU0NDgwIiwiUHJpbWFyeVBvdGVuY3lEaW1lbnNpb25zIjoibk0iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwyMTciLCJUYXJnZXRQaGFybWFjb2xvZ3kiOiJQYXJ0aWFsIEFnb25pc3QiLCJpZCI6IjY0NzM4NmRlZjYiLCJQcmltYXJ5VGFyZ2V0TGFiZWwiOiJEb3BhbWluZSBEMiByZWNlcHRvciJ9"
+},
+    {
+  "node": 345357,
+  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJJQzUwIiwiUHJpbWFyeVBvdGVuY3lWYWx1ZSI6IjQ0NS4wIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMTc4NzYzMDIiLCJQcmltYXJ5UG90ZW5jeVVyaSI6Imh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvcHVibWVkLzE3ODc2MzAyIiwiUHJpbWFyeVBvdGVuY3lEaW1lbnNpb25zIjoibk0iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwxMDc1MzIyIiwiVGFyZ2V0UGhhcm1hY29sb2d5IjoiQW50YWdvbmlzdCIsImlkIjoiZmExZTU0ZGM4MyIsIlByaW1hcnlUYXJnZXRMYWJlbCI6IkctcHJvdGVpbiBjb3VwbGVkIHJlY2VwdG9yIDU1In0="
+}
+]
+```
+
+The 'value's are base64 encoded strings ... decoding them gives you json with the actual target text and URLs from the webpage, e.g.:
+
+```json
+{"PrimaryPotencyType":"Unknown","PrimaryTargetType":"ChEMBL","PrimaryTargetUri":"https://www.ncbi.nlm.nih.gov/pubmed/16258853","PrimaryPotencyUri":"Unknown","PrimaryTargetId":"CHEMBL214","TargetPharmacology":"Agonist","id":"fd94203d21","PrimaryTargetLabel":"Serotonin 1a (5-HT1a) receptor"}
+```
+
+To get the entire dataset, you can iterate over all entries in the stitcher API using 'top' (must be <11) and 'skip' for example:
+
+https://stitcher.ncats.io/api/stitches/v1?top=10&skip=590 
+
 
 ## Troubleshooting
 - **Problem:** 
