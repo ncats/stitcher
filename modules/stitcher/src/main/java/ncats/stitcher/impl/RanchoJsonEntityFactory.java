@@ -84,43 +84,36 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
     void setProperty (Molecule mol, String name, JsonNode node)
         throws Exception {
         if (node.isObject()) {
-            mol.setProperty(name, base64.encodeToString
-                            (mapper.writeValueAsBytes(node)));
-        }
-        else if (node.isArray()) {
+            mol.setProperty(name, 
+                            base64.encodeToString(mapper.writeValueAsBytes(node)));
+        } else if (node.isArray()) {
             StringBuilder buf = new StringBuilder ();
             for (int i = 0; i < node.size(); ++i) {
                 JsonNode n = node.get(i);
                 String val;
                 if (n.isObject()) {
-                    val = base64.encodeToString
-                        (mapper.writeValueAsBytes(n));
-                    /*
-                    int len = val.length()-70;
-                    StringBuilder sb = new StringBuilder ();
-                    int j = 0;
-                    for (; j < len; j += 70) {
-                        sb.append(val.substring(j, j+70));
-                        sb.append('\n');
-                    }
-                    sb.append(val.substring(j));
-                    val = sb.toString();
-                    */
-                }
-                else
+                    val = base64.encodeToString(mapper.writeValueAsBytes(n));
+                } else {
                     val = n.asText();
-                if (buf.length() > 0) buf.append("\n");
+                }
+                
+                // if there's more than one value in the array
+                // concatenate using a special separator
+                if (buf.length() > 0) {
+                    buf.append("SPECIALSEPARATOR");
+                }
+
                 buf.append(val);
             }
             
             mol.setProperty(name, buf.toString());
-        }
-        else
+        } else {
             mol.setProperty(name, node.asText());
+        }
     }
 
     void register (JsonNode node, int total) {
-        System.out.println("+++++ "+(count+1)+"/"+total+" +++++");
+        System.out.println("+++++ " + (count + 1) + "/" + total + " +++++");
         if (node.has("smiles")) {
             String smiles = node.get("smiles").asText();
             try {
