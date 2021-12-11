@@ -1086,9 +1086,9 @@ public class DailyMedParser {
                 && (magic[2] & 0xff) == 0x03 
                 && (magic[3] & 0xff) == 0x04) {
                 // zip file
-                nb = parse(bis);
+                nb = parseZip(bis);
             } else { // assume xml
-                nb = parse(bis);
+                nb = parseXml(bis);
             }
         } else {
             logger.log(Level.SEVERE, "Premature EOF!");
