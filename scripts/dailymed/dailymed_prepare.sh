@@ -25,8 +25,20 @@ fi
 ######################################## declare/check ########################################
 # declare all necessary files
 files=(
-		dm_spl_release_human_rx.zip 
-		dm_spl_release_human_otc.zip
+		dm_spl_release_human_rx_part1.zip 
+		dm_spl_release_human_rx_part2.zip 
+		dm_spl_release_human_rx_part3.zip 
+		dm_spl_release_human_rx_part4.zip 
+		dm_spl_release_human_otc_part1.zip
+		dm_spl_release_human_otc_part2.zip
+		dm_spl_release_human_otc_part3.zip
+		dm_spl_release_human_otc_part4.zip
+		dm_spl_release_human_otc_part5.zip
+		dm_spl_release_human_otc_part6.zip
+		dm_spl_release_human_otc_part7.zip
+		dm_spl_release_human_otc_part8.zip
+		dm_spl_release_human_otc_part9.zip
+		dm_spl_release_human_otc_part10.zip
 		dm_spl_release_remainder.zip
 		dm_spl_release_animal.zip
 		dm_spl_release_homeopathic.zip
@@ -82,6 +94,9 @@ for type in ${types[@]}; do
 	#gzip spl$type.txt
 	#tar -czf spl$type.tar.gz spl$type.txt 
 done
+
+# process inactivated labels
+sbt dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > spl_inactivated.txt
 
 # compare with otc_monograph_final, and remove UNIIs that don't belong
 echo "Fixing OTC file..."
