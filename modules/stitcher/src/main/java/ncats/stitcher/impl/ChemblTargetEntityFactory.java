@@ -2,7 +2,8 @@ package ncats.stitcher.impl;
 
 import java.io.File;
 import ncats.stitcher.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -128,7 +129,7 @@ public class ChemblTargetEntityFactory extends EntityRegistry {
 
 
     public static void main(String[] argv) throws Exception {
-        log = Logger.getLogger(ChemblTargetEntityFactory.class);
+        log = LogManager.getLogger(ChemblTargetEntityFactory.class);
 
         if (argv.length < 1) {
             System.err.println("Usage: " + ChemblTargetEntityFactory.class.getName() + " DBDIR ");
