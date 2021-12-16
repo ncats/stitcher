@@ -133,16 +133,14 @@ if __name__ == "__main__":
 
     # get SPLs from the FDA and use old SPLs if no longer available from dailymed dump
     fileTypes = ['rx', 'otc', 'ani', 'rem', 'missing'] #'homeo' homeopathic lables not used
-    fDFs = []
+    splDF = pd.concat([pd.read_csv('temp/spl_'+fileType+'.txt', sep="\t", error_bad_lines=False, na_filter=False) \
+                       for fileType in fileTypes], ignore_index=True)
     for fileType in fileTypes:
-        f_new = 'temp/spl_'+fileType+'.txt'
         g_old = '../stitcher-rawinputs/files/spl-ndc/spl_'+fileType+'_old.txt.gz'
-        df_new = pd.read_csv(f_new, sep="\t", error_bad_lines=False, na_filter=False)
         f_old = gzip.open(g_old, 'rb')
         df_old = pd.read_csv(f_old, sep="\t", error_bad_lines=False, na_filter=False)
-        df_diff = df_old[~df_old.NDC.isin(df_new.NDC.values)]
-        fDFs.append(pd.concat([df_new, df_diff], ignore_index=True))
-    splDF = pd.concat(fDFs, ignore_index=True)
+        df_diff = df_old[~df_old.NDC.isin(splDF.NDC.values)]
+        splDF.append(pd.concat([splDF, df_diff], ignore_index=True))
     print(splDF.info(verbose=True))
 
     # get latest NDC file

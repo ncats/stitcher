@@ -99,7 +99,7 @@ done
 sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser ../stitcher-rawinputs/files/SPL-missing-labels.zip" > temp/spl_missing.txt
 
 # create summary spl file
-python $SCRIPT_DIR/dailymed/dailymed_merge_spl.py > data/spl_summary.txt
+python $SCRIPT_DIR/dailymed/dailymed_merge_ndc.py # produces data/spl_summary.txt
 
 # process inactivated labels
 sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > temp/spl_inactivated.txt
