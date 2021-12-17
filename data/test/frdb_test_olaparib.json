@@ -1,0 +1,1657 @@
+[{
+    "name": "OLAPARIB",
+    "smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+    "originator": "AstraZeneca",
+    "originator_uri": "http://www.drugdevelopment-technology.com/projects/lynparza-olaparib-cancer/",
+    "originator_comment": " ",
+    "compound_description": "Olaparib is an oral inhibitor of poly (ADP-ribose) polymerase enzymes, including PARP1, PARP2, and PARP3 which are involved in normal cellular homeostasis, such as DNA transcription, cell cycle regulation, and DNA\nrepair. Olaparib has shown activity in ovarian and breast tumors with known BRCA mutations and was the first FDA approved drug in this class. Lynparza (olaparib) is indicated for treatment of gBRCA-mutated advanced ovarian cancer. Its use together with other chemotherapy medicines can lead to increased effects on the blood resulting in reduction in the numbers of white blood cells and platelets, and anaemia.",
+    "description_uri": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+    "description_comment": "Description was created based on several sources, including:\nhttps://www.ncbi.nlm.nih.gov/pmc/articles/PMC4880823/",
+    "in_vivo_use_guide": "400 mg (eight 50 mg capsules) taken twice daily, for a total daily dose of 800 mg. Continue treatment until disease progression or unacceptable toxicity.",
+    "in_vivo_use_route": "Oral",
+    "in_vivo_uri": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+    "in_vitro_use_guide": "30-100 nM in SW620 cells",
+    "in_vitro_uri": "http://www.ncbi.nlm.nih.gov/pubmed/?term=18800822",
+    "structure_alert": "False",
+    "cns": "Unknown",
+    "cns_uri": "Unknown",
+    "curated_by": "oleg.stroganov@gmail.com",
+    "modified_datetime": 1631723821889.0,
+    "qcd": false,
+    "unii": "WOH1JD9AR8",
+    "cas": "763113-22-0",
+    "iupac": "4-[[3-[4-(cyclopropanecarbonyl)piperazine-1-carbonyl]-4-fluorophenyl]methyl]-2H-phthalazin-1-one",
+    "cid": "23725625",
+    "wikiurl": "https://en.wikipedia.org/wiki/olaparib",
+    "chembl_id": "CHEMBL521686",
+    "drugbank_id": "DB09074",
+    "chemspider_id": "23343272",
+    "kegg_id": "D09730",
+    "bindingdb_id": "27566",
+    "synonyms": [
+        "1(2H)-PHTHALAZINONE, 4-((3-((4-(CYCLOPROPYLCARBONYL)-1-PIPERAZINYL)CARBONYL)-4-FLUOROPHENYL)METHYL)-",
+        "4-((3-((4-(CYCLOPROPYLCARBONYL)PIPERAZIN-1-YL)CARBONYL)-4-FLUOROPHENYL)METHYL)PHTHALAZIN-1(2H)-ONE",
+        "AZD-2281",
+        "AZD2281",
+        "KU-0059436",
+        "KU-59436",
+        "LYNPARZA",
+        "OLAPARIB",
+        "OLAPARIBUM",
+        "PIPERAZINE, 1-(CYCLOPROPYLCARBONYL)-4-(5-((3,4-DIHYDRO-4-OXO-1-PHTHALAZINYL)METHYL)-2-FLUOROBENZOYL)-",
+        "\u041e\u041b\u0410\u041f\u0410\u0420\u0418\u0411",
+        "\u0623\u0648\u0644\u0627\u0628\u0627\u0631\u064a\u0628",
+        "\u5965\u62c9\u5e15\u5229",
+        "DB09074"
+    ],
+    "pmids": [
+        "26544897",
+        "26510020",
+        "252160170",
+        "24833294",
+        "23118055",
+        "22683710",
+        "22194930",
+        "21633166",
+        "21417348",
+        "21285347",
+        "21188115",
+        "21172086",
+        "21152454",
+        "21080930",
+        "21069103",
+        "21050424",
+        "21050423",
+        "21050422",
+        "20979652",
+        "20978505",
+        "20976249",
+        "20956982",
+        "20948822",
+        "20948704",
+        "20922827",
+        "20920367",
+        "20871615",
+        "20739657",
+        "20725763",
+        "20697530",
+        "20647699",
+        "20609468",
+        "20609467",
+        "20530711",
+        "20506057",
+        "20485165",
+        "20459590",
+        "20406929",
+        "20404603",
+        "20385032",
+        "20383346",
+        "20376879",
+        "20149218",
+        "20145144",
+        "20130818",
+        "20124459",
+        "20111741",
+        "20069122",
+        "20049732",
+        "20049345",
+        "20030882",
+        "20030873",
+        "20017885",
+        "20008842",
+        "19904273",
+        "19863774",
+        "19825178",
+        "19671736",
+        "19647219",
+        "19632796",
+        "19589159",
+        "19553641",
+        "18971340",
+        "18800822",
+        "12857389"
+    ],
+    "patent": [
+        "20080200469",
+        "20080146575",
+        "08247416",
+        "08183369",
+        "07692006"
+    ],
+    "conditions": [
+        {
+            "compound_id": 8.0,
+            "name": "Ovarian cancer",
+            "condition_uri": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+            "condition_comment": " ",
+            "product_name": "LYNPARZA",
+            "product_date": 1418947200000,
+            "condition_highest_phase": "Approved",
+            "highest_phase_uri": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+            "fda_use": "Monotherapy in patients with deleterious or suspected deleterious germline BRCA mutated advanced ovarian cancer who have been treated with three or more prior lines of chemotherapy.",
+            "offlabel_use": "Metastatic castrate resistant prostate cancer|Recurrent breast cancer with BRCA1/2 mutation|Recurrent or metastatic gastric cancer (in combination with paclitaxel)",
+            "offlabel_use_uri": "http://www.pbm.va.gov/PBM/clinicalguidance/drugmonographs/Olaparib_LYNPARZA_Drug_Monograph.pdf",
+            "offlabel_use_comment": " ",
+            "clinical_trial": "NCT02208375",
+            "condition_treatment_modality": "Primary",
+            "condition_do_imprecise": false,
+            "condition_mesh_imprecise": false,
+            "mesh_id": 10040.0,
+            "do_id": 4412.0,
+            "is_fda_use": true,
+            "fda_use_uri": "http://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+            "fda_use_comment": "The indication is approved under accelerated approval based on objective response rate and duration of response. Continued approval for this indication may be contingent upon verification and description of clinical benefit in confirmatory trials.",
+            "is_product_manual": false,
+            "highest_phase_discontinued": false,
+            "product_discontinued": false,
+            "is_product_date_unknown": false,
+            "target_refs": [
+                1442,
+                1443,
+                1444
+            ],
+            "condition_id": 1137
+        }
+    ],
+    "targets": [
+        {
+            "primary_target_id": "Q9Y6F1",
+            "compound_id": 8.0,
+            "target_primary_target_type": "UniProt",
+            "primary_target_uri": "http://www.ncbi.nlm.nih.gov/pubmed/27487106",
+            "target_primary_potency_type": "Unknown",
+            "primary_potency_uri": "Unknown",
+            "target_pharmacology": "Inhibitor",
+            "primary_target_label": "Poly [ADP-ribose] polymerase 3",
+            "primary_target_gene_symbol": "PARP3",
+            "primary_target_gene_id": "10039",
+            "primary_target_organism": "Homo sapiens (Human)",
+            "condition_refs": [
+                1137
+            ],
+            "target_id": 1444
+        },
+        {
+            "primary_target_id": "P09874",
+            "compound_id": 8.0,
+            "target_primary_target_type": "UniProt",
+            "primary_target_uri": "http://www.ncbi.nlm.nih.gov/pubmed/27487106",
+            "target_primary_potency_type": "IC50",
+            "target_primary_potency_value": "1.93999999999999995",
+            "target_primary_potency_dimensions": "nM",
+            "primary_potency_uri": "http://www.ncbi.nlm.nih.gov/pubmed/23881923",
+            "target_pharmacology": "Inhibitor",
+            "primary_target_label": "Poly [ADP-ribose] polymerase 1",
+            "primary_target_gene_symbol": "PARP1",
+            "primary_target_gene_id": "142",
+            "primary_target_organism": "Homo sapiens (Human)",
+            "condition_refs": [
+                1137
+            ],
+            "target_id": 1442
+        },
+        {
+            "primary_target_id": "Q9UGN5",
+            "compound_id": 8.0,
+            "target_primary_target_type": "UniProt",
+            "primary_target_uri": "http://www.ncbi.nlm.nih.gov/pubmed/27487106",
+            "target_primary_potency_type": "Unknown",
+            "primary_potency_uri": "Unknown",
+            "target_pharmacology": "Inhibitor",
+            "primary_target_label": "Poly [ADP-ribose] polymerase 2",
+            "primary_target_gene_symbol": "PARP2",
+            "primary_target_gene_id": "10038",
+            "primary_target_organism": "Homo sapiens (Human)",
+            "condition_refs": [
+                1137
+            ],
+            "target_id": 1443
+        }
+    ],
+    "pk": [
+        {
+            "pk_age_group": "ADULT",
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "BLOOD",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_hours": "12",
+            "pk_auc_type": "t",
+            "pk_auc_units": "\u03bcg \u00d7 h/mL",
+            "pk_auc_value": "31.7",
+            "pk_cmax_units": "\u03bcg/mL",
+            "pk_cmax_value": "6.88",
+            "pk_dose_type": "UNKNOWN",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "SINGLE",
+            "pk_food_status": "UNKNOWN",
+            "pk_health_status": "UNHEALTHY",
+            "pk_routes": "Oral",
+            "pk_sex": "FEMALE / MALE",
+            "pk_source_type": "EXPERIMENT",
+            "pk_source_uri": "https://www.ncbi.nlm.nih.gov/pubmed/30887180",
+            "pk_species": "Homo sapiens",
+            "pk_thalf_units": "h",
+            "pk_thalf_value": "6.52"
+        },
+        {
+            "pk_age_group": "ADULT",
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "BLOOD",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_hours": "12",
+            "pk_auc_type": "t",
+            "pk_auc_units": "\u03bcg \u00d7 h/mL",
+            "pk_auc_value": "10.9",
+            "pk_cmax_units": "\u03bcg/mL",
+            "pk_cmax_value": "2.97",
+            "pk_dose_type": "UNKNOWN",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "100",
+            "pk_experiment_type": "MULTIPLE",
+            "pk_food_status": "UNKNOWN",
+            "pk_frequency_period": "day",
+            "pk_frequency_times": "2",
+            "pk_health_status": "UNHEALTHY",
+            "pk_routes": "Oral",
+            "pk_sex": "FEMALE / MALE",
+            "pk_source_type": "EXPERIMENT",
+            "pk_source_uri": "https://www.ncbi.nlm.nih.gov/pubmed/30887180",
+            "pk_species": "Homo sapiens",
+            "pk_thalf_units": "h",
+            "pk_thalf_value": "7.17"
+        },
+        {
+            "pk_age_group": "ADULT",
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "BLOOD",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_type": "\u221e",
+            "pk_auc_units": "\u03bcg \u00d7 h/mL",
+            "pk_auc_value": "44",
+            "pk_cmax_units": "\u03bcg/mL",
+            "pk_cmax_value": "8.27",
+            "pk_dose_type": "UNKNOWN",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "STEADY-STATE",
+            "pk_food_status": "UNKNOWN",
+            "pk_frequency_period": "day",
+            "pk_frequency_times": "2",
+            "pk_health_status": "UNHEALTHY",
+            "pk_routes": "Oral",
+            "pk_sex": "FEMALE / MALE",
+            "pk_source_type": "EXPERIMENT",
+            "pk_source_uri": "https://www.ncbi.nlm.nih.gov/pubmed/30887180",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_age_group": "ADULT",
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "BLOOD",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_type": "\u221e",
+            "pk_auc_units": "\u03bcg \u00d7 h/mL",
+            "pk_auc_value": "16.7",
+            "pk_cmax_units": "\u03bcg/mL",
+            "pk_cmax_value": "3.75",
+            "pk_dose_type": "UNKNOWN",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "100",
+            "pk_experiment_type": "STEADY-STATE",
+            "pk_food_status": "UNKNOWN",
+            "pk_frequency_period": "day",
+            "pk_frequency_times": "2",
+            "pk_health_status": "UNHEALTHY",
+            "pk_routes": "Oral",
+            "pk_sex": "FEMALE / MALE",
+            "pk_source_type": "EXPERIMENT",
+            "pk_source_uri": "https://www.ncbi.nlm.nih.gov/pubmed/30887180",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_age_group": "UNKNOWN",
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "PLASMA",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_food_status": "UNKNOWN",
+            "pk_funbound_comment": "The in vitro protein binding of olaparib is approximately 82%",
+            "pk_funbound_value": "18",
+            "pk_health_status": "UNKNOWN",
+            "pk_sex": "UNKNOWN",
+            "pk_source_type": "DRUG LABEL",
+            "pk_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/208558s001lbl.pdf",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "plasma",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_hours": "12",
+            "pk_auc_type": "t",
+            "pk_auc_units": "ug*h/mL",
+            "pk_auc_value": "43.9499999999999",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "single",
+            "pk_frequency_period": "day",
+            "pk_frequency_times": "2",
+            "pk_health_status": "unhealthy",
+            "pk_routes": "oral",
+            "pk_source_type": "Clinical Trial",
+            "pk_source_uri": "https://clinicaltrials.gov/ct2/show/NCT02430311",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "plasma",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_hours": "12",
+            "pk_auc_type": "t",
+            "pk_auc_units": "ug*h/mL",
+            "pk_auc_value": "43.91",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "single",
+            "pk_frequency_period": "day",
+            "pk_frequency_times": "2",
+            "pk_health_status": "unhealthy",
+            "pk_routes": "oral",
+            "pk_source_type": "Clinical Trial",
+            "pk_source_uri": "https://clinicaltrials.gov/ct2/show/NCT02430311",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "plasma",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_cmax_units": "ug/mL",
+            "pk_cmax_value": "6.875",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "single",
+            "pk_health_status": "unhealthy",
+            "pk_routes": "oral",
+            "pk_source_type": "Clinical Trial",
+            "pk_source_uri": "https://clinicaltrials.gov/ct2/show/NCT02430311",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "plasma",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_hours": "12",
+            "pk_auc_type": "t",
+            "pk_auc_units": "ug*h/mL",
+            "pk_auc_value": "31.68",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "single",
+            "pk_health_status": "unhealthy",
+            "pk_routes": "oral",
+            "pk_source_type": "Clinical Trial",
+            "pk_source_uri": "https://clinicaltrials.gov/ct2/show/NCT02430311",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "plasma",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_hours": "48",
+            "pk_auc_type": "t",
+            "pk_auc_units": "ug*h/mL",
+            "pk_auc_value": "36.37",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "single",
+            "pk_health_status": "unhealthy",
+            "pk_routes": "oral",
+            "pk_source_type": "Clinical Trial",
+            "pk_source_uri": "https://clinicaltrials.gov/ct2/show/NCT02430311",
+            "pk_species": "Homo sapiens"
+        },
+        {
+            "pk_analyte_cid": "23725625",
+            "pk_analyte_mw": "434.4628",
+            "pk_analyte_pt": "OLAPARIB",
+            "pk_analyte_query": "OLAPARIB",
+            "pk_analyte_smiles": "FC1=C(C=C(CC2=NNC(=O)C3=C2C=CC=C3)C=C1)C(=O)N4CCN(CC4)C(=O)C5CC5",
+            "pk_analyte_tissue": "plasma",
+            "pk_analyte_unii": "WOH1JD9AR8",
+            "pk_auc_type": "?",
+            "pk_auc_units": "ug*h/mL",
+            "pk_auc_value": "36.53",
+            "pk_dose_units": "mg",
+            "pk_dose_value": "300",
+            "pk_experiment_type": "single",
+            "pk_health_status": "unhealthy",
+            "pk_routes": "oral",
+            "pk_source_type": "Clinical Trial",
+            "pk_source_uri": "https://clinicaltrials.gov/ct2/show/NCT02430311",
+            "pk_species": "Homo sapiens"
+        }
+    ],
+    "ddi": [
+        {
+            "ddi_clin_comment": "Itraconazole (strong CYP3A inhibitor) increased the AUC of olaparib by 2.7-fold and PBPK modeling predicted that fluconazole (moderate CYP3A inhibitor) would likely increase olaparib AUC by 2-fold.",
+            "ddi_clin_evidence": "co-administration study",
+            "ddi_clin_support": "yes",
+            "ddi_relation": "substrate",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "CYP3A",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=4",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "substrate",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "CYP2A6",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=29",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "substrate",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "CYP1A1",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=29",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_comment": "Up to 1.5 fold induction of CYP2B6 was observed with 3 \u00b5M of olaparib and up to 3.2 fold induction at the olaparib concentration of 30 \u00b5M. T",
+            "ddi_relation": "inducer",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "CYP2B6",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "substrate",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "P-gp",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=34",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_comment": "Data suggests that olaparib is a substrate of organic anion transporters (OATs) but the sponsor was not able to specify which ones due to large variability in the study KMX042.",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "OAT",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "37.9",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "OCT1",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "19.9",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "OCT2",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "18.4",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "OAT3",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "5.5",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "MATE1",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "47.1",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "MATE2",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "20.3",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "OATP1B1",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_comment": "Olaparib 10 \u00b5M inhibited the efflux of calcein (MRP2 substrate) by 25% in MDCKII cells transfected with MRP2.",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "MRP2",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=35",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inducer",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "CYP3A4",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=79",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inducer",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP1A2",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inducer",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2C9",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inducer",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2C19",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inducer",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP3A",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP1A2",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2A6",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2B6",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2C8",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2C9",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2C19",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2D6",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "10",
+            "ddi_concentration": ">100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "CYP2E1",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_activity": "44",
+            "ddi_concentration": "100",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "CYP3A",
+            "ddi_type": "Inhibition",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=33",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "substrate",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "BCRP",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=34",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "BCRP",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=34",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "no",
+            "ddi_target": "P-gp",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf#page=34",
+            "ddi_page": "-"
+        },
+        {
+            "ddi_concentration": "226",
+            "ddi_relation": "inhibitor",
+            "ddi_reported_magnitude": "yes",
+            "ddi_target": "hERG",
+            "ddi_type": "IC50",
+            "ddi_url": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000PharmR.pdf#page=58",
+            "ddi_page": "-"
+        }
+    ],
+    "toxicity": [
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "300",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/208558s000lbl.pdf |https://www.accessdata.fda.gov/drugsatfda_docs/nda/2017/208558Orig1s000MultidisciplineR.pdf",
+            "toxicity_species": "Homo sapiens",
+            "aes": [
+                {
+                    "adverseevents_frequency": "24",
+                    "adverseevents_liability": "Anemia",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption or reduction |leads to discontinuation"
+                },
+                {
+                    "adverseevents_frequency": "20",
+                    "adverseevents_liability": "Anemia",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption or reduction |leads to discontinuation"
+                },
+                {
+                    "adverseevents_frequency": "9",
+                    "adverseevents_liability": "Neutropenia",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption or reduction |leads to discontinuation"
+                },
+                {
+                    "adverseevents_frequency": "73",
+                    "adverseevents_liability": "Nausea",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption"
+                },
+                {
+                    "adverseevents_frequency": "3",
+                    "adverseevents_liability": "Nausea",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption"
+                },
+                {
+                    "adverseevents_frequency": "34",
+                    "adverseevents_liability": "Vomiting",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption"
+                },
+                {
+                    "adverseevents_frequency": "3",
+                    "adverseevents_liability": "Vomiting",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption"
+                }
+            ],
+            "tox_id": 34
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "300",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/208558s000lbl.pdf",
+            "toxicity_species": "Homo sapiens",
+            "aes": [
+                {
+                    "adverseevents_frequency": "62",
+                    "adverseevents_liability": "Fatigue",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption or reduction"
+                },
+                {
+                    "adverseevents_frequency": "4",
+                    "adverseevents_liability": "Fatigue",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption or reduction"
+                },
+                {
+                    "adverseevents_frequency": "31",
+                    "adverseevents_liability": "Diarrhea",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "2",
+                    "adverseevents_liability": "Diarrhea",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Abscess oral",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Aphthous ulcer",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Gingival abscess",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Gingival disorder",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Gingival pain",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Gingivitis",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Mouth ulceration",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Mucosal infection",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Mucosal inflammation",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oral candidiasis",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oral discomfort",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oral herpes",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oral infection",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oral mucosal erythema",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oral pain",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oropharyngeal discomfort",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "19",
+                    "adverseevents_liability": "Oropharyngeal pain",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Abscess oral",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Aphthous ulcer",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Gingival abscess",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Gingival disorder",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Gingival pain",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Gingivitis",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Mouth ulceration",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Mucosal infection",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Mucosal inflammation",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oral candidiasis",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oral discomfort",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oral herpes",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oral infection",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oral mucosal erythema",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oral pain",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oropharyngeal discomfort",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Oropharyngeal pain",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "36",
+                    "adverseevents_liability": "Nasopharyngitis",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "36",
+                    "adverseevents_liability": "Sinusitis",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "36",
+                    "adverseevents_liability": "Rhinitis",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "36",
+                    "adverseevents_liability": "Influenza",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "22",
+                    "adverseevents_liability": "Decreased appetite",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "30",
+                    "adverseevents_liability": "Arthralgia",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "30",
+                    "adverseevents_liability": "Myalgia",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "27",
+                    "adverseevents_liability": "Dysgeusia",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "25",
+                    "adverseevents_liability": "Headache",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Headache",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Rash"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Cough"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Dyspepsia"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Leukopenia"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Hypomagnesemia"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Dizziness"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Thrombocytopenia"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Creatinine increased"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Lymphopenia"
+                },
+                {
+                    "adverseevents_frequency": "<20",
+                    "adverseevents_liability": "Edema"
+                },
+                {
+                    "adverseevents_frequency": "89",
+                    "adverseevents_liability": "Mean corpuscular volume increased",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "66",
+                    "adverseevents_liability": "Decreased hemoglobin",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "17",
+                    "adverseevents_liability": "Decreased hemoglobin",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "64",
+                    "adverseevents_liability": "Leukocyte count decreased",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "5",
+                    "adverseevents_liability": "Leukocyte count decreased",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "56",
+                    "adverseevents_liability": "Lymphocyte count low",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "11",
+                    "adverseevents_liability": "Lymphocyte count low",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "44",
+                    "adverseevents_liability": "Absolute neutrophil count decreased",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "7",
+                    "adverseevents_liability": "Absolute neutrophil count decreased",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "44",
+                    "adverseevents_liability": "Creatinine serum increased",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "40",
+                    "adverseevents_liability": "Platelets decreased",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "2",
+                    "adverseevents_liability": "Platelets decreased",
+                    "adverseevents_severity": "grade 3-4"
+                }
+            ],
+            "tox_id": 33
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "300",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2017/208558Orig1s000MultidisciplineR.pdf",
+            "toxicity_species": "Homo sapiens",
+            "aes": [
+                {
+                    "adverseevents_frequency": "9 pts",
+                    "adverseevents_liability": "Thrombocytopenia",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to discontinuation | leads to dose interruption"
+                },
+                {
+                    "adverseevents_frequency": "2 pts",
+                    "adverseevents_liability": "Myelodysplastic syndrome",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to discontinuation"
+                },
+                {
+                    "adverseevents_frequency": "2 pts",
+                    "adverseevents_liability": "Acute myeloid leukemia",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to discontinuation"
+                }
+            ],
+            "tox_id": 35
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended|MTD",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "400",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+            "toxicity_species": "Homo sapiens",
+            "toxicity_dose_comment": "400 mg BID was the MTD for the capsule formulation",
+            "aes": [
+                {
+                    "adverseevents_frequency": "<1",
+                    "adverseevents_liability": "Myelodysplastic syndrome",
+                    "adverseevents_severity": "grade 5",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "WARNING"
+                },
+                {
+                    "adverseevents_frequency": "<1",
+                    "adverseevents_liability": "Acute myeloid leukemia",
+                    "adverseevents_severity": "grade 5",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "WARNING"
+                }
+            ],
+            "tox_id": 37
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended|MTD",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "400",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+            "toxicity_species": "Homo sapiens",
+            "toxicity_dose_comment": "400 mg BID was the MTD for the capsule formulation",
+            "aes": [
+                {
+                    "adverseevents_frequency": "<1",
+                    "adverseevents_liability": "Pneumonitis",
+                    "adverseevents_severity": "grade 5",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "WARNING"
+                }
+            ],
+            "tox_id": 38
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended|MTD",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "400",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf",
+            "toxicity_species": "Homo sapiens",
+            "toxicity_dose_comment": "400 mg BID was the MTD for the capsule formulation",
+            "aes": [
+                {
+                    "adverseevents_frequency": "16",
+                    "adverseevents_liability": "Anemia",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "18",
+                    "adverseevents_liability": "Anemia",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "35",
+                    "adverseevents_liability": "Abdominal discomfort",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "8",
+                    "adverseevents_liability": "Abdominal discomfort",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "21",
+                    "adverseevents_liability": "Decreased appetite",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Decreased appetite",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "30",
+                    "adverseevents_liability": "Diarrhea",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "1",
+                    "adverseevents_liability": "Diarrhea",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "25",
+                    "adverseevents_liability": "Dyspepsia",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "58",
+                    "adverseevents_liability": "Asthenia",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "8",
+                    "adverseevents_liability": "Asthenia",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "26",
+                    "adverseevents_liability": "Nasopharyngitis",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "21",
+                    "adverseevents_liability": "Arthralgia",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "21",
+                    "adverseevents_liability": "Musculoskeletal pain",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "22",
+                    "adverseevents_liability": "Myalgia",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "18",
+                    "adverseevents_liability": "Neutropenia",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "7",
+                    "adverseevents_liability": "Neutropenia",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "39",
+                    "adverseevents_liability": "Lymphopenia",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "17",
+                    "adverseevents_liability": "Lymphopenia",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "57",
+                    "adverseevents_liability": "Mean corpuscular volume increased",
+                    "adverseevents_severity": "grade 1-4"
+                },
+                {
+                    "adverseevents_frequency": "28",
+                    "adverseevents_liability": "Creatinine increased",
+                    "adverseevents_severity": "grade 1-2"
+                },
+                {
+                    "adverseevents_frequency": "2",
+                    "adverseevents_liability": "Creatinine increased",
+                    "adverseevents_severity": "grade 3-4"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Cough"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Constipation"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Dysgeusia"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Peripheral edema"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Back pain"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Dizziness"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Headache"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Urinary tract infection"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Dyspnea"
+                },
+                {
+                    "adverseevents_frequency": "10-20",
+                    "adverseevents_liability": "Rash"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Leukopenia"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Stomatitis"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Peripheral neuropathy"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Pyrexia"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Hypomagnesemia"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Hyperglycemia"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Anxiety"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Depression"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Insomnia"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Dysuria"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Urinary incontinence"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Vulvovaginal disorder"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Dry skin"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Eczema"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Pruritis"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Hypertension"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Venous thrombosis"
+                },
+                {
+                    "adverseevents_frequency": "1-10",
+                    "adverseevents_liability": "Hot flush"
+                }
+            ],
+            "tox_id": 36
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Recommended|MTD",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "400",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2014/206162lbl.pdf |https://www.accessdata.fda.gov/drugsatfda_docs/nda/2017/208558Orig1s000MultidisciplineR.pdf",
+            "toxicity_species": "Homo sapiens",
+            "toxicity_dose_comment": "400 mg BID was the MTD for the capsule formulation",
+            "aes": [
+                {
+                    "adverseevents_frequency": "3",
+                    "adverseevents_liability": "Nausea",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "39",
+                    "adverseevents_liability": "Vomiting",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "4",
+                    "adverseevents_liability": "Vomiting",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "8",
+                    "adverseevents_liability": "Fatigue",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "75",
+                    "adverseevents_liability": "Anemia",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "15",
+                    "adverseevents_liability": "Anemia",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "27",
+                    "adverseevents_liability": "Thrombocytopenia",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption"
+                },
+                {
+                    "adverseevents_frequency": "3",
+                    "adverseevents_liability": "Thrombocytopenia",
+                    "adverseevents_severity": "grade 3-4",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose interruption"
+                },
+                {
+                    "adverseevents_frequency": "61",
+                    "adverseevents_liability": "Nausea",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                },
+                {
+                    "adverseevents_frequency": "58",
+                    "adverseevents_liability": "Fatigue",
+                    "adverseevents_severity": "grade 1-2",
+                    "adverseevents_type": "discontinuation",
+                    "adverseevents_comment": "leads to dose reduction or interruption"
+                }
+            ],
+            "tox_id": 39
+        },
+        {
+            "compound_id": 8,
+            "toxicity_dose_type": "Highest studied dose",
+            "toxicity_dose_units": "mg",
+            "toxicity_dose_value": "600",
+            "toxicity_experiment_type": "steady",
+            "toxicity_frequency_period": "day",
+            "toxicity_frequency_times": "2",
+            "toxicity_health_status": "unhealthy",
+            "toxicity_routes": "oral",
+            "toxicity_source_uri": "https://www.accessdata.fda.gov/drugsatfda_docs/nda/2014/206162Orig1s000ClinPharmR.pdf",
+            "toxicity_species": "Homo sapiens",
+            "aes": [
+                {
+                    "adverseevents_comment": "No information on AEs is available"
+                }
+            ],
+            "tox_id": 32
+        },
+        {
+            "compound_id": 8,
+            "aes": [
+                {
+                    "adverseevents_type": "dose interruption"
+                }
+            ],
+            "tox_id": 5508
+        },
+        {
+            "compound_id": 8,
+            "tox_id": 5509
+        }
+    ],
+    "sourcing": [
+        {
+            "sourcing_vendor_name": "ChEBI",
+            "sourcing_vendor_substance_url": "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:83766",
+            "sourcing_vendor_type": "database",
+            "sourcing_vendor_substance_id": "CHEBI:83766"
+        },
+        {
+            "sourcing_vendor_name": "ChemicalBook",
+            "sourcing_vendor_substance_url": "https://www.chemicalbook.com/ChemicalProductProperty_EN_CB02473811",
+            "sourcing_vendor_type": "vendor",
+            "sourcing_vendor_substance_id": "CB02473811"
+        },
+        {
+            "sourcing_vendor_name": "ChemicalBook",
+            "sourcing_vendor_substance_url": "https://www.chemicalbook.com/ChemicalProductProperty_EN_CB02756176",
+            "sourcing_vendor_type": "vendor",
+            "sourcing_vendor_substance_id": "CB02756176"
+        },
+        {
+            "sourcing_vendor_name": "eMolecules",
+            "sourcing_vendor_substance_url": "https://www.emolecules.com/cgi-bin/more?vid=31526131",
+            "sourcing_vendor_type": "vendor",
+            "sourcing_vendor_substance_id": "31526131"
+        },
+        {
+            "sourcing_vendor_name": "MolPort",
+            "sourcing_vendor_substance_url": "https://www.molport.com/shop/molecule-link/MolPort-009-679-395",
+            "sourcing_vendor_type": "vendor",
+            "sourcing_vendor_substance_id": "MolPort-009-679-395"
+        },
+        {
+            "sourcing_vendor_name": "Selleck Chemicals",
+            "sourcing_vendor_substance_url": "http://www.selleckchem.com/products/AZD2281(Olaparib).html",
+            "sourcing_vendor_type": "vendor",
+            "sourcing_vendor_substance_id": "AZD2281(Olaparib)"
+        },
+        {
+            "sourcing_vendor_name": "ZINC",
+            "sourcing_vendor_substance_url": "http://zinc15.docking.org/substances/ZINC000040430143",
+            "sourcing_vendor_type": "database",
+            "sourcing_vendor_substance_id": "ZINC000040430143"
+        }
+    ]
+}]
