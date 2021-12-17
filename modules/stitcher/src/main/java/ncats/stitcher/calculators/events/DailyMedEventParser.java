@@ -135,6 +135,7 @@ public class DailyMedEventParser extends EventParser {
 
         Object content = null;
         Date date = null;
+        Date endDate = null;
 
         try {
             //Jan 2018 new columns for Route and MarketStatus
@@ -157,6 +158,12 @@ public class DailyMedEventParser extends EventParser {
                 if (date == null || date.after(date2))
                     date = date2;
             }
+
+            content = payload.get("EndDate");
+            if (content != null && !"1900-01-01".equals(content)) {
+                endDate = EventCalculator.SDF.parse((String)content);
+            }
+
             //exclude veterinary products from approved and/or Marketed
             if (!isVeterinaryProduct && date != null) {
 
@@ -237,6 +244,12 @@ public class DailyMedEventParser extends EventParser {
 
                 if (payload.containsKey("GenericProductName") && payload.get("GenericProductName") != null)
                     event.product = getFirstEntry(payload.get("GenericProductName"));
+
+                if (payload.containsKey("Product") && payload.get("Product") != null)
+                    event.product = getFirstEntry(payload.get("Product"));
+
+                if (payload.containsKey("Sponsor") && payload.get("Sponsor") != null)
+                    event.sponsor = getFirstEntry(payload.get("Sponsor"));
 
                 event.URL = (String) payload.get("URL");
                 //Jan 2018 new columns for Route and MarketStatus

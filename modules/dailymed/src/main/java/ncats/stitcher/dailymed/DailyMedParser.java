@@ -87,6 +87,7 @@ public class DailyMedParser {
         public String marketStatus;
         public String marketingStatus;
         public Calendar marketDate;
+        public Calendar endDate;
         public String ndc;
         public String equivNDC;
         public Boolean isPart;
@@ -109,6 +110,7 @@ public class DailyMedParser {
         public String url;
         public String indications;
         public String comment;
+        public String sponsor;
         public List<Product> products = new ArrayList<>();
         public List<Section> sections = new ArrayList<>();
     }
@@ -116,6 +118,7 @@ public class DailyMedParser {
     final ObjectWriter writer;
     File outdir;
     Set<String> tags = new TreeSet<>();
+    HashMap<String, HashMap<String, String>> inactivated = new HashMap<>(); // setid -> ["status": status, "date": date]
 
     public DailyMedParser() {
         ObjectMapper mapper = new ObjectMapper();   
@@ -490,7 +493,9 @@ public class DailyMedParser {
 
             if (pNode.getNodeType() == Node.ELEMENT_NODE
                 && !((Element) pNode).getTagName()
-                                     .equals("subjectOf")){
+                    .equals("subjectOf")
+                && !((Element) pNode).getTagName()
+                    .equals("consumedIn")) {
 
                 elParent.removeChild(pNode);
             }
@@ -590,6 +595,21 @@ public class DailyMedParser {
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, 
                                    "Bogus date format: " + low, ex);
+                    }
+                }
+                nl = marketingAct.getElementsByTagName("high");
+                if (nl.getLength() > 0) {
+                    String low = nl.item(0).getAttributes()
+                            .getNamedItem("value").getTextContent();
+                    try {
+                        LocalDate date = LocalDate.parse(low, DTF);
+                        product.endDate = Calendar.getInstance();
+                        product.endDate.set(date.getYear(),
+                                date.getMonthValue()-1,
+                                date.getDayOfMonth());
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE,
+                                "Bogus date format: " + low, ex);
                     }
                 }
             }
@@ -757,8 +777,40 @@ public class DailyMedParser {
                         label.productCategory = n.getTextContent().toUpperCase().trim();
                     }
                     break;
+
+                case "author":
+                    for (Node a1: asList(child.getChildNodes())) {
+                        for (Node a2: asList(a1.getChildNodes())) {
+                            for (Node a3 : asList(a2.getChildNodes())) {
+                                if (a3.getNodeType() == Node.ELEMENT_NODE &&
+                                    a3.getNodeName().equals("name")) {
+                                        label.sponsor = a3.getTextContent();
+                                }
+                            }
+                        }
+                    }
+                    break;
                 }
             }
+        }
+    }
+
+    public static List<Node> asList(NodeList n) {
+        return n.getLength()==0?
+                Collections.<Node>emptyList(): new NodeListWrapper(n);
+    }
+
+    static class NodeListWrapper extends AbstractList<Node>
+            implements RandomAccess {
+        private final NodeList list;
+        NodeListWrapper(NodeList l) {
+            list=l;
+        }
+        public Node get(int index) {
+            return list.item(index);
+        }
+        public int size() {
+            return list.getLength();
         }
     }
 
@@ -798,6 +850,12 @@ public class DailyMedParser {
                                                 p.marketDate.get(Calendar.MONTH)+1, 
                                                 p.marketDate.get(Calendar.DAY_OF_MONTH)) 
                                 : "";
+            String endDate = p.endDate != null
+                    ? String.format("%1$04d-%2$02d-%3$02d",
+                    p.endDate.get(Calendar.YEAR),
+                    p.endDate.get(Calendar.MONTH)+1,
+                    p.endDate.get(Calendar.DAY_OF_MONTH))
+                    : "";
 
             for (Ingredient i : p.ingredients) {
                 System.out.println(i.substance.unii + "\t"
@@ -806,13 +864,14 @@ public class DailyMedParser {
                                    + (label.productCategory != null 
                                       ? label.productCategory : "") + "\t"
                                    + marketDate + "\t"
-                                   + (label.initialApprovalYear != null 
+                                   + endDate + "\t"
+                                   + (label.initialApprovalYear != null
                                       ? label.initialApprovalYear : "") + "\t"
                                    + i.code + "\t"
                                    + (p.approvalId != null ? p.approvalId : "") + "\t"
                                    + (p.equivNDC != null ? p.equivNDC : "") + "\t"
                                    + (p.ndc != null ? p.ndc : "") + "\t"
-                                   + (p.route != null ? p.route : "") + "\t"
+                                   + (p.route != null ? p.route + (p.formulation != null ? " " + p.formulation : "") : "") + "\t"
                                    + "\""+i.substance.name.replaceAll("\n","").toUpperCase().trim()
                                    + "\""+"\t"+(p.genericName != null 
                                                 ? ("\"" 
@@ -820,9 +879,12 @@ public class DailyMedParser {
                                                                   .toUpperCase().trim()
                                                    + "\"")
                                                 : "") + "\t"
+                                   + (p.name != null ? ("\""+p.name.replaceAll("\n", "").trim()+"\"") : "") + "\t"
+                                   + (label.sponsor != null ? ("\""+label.sponsor.replaceAll("\n", "").trim()+"\"") : "") + "\t"
                                    + (label.url != null ? label.url : "") + "\t"
                                    + (label.indications != null ? label.indications : "") + "\t"
-                                   + (label.comment != null ? label.comment : ""));
+                                   + (label.comment != null ? label.comment : "")
+                );
                 //seen.add(i.substance.unii);
             }
         }
@@ -888,7 +950,118 @@ public class DailyMedParser {
         
         return 0;
     }
-    
+
+    protected int parseInitiatedInactivatedXml(InputStream is) throws Exception {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+        Element doc = builder.parse(is).getDocumentElement();
+
+        Set<String> setids = new HashSet<String>();
+
+        for (Node n1: asList(doc.getElementsByTagName("relatedDocument"))) {
+            for (Node n2 : asList(n1.getChildNodes())) {
+                if (n2.getNodeName().equals("setId")) {
+                    String setid = n2.getAttributes().getNamedItem("root").getTextContent();
+                    if (!setids.contains(setid)) {
+                        setids.add(setid);
+                    }
+                }
+            }
+        }
+
+        for (Node n1: asList(doc.getElementsByTagName("manufacturedProduct"))) {
+            for (Node n2 : asList(n1.getChildNodes())) {
+                if (n2.getNodeName().equals("asContent")) {
+                    String ndc = null;
+                    String status = null;
+                    Calendar startDate = null;
+                    for (Node n3 : asList(n2.getChildNodes())) {
+                        if (n3.getNodeName().equals("containerPackagedProduct")) {
+                            for (Node n4 : asList(n3.getChildNodes())) {
+                                if (n4.getNodeName().equals("code")) {
+                                    ndc = n4.getAttributes().getNamedItem("code").getTextContent();
+                                }
+                            }
+                        } else if (n3.getNodeName().equals("subjectOf")) {
+                            for (Node n4 : asList(n3.getChildNodes())) {
+                                if (n4.getNodeName().equals("action")) {
+                                    for (Node n5 : asList(n4.getChildNodes())) {
+                                        if (n5.getNodeName().equals("code")) {
+                                            status = n5.getAttributes().getNamedItem("displayName").getTextContent();
+                                        }
+                                        if (n5.getNodeName().equals("effectiveTime")) {
+                                            Node nl = asList(n5.getChildNodes()).get(1);
+                                            if (nl.getNodeName().equals("low")) {
+                                                String low = nl.getAttributes()
+                                                        .getNamedItem("value").getTextContent();
+                                                try {
+                                                    LocalDate date = LocalDate.parse(low, DTF);
+                                                    startDate = Calendar.getInstance();
+                                                    startDate.set(date.getYear(),
+                                                            date.getMonthValue()-1,
+                                                            date.getDayOfMonth());
+                                                } catch (Exception ex) {
+                                                    logger.log(Level.SEVERE,
+                                                            "Bogus date format: " + low, ex);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (status != null && startDate != null) {
+                        for (String setid : setids) {
+                            System.out.println(
+                                    setid + "\t" +
+                                    ndc + "\t" +
+                                    status + "\t" +
+                                    String.format("%1$04d-%2$02d-%3$02d",
+                                            startDate.get(Calendar.YEAR),
+                                            startDate.get(Calendar.MONTH)+1,
+                                            startDate.get(Calendar.DAY_OF_MONTH))
+                                );
+                        }
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    protected int parseInitiatedInactivatedZip(InputStream is) throws Exception {
+        // https://www.govinfo.gov/content/pkg/FR-2019-08-14/pdf/2019-17436.pdf
+        ZipInputStream zis = new ZipInputStream(is);
+
+        for (ZipEntry ze; zis.available() > 0; ) {
+            ze = zis.getNextEntry();
+
+            if (ze != null && !ze.isDirectory()) {
+                String name = ze.getName();
+
+                if (name.endsWith(".zip")) {
+                    is = getInputStream(zis, ze);
+
+                    if (is != null){
+                        parseInitiatedInactivatedZip(is);
+                    }
+
+                } else if (name.endsWith(".xml")) {
+                    is = getInputStream(zis, ze);
+
+                    if (is != null){
+                        parseInitiatedInactivatedXml(is);
+                    }
+                }
+            }
+        }
+        zis.close();
+
+        return 0;
+    }
+
     public int parse(InputStream is) throws Exception {
         BufferedInputStream bis = new BufferedInputStream(is);
 
@@ -944,10 +1117,19 @@ public class DailyMedParser {
             System.exit(1);
         }
 
+        if (argv[0].contains("fda_initiated_inactive_ndcs_indexing_spl_files.zip")) {
+            DailyMedParser daily = new DailyMedParser();
+            logger.info("***** parsing inactivated xml " + argv[0] + " ******");
+            System.out.println("setid\tndc\tstatus\tstartdate");
+            daily.parseInitiatedInactivatedZip(new BufferedInputStream(new FileInputStream(argv[0])));
+            System.exit(0);
+        }
+
         System.out.println("UNII\t"+
                            "MarketingStatus\t"+
                            "ProductCategory\t"+
                            "MarketDate\t"+
+                           "EndDate\t"+
                            "InitialYearApproval\t"+
                            "ActiveCode\t"+
                            "ApprovalAppId\t"+
@@ -956,10 +1138,12 @@ public class DailyMedParser {
                            "Route\t"+
                            "ActiveMoietyName\t"+
                            "GenericProductName\t"+
+                           "Product\t"+
+                           "Sponsor\t"+
                            "URL\t"+
                            "Indications\t"+
                            "Comment");
-        
+
         DailyMedParser daily = new DailyMedParser();
 
         for (int i = 0; i < argv.length; i++) {
