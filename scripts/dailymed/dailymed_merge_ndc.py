@@ -27,7 +27,7 @@ def prepNDCDF():
                 out.write(response.read())
     with zipfile.ZipFile(ndcZip, 'r') as ndcZipRef:
         with ndcZipRef.open('product.txt') as ndcFile:
-            ndc = pd.read_csv(ndcFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False)
+            ndc = pd.read_csv(ndcFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False, dtype=str)
             return ndc
 
 def findUnii(uniiDF, name):
@@ -133,12 +133,12 @@ if __name__ == "__main__":
 
     # get SPLs from the FDA and use old SPLs if no longer available from dailymed dump
     fileTypes = ['rx', 'otc', 'ani', 'rem', 'missing'] #'homeo' homeopathic lables not used
-    splDF = pd.concat([pd.read_csv('temp/spl_'+fileType+'.txt', sep="\t", error_bad_lines=False, na_filter=False) \
+    splDF = pd.concat([pd.read_csv('temp/spl_'+fileType+'.txt', sep="\t", error_bad_lines=False, na_filter=False, dtype=str) \
                        for fileType in fileTypes], ignore_index=True)
     for fileType in fileTypes:
         g_old = '../stitcher-rawinputs/files/spl-ndc/spl_'+fileType+'_old.txt.gz'
         f_old = gzip.open(g_old, 'rb')
-        df_old = pd.read_csv(f_old, sep="\t", error_bad_lines=False, na_filter=False)
+        df_old = pd.read_csv(f_old, sep="\t", error_bad_lines=False, na_filter=False, dtype=str)
         df_diff = df_old[~df_old.NDC.isin(splDF.NDC.values)]
         splDF.append(pd.concat([splDF, df_diff], ignore_index=True))
     print(splDF.info(verbose=True))
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     ndcOldFileGZ = '../stitcher-rawinputs/files/spl-ndc/Products_all-2018-02-25.txt.gz' # from https://data.nber.org/fda/ndc/
     with gzip.open(ndcOldFileGZ, 'rb') as ndcOldFile:
         entryList = []
-        ndcOldDF = pd.read_csv(ndcOldFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False)
+        ndcOldDF = pd.read_csv(ndcOldFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False, dtype=str)
         for index, entry in ndcOldDF[~ndcOldDF.PRODUCTNDC.isin(ndcDF.PRODUCTNDC.values)].iterrows():
             if entry.ENDMARKETINGDATE == '':
                 entry.ENDMARKETINGDATE = entry.LISTING_RECORD_CERTIFIED_THROUGH
@@ -172,19 +172,19 @@ if __name__ == "__main__":
         indicies = []
         uniiset = splDF[splDF.UNII == unii]
         print(unii, uniiset.shape[0])
-        uniiset.sort_values(by=['ActiveCode', 'MarketingStatus', 'ApprovalAppId', 'MarketDate'], ascending=[True, False, True, True])
-        for index, entry in uniiset.iterrows():
-            if len(entries) < 3:
-                entries.append(entry)
-                indicies.append(entry.NDC)
         uniiset.sort_values(by=['MarketDate'], ascending=[True])
         for index, entry in uniiset.iterrows():
-            if len(entries) < 4 and (entry.NDC not in indicies):
+            if len(entries) < 2 and (entry.NDC not in indicies):
                 entries.append(entry)
                 indicies.append(entry.NDC)
-        uniiset.sort_values(by=['MarketDate'], ascending=[False])
+        uniiset.sort_values(by=['EndDate'], ascending=[True])
+        entry = uniiset.iloc[-1]
+        if len(entries) < 3 and (entry.NDC not in indicies):
+            entries.append(entry)
+            indicies.append(entry.NDC)
+        uniiset.sort_values(by=['ActiveCode', 'MarketingStatus', 'ApprovalAppId', 'MarketDate'], ascending=[True, False, True, True])
         for index, entry in uniiset.iterrows():
-            if len(entries) < 5 and (entry.NDC not in indicies):
+            if len(entries) < 6 and (entry.NDC not in indicies):
                 entries.append(entry)
                 indicies.append(entry.NDC)
         for entry in entries:
@@ -193,7 +193,4 @@ if __name__ == "__main__":
     # write out summary list
     summaryDF = pd.concat(summaryList, axis=1).T
     summaryDF.to_csv("data/spl_summary.txt", sep="\t", index=False, encoding="utf-8")
-
-
-
 
