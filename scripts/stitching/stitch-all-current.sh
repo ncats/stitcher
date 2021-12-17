@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 timestamp="$(date +'%Y%m%d-%H%M%S')"
 db="stitchv${timestamp}.db"
-dbzip="stitchv${timestamp}db.zip"
+dbzip="${db}.zip"
 log="log${timestamp}.txt"
 
 #keep track of current time
@@ -24,7 +24,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, May 2021\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2021-05-02.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, July 2020\" cache=data/hash.db ../stitcher-rawinputs/files/rancho-export_2020-07-24_14-33.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-10-19.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
@@ -72,13 +72,11 @@ echo 'IIG:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 #cp -r $db NOSTITCH$db
 
 # now the stitching...
-sbt -mem 16000 stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
+sbt -mem 32000 stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 echo $(date) >> $log
 
-
-# zip up the directory and copy over to centos
-# zip -r $dbzip $db
-# scp $dbzip centos@dev.ncats.io:/tmp
+# zip up the database (it takes a while)
+zip -r $dbzip $db
 
