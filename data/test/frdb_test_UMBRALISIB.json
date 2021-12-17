@@ -1,0 +1,117 @@
+[
+  {
+    "name": "RP-5264",
+    "smiles": "CC(C)OC1=CC=C(C=C1F)C2=NN([C@@H](C)C3=C(C4=CC(F)=CC=C4)C(=O)C5=CC(F)=CC=C5O3)C6=C2C(N)=NC=N6",
+    "curated_by": "curator8",
+    "modified_datetime": 1532351698111,
+    "qcd": false,
+    "unii": "38073MQB2A",
+    "cas": "1532533-67-7",
+    "iupac": "2-[(1S)-1-[4-amino-3-(3-fluoro-4-propan-2-yloxyphenyl)pyrazolo[3,4-d]pyrimidin-1-yl]ethyl]-6-fluoro-3-(3-fluorophenyl)chromen-4-one",
+    "cid": "72950888",
+    "chemspider_id": "34979945",
+    "synonyms": [
+      "RP-5264",
+      "TGR-1202",
+      "Umbralisib"
+    ],
+    "patent": [
+      "20140011819"
+    ],
+    "targets": [
+      {
+        "compound_id": 41478,
+        "primary_target_id": "CHEMBL3130",
+        "target_primary_target_type": "ChEMBL",
+        "primary_target_uri": "https://www.ncbi.nlm.nih.gov/pubmed/27784673",
+        "target_primary_potency_type": "EC50",
+        "target_primary_potency_value": "22.1999999999999993",
+        "target_primary_potency_dimensions": "nM",
+        "primary_potency_uri": "https://www.ncbi.nlm.nih.gov/pubmed/27784673",
+        "target_pharmacology": "Inhibitor",
+        "primary_target_label": "PI3-kinase p110-delta subunit",
+        "target_id": 18539
+      },
+      {
+        "compound_id": 41478,
+        "primary_target_id": "P49674",
+        "target_primary_target_type": "UniProt",
+        "primary_target_uri": "https://www.ncbi.nlm.nih.gov/pubmed/27784673",
+        "target_primary_potency_type": "Unknown",
+        "primary_potency_uri": "Unknown",
+        "target_pharmacology": "Inhibitor",
+        "primary_target_label": "Casein kinase I isoform epsilon",
+        "primary_target_gene_symbol": "CSNK1E",
+        "primary_target_gene_id": "102800317|||1454",
+        "primary_target_organism": "Homo sapiens (Human)",
+        "target_id": 18540
+      }
+    ]
+  },
+  {
+    "name": "UMBRALISIB",
+    "smiles": "CCOC1=C(F)C=C(C=C1)C2=NN([C@H](C)C3=C(C(=O)C4=C(O3)C=CC(F)=C4)C5=CC(F)=CC=C5)C6=C2C(N)=NC=N6",
+    "originator": "Incozen Therapeutics; Rhizen Pharmaceuticals",
+    "originator_uri": "https://adisinsight.springer.com/drugs/800037325",
+    "compound_description": "Umbralisib (TGR-1202) is an orally available PI3K delta inhibitor, targeting the delta isoform with nanomolar potency and several fold selectivity over the alpha, beta, and gamma isoforms of PI3K.  The delta isoform of PI3K is strongly expressed in cells of hematopoietic origin and is believed to be important in the proliferation and survival of B-cell lymphocytes. Inhibition of PI3K delta signaling with umbralisib has demonstrated robust activity in numerous pre-clinical models and primary cells from patients with hematologic malignancies. Umbralisib is currently in Phase 3 clinical development in combination with Ublituximab for patients with hematologic malignancies.",
+    "description_uri": "http://www.tgtherapeutics.com/pipeline/TGR-1202.cfm | https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=NCI_Thesaurus&code=C104413",
+    "in_vivo_use_guide": "relapsed or refractory chronic lymphocytic leukaemia or mantle cell lymphoma: umbralisib orally once daily (400 mg, 600 mg, or 800 mg) and ibrutinib orally once daily (420 mg for chronic lymphocytic leukaemia or 560 mg for mantle cell lymphoma) until disease progression or unacceptable toxicity. Umbralisib plus ibrutinib is well tolerated and active in relapsed or refractory chronic lymphocytic leukaemia and mantle cell lymphoma, with a recommended phase 2 dose of umbralisib 800 mg once daily.",
+    "in_vivo_use_route": "Oral",
+    "in_vivo_uri": "https://www.ncbi.nlm.nih.gov/pubmed/30558987",
+    "in_vitro_use_guide": "Umbralisib (TGR-1202), a novel, next generation PI3Kδ inhibitor, inhibits PI3Kδ activity in enzyme and cell based assays with IC50 and EC50 values of 22.2 & 24.3 nM, respectively.",
+    "in_vitro_uri": "http://www.tgtxinc.com/AACR2012Poster3741.pdf",
+    "curated_by": "anna@ranchobiosciences.com",
+    "modified_datetime": 1564068318877,
+    "qcd": false,
+    "unii": "38073MQB2A",
+    "cas": "1532533-67-7",
+    "iupac": "2-[(1S)-1-[4-amino-3-(3-fluoro-4-propan-2-yloxyphenyl)pyrazolo[3,4-d]pyrimidin-1-yl]ethyl]-6-fluoro-3-(3-fluorophenyl)chromen-4-one",
+    "cid": "72950888",
+    "wikiurl": "https://en.wikipedia.org/wiki/Umbralisib",
+    "synonyms": [
+      "TGR-1202",
+      "RP5264",
+      "rp-5264",
+      "TGR1202"
+    ],
+    "pmids": [
+      "29475725",
+      "30936084",
+      "29500299"
+    ],
+    "targets": [
+      {
+        "compound_id": 50879,
+        "primary_target_id": "P49674",
+        "target_primary_target_type": "UniProt",
+        "primary_target_uri": "https://www.ncbi.nlm.nih.gov/pubmed/29475723",
+        "target_primary_potency_type": "Kd",
+        "target_primary_potency_value": "180",
+        "target_primary_potency_dimensions": "nM",
+        "primary_potency_uri": "https://www.ncbi.nlm.nih.gov/pubmed/29475723",
+        "target_pharmacology": "Inhibitor",
+        "primary_target_label": "Casein kinase I isoform epsilon",
+        "primary_target_gene_symbol": "CSNK1E",
+        "primary_target_gene_id": "102800317|||1454",
+        "primary_target_organism": "Homo sapiens (Human)",
+        "target_id": 20182
+      },
+      {
+        "compound_id": 50879,
+        "primary_target_id": "O00329",
+        "target_primary_target_type": "UniProt",
+        "primary_target_uri": "https://www.ncbi.nlm.nih.gov/pubmed/29475723",
+        "target_primary_potency_type": "Kd",
+        "target_primary_potency_value": "6.20000000000000018",
+        "target_primary_potency_dimensions": "nM",
+        "primary_potency_uri": "https://www.ncbi.nlm.nih.gov/pubmed/29475723",
+        "target_pharmacology": "Inhibitor",
+        "primary_target_label": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta isoform",
+        "primary_target_gene_symbol": "PIK3CD",
+        "primary_target_gene_id": "5293",
+        "primary_target_organism": "Homo sapiens (Human)",
+        "target_id": 20181
+      }
+    ]
+  }
+]

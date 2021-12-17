@@ -65,11 +65,16 @@ public class MoleculeEntityFactory extends EntityRegistry {
 
     public Entity _register (final Molecule mol) {
         String idval =  null;
+        String SOURCE = getDataSource().getName();
+        // some properties can be concatenated via a separator
+        // see individual entity factories for each source
+        String valueSeparator = "\n"; 
+
         // add unique identifier to node (source is already present as label?)
         if (idField != null) {
             idval = mol.getProperty(idField);
         }
-
+       
         Entity ent = Entity._getEntity(_createNode ());
         DefaultPayload payload = new DefaultPayload (getDataSource ());
 
@@ -182,7 +187,7 @@ public class MoleculeEntityFactory extends EntityRegistry {
             mapValues (ent, values);
         }
 
-        // now store all original properties..
+        // now store all original properties...
         for (int i = 0; i < mol.getPropertyCount(); ++i) {
             String prop = mol.getPropertyKey(i);
             String value = mol.getProperty(prop);
@@ -190,7 +195,16 @@ public class MoleculeEntityFactory extends EntityRegistry {
             if (value != null && !payload.has(prop)) {
                 List<String> values = new ArrayList<String>();
                 int max = 0;
-                for (String s : value.split("\n")) {
+
+                // default separator is newline
+                // which is used to concatenate multiple properties during source parsing
+                // however some sources may contain newlines as properties
+                // TODO: check if Rancho resource works and review other sources
+                if (SOURCE.startsWith("FRDB")) {
+                    valueSeparator = "SPECIALSEPARATOR";
+                } 
+
+                for (String s : value.split(valueSeparator)) {
                     String v = s.trim();
                     int len = v.length();
                     if (len > 0) {
@@ -200,9 +214,11 @@ public class MoleculeEntityFactory extends EntityRegistry {
                         values.add(v);
                     }
                 }
+
                 // don't index if the string content is too long
-                if (!values.isEmpty())
+                if (!values.isEmpty()) {
                     payload.put(prop, values.toArray(new String[0]), max < 100);
+                }
             }
             properties.add(prop);
         }
