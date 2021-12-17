@@ -94,7 +94,7 @@ public class NCGCLoader extends MoleculeEntityFactory {
                 DataSource ds = nl.register(argv[1]);
                 nl.setDataSource(ds);
                 HashMap<String, Long> loaded = new HashMap<>();
-                ResourceIterator<Node> i = nl.gdb.findNodes(DynamicLabel.label(ds.getName()));
+                ResourceIterator<Node> i = nl.gdb.findNodes(Label.label(ds.getName()));
                 while (i.hasNext()) {
                     Node n = i.next();
                     String ncgc = (String) n.getProperty(Entity.ID);
@@ -152,7 +152,7 @@ public class NCGCLoader extends MoleculeEntityFactory {
             for (RelationshipType rt: conservativeKeys)
                 rts.add(rt.name());
 
-            ge.greedyConnectedComponents(DynamicLabel.label("ginas"), rts);
+            ge.greedyConnectedComponents(Label.label("ginas"), rts);
             ge.writeOutNodeTags("NodesAndLabels.txt");
             graphDb.shutdown();
         } catch (Exception e) {e.printStackTrace();}

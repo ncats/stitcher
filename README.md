@@ -65,136 +65,144 @@ Detailed Instructions
 ## Preparing the Database and Stitching
 
 1) Try invoking the `sbt` shell to check if it is available, then `exit`.
-```console
-$ sbt
-```
+    ```console
+    $ sbt
+    ```
 
-2) Initiate (define auxiliary functions, check for java version, etc.), then `exit`.
-```console
-$ bash activator2
-```
+    2) Initiate (define auxiliary functions, check for java version, etc.), then `exit`.
+    ```console
+    $ bash activator2
+    ```
 
-3) Build, stitch, and calculate events. 
-a) Make sure you have a file `.sbtopts` in your `stitcher` directory that has the following content:
-```console
--J-Xms1024M -J-Xmx16G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC
-```
+3) Build, stitch, and calculate events.  
+    1. Make sure you have a file `.sbtopts` in your `stitcher` directory that has the following content:
+        ```console
+        -J-Xms1024M -J-Xmx16G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC
+        ```
 
-b) Check the script and search for the database name (e.g. `stitchv1.db`):
-```console
-$ cat scripts/stitch-all-current.sh
-```
-If you have a database with the same name in your `stitcher` directory, either remove it or modify the script to have a different db name (e.g. `stitchv2.db`).
+    2. From the `stitcher` directory, run:
+        ```console
+        $ ./scripts/stitching/stitch-all-current.sh
+        ```
+        The script will create a date- and time-stamped database named according to the following convention `stitchvYYYYMMDD-hhmmss.db`.  
+        **NOTE:** Building the database and stitching should take about 14 hours total on a server with two Intel(R) Xeon(R) E5-2665 CPUs. The application uses about 20GB of RAM.
 
-c) From the `stitcher` directory, run:
-```console
-$ bash scripts/stitch-all-current.sh
-```
-NOTE: Building the databse and stitching should take about 4 and 5 hours, respectively, on a laptop (i5-4200U @ 2.3 GHz, 8GB RAM).
-Complete process on a server (`ifxdev.ncats.nih.gov`) takes approximately 5-6 hours.
+    3. Alternatively, to create a log file, run:
+        ```console
+        $ ./scripts/stitching/master-stitch-all-current.sh
+        ```
+        **NOTE:** Since the process takes a while, it's better run the process in a separate `screen` to keep the process running, if the connection to the server/terminal is reset.
+        While `nohup` is another option, it is problematic in this case, as it will stop the job at the end of every command due to a `tty` output attempt. 
+        ```console
+        $ screen
+        $ ./scripts/stitching/master-stitch-all-current.sh
+        #press 'ctrl+a', then 'd' to disconnect from the screen
+        ```
 
-NOTE: Since the process takes a while, it's better run the process in a separate `screen` to keep the process running, if the connection to the server/terminal is reset.
-While `nohup` is another option, it is problematic in this case, as it will stop the job at the end of every command due to a `tty` output attempt. 
-```console
-$ screen
-$ bash scripts/stitch-all-current.sh > stitch.out 2>&1
-#press 'ctrl+a', then 'd' to disconnect from the screen
-```
-
-NOTE: If you encounter errors, try cleaning the project by removing all target directories directly, and then re-run the script:
-```console
-$ find . -name target -type d -exec rm -rf {} \;
-$ bash scripts/stitch-all-current.sh
-```
+    **NOTE:** If you encounter errors, try cleaning the project by removing all target directories directly, and then re-run the script:
+    ```console
+    $ find . -name target -type d -exec rm -rf {} \;
+    $ bash scripts/stitch-all-current.sh
+    ```
 
 ## Testing Locally
+### Stitching (Inxight)
+Since the stitching takes a long time, one might want to test a small subset of substances.  
+1) Prepare test data sources by selecting a desired subset of substances in each.  
 
-1) In your `stitcher` directory, make a symbolic link `stitcher.ix/data.db` pointing to the database you have just made.
-```console
-#first, remove old link or a folder with the same name (if present)
-$ rm -r stitcher.ix/data.db
-#then create the symlink
-$ ln -s ../stitchv1.db stitcher.ix/data.db
-```
+2) To make a G-SRS data source, run:
+    ```console
+    $ ./scripts/stitcher-testing/make-test-gsrs-dump.sh UNII
+    ```
+    The script takes a UNII as an argument and will excise that record from the G-SRS dump and a path to that G-SRS dump.  
+    **NOTE:** the first run is slow, but the follow-up runs are fast, as the script will attempt to locate temporary files it produced in `/tmp` directory.
+3) Modify the test script accordingly and run it:
+    ```console
+    $ ./scripts/stitching/test/stitch-all-current.sh
+    ```
 
-2) Navigate to your `stitcher` directory and run the project.
-```console
-$ sbt run
-```
+### App Deployment
+1) In your `stitcher` directory, run:
+    ```console
+    $ ./scripts/deployment/restart-stitcher-from-repo.sh YOUR-DATABASE-PATH
+    ```
+   The script takes one argument, the path to your desired database.
+  
+2) When prompted in the console, in your browser navigate to  
+   http://localhost:9000/app/stitches/latest
 
-3) When prompted in the console, navigate to http://localhost:9000/app/stitches/latest in your browser.
-
-## Deployment  
-
+## Deployment
 ### Build the Binary Distribution 
-####(optional -- only do this if you have changed the stitcher code or starting anew)
+**NOTE:** only do this if you have changed the stitcher code or starting anew.  
 
-0) !!!*Please* make sure you run the following test when you update the stitching algorithm
-```console
-sbt stitcher/"testOnly ncats.stitcher.test.TestStitcher"
-```
-and ensure all the basic stitching test cases are passed before doing a build
+
+0) **Please** make sure you run the following test when you update the stitching algorithm
+    ```console
+    sbt stitcher/"testOnly ncats.stitcher.test.TestStitcher"
+    ```
+    and ensure all the basic stitching test cases are passed before doing a build
 
 1) Make a distribution. In the `stitcher` directory run:
-```
-sbt dist
-```
-It will be created in `stitcher/target/universal/` and have a name similar to `ncats-stitcher-master-20171110-400d1f1.zip`.
+    ```
+    sbt dist
+    ```
+    It will be created in `stitcher/target/universal/` and have a name similar to `ncats-stitcher-master-20171110-400d1f1.zip`.
 
-2) Copy the archive to the deployment server (e.g. `dev.ncats.io`). For example:
-```
-#navigate to path-to-stitcher-parent-directory/stitcher/target/universal/ 
-#scp to the server
-$ scp ncats-stitcher-master-20171110-400d1f1.zip centos@dev.ncats.io:/tmp
-```
+2) Copy the archive to the deployment server (e.g., `dev.ncats.io`). For example:
+    ```
+    #navigate to path-to-stitcher-parent-directory/stitcher/target/universal/ 
+    #scp to the server
+    $ scp ncats-stitcher-master-20171110-400d1f1.zip centos@dev.ncats.io:/tmp
+    ```
 
-3) Unzip into the desired folder (on `centos@dev.ncats.io`, it is `~`).
-```
-#navigate to the desired folder on the deployment server
-$ ssh centos@dev.ncats.io
-#unzip
-$ unzip /tmp/ncats-stitcher-master-20171110-400d1f1.zip
-```
+3) Unzip into the desired folder.
+    ```
+    #navigate to the desired folder on the deployment server
+    $ ssh centos@dev.ncats.io
+    #unzip
+    $ unzip /tmp/ncats-stitcher-master-20171110-400d1f1.zip
+    ```
 
 ### Deploy
 
 1) In the `stitcher` folder (where you have prepared the database), archive the database folder and copy it over to the deployment server.
-```
-$ zip -r stitchv1db.zip stitchv1.db/
-$ scp stitchv1db.zip centos@dev.ncats.io:/tmp
-```
+    ```
+    $ zip -r stitchv1db.zip stitchv1.db/
+    $ scp stitchv1db.zip centos@dev.ncats.io:/tmp
+    ```
 
 2) On the deployment server, navigate to a directory containing the stitcher distribution folder and unzip the database.
-```
-$ ssh centos@dev.ncats.io
-$ unzip /tmp/stitchv1db.zip
-```
+    ```
+    $ ssh centos@dev.ncats.io
+    $ unzip /tmp/stitchv1db.zip
+    ```
 
 3) Start up the app. The script takes the distribution and db folders as arguments.
-```
-$ bash restart-stitcher.sh ncats-stitcher-master-20171110-400d1f1 stitchv1.db
-```
+    ```
+    $ ./scripts/deployment/restart-stitcher.sh ncats-stitcher-master-20171110-400d1f1 stitchv1.db
+    ```
 
 ### Summary 
-#### To run a new stitcher instance you'll need in the same directory
+#### To run a new stitcher instance you'll need:
 1) A distribution folder (e.g. `~/ncats-stitcher-master-20171110-400d1f1`).
-2) A database (e.g. `~/stitchv1.db`).
+2) A database (e.g. `stitchv1.db`).
 3) A `files-for-stitcher.ix` folder with three files.
 4) The script for (re)starting stitcher `restart-stitcher.sh`.
 
-## Useful links
+Examples
+===========================================
+## Sample API Queries
 
 https://stitcher.ncats.io/app/stitches/latest  
 https://stitcher.ncats.io/app/stitches/latest/ + UNII  
 https://stitcher.ncats.io/app/stitches/latest/aspirin  
 https://stitcher.ncats.io/api/datasources  
 
-## Scraping Inxight target data
+## Scraping Inxight Target Data
 
 The activity data is linked to the substance records using the UNII identifier.
 
-For example, the UNII for cannabidiol is 19GBJ60SN5 
-https://drugs.ncats.io/drug/19GBJ60SN5
+For example, the UNII for cannabidiol is 19GBJ60SN5, and [Inxight](https://drugs.ncats.io/drug/19GBJ60SN5) contains the following data:
 
 | Primary Target | Pharmacology | Condition | Potency |
 | ---- |---- | ---- | ---- |
@@ -204,70 +212,75 @@ https://drugs.ncats.io/drug/19GBJ60SN5
 |G-protein coupled receptor 55 | Antagonist || 445.0 nM [IC50] |
 |Serotonin 1a (5-HT1a) receptor | Agonist |
 
-The target data can be found in the json at:
-
-https://stitcher.ncats.io/api/stitches/v1/19GBJ60SN5
-
- -> sgroup / properties / Targets
+The target data can be found in the json in [Stitcher](https://stitcher.ncats.io/api/stitches/v1/19GBJ60SN5) as well under:  
+`sgroup / properties / targets`  
+For example:
+```json
+"targets": 
+    [
+      0: 
+      {
+        "node": 380111
+        "value": "eyJwcmltYXJ5X3RhcmdldF9pZCI6IkNIRU1CTDIxNCIsImNvbXBvdW5kX2lkIjo4MjMzLjAsInRhcmdldF9wcmltYXJ5X3RhcmdldF90eXBlIjoiQ2hFTUJMIiwicHJpbWFyeV90YXJnZXRfdXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMTYyNTg4NTMiLCJ0YXJnZXRfcHJpbWFyeV9wb3RlbmN5X3R5cGUiOiJVbmtub3duIiwicHJpbWFyeV9wb3RlbmN5X3VyaSI6IlVua25vd24iLCJ0YXJnZXRfcGhhcm1hY29sb2d5IjoiQWdvbmlzdCIsInByaW1hcnlfdGFyZ2V0X2xhYmVsIjoiU2Vyb3RvbmluIDFhICg1LUhUMWEpIHJlY2VwdG9yIiwidGFyZ2V0X2lkIjo5NjA4fQ"
+      }
+```
+The `value` properties are base64 encoded json objects and decoding them yields all relevant target information including the source URL, e.g.:
 
 ```json
-"Targets": [
-    {
-  "node": 345357,
-  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJVbmtub3duIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMTYyNTg4NTMiLCJQcmltYXJ5UG90ZW5jeVVyaSI6IlVua25vd24iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwyMTQiLCJUYXJnZXRQaGFybWFjb2xvZ3kiOiJBZ29uaXN0IiwiaWQiOiJmZDk0MjAzZDIxIiwiUHJpbWFyeVRhcmdldExhYmVsIjoiU2Vyb3RvbmluIDFhICg1LUhUMWEpIHJlY2VwdG9yIn0="
-},
-    {
-  "node": 345357,
-  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJVbmtub3duIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMjI1ODU3MzYiLCJQcmltYXJ5UG90ZW5jeVVyaSI6IlVua25vd24iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwxMDc1MDkyIiwiVGFyZ2V0UGhhcm1hY29sb2d5IjoiQmluZGluZyBBZ2VudCIsImlkIjoiZDY4ZGMxMzNkMSIsIlByaW1hcnlUYXJnZXRMYWJlbCI6IkdseWNpbmUgcmVjZXB0b3Igc3VidW5pdCBhbHBoYS0zIn0="
-},
-    {
-  "node": 345357,
-  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJFQzUwIiwiUHJpbWFyeVBvdGVuY3lWYWx1ZSI6IjMuMiIsIlByaW1hcnlUYXJnZXRUeXBlIjoiQ2hFTUJMIiwiUHJpbWFyeVRhcmdldFVyaSI6Imh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvcHVibWVkLzExNjA2MzI1IiwiUHJpbWFyeVBvdGVuY3lVcmkiOiJodHRwczovL3d3dy5uY2JpLm5sbS5uaWguZ292L3B1Ym1lZC8xMTYwNjMyNSIsIlByaW1hcnlQb3RlbmN5RGltZW5zaW9ucyI6IsK1TSIsIlByaW1hcnlUYXJnZXRJZCI6IkNIRU1CTDQ3OTQiLCJUYXJnZXRQaGFybWFjb2xvZ3kiOiJBZ29uaXN0IiwiaWQiOiI0Y2RiMTc0ZTZmIiwiUHJpbWFyeVRhcmdldExhYmVsIjoiVmFuaWxsb2lkIHJlY2VwdG9yIn0="
-},
-    {
-  "node": 345357,
-  "value": "eyJQcmltYXJ5UG90ZW5jeUNvbW1lbnQiOiJjYW5uYWJpZGlvbCBpbmhpYml0ZWQgdGhlIGJpbmRpbmcgb2YgcmFkaW8tZG9tcGVyaWRvbmUgd2l0aCBkaXNzb2NpYXRpb24gY29uc3RhbnRzIG9mIDEx4oCJbk0gYXQgZG9wYW1pbmUgRDJIaWdoIHJlY2VwdG9ycyBhbmQgMjgwMOKAiW5NIGF0IGRvcGFtaW5lIEQyTG93IHJlY2VwdG9ycywgaW4gdGhlIHNhbWUgYmlwaGFzaWMgbWFubmVyIGFzIGEgZG9wYW1pbmUgcGFydGlhbCBhZ29uaXN0IGFudGlwc3ljaG90aWMgZHJ1ZyBzdWNoIGFzIGFyaXBpcHJhem9sZS4iLCJQcmltYXJ5UG90ZW5jeVR5cGUiOiJLaSIsIlByaW1hcnlQb3RlbmN5VmFsdWUiOiIxMS4wIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMjc3NTQ0ODAiLCJQcmltYXJ5UG90ZW5jeVVyaSI6Imh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvcHVibWVkLzI3NzU0NDgwIiwiUHJpbWFyeVBvdGVuY3lEaW1lbnNpb25zIjoibk0iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwyMTciLCJUYXJnZXRQaGFybWFjb2xvZ3kiOiJQYXJ0aWFsIEFnb25pc3QiLCJpZCI6IjY0NzM4NmRlZjYiLCJQcmltYXJ5VGFyZ2V0TGFiZWwiOiJEb3BhbWluZSBEMiByZWNlcHRvciJ9"
-},
-    {
-  "node": 345357,
-  "value": "eyJQcmltYXJ5UG90ZW5jeVR5cGUiOiJJQzUwIiwiUHJpbWFyeVBvdGVuY3lWYWx1ZSI6IjQ0NS4wIiwiUHJpbWFyeVRhcmdldFR5cGUiOiJDaEVNQkwiLCJQcmltYXJ5VGFyZ2V0VXJpIjoiaHR0cHM6Ly93d3cubmNiaS5ubG0ubmloLmdvdi9wdWJtZWQvMTc4NzYzMDIiLCJQcmltYXJ5UG90ZW5jeVVyaSI6Imh0dHBzOi8vd3d3Lm5jYmkubmxtLm5paC5nb3YvcHVibWVkLzE3ODc2MzAyIiwiUHJpbWFyeVBvdGVuY3lEaW1lbnNpb25zIjoibk0iLCJQcmltYXJ5VGFyZ2V0SWQiOiJDSEVNQkwxMDc1MzIyIiwiVGFyZ2V0UGhhcm1hY29sb2d5IjoiQW50YWdvbmlzdCIsImlkIjoiZmExZTU0ZGM4MyIsIlByaW1hcnlUYXJnZXRMYWJlbCI6IkctcHJvdGVpbiBjb3VwbGVkIHJlY2VwdG9yIDU1In0="
+{
+    "primary_target_id": "CHEMBL214",
+    "compound_id": 8233.0,
+    "target_primary_target_type": "ChEMBL",
+    "primary_target_uri": "https://www.ncbi.nlm.nih.gov/pubmed/16258853",
+    "target_primary_potency_type": "Unknown",
+    "primary_potency_uri": "Unknown",
+    "target_pharmacology": "Agonist",
+    "primary_target_label": "Serotonin 1a (5-HT1a) receptor",
+    "target_id": 9608
 }
-]
 ```
+**NOTE:** The `node` property refers to the Stitcher data source.
+**NOTE:** all homonymous properties from different sources are merged into a single array in Stitcher; therefore, some `targets` coming from different sources may not be base64 encoded. 
 
-The 'value's are base64 encoded strings ... decoding them gives you json with the actual target text and URLs from the webpage, e.g.:
-
-```json
-{"PrimaryPotencyType":"Unknown","PrimaryTargetType":"ChEMBL","PrimaryTargetUri":"https://www.ncbi.nlm.nih.gov/pubmed/16258853","PrimaryPotencyUri":"Unknown","PrimaryTargetId":"CHEMBL214","TargetPharmacology":"Agonist","id":"fd94203d21","PrimaryTargetLabel":"Serotonin 1a (5-HT1a) receptor"}
-```
-
-To get the entire dataset, you can iterate over all entries in the stitcher API using 'top' (must be <11) and 'skip' for example:
-
+To get the entire dataset, you can iterate over all entries in the stitcher API using 'top' (must be <11) and 'skip', e.g.:  
 https://stitcher.ncats.io/api/stitches/v1?top=10&skip=590 
 
 
-## Troubleshooting
-- **Problem:** 
-    ```
-    java.lang.NumberFormatException: For input string: "0x100"
-    ```
-    **Cause:**    
-    `SBT` uses `jline` for terminal output. The latter in turn uses the `infocmp` utility provided by `ncurses`, which expects only decimal values. This behaviour was fixed in a new version of `jline` and and newer version of `SBT`, however version `0.13.15` used for this project still suffers from it.  
-    **Solution:**   
-    Add the following to your `~/.bashrc`:  
-    ```
-    export TERM=xterm-color
-    ```
+Troubleshooting
+===================================
+
+## Issue #1   
+
+**Description:**    
+```
+java.lang.NumberFormatException: For input string: "0x100"
+```  
+
+**Cause:**    
+`SBT` uses `jline` for terminal output. The latter in turn uses the `infocmp` utility provided by `ncurses`, which expects only decimal values. This behaviour was fixed in a new version of `jline` and and newer version of `SBT`, however version `0.13.15` used for this project still suffers from it.  
+
+**Solution:**   
+Add the following to your `~/.bashrc`:  
+```
+export TERM=xterm-color
+```
 
 Access to underlying Neo4j database
 ===================================
 
-The underlying Neo4j for stitcher is publicly accessible [here](https://stitcher.ncats.io/browser/). Please specify ```stitcher.ncats.io:80``` in the ```Host``` field. No credentials are needed.
+The underlying Neo4j for stitcher is publicly accessible [here](https://stitcher.ncats.io/browser/).  
+Please specify ```stitcher.ncats.io:80``` in the ```Host``` field.  
+No credentials are needed.
 
-Scripts for Recent Approval Data from FDA
+Data Preparation
 =========================================
+Scripts for Recent Approval Data from FDA
 
+```console
 cd scripts
-python approvalYears.py   [requires python 3+]
-in the /data folder, there should now be a file like approvalYears-2020-12-14.txt. If acceptable, update the filename reference in /data/conf/ob.conf to point to this new file.
+python approvalYears.py   # requires python 3+
+```
+In the `/data` folder, there should now be a file named according to the following convention: `approvalYears-YYYY-MM-DD.txt`.  
+If acceptable, update the filename reference in `/data/conf/ob.conf` to point to this new file.
+
 
