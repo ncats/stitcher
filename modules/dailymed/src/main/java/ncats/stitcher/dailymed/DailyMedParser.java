@@ -912,12 +912,15 @@ public class DailyMedParser {
     InputStream getInputStream(ZipInputStream zis, ZipEntry ze) throws IOException {
         logger.info("$$ " + ze.getName() + " " + ze.getSize());
 
-        if (ze.getSize() > 0l) {        
-            byte[] buf = new byte[(int)ze.getSize()];
-            for (int nb, tb = 0; (nb = zis.read(buf, tb, buf.length - tb)) > 0; tb += nb);
-            
-            return new ByteArrayInputStream(buf);
-        }
+        try {
+            if (ze.getSize() > 0l) {        
+                byte[] buf = new byte[(int)ze.getSize()];
+
+                for (int nb, tb = 0; (nb = zis.read(buf, tb, buf.length - tb)) > 0; tb += nb);
+                
+                return new ByteArrayInputStream(buf);
+            }
+        } catch (Exception ex) {ex.printStackTrace();}
         return null;
     }
 
