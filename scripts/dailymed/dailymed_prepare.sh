@@ -45,7 +45,7 @@ files=(
 		)
 		
 # append full paths to file names
-files=( "${files[@]/#/$save_to}" ) 
+files=( "${files[@]/#/$1}" ) # files=( "${files[@]/#/$save_to}" ) 
 
 missing_files=()
 
@@ -96,13 +96,13 @@ for type in ${types[@]}; do
 done
 
 # process 'missing' labels
-sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser ../stitcher-rawinputs/files/SPL-missing-labels.zip" > temp/spl_missing.txt
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser ../stitcher-rawinputs/files/spl-ndc/spl-missing-labels.zip" > temp/spl_missing.txt 2> /dev/null
 
 # create summary spl file
 python $SCRIPT_DIR/dailymed/dailymed_merge_ndc.py # produces data/spl_summary.txt
 
 # process inactivated labels
-sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > temp/spl_inactivated.txt
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > temp/spl_inactivated.txt 2> /dev/null
 
 # compare with otc_monograph_final, and remove UNIIs that don't belong
 #echo "Fixing OTC file..."

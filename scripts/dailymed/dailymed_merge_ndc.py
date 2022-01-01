@@ -3,10 +3,15 @@ import os
 import io
 import gzip
 import zipfile
+import traceback
+import subprocess
 import pandas as pd
 import urllib.request
 
 def prepUniiDF():
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
+
     uniiZip = 'temp/UNIIs.zip'
     if not os.path.exists(uniiZip):
         with urllib.request.urlopen('https://fdasis.nlm.nih.gov/srs/download/srs/UNIIs.zip') as response:
@@ -47,27 +52,51 @@ def findUnii(uniiDF, name):
             sys.exit()
     return None
 
-def getArchiveLabel(product, labelername, path = 'temp/labels/'):
-    url = 'https://dailymed.nlm.nih.gov/dailymed/archives/index.cfm?query='+urllib.parse.quote_plus(product)+'&date=&pagesize=20&page=1'
+def getArchiveLabelRequest(url, path, outfile, labelername):
     with urllib.request.urlopen(url) as response:
         html = response.read()
         idx = html.find(b'<a href="/dailymed/archives/fdaDrugInfo.cfm?archiveid=')
         while idx > -1:
             ref = 'https://dailymed.nlm.nih.gov' + \
-                  html[html.find(b'/dailymed', idx):html.find(b'" title="">', idx)].decode('utf-8')
+                html[html.find(b'/dailymed', idx):html.find(b'" title="">', idx)].decode('utf-8')
             zip = 'https://dailymed.nlm.nih.gov/dailymed/getArchivalFile.cfm?archive_id=' + \
-                  html[html.find(b'archiveid=', idx)+10:html.find(b'" title="">', idx)].decode('utf-8')
+                html[html.find(b'archiveid=', idx)+10:html.find(b'" title="">', idx)].decode('utf-8')
             prod = html[html.find(b'" title="">', idx)+11:html.find(b'<br></a>', idx)].decode('utf-8')
             labeler = html[html.find(b'Packager: <span>', idx)+16:html.find(b'</span></div>', idx)].decode('utf-8').replace('&amp;', '&')
             date = html[html.find(b'<div class="date">', idx)+18:html.find(b'<a download target="_blank"', idx)].decode('utf-8')
-            print(ref, zip, prod, labeler, date)
+            print(ref, zip, repr(prod), repr(labeler), date)
             if labeler == labelername:
                 with urllib.request.urlopen(zip) as response:
-                    outfile = path + response.info().get_filename()
+                    #outfile = path + response.info().get_filename()
+                    if not os.path.exists(path):
+                        os.makedirs(path)
                     with open(outfile, 'wb') as out:
                         out.write(response.read())
                     return outfile
             idx = html.find(b'<a href="/dailymed/archives/fdaDrugInfo.cfm?archiveid=', idx+1)
+    return
+
+def getArchiveLabel(product, labelername, path = 'temp/labels/'):
+    url = 'https://dailymed.nlm.nih.gov/dailymed/archives/index.cfm?query='+urllib.parse.quote_plus(product)+'&date=&pagesize=20&page=1'
+    outfile = path + product + '.zip'
+    if not os.path.exists(outfile):
+        try:
+            getArchiveLabelRequest(url, path, outfile, labelername)
+        except:
+            try:
+                getArchiveLabelRequest(url, path, outfile, labelername)
+            except:
+                print("this didn't work")
+                traceback.print_exc()
+                sys.exit()
+    if os.path.exists(outfile):
+        print('unfortunately, need to run sbt java to process downloaded zip file ... what a chore')
+        #print(os.popen('sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser '+outfile+'"').read())
+        #cmd = 'sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser '+outfile+'"'
+        #process = subprocess.Popen("C:\Program Files\Git\git-bash.exe " + cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #print(process.communicate())
+        #df = pd.read_csv(process.communicate(), sep="\t", error_bad_lines=False, na_filter=False, dtype=str)
+        #sys.exit()
     return None
 
 def searchArchiveMissingNDCs(spl, ndc):
@@ -92,8 +121,8 @@ def searchArchiveMissingNDCs(spl, ndc):
         if unii is not None and unii not in spl.UNII.values and \
                 row['APPLICATIONNUMBER'] not in spl.ApprovalAppId.values and \
                 row['MARKETINGCATEGORYNAME'] not in ['UNAPPROVED HOMEOPATHIC']:
-            print(row)
-            archiveLabel = None #!!!! getArchiveLabel(row['PROPRIETARYNAME'], row['LABELERNAME'], 'temp/labels/')
+            print(str(row).encode(sys.stdout.encoding, errors='replace'))
+            archiveLabel = getArchiveLabel(row['PROPRIETARYNAME'], row['LABELERNAME'], 'temp/labels/')  #!!!!
             if archiveLabel is None: # couldn't find an SPL version of this product in the archive
                 entry = {'UNII': unii, \
                          'MarketingStatus': row['MARKETINGCATEGORYNAME'], \
@@ -117,6 +146,11 @@ def searchArchiveMissingNDCs(spl, ndc):
                     entry['EndDate'] = row['LISTING_RECORD_CERTIFIED_THROUGH']
                 print(entry)
                 entryList.append(pd.Series(entry))
+            else:
+                print(entry)
+                entryList.append(pd.Series(archiveLabel))
+                print("retrieved from web")
+                sys.exit()
     newDF = pd.concat(entryList, axis=1).T
     print(len(spl.UNII.values))
     spl = pd.concat([spl, newDF], ignore_index=True)
@@ -170,23 +204,27 @@ if __name__ == "__main__":
     for unii in splDF.UNII.unique():
         entries = []
         indicies = []
+        status = []
         uniiset = splDF[splDF.UNII == unii]
         print(unii, uniiset.shape[0])
-        uniiset.sort_values(by=['MarketDate'], ascending=[True])
+        uniiset = uniiset.sort_values(by=['MarketDate'], ascending=[True])
         for index, entry in uniiset.iterrows():
             if len(entries) < 2 and (entry.NDC not in indicies):
                 entries.append(entry)
                 indicies.append(entry.NDC)
-        uniiset.sort_values(by=['EndDate'], ascending=[True])
+                status.append(entry.MarketingStatus)
+        uniiset = uniiset.sort_values(by=['EndDate'], ascending=[True])
         entry = uniiset.iloc[-1]
         if len(entries) < 3 and (entry.NDC not in indicies):
             entries.append(entry)
             indicies.append(entry.NDC)
-        uniiset.sort_values(by=['ActiveCode', 'MarketingStatus', 'ApprovalAppId', 'MarketDate'], ascending=[True, False, True, True])
+            status.append(entry.MarketingStatus)
+        uniiset = uniiset.sort_values(by=['ActiveCode', 'MarketingStatus', 'ApprovalAppId', 'MarketDate'], ascending=[True, False, True, True])
         for index, entry in uniiset.iterrows():
-            if len(entries) < 6 and (entry.NDC not in indicies):
+            if len(entries) < 10 and (entry.NDC not in indicies) and (entry.MarketingStatus not in status):
                 entries.append(entry)
                 indicies.append(entry.NDC)
+                status.append(entry.MarketingStatus)
         for entry in entries:
             summaryList.append(entry)
 
