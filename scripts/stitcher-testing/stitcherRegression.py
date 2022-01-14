@@ -104,7 +104,7 @@ def approvedStitches(approved, stitch):
                 #find unii of product ingredient
                 maxct = 0
                 for member in stitch['sgroup']['members']:
-                    if member['source'][0:5] == 'G-SRS':
+                    if member['source'][0:5] == 'G-SRS' and 'id' in member:
                         memUnii = member['id']
                         if 'data' in member:
                             for data in member['data']:
@@ -172,7 +172,7 @@ def nmeStitches(stitch2nmes, stitch, nmelist):
     entries = []
     for node in stitch['sgroup']['members']:
         if node['source'] == 'G-SRS, October 2021':
-            if node['id'] in nmelist:
+            if 'id' in node and node['id'] in nmelist:
                 entries.append(node['id'])
     if len(entries) > 1:
         entries.sort()
@@ -407,10 +407,10 @@ def probeUniiClash():
     
     edges, nodesrc = getEdges(nodes, edges, nodesrc)
 
-    print stitch
-    print ostitch
-    print nodesrc
-    print edges
+    print(stitch)
+    print(ostitch)
+    print(nodesrc)
+    print(edges)
 
     paths = getPathsFromStitch(stitch)
     match = []
@@ -424,7 +424,7 @@ def probeUniiClash():
             paths = extendPaths(paths, edges)
             if len(paths) == 0 or round > 10:
                 match = ["impossible"]
-    print match
+    print(match)
 
 
 if __name__=="__main__":
@@ -469,7 +469,7 @@ if __name__=="__main__":
     testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tNode PN\tStatus\tStitch\tStitch Rank\tAppId\tEventId\tproduct\tURL'
 
     # initialize list of NMEs
-    nmeList = open("../../data/approvalYears-2020-07-23.txt", "r").readlines()
+    nmeList = open("../../data/approvalYears-2021-11-02.txt", "r").readlines()
     for entry in nmeList[1:]:
         sline = entry.split('\t')
         if sline[0] not in NMEs:
@@ -482,7 +482,7 @@ if __name__=="__main__":
 
     # initialize UNII preferred terms
     uniis = dict()
-    fp = open('../../temp/UNIIs-2019-06-18/UNII NAMES 7Mar2019.txt', 'r')
+    fp = open('../../temp/UNII_Names_13Dec2021.txt', 'r')
     line = fp.readline()
     line = fp.readline()
     while line != "":
@@ -507,7 +507,7 @@ if __name__=="__main__":
     # write out results
     for i in range(len(tests)):
         test = tests[i].__name__
-        print testHeaders[test]
+        print(testHeaders[test])
         output = outputs[i]
         keys = output.keys()
         keys.sort()
@@ -520,7 +520,7 @@ if __name__=="__main__":
                 outline = outline + "\t" + unicode(item).encode('ascii', 'ignore')
                 if uniis.has_key(item):
                     outline = outline + "\t" + uniis[item]
-            print outline  
+            print(outline)  
     sys.exit()
     
 
@@ -538,9 +538,9 @@ if __name__=="__main__":
             name1 = getName(obj1).encode('ascii', 'ignore')
             name2 = getName(obj2).encode('ascii', 'ignore')
             if obj1['rank'] == 1:
-                print unii, nodes[0], name1, nodes[1], obj2['rank'], name2
+                print(unii, nodes[0], name1, nodes[1], obj2['rank'], name2)
             elif obj2['rank'] == 1:
-                print unii, nodes[1], name2, nodes[0], obj1['rank'], name1
+                print(unii, nodes[1], name2, nodes[0], obj1['rank'], name1)
             sys.stdout.flush()
       
     
