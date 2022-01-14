@@ -35,7 +35,7 @@ args_p.add_argument('addr',
 args_p.add_argument('--unii',
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "UNII Names 31Aug2018.txt"),
+                                         "UNII_Names_31Dec2021.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--appyears",
