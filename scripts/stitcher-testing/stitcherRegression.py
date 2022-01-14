@@ -8,7 +8,7 @@ import time
 import ssl
 
 # NOTE: TO RUN you will need to download UNII names file from FDA SRS webpage into temp folder
-# See --- open('../temp/UNIIs-2018-09-07/UNII Names 31Aug2018.txt', 'r') below
+# See --- open('../data/UNII_Names_13Dec2021.txt', 'r') below
 
 cookies = cookielib.CookieJar()
 
@@ -482,7 +482,7 @@ if __name__=="__main__":
 
     # initialize UNII preferred terms
     uniis = dict()
-    fp = open('../../temp/UNII_Names_13Dec2021.txt', 'r')
+    fp = open('../data/UNII_Names_13Dec2021.txt', 'r')
     line = fp.readline()
     line = fp.readline()
     while line != "":
