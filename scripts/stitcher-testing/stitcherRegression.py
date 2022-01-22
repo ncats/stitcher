@@ -469,7 +469,7 @@ if __name__=="__main__":
     testHeaders['highestStatus'] = '\nhighestStatus\tUNII\tUNII PN\tNode PN\tStatus\tStitch\tStitch Rank\tAppId\tEventId\tproduct\tURL'
 
     # initialize list of NMEs
-    nmeList = open("../../data/approvalYears-2021-11-02.txt", "r").readlines()
+    nmeList = open("../../data/approvalYears-2022-01-17.txt", "r").readlines()
     for entry in nmeList[1:]:
         sline = entry.split('\t')
         if sline[0] not in NMEs:
