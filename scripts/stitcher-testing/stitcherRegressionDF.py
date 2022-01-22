@@ -41,7 +41,7 @@ args_p.add_argument('--unii',
 args_p.add_argument("--appyears",
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "../../data/approvalYears-2021-11-02.txt"),
+                                         "../../data/approvalYears-2022-01-17.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--fdanme",
@@ -864,13 +864,7 @@ if __name__ == "__main__":
         output_df.to_excel(xl_writer,
                            sheet_name=test_name,
                            header=True,
-                           index=False)
-
-        output_df.to_csv(os.path.join(outdir
-                                            ,test_name+"".join([date,
-                                                "_regression_",
-                                                site_arg,
-                                                ".tsv"])), sep='\t')
+                           index=True)
 
     xl_writer.save()
 
