@@ -25,7 +25,7 @@ def getScriptsDataDir():
     
     return sdata
 
-sdata = '../data'#getScriptsDataDir()
+sdata = getScriptsDataDir()
 
 # check for arguments
 args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
