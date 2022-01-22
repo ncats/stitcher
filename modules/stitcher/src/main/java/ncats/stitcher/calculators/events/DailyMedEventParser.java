@@ -169,6 +169,7 @@ public class DailyMedEventParser extends EventParser {
 
                 String productType = (String) payload.get("ProductCategory");
                 String splComment = (String) payload.get("Comment");
+                String activeCode = (String) payload.get("ActiveCode");
                 Event.EventKind et=null;
                 
                 //ProductType shouldn't ever be null
@@ -180,7 +181,11 @@ public class DailyMedEventParser extends EventParser {
                     if(splComment == null){
                         splComment = "";
                     }
-                    et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
+                    if(activeCode != "IACT") {
+                        et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
+                    } else {
+                        et = Event.EventKind.Marketed;
+                    }
                 }
 
                 if(et == null) {
