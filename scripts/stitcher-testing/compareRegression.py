@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
     report1 = args_p.parse_args().report1
     report2 = args_p.parse_args().report2
-    verbose = args_p.parse_args().verbose is not None
+    verbose = True if args_p.parse_args().verbose else False
 
     df1 = readHighestStatusDF(report1)
     df2 = readHighestStatusDF(report2)
