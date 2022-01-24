@@ -31,6 +31,9 @@ resolverCache["FISH OIL TRIGLYCERIDES"] = "XGF7L72M0F"
 resolverCache["VERARD"] = "A7V27PHC7A" #https://books.google.com/books?id=IXWOXUpylO8C&pg=PA47&lpg=PA47&dq=verard+drug&source=bl&ots=WYI8qC1dDL&sig=ACfU3U3fGdeaopIKKyPWB3agXtKCHqNb9g&hl=en&sa=X&ved=2ahUKEwiwlc3pobnmAhVIwVkKHZ6lCIAQ6AEwCHoECAoQAQ#v=onepage&q=verard%20drug&f=false
 resolverCache["COAGULATION FACTOR XA (RECOMBINANT), INACTIVATED - ZHZO"] = "BI009E452R"
 resolverCache["FAM-TRASTUZUMAB DERUXTECAN-NXKI"] = "5384HK7574"
+resolverCache["OMBITASVIR, PARITAPREVIR, RITONAVIR"] = "OU2YM37K86"
+resolverCache["MYCOPHENOLIC SODIUM"] = "WX877SQI1G"
+
 
 cberReplace = dict()
 cberReplace['MUROMANAB-CD3'] = ['JGA39ICE2V']
@@ -58,6 +61,7 @@ cberReplace['INSULIN DEGLUDEC AND INSULIN ASPART'] = ['54Q18076QB', 'D933668QVX'
 cberReplace['HUMAN PAPILLOMAVIRUS BIVALENT (TYPES 16 AND 18) VACCINE, RECOMBINANT'] = ['6LTE2DNX63', 'J2D279PEM5']
 cberReplace['LONCASTUXIMAB TESIRINE-LPYL'] = ['7K5O7P6QIU']
 cberReplace['POSITIVE SKIN TEST CONTROL-HISTAMINE'] = ['820484N8I3']
+cberReplace['POSITIVE SKIN TEST CONTROL - HISTAMINE'] = ['820484N8I3']
 cberReplace['MENINGOCOCCAL POLYSACCHARIDE VACCINE, GROUP C'] = ['837RU6905N']
 cberReplace['TECHNETIUM 99M TC FANOLESOMAB'] = ['AMF7KOE318']
 cberReplace['INFLUENZA VIRUS VACCINE, H5N1'] = ['F3U797X68A', '3L2F8AM65K', 'UH52RJ06IG']
@@ -158,6 +162,20 @@ cberReplace['VENOMS, WASP VENOM PROTEIN'] = ['987GS3GJZX', 'L0L5D5D9BQ', 'AKT0E6
 cberReplace['VENOMS, YELLOW JACKET VENOM PROTEIN'] = ['8SH7583MUK', 'V34908RT03', 'Q79PS8P34R', 'D7974DM2EJ', 'S125N1F5X5']
 cberReplace['ZOSTER VACCINE LIVE'] = ['GPV39ZGD8C', '059QF0KO0R']
 cberReplace['ZOSTER VACCINE RECOMBINANT, ADJUVANTED'] = ['COB9FF6I46']
+cberReplace['TEZEPELUMAB-EKKO'] = ['RJ1IW3B4QX']
+cberReplace['EFGARTIGIMOD ALFA-FCAB'] = ['961YV2O515']
+cberReplace['INSULIN GLARGINE-AGLR'] = ['2ZM8CX04RZ']
+cberReplace['ADALIMUMAB-AQVH'] = ['FYS6T7F842']
+cberReplace['TRALOKINUMAB-LDRM'] = ['GK1LYB375A']
+cberReplace['ALLOGENEIC CULTURED KERATINOCYTES AND DERMAL FIBROBLASTS IN MURINE COLLAGEN-DSAT'] = ['DYB2T93463']
+cberReplace['COVID-19 VACCINE, MRNA'] = ['5085ZFP6SJ']
+cberReplace['SMALLPOX (VACCINIA) VACCINE, LIVE'] = ['4SV59689SK']
+cberReplace['PLASMINOGEN, HUMAN-TVMH'] = ['1EF190B6M7']
+cberReplace['SMALLPOX AND MONKEYPOX VACCINE, LIVE, NON-REPLICATING'] = ['TU8J357395']
+cberReplace['ALLOGENEIC PROCESSED THYMUS TISSUE'] = ['XD66YK3YY3']
+cberReplace['INFLUENZA A (H5N1) MONOVALENT VACCINE, ADJUVANTED'] = ['TH23C7H4M5']
+cberReplace['20-VALENT PNEUMOCOCCAL CONJUGATE VACCINE'] = ['ADR2S9OIF2','N47C1SHV0F','RDA5AKV23D','T6O227OX7Q','H8Q6FRO6DY','U1E9VSB2K2','9WP2BC3I04']
+cberReplace['PNEUMOCOCCAL 15-VALENT CONJUGATE VACCINE'] = ['08VC9WC084']
 
 def getTimeStamp():
     ts = time.gmtime()
@@ -343,8 +361,9 @@ def readTabFP(fp, header = True, delim = '\t'):
         data['table'].append(sline)
         line = fp.readline()
 
-    while len(data['header']) < elems:
-        data['header'].append('')
+    if header:
+        while len(data['header']) < elems:
+            data['header'].append('')
     for i in range(len(data['table'])):
         while len(data['table'][i]) < elems:
             data['table'][i].append('')
@@ -443,15 +462,11 @@ def readUniiFile(maindir):
     print("UNIIs in memory:", len(uniiPT), len(uniiALL))
     return uniiPT, uniiALL
 
-def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, uniiALL):
+def writeCBERBLAs(purpleBookfile, fdaSPLfile, fpout, uniiPT, uniiALL):
     spldata = dict()
     spldata['table'] = []
-    #fp = open(fdaSPLRxfile, 'r')
+    #fp = open(fdaSPLfile, 'r')
     #spldata = readTabFP(fp)
-    #fp.close()
-    #fp = open(fdaSPLRemfile, 'r')
-    #for item in readTabFP(fp)['table']:
-    #    spldata['table'].append(item)
     #fp.close()
 
     w = re.compile('\w+')
@@ -465,7 +480,7 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
     line = fp.readline()
     while not line.startswith('Purple Book Database Extract'):
         line = fp.readline()
-    data = readTabFP(fp, delim=',')
+    data = readTabFP(fp, True, ',')
     for item in data['table']:
         if len(item) < 10:
             print(item)
@@ -475,7 +490,7 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
             if ingred.find(phrase) == 0:
                 ingred = ingred[len(phrase):]
         uniis = []
-        if ingred in cberReplace.keys():
+        if ingred in cberReplace:
             uniis = cberReplace[ingred]
         elif ingred in uniiALL:
             uniis = [uniiALL[ingred]]
@@ -501,6 +516,9 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
         manu = item[1]
         bla = item[2]
         date = item[20] if len(item[20]) > 0 and int(item[20][-4:]) < int(item[12][-4:]) else item[12]
+        if date != '' and date[-4:] < "1930":
+            print("Replaced bogus date:" + manu + " " + brand + " " + date)
+            date = date[0:-4] + '1984'
         form = item[7]
         route = item[8]
         comment = product + " " + route + " " + form
@@ -521,7 +539,7 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
                     cberBLAs[unii].append(entry)
 
     # approvalsList https://www.fda.gov/media/76363/download
-    # approval lsit with BLAs https://www.fda.gov/media/113210/download
+    # approval list with BLAs https://www.fda.gov/media/113210/download
     # prodDates https://www.fda.gov/media/76356/download
     # Use Adobe Acrobat -> Export to text (plain)
 
@@ -542,7 +560,7 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
                 item[i] = item[i][1:-1]
         ingred = item[3]
         while len(ingred) > 5:
-            if ingred in uniiALL:
+            if ingred in uniiALL or ingred in cberReplace:
                 break
             matches = list(re.finditer(w, ingred))
             if len(matches) > 1:
@@ -551,10 +569,13 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
                 else:
                     ingred = ingred[:matches[-2].span()[1]]
             else:
+                print("Unrecognized cber billable entry: %s" % (item[3]))
                 ingred = ''
-        unii = ''
-        if ingred in uniiALL:
-            unii = uniiALL[ingred]
+        uniis = []
+        if ingred in cberReplace:
+            uniis = cberReplace[ingred]
+        elif ingred in uniiALL:
+            uniis = [uniiALL[ingred]]
         product = item[3]
         brand = item[2]
         if len(brand) == 0:
@@ -573,13 +594,15 @@ def writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fpout, uniiPT, un
             active = "false"
             comment = comment + " Discontinued: " + discndate
         url = "https://www.fda.gov/media/113210/download"
-        # UNII	Approval_Year	Date	Date_Method	App_Type	App_No	Sponsor	Product	Url	active	Comment
-        #R9400W927I	2000	04/25/2000	Drugs@FDA	ANDA	075581	TEVA	KETOCONAZOLE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=075581	true	075581/001
-        entry = unii+"\t"+date[-4:]+"\t"+date+"\tCBER-BLAs\tBLA\t"+bla+"\t"+manu+"\t"+brand+"\t"+url+"\t"+active+"\t"+comment+"\n"
-        if unii not in cberBLAs:
-            cberBLAs[unii] = []
-        if entry not in cberBLAs[unii]:
-            cberBLAs[unii].append(entry)
+        for unii in uniis:
+            # UNII	Approval_Year	Date	Date_Method	App_Type	App_No	Sponsor	Product	Url	active	Comment
+            #R9400W927I	2000	04/25/2000	Drugs@FDA	ANDA	075581	TEVA	KETOCONAZOLE	https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=075581	true	075581/001
+            entry = unii+"\t"+date[-4:]+"\t"+date+"\tCBER-BLAs\tBLA\t"+bla+"\t"+manu+"\t"+brand+"\t"+url+"\t"+active+"\t"+comment+"\n"
+            if unii != '':
+                if unii not in cberBLAs:
+                    cberBLAs[unii] = []
+                if entry not in cberBLAs[unii]:
+                    cberBLAs[unii].append(entry)
     #print len(cberBLAs)
     for unii in cberBLAs:
         for entry in cberBLAs[unii]:
@@ -667,7 +690,7 @@ if __name__=="__main__":
     if not os.path.exists(purpleBookfile):
         os.system(syscall)
 
-    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2021-05-02.gsrs'
+    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2021-12-15.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
@@ -677,12 +700,9 @@ if __name__=="__main__":
 
     uniiPT, uniiALL = readUniiFile(maindir)
 
-    fdaSPLRemfile = maindir+'/data/spl_acti_rem.txt'
-    if not os.path.exists(fdaSPLRemfile):
-        raise ValueError("Can't find FDA SPLs REM file: "+fdaSPLRemfile)
-    fdaSPLRxfile = maindir+'/data/spl_acti_rx.txt'
-    if not os.path.exists(fdaSPLRxfile):
-        raise ValueError("Can't find FDA SPLs Rx file: "+fdaSPLRxfile)
+    fdaSPLfile = maindir+'/data/spl_summary.txt'
+    if not os.path.exists(fdaSPLfile):
+        raise ValueError("Can't find FDA SPLs file: "+fdaSPLfile)
 
     zfp = zipfile.ZipFile(drugsAtfdafile, 'r')
     fp = io.TextIOWrapper(zfp.open('Products.txt', 'r'))
@@ -968,7 +988,7 @@ if __name__=="__main__":
             writeInitApp(fp, unii, early[key], early[key][-2], myunii)
 
     # write out additional CBER BLAs
-    writeCBERBLAs(purpleBookfile, fdaSPLRxfile, fdaSPLRemfile, fp, uniiPT, uniiALL)
+    writeCBERBLAs(purpleBookfile, fdaSPLfile, fp, uniiPT, uniiALL)
             
     # write out all products data
     prod2UNIIs = dict()

@@ -35,13 +35,13 @@ args_p.add_argument('addr',
 args_p.add_argument('--unii',
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "UNII Names 31Aug2018.txt"),
+                                         "UNII_Names_13Dec2021.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--appyears",
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "approvalYears.txt"),
+                                         "../../data/approvalYears-2022-01-17.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--fdanme",
@@ -131,15 +131,20 @@ def uniiClashes(unii2stitch, stitch):
                 uniis = [uniis]
 
             for unii in uniis:
-                unii2stitch.setdefault(unii,
-                                       [" -- ".join([unii,
-                                                     all_uniis.get(unii, "")])
-                                        ])
-                if stitch['id'] not in unii2stitch[unii]:
-                    unii2stitch[unii].append(stitch['id'])
+                unii2stitch.setdefault(unii, set()).add(stitch['id'])
+
 
     return unii2stitch
 
+def curationsApplied(unii2stitch, stitch):
+    for node in stitch['sgroup']['members']:
+        if 'id' in node and node['id'] == 'VOY':
+            if not 'stitches' in node or not 'I_UNII' in node['stitches']:
+                if not 'WCH9HW127L' in unii2stitch:
+                    unii2stitch['WCH9HW127L'] = []
+                unii2stitch['WCH9HW127L'].append(stitch['id'])
+                unii2stitch['WCH9HW127L'].append(' does NOT contain a UNII, indicating curations have NOT been applied!!!!!')
+    return unii2stitch
 
 def approvedStitches(approved, stitch):
     ''' defined in main
@@ -169,7 +174,7 @@ def approvedStitches(approved, stitch):
         # unii = ''
         # for node in stitch['sgroup']['members']:
         #     if node['node'] == parent:
-        #         if not node.has_key('id'):
+        #         if not 'id' in node:
         #             unii = node['name']
         #         else:
         #             unii = node['id']
@@ -184,7 +189,7 @@ def approvedStitches(approved, stitch):
                 #find unii of product ingredient
                 maxct = 0
                 for member in stitch['sgroup']['members']:
-                    if member['source'][0:5] == 'G-SRS':
+                    if member['source'][0:5] == 'G-SRS' and 'id' in member:
                         memUnii = member['id']
                         if 'data' in member:
                             for data in member['data']:
@@ -213,6 +218,54 @@ def approvedStitches(approved, stitch):
     return approved
 
 
+def highestStatus(approved, stitch, full=True):
+    status = 'Other'
+    url = ''
+    startDate = ''
+    prod = ''
+    approvalAppId = ''
+    uniis = []
+    if 'highestPhase' in stitch:
+        status = stitch['highestPhase']
+        for event in stitch['events']:
+            if event['id'] == status:
+                status = event['kind']
+                if 'URL' in event:
+                    url = event['URL']
+                if 'startDate' in event:
+                    startDate = event['startDate']
+                if 'approvalAppId' in event:
+                    approvalAppId = event['approvalAppId']
+                prod = event['id']
+    parent = stitch['sgroup']['parent']
+    rank = stitch['rank']
+    unii = ''
+    name = ''
+    for node in stitch['sgroup']['members']:
+        if node['node'] == parent:
+            if 'id' in node:
+                unii = node['id']
+            elif 'name' in node:
+                unii = node['name']
+            else:
+                sys.stderr.write("failed parent node: "+str(parent)+"\n")
+                sys.stderr.flush()
+            name = getName(stitch)
+        if node['source'].startswith('G-SRS'):
+            if 'id' in node:
+                uniis.append(node['id'])
+    entry = [name, status, stitch['id'], rank]
+    if full:
+        entry.append(approvalAppId)
+        entry.append(prod)
+        entry.append(startDate)
+        entry.append(url)
+        entry.append("|".join(uniis))
+    if status != 'Other':
+        approved[unii] = entry
+    return approved
+
+
 def nmeStitches(stitch2nmes, stitch, nmelist):
     ''' defined in main
     header = ["UNII -- UNII PT",  # can repeat
@@ -225,7 +278,7 @@ def nmeStitches(stitch2nmes, stitch, nmelist):
 
     for node in stitch['sgroup']['members']:
         if "g-srs" in node['source'].lower():
-            if node['id'] in nmelist:
+            if 'id' in node and node['id'] in nmelist:
                 # print node['id']
                 # add the UNII and its preferred name to the list
                 entries.append(" -- ".join([node['id'],
@@ -253,7 +306,7 @@ def nmeClashes2(stitch2nmes, stitch):
     return nmeStitches(stitch2nmes, stitch, NMEs2)
 
 
-def PMEClashes(stitch2pmes, stitch):
+def sourceClashes(stitch2pmes, stitch, source):
     '''  defined in main
     header = ["PME Entry",
               "Stitch",
@@ -264,7 +317,7 @@ def PMEClashes(stitch2pmes, stitch):
     entries = []
 
     for node in stitch['sgroup']['members']:
-        if "manufacturing" in node['source'].lower():
+        if source in node['source'].lower():
             entries.append(node['name'])
 
     # if more than one PME entry found,
@@ -277,6 +330,11 @@ def PMEClashes(stitch2pmes, stitch):
 
     return stitch2pmes
 
+def PMEClashes(stitch2pmes, stitch):
+    return sourceClashes(stitch2pmes, stitch, "manufacturing")
+
+def DrugBankClashes(stitch2pmes, stitch):
+    return sourceClashes(stitch2pmes, stitch, "drugbank")
 
 def activemoietyClashes(stitch2ams, stitch):
     key = stitch['id']
@@ -614,7 +672,7 @@ def ranchoShouldBeApproved(rancho_drugs2check, stitch):
                                                  "highest_phase": []}
 
             # get gsrs uniis and names for all such members
-            if "g-srs" in member["source"].lower():
+            if "g-srs" in member["source"].lower() and 'id' in member:
                 gsrs[member["id"]] = member.get("name", "MISSING")
 
         if len(rancho) == 0:
@@ -698,14 +756,17 @@ if __name__ == "__main__":
     # that should have a condition with an "Approved" Highest Phase in RCAP, but don't
 
     tests = [
-            #  nmeClashes,
-            #  nmeClashes2,
-            #  PMEClashes,
-            #  activemoietyClashes,
-            #  uniiClashes,
-            #  findOrphans,
-             approvedStitches,
-            #  ranchoShouldBeApproved
+              nmeClashes,
+              nmeClashes2,
+              PMEClashes,
+              DrugBankClashes,
+              activemoietyClashes,
+              uniiClashes,
+              findOrphans,
+              approvedStitches,
+              highestStatus,
+              ranchoShouldBeApproved,
+              curationsApplied
              ]
 
     headers = {"nmeClashes": ["UNII -- UNII PT",
@@ -715,6 +776,9 @@ if __name__ == "__main__":
                                "Stitch",
                                "Rank"],
                "PMEClashes": ["PME Entry",
+                              "Stitch",
+                              "Rank"],
+               "DrugBankClashes": ["DrugBank Entry",
                               "Stitch",
                               "Rank"],
                "activemoietyClashes": ["UNII -- UNII PT",
@@ -730,11 +794,21 @@ if __name__ == "__main__":
                                     "Approval Year",
                                     "Stitch",
                                     "Rank"],
+               "highestStatus": ["Name", 
+                                    "HighestStatus",
+                                    "Stitch",
+                                    "Stitch Rank",
+                                    "AppId",
+                                    "Product",
+                                    "StartDate",
+                                    "URL",
+                                    "uniis"],
                "ranchoShouldBeApproved": ["Stitch ID",
                                           "UNIIs",
                                           "G-SRS Names",
                                           "Rancho Names",
-                                          "Highest Phases"]
+                                          "Highest Phases"],
+                "curationsApplied": ['Have Curations been applied to the stitcher database? - no results here indicates all good']
                }
 
     # initialize list of NMEs
@@ -765,6 +839,9 @@ if __name__ == "__main__":
                 if len(v) > 3
             }
 
+    if "http" in site_arg:
+        site_arg = "other"
+
     xl_writer = pd.ExcelWriter(os.path.join(outdir
                                             ,"".join([date,
                                                 "_regression_",
@@ -787,7 +864,7 @@ if __name__ == "__main__":
         output_df.to_excel(xl_writer,
                            sheet_name=test_name,
                            header=True,
-                           index=False)
+                           index=True)
 
     xl_writer.save()
 
