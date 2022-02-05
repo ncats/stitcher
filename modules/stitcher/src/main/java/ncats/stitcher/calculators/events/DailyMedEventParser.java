@@ -1,6 +1,7 @@
 package ncats.stitcher.calculators.events;
 
 import ncats.stitcher.calculators.EventCalculator;
+import ncats.stitcher.calculators.events.Event.EventKind;
 
 import java.io.*;
 import java.util.*;
@@ -21,7 +22,9 @@ public class DailyMedEventParser extends EventParser {
         US_Approved_OTC("US Approved OTC", Event.EventKind.USApprovalOTC),
         US_Approved_Rx("US Approved Rx", Event.EventKind.USApprovalRx),
         US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.USUnapproved),
-        US_Approved_Allergenic("US Approved Allergenic", Event.EventKind.USApprovalAllergenic)
+        US_Approved_Allergenic("US Approved Allergenic", Event.EventKind.USApprovalAllergenic),
+        Marketed("Marketed", Event.EventKind.Marketed),
+        Excipient("Excipient", Event.EventKind.Excipient)
         ;
 
         private static Map<String, DevelopmentStatus> map = new HashMap<>();
@@ -181,10 +184,10 @@ public class DailyMedEventParser extends EventParser {
                     if(splComment == null){
                         splComment = "";
                     }
-                    if(activeCode != "IACT") {
-                        et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
+                    if(activeCode == "IACT") {
+                        et = Event.EventKind.Excipient;
                     } else {
-                        et = Event.EventKind.Marketed;
+                        et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
                     }
                 }
 
@@ -265,7 +268,8 @@ public class DailyMedEventParser extends EventParser {
 
                 // only trust DailyMed for Allergenic Extract events Event.EventKind.USApprovalAllergenic
                 if (event.kind == Event.EventKind.USApprovalRx ||
-                        event.kind == Event.EventKind.USApprovalOTC)
+                        event.kind == Event.EventKind.USApprovalOTC ||
+                        event.kind == Event.EventKind.USUnapproved)
                     event.kind = Event.EventKind.Marketed;
             }
 
