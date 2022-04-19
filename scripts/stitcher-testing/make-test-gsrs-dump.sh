@@ -15,7 +15,8 @@ gsrs_json="/tmp/gsrs_json"
 gsrs_unii="/tmp/gsrs_unii"
 gsrs_extract="/tmp/gsrs_extract"
 # default 
-gsrs_default_dir="../stitcher-rawinputs/files"
+stitcherDataInxightRepo="../stitcher-data-inxight"
+gsrs_default_dir="$stitcherDataInxightRepo/files"
 outdir="."
 
 # unzip the dump

@@ -8,6 +8,10 @@ import subprocess
 import pandas as pd
 import urllib.request
 
+def getStitcherDataInxightRepo():
+    stitcherDataInxightRepo = "../stitcher-data-inxight"
+    return stitcherDataInxightRepo
+
 def prepUniiDF():
     if not os.path.exists('temp'):
         os.makedirs('temp')
@@ -156,10 +160,10 @@ def searchArchiveMissingNDCs(spl, ndc):
     spl = pd.concat([spl, newDF], ignore_index=True)
     print(len(spl.UNII.values))
 
-    # zip ../stitcher-rawinputs/files/spl-ndc/spl-missing-labels.zip temp/labels/*
     return spl
 
 if __name__ == "__main__":
+    stitcherDataInxightRepo = getStitcherDataInxightRepo()
     # get latest UNII dictionary to resolve NDC substance names to UNIIs, which SPLs already have
     uniiDF = prepUniiDF()
     print(uniiDF.info(verbose=True))
@@ -170,7 +174,7 @@ if __name__ == "__main__":
     splDF = pd.concat([pd.read_csv('temp/spl_'+fileType+'.txt', sep="\t", error_bad_lines=False, na_filter=False, dtype=str) \
                        for fileType in fileTypes], ignore_index=True)
     for fileType in fileTypes:
-        g_old = '../stitcher-rawinputs/files/spl-ndc/spl_'+fileType+'_old.txt.gz'
+        g_old = f'{stitcherDataInxightRepo}/files/spl-ndc/spl_'+fileType+'_old.txt.gz'
         f_old = gzip.open(g_old, 'rb')
         df_old = pd.read_csv(f_old, sep="\t", error_bad_lines=False, na_filter=False, dtype=str)
         df_diff = df_old[~df_old.NDC.isin(splDF.NDC.values)]
@@ -182,7 +186,7 @@ if __name__ == "__main__":
     print(ndcDF.info(verbose=True))
 
     # get old NDC file to capture discontinued products
-    ndcOldFileGZ = '../stitcher-rawinputs/files/spl-ndc/Products_all-2018-02-25.txt.gz' # from https://data.nber.org/fda/ndc/
+    ndcOldFileGZ = f'{stitcherDataInxightRepo}/files/spl-ndc/Products_all-2018-02-25.txt.gz' # from https://data.nber.org/fda/ndc/
     with gzip.open(ndcOldFileGZ, 'rb') as ndcOldFile:
         entryList = []
         ndcOldDF = pd.read_csv(ndcOldFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False, dtype=str)
