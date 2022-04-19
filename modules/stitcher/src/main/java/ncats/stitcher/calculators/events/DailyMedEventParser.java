@@ -1,6 +1,7 @@
 package ncats.stitcher.calculators.events;
 
 import ncats.stitcher.calculators.EventCalculator;
+import ncats.stitcher.calculators.events.Event.EventKind;
 
 import java.io.*;
 import java.util.*;
@@ -21,7 +22,9 @@ public class DailyMedEventParser extends EventParser {
         US_Approved_OTC("US Approved OTC", Event.EventKind.USApprovalOTC),
         US_Approved_Rx("US Approved Rx", Event.EventKind.USApprovalRx),
         US_Unapproved_Marketed("US Unapproved, Marketed", Event.EventKind.USUnapproved),
-        US_Approved_Allergenic("US Approved Allergenic", Event.EventKind.USApprovalAllergenic)
+        US_Approved_Allergenic("US Approved Allergenic", Event.EventKind.USApprovalAllergenic),
+        Marketed("Marketed", Event.EventKind.Marketed),
+        Excipient("Excipient", Event.EventKind.Excipient)
         ;
 
         private static Map<String, DevelopmentStatus> map = new HashMap<>();
@@ -135,6 +138,7 @@ public class DailyMedEventParser extends EventParser {
 
         Object content = null;
         Date date = null;
+        Date endDate = null;
 
         try {
             //Jan 2018 new columns for Route and MarketStatus
@@ -157,11 +161,18 @@ public class DailyMedEventParser extends EventParser {
                 if (date == null || date.after(date2))
                     date = date2;
             }
+
+            content = payload.get("EndDate");
+            if (content != null && !"1900-01-01".equals(content)) {
+                endDate = EventCalculator.SDF.parse((String)content);
+            }
+
             //exclude veterinary products from approved and/or Marketed
             if (!isVeterinaryProduct && date != null) {
 
                 String productType = (String) payload.get("ProductCategory");
                 String splComment = (String) payload.get("Comment");
+                String activeCode = (String) payload.get("ActiveCode");
                 Event.EventKind et=null;
                 
                 //ProductType shouldn't ever be null
@@ -173,7 +184,11 @@ public class DailyMedEventParser extends EventParser {
                     if(splComment == null){
                         splComment = "";
                     }
-                    et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
+                    if(activeCode == "IACT") {
+                        et = Event.EventKind.Excipient;
+                    } else {
+                        et = developmentStatusLookup.lookup((String) marketStatus, productType, splComment);
+                    }
                 }
 
                 if(et == null) {
@@ -238,6 +253,12 @@ public class DailyMedEventParser extends EventParser {
                 if (payload.containsKey("GenericProductName") && payload.get("GenericProductName") != null)
                     event.product = getFirstEntry(payload.get("GenericProductName"));
 
+                if (payload.containsKey("Product") && payload.get("Product") != null)
+                    event.product = getFirstEntry(payload.get("Product"));
+
+                if (payload.containsKey("Sponsor") && payload.get("Sponsor") != null)
+                    event.sponsor = getFirstEntry(payload.get("Sponsor"));
+
                 event.URL = (String) payload.get("URL");
                 //Jan 2018 new columns for Route and MarketStatus
                 Object route = payload.get("Route");
@@ -247,7 +268,8 @@ public class DailyMedEventParser extends EventParser {
 
                 // only trust DailyMed for Allergenic Extract events Event.EventKind.USApprovalAllergenic
                 if (event.kind == Event.EventKind.USApprovalRx ||
-                        event.kind == Event.EventKind.USApprovalOTC)
+                        event.kind == Event.EventKind.USApprovalOTC ||
+                        event.kind == Event.EventKind.USUnapproved)
                     event.kind = Event.EventKind.Marketed;
             }
 

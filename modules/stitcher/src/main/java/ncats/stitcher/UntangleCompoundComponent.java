@@ -479,8 +479,30 @@ public class UntangleCompoundComponent extends UntangleCompoundAbstract {
         component.stitches((source, target) -> {
                 //Entity[] out = source.outNeighbors(R_activeMoiety);
                 Object moietyKeys = source.keys().get(R_activeMoiety);
+                
+                // TODO: review which approach is better: uniiCount or more abstract keyCount
+
+                // int keyCount = 0;
+                // if (moietyKeys.getClass().isArray()) {
+                //     keyCount = Array.getLength(moietyKeys);
+                //     // prodrugs sometimes has 2 active moieties, ignore self one e.g. 54K37P50KH
+                //     Object unii = source.get(I_UNII);
+                //     if (unii == null)
+                //         unii = "unknown";
+                //     else if (unii.getClass().isArray() && Array.getLength(unii) == 1)
+                //         unii = Array.get(unii, 0);
+                //     else if (unii.getClass().isArray())
+                //         unii = "unknown";
+                //     for (int i=0; i<keyCount; i++)
+                //         if (unii.equals(Array.get(moietyKeys, i)))
+                //             keyCount--;
+                // }
+                // else if (moietyKeys != null && ((String)moietyKeys).length() == 10) // activeMoiety is a UNII
+                //     keyCount = 1;
+
                 Set uniis = Util.toSet(moietyKeys);
                 int uniiCount = uniis.size();
+
                 Entity[] in = target.inNeighbors(R_activeMoiety);
                 //logger.info(" ("+out.length+") "+source.getId()
                 logger.info(" ("+uniiCount+") "+source.getId()

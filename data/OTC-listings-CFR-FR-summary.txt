@@ -1277,21 +1277,21 @@ OTC_ID	UNII	OTC_Ingredient	OTC_Monograph	OTC_Status	OTC_Ref_Text	OTC_URL
 1276	ZQH6VH092Z	ginseng	stimulant	Previously Marketed	39 FR 6104	https://www.loc.gov/search/?fa=partof:federal+register:+volume+39
 1277	H4N855PNZ1	vitamin E	stimulant	Previously Marketed	39 FR 6104	https://www.loc.gov/search/?fa=partof:federal+register:+volume+39
 1278	3G6A5W338E	caffeine	stimulant	Approved	21 CFR 340.10	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec340-10.xml
-1279	5P4DHS6ENR	benzonatate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1280	09TQU5PG95	caramiphen edisylate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1281	4SH0MFJ5HJ	carbetapentane citrate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1282	BBL281NWFG	cod liver oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1283	3JYG22FD73	creosote, beechwood	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1284	91QY4PXU8Q	elm bark	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1285	MFM5450P3T	ethylmorphine hydrochloride	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1286	RV6J6604TK	eucalyptol	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1287	2R04ONI662	eucalyptus oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1288	7A72MUN24Z	horehound	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1289	NO70W886KK	hydrocodone bitartrate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1290	8V32U4AOQU	noscapine	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1291	TTN62ITH9I	noscapine hydrochloride	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1292	V95R5KMY2B	peppermint oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
-1293	XJ6RUH0O4G	turpentine oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://www.loc.gov/search/?fa=partof:federal+register:+volume+52
+1279	5P4DHS6ENR	benzonatate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1280	09TQU5PG95	caramiphen edisylate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1281	4SH0MFJ5HJ	carbetapentane citrate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1282	BBL281NWFG	cod liver oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1283	3JYG22FD73	creosote, beechwood	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1284	91QY4PXU8Q	elm bark	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1285	MFM5450P3T	ethylmorphine hydrochloride	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1286	RV6J6604TK	eucalyptol	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1287	2R04ONI662	eucalyptus oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1288	7A72MUN24Z	horehound	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1289	NO70W886KK	hydrocodone bitartrate	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1290	8V32U4AOQU	noscapine	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1291	TTN62ITH9I	noscapine hydrochloride	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1292	V95R5KMY2B	peppermint oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
+1293	XJ6RUH0O4G	turpentine oil	cough/cold:antitussive	Previously Marketed	52 FR 30054	https://tile.loc.gov/storage-services/service/ll/fedreg/fr052/fr052155/fr052155.pdf#page=228y
 1294	3G6A5W338E	caffeine	cough/cold:miscellaneous	Previously Marketed	67 FR 78158	https://www.federalregister.gov/documents/search?conditions%5Bterm%5D=67+FR+78158
 1295	YQE403BP4D	phenobarbital	cough/cold:miscellaneous	Previously Marketed	67 FR 78158	https://www.federalregister.gov/documents/search?conditions%5Bterm%5D=67+FR+78158
 1296	5TJD82A1ET	camphor	cough/cold:nasal decongestant	Previously Marketed	59 FR 43408	https://www.gpo.gov/fdsys/pkg/FR-1994-08-23/html/94-20456.htm
@@ -1709,34 +1709,34 @@ OTC_ID	UNII	OTC_Ingredient	OTC_Monograph	OTC_Status	OTC_Ref_Text	OTC_URL
 1708	O414PZ4LPZ	salicylic acid	wart remover:collodoin-like vehicle	Approved	21 CFR 358.110(b)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-110.xml
 1709	O414PZ4LPZ	salicylic acid	wart remover:karaya gum, glycol plaster vehicle	Approved	21 CFR 358.110(c)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-110.xml
 1710	O414PZ4LPZ	salicylic acid	wart remover:plaster vehicle	Approved	21 CFR 358.110(a)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-110.xml
-1711	Q40Q9N063P	acetic acid	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1712	Q40Q9N063P	acetic acid, glacial	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1713	PQ6CK8PD0R	ascorbic acid	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1714	U3RSY48JW5	benzocaine	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1715	568ET80C3D	calcium pantothenate	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1716	5TJD82A1ET	camphor	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1717	D5340Y2I9G	castor oil	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1718	9679TC07X4	iodine	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1719	33X04XA5AT	lactic acid	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1720	LT10EIP3A	menthol	wart remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
+1711	Q40Q9N063P	acetic acid	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1712	Q40Q9N063P	acetic acid, glacial	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1713	PQ6CK8PD0R	ascorbic acid	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1714	U3RSY48JW5	benzocaine	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1715	568ET80C3D	calcium pantothenate	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1716	5TJD82A1ET	camphor	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1717	D5340Y2I9G	castor oil	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1718	9679TC07X4	iodine	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1719	33X04XA5AT	lactic acid	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1720	LT10EIP3A	menthol	wart remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
 1721	YGR27ZW0Y7	sodium sulfide (aqueous)	ingrown toenail	Approved	21 CFR 358.310	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-310.xml
 1722	O414PZ4LPZ	salicylic acid	corn/callus remover:collodoin-like vehicle	Approved	21 CFR 358.510(b)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-510.xml
 1723	O414PZ4LPZ	salicylic acid	corn/callus remover:plaster vehicle	Approved	21 CFR 358.510(a)	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-510.xml
-1724	Q40Q9N063P	acetic acid, glacial	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1725	344S277G0Z	allantoin (5-ureidohydantoin)	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1726	PQ6CK8PD0R	ascorbic acid	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1727	WQZ3G9PF0H	belladonna alkaloids	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1728	HM4YQM8WRC	chlorobutanol	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1729	5YZ5R8I73Y	diperodon hydrochloride	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1730	NQ14646378	ichthammol	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1731	9679TC07X4	iodine	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1732	LAV5U5022Y	methyl salicylate	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1733	WOA57K8S5V	methylbenzethonium chloride	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1734	WV9CM0O67Z	panthenol	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1735	YRC253429Q	phenoxyacetic acid	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1736	28A37T47QO	phenyl salicylate	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1737	81G40H8B0T	vitamin A	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
-1738	86Q357L16B	zinc chloride	corn/callus remover	Previously Marketed	55 FR 33254	https://www.loc.gov/search/?fa=partof:federal+register:+volume+55
+1724	Q40Q9N063P	acetic acid, glacial	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1725	344S277G0Z	allantoin (5-ureidohydantoin)	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1726	PQ6CK8PD0R	ascorbic acid	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1727	WQZ3G9PF0H	belladonna alkaloids	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1728	HM4YQM8WRC	chlorobutanol	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1729	5YZ5R8I73Y	diperodon hydrochloride	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1730	NQ14646378	ichthammol	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1731	9679TC07X4	iodine	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1732	LAV5U5022Y	methyl salicylate	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1733	WOA57K8S5V	methylbenzethonium chloride	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1734	WV9CM0O67Z	panthenol	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1735	YRC253429Q	phenoxyacetic acid	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1736	28A37T47QO	phenyl salicylate	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1737	81G40H8B0T	vitamin A	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
+1738	86Q357L16B	zinc chloride	corn/callus remover	Previously Marketed	55 FR 33254	https://tile.loc.gov/storage-services/service/ll/fedreg/fr055/fr055157/fr055157.pdf#page=168
 1739	ZUM06L90GV	pyrethrum extract	pediculicide	Approved	21 CFR 358.610	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-610.xml
 1740	LWK91TU9AH	piperonyl butoxide	pediculicide	Approved	21 CFR 358.610	https://www.gpo.gov/fdsys/pkg/CFR-2018-title21-vol5/xml/CFR-2018-title21-vol5-sec358-610.xml
 1741	CIW5S16655	dichlorodiphenyl trichloroethane (DDT)	pediculicide	Previously Marketed	58 FR 27636	https://www.loc.gov/search/?fa=partof:federal+register:+volume+58

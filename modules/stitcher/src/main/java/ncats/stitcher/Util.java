@@ -607,12 +607,88 @@ public class Util {
             mol.setName(unii.asText());
         }
         else {
-            logger.warning("No UNII found!");
+            logger.warning("No UNII found! " + node.get("uuid").asText());
+        }
+                    
+        JsonNode names = node.get("names");
+        if (names != null && names.isArray()) {
+            int size = names.size();
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = names.get(i);
+                String name = n.get("name").asText();
+                if (name.length() > 3) {
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(name);
+
+                    if (n.get("displayName").asBoolean()) {
+                        mol.setProperty("PreferredName", name);
+                    }
+                }
+            }
+                        
+            mol.setProperty("Synonyms", sb.toString());
+        }
+                    
+        JsonNode codes = node.get("codes");
+        if (codes != null && codes.isArray()) {
+            int size = codes.size();
+            Map<String, StringBuilder> buf =
+                new HashMap<String, StringBuilder>();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = codes.get(i);
+                if (n.has("type") && "PRIMARY".equals(n.get("type").asText())) {
+                    String sys = n.get("codeSystem").asText();
+                    StringBuilder sb = buf.get(sys);
+                    if (sb == null) {
+                        buf.put(sys, sb = new StringBuilder ());
+                    }
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(n.get("code").asText());
+                }
+            }
+                        
+            for (Map.Entry<String, StringBuilder> me
+                     : buf.entrySet()) {
+                mol.setProperty(me.getKey(),
+                                me.getValue().toString());
+            }
+        }
+
+        JsonNode refs = node.get("references");
+        if (refs != null && refs.isArray()) {
+            int size = refs.size();
+            StringBuilder sb = new StringBuilder ();
+            for (int i = 0; i < size; ++i) {
+                JsonNode n = refs.get(i);
+                if (sb.length() > 0) sb.append("\n");
+                if (n.has("citation"))
+                    sb.append(n.get("citation").asText());
+            }
+            mol.setProperty("References", sb.toString());
+        }
+
+        JsonNode rels = node.get("relationships");
+        StringBuilder sb = new StringBuilder();
+        if (rels != null && rels.isArray() && rels.size() > 0) {
+            for (int i = 0; i < rels.size(); ++i) {
+                JsonNode n = rels.get(i);
+                String type = n.get("type").asText();
+                if (n.has("relatedSubstance") && n.get("relatedSubstance").has("approvalID")) {
+                    // alternative definitions do not have an approvalID
+                    String id = n.get("relatedSubstance")
+                            .get("approvalID").asText();
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(type + "|" + id);
+                }
+            }
+
+            mol.setProperty("relationships", sb.toString());
         }
         
         Map<String, Object> props = parseSubstance (node);
         for (Map.Entry<String, Object> me : props.entrySet()) {
-            final StringBuilder sb = new StringBuilder ();
+            sb = new StringBuilder ();
             Stream.of(toArray(me.getValue())).forEach(v -> sb.append(v+"\n"));
             mol.setProperty(me.getKey(), sb.toString());
         }
@@ -630,7 +706,7 @@ public class Util {
             map.put("UNII", unii.asText());
         }
         else {
-            logger.warning("No UNII found!");
+            logger.warning("No UNII found! " + node.get("uuid").asText());
         }
 
         JsonNode cls = node.get("substanceClass");
@@ -729,15 +805,17 @@ public class Util {
             for (int i = 0; i < rels.size(); ++i) {
                 JsonNode n = rels.get(i);
                 String type = n.get("type").asText();
-                String id = n.get("relatedSubstance").get("approvalID").asText();
-                Object val = map.get("relationships");
-                if (val != null)
-                    val = Util.merge(val, type+"|"+id);
-                else
-                    val = type+"|"+id;
-                if ("ACTIVE MOIETY".equals(type))
-                    activeMoieties.add(id);
-                map.put("relationships", val);
+                if (n.has("relatedSubstance") && n.get("relatedSubstance").has("approvalID")) {
+                    // alternative definitions do not have an approvalID
+                    String id = n.get("relatedSubstance")
+                            .get("approvalID").asText();
+                    Object val = map.get("relationships");
+                    if (val != null)
+                        val = Util.merge(val, type + "|" + id);
+                    else
+                        val = type + "|" + id;
+                    map.put("relationships", val);
+                }
             }
             map.put("ActiveMoieties", activeMoieties.toArray(new String[0]));
         }

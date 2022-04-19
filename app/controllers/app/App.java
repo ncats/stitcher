@@ -177,7 +177,7 @@ public class App extends Controller {
         catch (Exception ex) {
             // now try looking by name or id
             Entity[] entities = es.getEntityFactory()
-                .filter("id", "'"+name+"'", "S_STITCH_V"+version);
+                .filter("id", "'"+name+"'", 0, 0, "S_STITCH_V"+version);
             
             return ok (stitches.render
                        (version, name, new int[]{entities.length},

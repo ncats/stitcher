@@ -21,6 +21,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static Map<String, StitchKey> mappedRels = new HashMap<>();
     static {
         mappedRels.put("ACTIVE MOIETY", R_activeMoiety);
+        mappedRels.put("SUB_ALTERNATE->SUBSTANCE", R_activeMoiety);
         // TODO These other relationships cause OutOfMemory ... and excessive traverses
         mappedRels.put("PARENT->SALT/SOLVATE", R_rel); // QO84GZ3TST has two such relationships, enabling this causes it not to get linked to 5UX2SD1KE2
         mappedRels.put("SALT/SOLVATE->PARENT", R_rel);

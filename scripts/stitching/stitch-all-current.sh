@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 timestamp="$(date +'%Y%m%d-%H%M%S')"
 db="stitchv${timestamp}.db"
-dbzip="stitchv${timestamp}db.zip"
+dbzip="${db}.zip"
 log="log${timestamp}.txt"
 
 #keep track of current time
@@ -21,10 +21,10 @@ echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/broad.conf"
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, April 2020\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2020-04-28.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, December 2021\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2021-12-15.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, July 2020\" cache=data/hash.db ../stitcher-rawinputs/files/rancho-export_2020-07-24_14-33.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db ../stitcher-rawinputs/files/frdb_2021-10-19.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
@@ -38,20 +38,23 @@ echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 
 # these add additional data for event calculator
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_rx.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_summary.conf"
 echo 'DailyMed-Rx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_rem.conf"
-echo 'DailyMed-Rem:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_rx.conf"
+#echo 'DailyMed-Rx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_otc.conf"
-echo 'DailyMed-OTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_rem.conf"
+#echo 'DailyMed-Rem:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-# sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_animal.conf"
-# echo 'DailyMed-Animal:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+#sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_otc.conf"
+#echo 'DailyMed-OTC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-# sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_homeo.conf"
-# echo 'DailyMed-Homeopathic:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+## sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_animal.conf"
+## echo 'DailyMed-Animal:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+
+## sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_homeo.conf"
+## echo 'DailyMed-Homeopathic:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/ob.conf"
 echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
@@ -72,13 +75,11 @@ echo 'IIG:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 #cp -r $db NOSTITCH$db
 
 # now the stitching...
-sbt -mem 16000 stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
+sbt -mem 32000 stitcher/"runMain ncats.stitcher.tools.CompoundStitcher $db 1"
 echo 'Stitching:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 echo $(date) >> $log
 
-
-# zip up the directory and copy over to centos
-# zip -r $dbzip $db
-# scp $dbzip centos@dev.ncats.io:/tmp
+# zip up the database (it takes a while)
+zip -r $dbzip $db
 

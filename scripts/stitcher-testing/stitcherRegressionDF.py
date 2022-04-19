@@ -2,9 +2,8 @@
 
 import os
 import sys
-import cookielib
-import urllib
-import urllib2
+import http.cookiejar
+import urllib.request as urllib2
 import json
 import time
 import argparse
@@ -13,9 +12,6 @@ import base64
 from tqdm import tqdm
 import re
 
-# check that the python version is correct (need 2)
-if sys.version_info[0] > 2:
-    raise "Must be using Python 2! Aborting."
 
 #get a default directory with data files for this script
 def getScriptsDataDir():
@@ -39,13 +35,13 @@ args_p.add_argument('addr',
 args_p.add_argument('--unii',
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "UNII Names 31Aug2018.txt"),
+                                         "UNII_Names_13Dec2021.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--appyears",
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "approvalYears.txt"),
+                                         "../../data/approvalYears-2022-01-17.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--fdanme",
@@ -57,7 +53,7 @@ args_p.add_argument("--fdanme",
 args_p.add_argument('--maxsubs',
                     nargs="?",
                     type=int,
-                    default=100000,
+                    default=0, # value less than or equal to zero means get ALL substances
                     help="maximum number of substances to evaluate")
 
 args_p.add_argument('--outdir',
@@ -85,11 +81,11 @@ ports_patt = "^[0-9]{4}$"
 if site_arg in switcher:
     site = switcher[site_arg]
 elif re.search(ports_patt, str(site_arg)):
-    site = "http://localhost:%s/" % site_arg
+    site = f"http://localhost:{site_arg}/"
 else:
     site = site_arg
 
-print "Querying stitcher instance at %s..." % site
+print(f"Querying stitcher instance at {site}...")
 
 #create output directory if missing
 if not os.path.exists(outdir):
@@ -97,7 +93,7 @@ if not os.path.exists(outdir):
 
 date = time.strftime("%Y-%m-%d", time.gmtime())
 
-cookies = cookielib.CookieJar()
+cookies = http.cookiejar.CookieJar()
 
 opener = urllib2.build_opener(
     urllib2.HTTPRedirectHandler(),
@@ -135,15 +131,20 @@ def uniiClashes(unii2stitch, stitch):
                 uniis = [uniis]
 
             for unii in uniis:
-                unii2stitch.setdefault(unii,
-                                       [" -- ".join([unii,
-                                                     all_uniis.get(unii, "")])
-                                        ])
-                if stitch['id'] not in unii2stitch[unii]:
-                    unii2stitch[unii].append(stitch['id'])
+                unii2stitch.setdefault(unii, set()).add(stitch['id'])
+
 
     return unii2stitch
 
+def curationsApplied(unii2stitch, stitch):
+    for node in stitch['sgroup']['members']:
+        if 'id' in node and node['id'] == 'VOY':
+            if not 'stitches' in node or not 'I_UNII' in node['stitches']:
+                if not 'WCH9HW127L' in unii2stitch:
+                    unii2stitch['WCH9HW127L'] = []
+                unii2stitch['WCH9HW127L'].append(stitch['id'])
+                unii2stitch['WCH9HW127L'].append(' does NOT contain a UNII, indicating curations have NOT been applied!!!!!')
+    return unii2stitch
 
 def approvedStitches(approved, stitch):
     ''' defined in main
@@ -153,31 +154,115 @@ def approvedStitches(approved, stitch):
               "Rank"]
     '''
 
-    if stitch['USapproved']:
-        apprYear = "not given"
-
-        if 'approvedYear' in stitch:
-            apprYear = stitch['approvedYear']
+    appr = ''
+    apprType = ''
+    if 'highestPhase' in stitch:
+        for event in stitch['events']:
+            if event['id'] == stitch['highestPhase']:
+                if event['kind'] in ['USApprovalOTC', 'USApprovalRx', 'USWithdrawn', 'USPreviouslyMarketed']:
+                    appr = stitch['highestPhase']
+                    apprType = event['kind']
+    if appr != '':
+        if 'initiallyMarketedUS' in stitch and stitch['initiallyMarketedUS'] != "null":
+            appr = stitch['initiallyMarketedUS']
+        elif 'initiallyMarketed' in stitch and stitch['initiallyMarketed'] != "null":
+            appr = stitch['initiallyMarketed']
 
         parent = stitch['sgroup']['parent']
         rank = stitch['rank']
-        unii = ''
+        unii = getRootNode(stitch)
+        # unii = ''
+        # for node in stitch['sgroup']['members']:
+        #     if node['node'] == parent:
+        #         if not 'id' in node:
+        #             unii = node['name']
+        #         else:
+        #             unii = node['id']
 
-        for node in stitch['sgroup']['members']:
-            if node['node'] == parent:
-                if 'id' not in node:
-                    unii = node['name']
-                else:
-                    unii = node['id']
+        apprDate = ''
+        apprUnii = unii
+        for event in stitch['events']:
+            if event['id'] == appr:
+                apprDate = 'unknown'
+                if 'startDate' in event:
+                    apprDate = event['startDate']
+                #find unii of product ingredient
+                maxct = 0
+                for member in stitch['sgroup']['members']:
+                    if member['source'][0:5] == 'G-SRS' and 'id' in member:
+                        memUnii = member['id']
+                        if 'data' in member:
+                            for data in member['data']:
+                                memct = 0
+                                for item1 in event.values():
+                                    for item2 in data.values():
+                                        if item1 == item2:
+                                            memct = memct + 1
+                                if memct > maxct:
+                                    maxct = memct
+                                    apprUnii = memUnii
 
-        name = getName(stitch)
+        # name = getName(stitch)
 
         approved[unii] = [" -- ".join([unii,
                                        all_uniis.get(unii, "")]),
-                          apprYear,
+                          apprDate,
+                          apprType,
                           parent,
-                          rank]
+                          rank,
+                          all_uniis.get(apprUnii, ""),
+                          apprUnii]
 
+        #approved[unii] = [apprDate, parent, rank, name, apprUnii, apprType]
+
+    return approved
+
+
+def highestStatus(approved, stitch, full=True):
+    status = 'Other'
+    url = ''
+    startDate = ''
+    prod = ''
+    approvalAppId = ''
+    uniis = []
+    if 'highestPhase' in stitch:
+        status = stitch['highestPhase']
+        for event in stitch['events']:
+            if event['id'] == status:
+                status = event['kind']
+                if 'URL' in event:
+                    url = event['URL']
+                if 'startDate' in event:
+                    startDate = event['startDate']
+                if 'approvalAppId' in event:
+                    approvalAppId = event['approvalAppId']
+                prod = event['id']
+    parent = stitch['sgroup']['parent']
+    rank = stitch['rank']
+    unii = ''
+    name = ''
+    for node in stitch['sgroup']['members']:
+        if node['node'] == parent:
+            if 'id' in node:
+                unii = node['id']
+            elif 'name' in node:
+                unii = node['name']
+            else:
+                sys.stderr.write("failed parent node: "+str(parent)+"\n")
+                sys.stderr.flush()
+            name = getName(stitch)
+        if node['source'].startswith('G-SRS'):
+            if 'id' in node:
+                uniis.append(node['id'])
+    entry = [name, status, stitch['id'], rank]
+    if full:
+        entry.append(approvalAppId)
+        entry.append(prod)
+        entry.append(startDate)
+        entry.append(url)
+        entry.append("|".join(uniis))
+    if status != 'Other':
+        approved[unii] = entry
     return approved
 
 
@@ -193,7 +278,7 @@ def nmeStitches(stitch2nmes, stitch, nmelist):
 
     for node in stitch['sgroup']['members']:
         if "g-srs" in node['source'].lower():
-            if node['id'] in nmelist:
+            if 'id' in node and node['id'] in nmelist:
                 # print node['id']
                 # add the UNII and its preferred name to the list
                 entries.append(" -- ".join([node['id'],
@@ -221,7 +306,7 @@ def nmeClashes2(stitch2nmes, stitch):
     return nmeStitches(stitch2nmes, stitch, NMEs2)
 
 
-def PMEClashes(stitch2pmes, stitch):
+def sourceClashes(stitch2pmes, stitch, source):
     '''  defined in main
     header = ["PME Entry",
               "Stitch",
@@ -232,7 +317,7 @@ def PMEClashes(stitch2pmes, stitch):
     entries = []
 
     for node in stitch['sgroup']['members']:
-        if "manufacturing" in node['source'].lower():
+        if source in node['source'].lower():
             entries.append(node['name'])
 
     # if more than one PME entry found,
@@ -245,6 +330,11 @@ def PMEClashes(stitch2pmes, stitch):
 
     return stitch2pmes
 
+def PMEClashes(stitch2pmes, stitch):
+    return sourceClashes(stitch2pmes, stitch, "manufacturing")
+
+def DrugBankClashes(stitch2pmes, stitch):
+    return sourceClashes(stitch2pmes, stitch, "drugbank")
 
 def activemoietyClashes(stitch2ams, stitch):
     key = stitch['id']
@@ -283,7 +373,7 @@ def activemoietyClashes(stitch2ams, stitch):
 
 orphanList = ['Pharmaceutical Manufacturing Encyclopedia (Third Edition)',
               'Broad Institute Drug List 2017-03-27',
-              'Rancho BioSciences, July 2020',
+              'FRDB, October 2021',
               'DrugBank, July 2020',
               'NCATS Pharmaceutical Collection, April 2012',
               'Withdrawn and Shortage Drugs List Feb 2018']
@@ -348,30 +438,20 @@ def findOrphans(orphans, stitch):
     return orphans
 
 
-def iterateStitches(funcs):
+def iterateStitches(funcs, substances = 0):
     dicts = [{} for d in range(len(funcs))]
 
     top = 10
-    # max_subs = get_max_subs(100000, top)
-    # max_subs = 100000
+    if substances < 1:
+        substances = get_max_subs()
 
-    for skip in tqdm(xrange(0, max_subs, top), ncols=100):
-        uri = site+'api/stitches/v1?top='+str(top)+'&skip='+str(skip)
-        obj = requestJson(uri)
+    for skip in tqdm(range(0, substances, top), ncols=50):
+        obj = get_site_obj(top, skip)
 
-        if 'contents' not in obj:
-            obj = {'contents': obj}
-            skip = max_subs
-
-        if len(obj['contents']) == 0:
-            skip = max_subs
-        elif obj is not None:
+        if obj is not None:
             for stitch in obj['contents']:
                 for i in range(len(funcs)):
                     funcs[i](dicts[i], stitch)
-
-        # sys.stderr.write(uri+"\n")
-        # sys.stderr.flush()
 
     return dicts
 
@@ -380,42 +460,78 @@ def get_site_obj(top, skip):
     
     uri = site + 'api/stitches/v1?top=' + str(top) + '&skip=' + str(skip)
     
-    sys.stderr.write("Getting " + uri + "\n")
-    sys.stderr.flush()
+    # sys.stderr.write("Getting " + uri + "\n")
+    # sys.stderr.flush()
 
     obj = requestJson(uri)
+    if obj is None: # sometimes the call fails, try again
+        obj = requestJson(uri)
 
     return obj
 
-# TODO: possibly add a way to find the max number of pages
 # helpful for a decent progress bar
-def get_max_subs(startmax, top):
-    precision = 1000
+def get_max_subs():
+    max = 1000000
+    min = 0
 
     # check the page using a start maximum
 
-    "Trying to guess the max number of pages to navigate..."
+    sys.stderr.write("Trying to guess the max number of pages to navigate...\n")
 
-    obj = get_site_obj(top, startmax)
-    
-    # if not contents object present, reduce page number
-    # or the other way around
-    if 'contents' not in obj or len(obj['contents']) == 0:
-        newmax = startmax - precision
-        sys.stderr.write(str(startmax) + " - too high!\n")
-        sys.stderr.flush()
-    else:
-        newmax = startmax + precision
-        sys.stderr.write(str(startmax) + " - too low!\n")
-        sys.stderr.flush()
+    while max - min > 100:
+        guess = int(max/2 + min/2)
+        obj = get_site_obj(1, guess)
 
-    if abs(newnewmax - startmax) > precision:
-        # now if you call the same function 
-        # and it returns the same number (startmax)
+        # if not contents object present, reduce page number
+        # or the other way around
+        if 'count' in obj and obj['count'] == 0:
+            max = guess
+            # sys.stderr.write(str(max) + " - too high!\n")
+            # sys.stderr.flush()
+        else:
+            min = guess
+            # sys.stderr.write(str(min) + " - too low!\n")
+            # sys.stderr.flush()
 
-        startmax = get_max_subs(newmax, top)
+    sys.stderr.write("Max substances less than: " + str(max) +"\n")
+    sys.stderr.flush()
+    return max
 
-    return newmax
+def getRootNode(stitch):
+    root = "unknown"
+    am = ""
+
+    parent = stitch['sgroup']['parent']
+    for node in stitch['sgroup']['members']:
+        if node['node'] == parent:
+            if 'stitches' in node and 'R_activeMoiety' in node['stitches']:
+                if isinstance(node['stitches']['R_activeMoiety'], list):
+                    if len(node['stitches']['R_activeMoiety']) == 1:
+                        am = node['stitches']['R_activeMoiety'][0]
+                else:
+                    am = node['stitches']['R_activeMoiety']
+            if 'id' not in node:
+                root = node['name']
+            else:
+                root = node['id']
+            if am == root:
+                am = ""
+    while len(am) > 0:
+        for node in stitch['sgroup']['members']:
+            if 'id' in node and node['id'] == am:
+                if 'stitches' in node and 'R_activeMoiety' in node['stitches']:
+                    if isinstance(node['stitches']['R_activeMoiety'], list):
+                        am = node['stitches']['R_activeMoiety'][0]
+                    else:
+                        am = node['stitches']['R_activeMoiety']
+                if 'id' not in node:
+                    root = node['name']
+                else:
+                    root = node['id']
+                if am == root:
+                    am = ""                 
+
+    return root
 
 def getName(obj):
     name = ""
@@ -556,7 +672,7 @@ def ranchoShouldBeApproved(rancho_drugs2check, stitch):
                                                  "highest_phase": []}
 
             # get gsrs uniis and names for all such members
-            if "g-srs" in member["source"].lower():
+            if "g-srs" in member["source"].lower() and 'id' in member:
                 gsrs[member["id"]] = member.get("name", "MISSING")
 
         if len(rancho) == 0:
@@ -639,14 +755,19 @@ if __name__ == "__main__":
     # ranchoShouldBeApproved: A list of all drugs with UNIIs, G-SRS, and Rancho names
     # that should have a condition with an "Approved" Highest Phase in RCAP, but don't
 
-    tests = [nmeClashes,
-             nmeClashes2,
-             PMEClashes,
-             activemoietyClashes,
-             uniiClashes,
-             findOrphans,
-             approvedStitches,
-             ranchoShouldBeApproved]
+    tests = [
+              nmeClashes,
+              nmeClashes2,
+              PMEClashes,
+              DrugBankClashes,
+              activemoietyClashes,
+              uniiClashes,
+              findOrphans,
+              approvedStitches,
+              highestStatus,
+              ranchoShouldBeApproved,
+              curationsApplied
+             ]
 
     headers = {"nmeClashes": ["UNII -- UNII PT",
                               "Stitch",
@@ -655,6 +776,9 @@ if __name__ == "__main__":
                                "Stitch",
                                "Rank"],
                "PMEClashes": ["PME Entry",
+                              "Stitch",
+                              "Rank"],
+               "DrugBankClashes": ["DrugBank Entry",
                               "Stitch",
                               "Rank"],
                "activemoietyClashes": ["UNII -- UNII PT",
@@ -670,11 +794,21 @@ if __name__ == "__main__":
                                     "Approval Year",
                                     "Stitch",
                                     "Rank"],
+               "highestStatus": ["Name", 
+                                    "HighestStatus",
+                                    "Stitch",
+                                    "Stitch Rank",
+                                    "AppId",
+                                    "Product",
+                                    "StartDate",
+                                    "URL",
+                                    "uniis"],
                "ranchoShouldBeApproved": ["Stitch ID",
                                           "UNIIs",
                                           "G-SRS Names",
                                           "Rancho Names",
-                                          "Highest Phases"]
+                                          "Highest Phases"],
+                "curationsApplied": ['Have Curations been applied to the stitcher database? - no results here indicates all good']
                }
 
     # initialize list of NMEs
@@ -695,7 +829,7 @@ if __name__ == "__main__":
 
     # iterate over stitches, perform tests
     # returns a list of dictionaries
-    outputs = iterateStitches(tests)
+    outputs = iterateStitches(tests, max_subs)
 
     # remove unimportant output for uniiClashes
     if uniiClashes in tests:
@@ -704,6 +838,9 @@ if __name__ == "__main__":
                 v in outputs[tests.index(uniiClashes)].items()
                 if len(v) > 3
             }
+
+    if "http" in site_arg:
+        site_arg = "other"
 
     xl_writer = pd.ExcelWriter(os.path.join(outdir
                                             ,"".join([date,
@@ -727,7 +864,7 @@ if __name__ == "__main__":
         output_df.to_excel(xl_writer,
                            sheet_name=test_name,
                            header=True,
-                           index=False)
+                           index=True)
 
     xl_writer.save()
 

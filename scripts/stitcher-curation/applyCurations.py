@@ -2,17 +2,13 @@
 
 import os
 import sys
-import cookielib
-import urllib
-import urllib2
-import ssl
+import requests
 import json
-import time
 import argparse
 
-# check that the python version is correct (need 2)
-if sys.version_info[0] > 2:
-    raise "Must be using Python 2! Aborting."
+# check that the python version is correct (need 3)
+if sys.version_info[0] < 3:
+    raise "Must be using Python 3! Aborting."
 
 # check for arguments
 args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
@@ -39,54 +35,23 @@ if site_arg in switcher:
 else:
     site = site_arg
 
-cookies = cookielib.CookieJar()
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
-
-opener = urllib2.build_opener(
-    urllib2.HTTPRedirectHandler(),
-    urllib2.HTTPHandler(debuglevel=0),
-    urllib2.HTTPSHandler(debuglevel=0, context=ctx),
-    urllib2.HTTPCookieProcessor(cookies))
-opener.addheaders = [
-    ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
-                    'Windows NT 5.2; .NET CLR 1.1.4322)'))
-]
-
-
-def requestJson(uri):
-    try:
-        handle = opener.open(uri)
-        response = handle.read()
-        handle.close()
-        obj = json.loads(response)
-        return obj
-    except:
-        sys.stderr.write("failed: "+uri+"\n")
-        sys.stderr.flush()
-        time.sleep(5)
-
 def applyCuration(sline):
     obj = json.loads(sline[-1])
     url = site[:-1]+obj['_uri']
+    badkeys = []
     for key in obj.keys():
         if key[0] == "_": # do not post parameters created by API
-            del obj[key]
+            badkeys.append(key)
+    for key in badkeys:
+        del obj[key]
     #print url, json.dumps(obj)
 
-    req = urllib2.Request(url, json.dumps(obj), {'Content-Type': 'application/json'})
     try:
-        html = urllib2.urlopen(req, context=ctx)
-        sys.stderr.write(html.read())
+        req = requests.post(url, data=json.dumps(obj), headers={'Content-Type': 'application/json'})
+        sys.stderr.write(req.text)
         sys.stderr.write("\n")
-    except urllib2.HTTPError, e:
+    except requests.exceptions.HTTPError as e:
         err = 'HTTP Error ERROR en el listado code => %s \n URL=> %s\n' % (e.code,url)
-        sys.stderr.write(err)
-        sys.exit()
-    except urllib2.URLError, e:
-        err = 'URL Error ERROR en el listado reason => %s \n URL=> %s\n' % (e.reason,url)
         sys.stderr.write(err)
         sys.exit()
     return

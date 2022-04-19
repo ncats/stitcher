@@ -25,15 +25,27 @@ fi
 ######################################## declare/check ########################################
 # declare all necessary files
 files=(
-		dm_spl_release_human_rx.zip 
-		dm_spl_release_human_otc.zip
+		dm_spl_release_human_rx_part1.zip 
+		dm_spl_release_human_rx_part2.zip 
+		dm_spl_release_human_rx_part3.zip 
+		dm_spl_release_human_rx_part4.zip 
+		dm_spl_release_human_otc_part1.zip
+		dm_spl_release_human_otc_part2.zip
+		dm_spl_release_human_otc_part3.zip
+		dm_spl_release_human_otc_part4.zip
+		dm_spl_release_human_otc_part5.zip
+		dm_spl_release_human_otc_part6.zip
+		dm_spl_release_human_otc_part7.zip
+		dm_spl_release_human_otc_part8.zip
+		dm_spl_release_human_otc_part9.zip
+		dm_spl_release_human_otc_part10.zip
 		dm_spl_release_remainder.zip
 		dm_spl_release_animal.zip
 		dm_spl_release_homeopathic.zip
 		)
 		
 # append full paths to file names
-files=( "${files[@]/#/$save_to}" ) 
+files=( "${files[@]/#/$1}" ) # files=( "${files[@]/#/$save_to}" ) 
 
 missing_files=()
 
@@ -66,27 +78,36 @@ for type in ${types[@]}; do
 	echo "Parsing $subset files..."
 	
 	# parse them
-	sbt dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser `echo $subset`" > spl$type.txt 
+	sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser `echo $subset`" > temp/spl$type.txt
 	
 	wait
 	
 	# leave only active compounds (otherwise stitching later will take too long)
 	# by removing the ones with inactive (IACT) and NOT/MAY contain (CNTM) codes
-	cat spl$type.txt | sed '/\tIACT\t/d' | sed '/\tCNTM\t/d' | sed '/\tINGR\t/d' > spl_acti$type.txt
+	#cat spl$type.txt | sed '/\tIACT\t/d' | sed '/\tCNTM\t/d' | sed '/\tINGR\t/d' > spl_acti$type.txt
 	
 	# remove all lines starting with control elements (they are auxiliary)
-	sed -i '/^[[:cntrl:]]/ d' spl_acti$type.txt 
-	sed -i '/^java/ d' spl_acti$type.txt
+	#sed -i '/^[[:cntrl:]]/ d' spl_acti$type.txt 
+	#sed -i '/^java/ d' spl_acti$type.txt
 	
 	# gzip the original file [deprecated/unnecessary]
 	#gzip spl$type.txt
 	#tar -czf spl$type.tar.gz spl$type.txt 
 done
 
+# process 'missing' labels
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser ../stitcher-rawinputs/files/spl-ndc/spl-missing-labels.zip" > temp/spl_missing.txt 2> /dev/null
+
+# create summary spl file
+python $SCRIPT_DIR/dailymed/dailymed_merge_ndc.py # produces data/spl_summary.txt
+
+# process inactivated labels
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > temp/spl_inactivated.txt 2> /dev/null
+
 # compare with otc_monograph_final, and remove UNIIs that don't belong
-echo "Fixing OTC file..."
-python $SCRIPT_DIR/dailymed_fix_otc.py spl_acti_otc.txt data/otc_monograph_final_all.xls
-wait
+#echo "Fixing OTC file..."
+#python $SCRIPT_DIR/dailymed_fix_otc.py spl_acti_otc.txt data/otc_monograph_final_all.xls
+#wait
 
 echo "All done!"
 
