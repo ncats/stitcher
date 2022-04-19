@@ -177,6 +177,10 @@ cberReplace['INFLUENZA A (H5N1) MONOVALENT VACCINE, ADJUVANTED'] = ['TH23C7H4M5'
 cberReplace['20-VALENT PNEUMOCOCCAL CONJUGATE VACCINE'] = ['ADR2S9OIF2','N47C1SHV0F','RDA5AKV23D','T6O227OX7Q','H8Q6FRO6DY','U1E9VSB2K2','9WP2BC3I04']
 cberReplace['PNEUMOCOCCAL 15-VALENT CONJUGATE VACCINE'] = ['08VC9WC084']
 
+def getStitcherDataInxightRepo():
+    stitcherDataInxightRepo = "../stitcher-data-inxight"
+    return stitcherDataInxightRepo
+
 def getTimeStamp():
     ts = time.gmtime()
     return time.strftime("%Y-%m-%d", ts)
@@ -670,6 +674,7 @@ def writeCBERBLAs(purpleBookfile, fdaSPLfile, fpout, uniiPT, uniiALL):
 if __name__=="__main__":
 
     maindir = getMainDir()
+    stitcherDataInxightRepo = getStitcherDataInxightRepo()
 
     drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
@@ -690,7 +695,7 @@ if __name__=="__main__":
     if not os.path.exists(purpleBookfile):
         os.system(syscall)
 
-    gsrsDumpfile = maindir+'/../stitcher-rawinputs/files/dump-public-2021-12-15.gsrs'
+    gsrsDumpfile = maindir + f'/{stitcherDataInxightRepo}/files/dump-public-2021-12-15.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
