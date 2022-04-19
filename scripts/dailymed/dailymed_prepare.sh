@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+stitcherDataInxightRepo="../stitcher-data-inxight"
 
 # run this from the stitcher directory! (due to DailyMedParser dependency)
 if [[ ! `pwd` == */stitcher ]]; then
@@ -96,7 +97,7 @@ for type in ${types[@]}; do
 done
 
 # process 'missing' labels
-sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser ../stitcher-rawinputs/files/spl-ndc/spl-missing-labels.zip" > temp/spl_missing.txt 2> /dev/null
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser $stitcherDataInxightRepo/files/spl-ndc/spl-missing-labels.zip" > temp/spl_missing.txt 2> /dev/null
 
 # create summary spl file
 python $SCRIPT_DIR/dailymed/dailymed_merge_ndc.py # produces data/spl_summary.txt

@@ -19,6 +19,8 @@ public class Test extends Controller {
     @Inject public SchedulerService scheduler;
     @Inject Environment env;
     @Inject public WebJarsUtil webjars;
+
+    String stitcherDataInxightRepo = "../stitcher-data-inxight";
     
     public Test () {
     }
@@ -31,7 +33,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (DrugBankMoleculeRegistrationJob.class, null,
-                 env.getFile("../stitcher-rawinputs/files/drugbank-full-annotated.sdf"));
+                 env.getFile(stitcherDataInxightRepo + "/files/drugbank-full-annotated.sdf"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {
@@ -43,7 +45,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (NPCMoleculeRegistrationJob.class, null,
-                 env.getFile("../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
+                 env.getFile(stitcherDataInxightRepo + "/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {
@@ -55,7 +57,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (SRSJsonRegistrationJob.class, null,
-                 env.getFile("../stitcher-rawinputs/files/public2015-11-30.gsrs"));
+                 env.getFile(stitcherDataInxightRepo + "/files/public2015-11-30.gsrs"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {
@@ -67,7 +69,7 @@ public class Test extends Controller {
         try {
             String key = scheduler.submit
                 (IntegrityMoleculeRegistrationJob.class, null,
-                 env.getFile("../stitcher-rawinputs/files/integr.sdf.gz"));
+                 env.getFile(stitcherDataInxightRepo + "/files/integr.sdf.gz"));
             return redirect (controllers.app.routes.App.console(key));
         }
         catch (Exception ex) {

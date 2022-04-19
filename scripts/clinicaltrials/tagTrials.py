@@ -713,10 +713,6 @@ if __name__=="__main__":
     
     drugPapers = readDrugPapers()
 
-    #with open('/Users/southalln/git/stitcher-rawinputs/files/rancho-export_2020-07-24_14-33.json', 'r') as f:
-    #    ranchoDrugs = json.load(f)
-    #print("Loaded Rancho drugs file")
-
     drugTrials = dict()
     for item in ctgovuniis: # nctNumber, unii, displayTerm
         if item[0] in ctdata.keys():

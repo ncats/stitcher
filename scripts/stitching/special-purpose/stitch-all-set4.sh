@@ -3,17 +3,18 @@ timestamp="$(date +'%Y%m%d-%H%M%S')"
 db="stitchv${timestamp}SET4.db"
 dbzip="stitchv${timestamp}SET4db.zip"
 log="log${timestamp}.txt"
+stitcherDataInxightRepo="../stitcher-data-inxight"
 
 #keep track of current time
 curr_time=$(date +%s)
 
 echo $(date) > $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2018-07-19.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2018\" cache=data/hash.db $stitcherDataInxightRepo/files/dump-public-2018-07-19.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, July 2018\" cache=data/hash.db ../stitcher-rawinputs/files/drugbank_all_full_database.xml.zip"
+sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, July 2018\" cache=data/hash.db $stitcherDataInxightRepo/files/drugbank_all_full_database.xml.zip"
 echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" ../stitcher-rawinputs/files/PharmManuEncycl3rdEd.json"
+sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" $stitcherDataInxightRepo/files/PharmManuEncycl3rdEd.json"
 echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/withdrawn.conf"
 echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
