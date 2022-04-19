@@ -2,6 +2,7 @@
 timestamp="$(date +'%Y%m%d-%H%M%S')"
 db="stitchv$timestamp.db"
 log="log$timestamp.txt"
+stitcherDataInxightRepo="../stitcher-data-inxight"
 
 #keep track of current time
 curr_time=$(date +%s)
@@ -13,15 +14,15 @@ sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/bro
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/ruili.conf"
 echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, February 2018\" cache=data/hash.db ../stitcher-rawinputs/files/dump-public-2018-02-06.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, February 2018\" cache=data/hash.db $stitcherDataInxightRepo/files/dump-public-2018-02-06.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, February 2018\" cache=data/hash.db data/rancho-export_2018-02-20_22-20.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db ../stitcher-rawinputs/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
+sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db $stitcherDataInxightRepo/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"
 echo 'NPC:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" ../stitcher-rawinputs/files/PharmManuEncycl3rdEd.json"
+sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $db \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" $stitcherDataInxightRepo/files/PharmManuEncycl3rdEd.json"
 echo 'PharmManuEncycl:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
-sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, November 2017\" cache=data/hash.db ../stitcher-rawinputs/files/drugbank_all_full_database.xml.zip"
+sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $db \"name=DrugBank, November 2017\" cache=data/hash.db $stitcherDataInxightRepo/files/drugbank_all_full_database.xml.zip"
 echo 'DrugBank:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 # these add additional data for event calculator
