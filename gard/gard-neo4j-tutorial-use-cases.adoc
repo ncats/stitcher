@@ -1,0 +1,175 @@
+
+== https://ncats.nih.gov[NCATS,window="_blank"] Integrated Disease Ontologies
+:author: NCATS Informatics
+:neo4j-version: 3.5
+
+image::https://ncats.nih.gov/sites/all/themes/ncats-2014/images/assets/ncats-logo.png[width=200,float=center]
+'''
+
+With the availability of numerous disease nomenclature and ontologies, proper handling of clinical nosology is perhaps one of most challenging issues for many data integration efforts. To address this challenge, https://ncats.nih.gov/preclinical/core/informatics/informatics-scientists-software-developers[we,window="_blank"] set out to build a comprehensive graph database that aims to integrate a large number of disease ontologies. This guide serves to showcase the content of this database through a number of use cases; where appropriate, the structure of underlying the data is discussed through the corresponding https://neo4j.com/developer/cypher/[cypher,window="_blank"] query. This is still very much a work-in-progress, and the code that constructs the database is available https://github.com/ncats/stitcher[here,window="_blank"]. If you have specific questions, please feel free to mailto:nguyenda@mail.nih.gov[drop us a line].
+
+First, we can use the following query to see the list of data sources:
+
+//setup
+//output
+[source,cypher]
+----
+MATCH (n:DATASOURCE)
+RETURN n.name as `Name`, n.key as `Source_Key`, n.instances as `Records`, n.versionIRI as `Version`
+----
+
+//table
+
+== Disease mapping between ontologies
+
+In this use case, we'd like to find https://icd.who.int/browse10/2019/en[ICD10,window="_blank"] concepts that mapped to https://rarediseases.info.nih.gov/[GARD,window="_blank"] rare diseases. Given that each nomenclature serves a different purpose, we should not expect there to be significant mappings that are exact.
+
+//setup
+//output
+[source,cypher]
+----
+MATCH (o:S_ORDO_ORPHANET)-[:R_exactMatch|:R_equivalentClass]-(m:S_MONDO)-[:R_exactMatch|:R_equivalentClass]-(n:S_GARD)<-[:PAYLOAD]-(d:DATA)
+WHERE d.is_rare=true
+WITH o,n,m,d
+MATCH (o)-[e:R_exactMatch|:R_closeMatch]-(k:S_ICD10CM)<-[:PAYLOAD]-(h)
+RETURN DISTINCT d.id as `GARD_ID`,d.name as `GARD_Disease`,e.name as `Match_Type`,h.notation as `ICD10_ID`,h.label as `ICD10_Disease`
+----
+
+//table
+
+Indeed, the column `Match_Type` indicates the nature of the mapping going from GARD to ICD10. To generate the mapping, we make use of the https://www.orpha.net/consor/cgi-bin/index.php[Orphanet,window="_blank"]'s ICD10 cross references and https://monarchinitiative.org/[MONDO,window="_blank"]'s inferred `exactMatch` and `equivalentClass` relationships. Of course, we can also generate the mappings via direct matching of synonyms and cross references afforded by the respective data source.
+
+//setup
+//output
+[source,cypher]
+----
+MATCH (d:DATA)-[:PAYLOAD]->(o:S_GARD)-[e:I_CODE|:N_Name]-(m:S_ICD10CM)<-[:PAYLOAD]-(h:DATA)
+WHERE d.is_rare=true
+RETURN DISTINCT d.id as `GARD_ID`,d.name as `GARD_Disease`,e.value as `Matched_By`, h.notation as `ICD10_ID`,h.label as `ICD10_Disease`
+----
+
+//table
+
+Notice that the number of mappings are much smaller.
+
+== Ontology overalp
+
+A common use case we often encounter is to determine the overlap between two data sources, e.g., what's the overlap between Orphanet and https://omim.org[OMIM,window="_blank"]?
+
+//output
+[source,cypher]
+----
+MATCH (n:`S_ORDO_ORPHANET`)--(m:DATA)
+WHERE NOT EXISTS(m.symbol) AND NOT EXISTS(m.reason_for_obsolescence)
+WITH n MATCH(n)-[:N_Name|:I_CODE*1]-(a:`S_OMIM`:T047)
+RETURN COUNT(DISTINCT n) as `Orphanet`, COUNT(DISTINCT a) as `OMIM`
+----
+
+//table
+
+This query will take a bit of time to complete. The overlap in this query considers only direct synonym or cross reference mappings only. To generate a matrix of all-pairwise overlap (as we have done https://github.com/ncats/stitcher/blob/master/gard/gard-disease.pdf[here,window="_blank"]), please consider using this https://github.com/ncats/stitcher/blob/master/scripts/disease-matrix.py[Python script,window="_blank"].
+
+== Approved drugs for rare diseases
+
+An important use case is to know which rare diseases have approved therapies. To support this use case, we map our https://drugs.ncats.io[drugs resource,window="_blank"] to GARD diseases as follows:
+
+[source,cypher]
+----
+MATCH p=(d:DATA)-[:PAYLOAD]->(m)--(n:`S_RANCHO-DISEASE-DRUG_2018-12-18_13-30`)-[e:R_rel]-(:`S_RANCHO-DISEASE-DRUG_2018-12-18_13-30`)<--(z:DATA)
+WHERE e.HighestPhase='Approved' AND (m:S_DOID OR m:S_MESH:T047)
+WITH p,m,z
+MATCH q=(m)-[:R_exactMatch|:R_equivalentClass]-(:S_MONDO)-[:R_exactMatch|:R_equivalentClass]-(:S_GARD)<-[:PAYLOAD]-(g)
+WHERE g.is_rare=true
+RETURN g.id as `GARD_ID`, g.name as `GARD_Disease`, COUNT(DISTINCT z) as Drugs ORDER BY Drugs DESC
+----
+
+//table
+
+== Orphan designation
+
+The https://www.accessdata.fda.gov/scripts/opdlisting/oopd/[orphan designation drug list,window="_blank"] provides a valuable view of the current therapeutic development landscape for rare diseases. Here, we've mapped (which included manual curation) the designated conditions to GARD rare diseases. The data can be retrieved as follows:
+
+[source,cypher]
+----
+MATCH p=(d:DATA)-[:PAYLOAD]->(m:S_GARD)--(n:`S_FDAORPHANGARD_20190216`)<--(z:DATA)
+WHERE d.is_rare=true
+RETURN d.id as `GARD_ID`, d.name as `GARD_Disease`, z.`Orphan Drug Status` as `Status`, count(distinct z) as Count
+ORDER BY Count DESC
+----
+
+== Monogenic diseases and their genes
+
+[source,cypher]
+----
+MATCH(n:S_MONDO)--(d:DATA) WHERE d.id='MONDO:0000275' 
+WITH n,d MATCH (n)<-[e:R_subClassOf*1..10]-(m:S_MONDO)<-[:PAYLOAD]-(z:DATA) 
+WITH m,z MATCH p=(d:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_exactMatch|:R_equivalentClass]-(m)
+OPTIONAL MATCH q=(m)-[:R_exactMatch|:R_equivalentClass]-(:S_ORDO_ORPHANET)-[e:R_rel{name:'disease_associated_with_gene'}]->(:S_ORDO_ORPHANET)<-[:PAYLOAD]-(o:DATA)
+RETURN DISTINCT d.id as `GARD_ID`,d.name as `GARD_Disease`,e.DisorderGeneAssociationType as `Disease_Gene_Association`,o.symbol as `Gene_Symbol`,o.label as `Gene_Name`
+ORDER BY d.id
+----
+
+== Phenotypes across rare diseases
+
+[source,cypher]
+----
+MATCH (d:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_hasPhenotype]->(:S_HP)<-[:PAYLOAD]-(z)
+WHERE d.is_rare=true
+RETURN d.id as `GARD_ID`, d.name as `GARD_Disease`, COUNT(DISTINCT z) as Phenotypes
+ORDER BY Phenotypes DESC
+----
+
+== Genes across rare diseases
+
+[source,cypher]
+----
+MATCH (d:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_exactMatch|:R_equivalentClass]-(:S_MONDO)-[:R_exactMatch|:R_equivalentClass]-(:S_ORDO_ORPHANET)-[e:R_rel{name:'disease_associated_with_gene'}]->(:S_ORDO_ORPHANET)<-[:PAYLOAD]-(z)
+RETURN d.id as `GARD_ID`,d.name as `GARD_Disease`,COUNT(DISTINCT z) as Genes
+ORDER BY Genes DESC
+----
+
+== Rare diseases across mode of inheritance
+
+[source,cypher]
+----
+MATCH p=(d:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_exactMatch|:R_equivalentClass]-(:S_MONDO)-[:R_exactMatch|:R_equivalentClass]-(:S_ORDO_ORPHANET)-[e:R_rel{name:'has_inheritance'}]->(:S_ORDO_ORPHANET)<-[:PAYLOAD]-(z)
+RETURN z.label as `Inheritance`,count(distinct d) as `GARD_Diseases`
+ORDER BY GARD_Diseases DESC
+----
+
+== Rare diseases across anatomical system
+
+Due to the complexity of query, the counts returned are only approximate. Increase the depth beyond 7 for more precise counts at the expense of significant increased in execution time.
+
+[source,cypher]
+----
+MATCH (z:DATA)-[:PAYLOAD]->(m:S_MONDO)-[:R_subClassOf]->(n:S_MONDO)<-[:PAYLOAD]-(h)
+WHERE h.notation ='MONDO:0021199'
+WITH m MATCH (z:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_exactMatch|:R_equivalentClass]-(:S_MONDO)-[:R_subClassOf*1..7]->(m)<-[:PAYLOAD]-(h:DATA)
+RETURN h.notation as `MONDO_ID`, h.label as `Anatomical`, count(distinct z) as `GARD_Diseases`
+----
+
+== GO terms across rare diseases
+
+[source,cypher]
+----
+MATCH(n:S_MONDO)--(d:DATA) WHERE d.id='MONDO:0000275' 
+WITH n,d match (n)<-[e:R_subClassOf*1..10]-(m:S_MONDO)<-[:PAYLOAD]-(z:DATA) 
+WITH m,z match p=(d:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_exactMatch|:R_equivalentClass]-(m)
+MATCH q=(m)-[:R_exactMatch|:R_equivalentClass]-(:S_ORDO_ORPHANET)-[e:R_rel{name:'disease_associated_with_gene'}]->(n:S_OGG)-[:R_rel{name:'has_go_association'}]-(:S_GO)<-[:PAYLOAD]-(g)
+WHERE NOT EXISTS(g.deprecated)
+RETURN g.hasOBONamespace as `GO_Category`,g.label as `GO_Term`,count(distinct d) as `GARD_Diseases`
+ORDER BY GARD_Diseases DESC
+----
+
+To visualize this query for a limited view, try this query:
+
+[source,cypher]
+----
+MATCH(n:S_MONDO)--(d:DATA) WHERE d.id='MONDO:0000275' 
+WITH n,d MATCH (n)<-[e:R_subClassOf*1..10]-(m:S_MONDO)<-[:PAYLOAD]-(z:DATA) 
+WITH m,z MATCH p=(d:DATA)-[:PAYLOAD]->(:S_GARD)-[:R_exactMatch|:R_equivalentClass]-(m)
+MATCH q=(m)-[:R_exactMatch|:R_equivalentClass]-(:S_ORDO_ORPHANET)-[e:R_rel{name:'disease_associated_with_gene'}]->(n:S_OGG)-[:R_rel{name:'has_go_association'}]-(:S_GO)<-[:PAYLOAD]-(g)
+WHERE g.notation='GO:0005515' AND NOT exists(g.deprecated) 
+RETURN p,q LIMIT 50
+----
