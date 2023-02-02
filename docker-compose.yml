@@ -1,0 +1,31 @@
+version: '3'
+services:
+  build-api:
+    build:
+      context: ..
+      dockerfile: stitcher/aDockerfile
+    volumes:
+      - type: bind
+        source: ./database/api
+        target: /opt/app/apiDB
+      - type: bind
+        source: ./database/browser/databases
+        target: /opt/app/browserDB
+    ports:
+      - "9003:9003"
+    tty: true
+  neo4j-browser:
+    image: neo4j:3.2.13
+    environment:
+      - NEO4J_AUTH=none
+      - NEO4J_dbms_read__only=true
+    volumes:
+      - type: bind
+        source: ./database/browser
+        target: /data
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    tty: true
+    depends_on:
+      - build-api

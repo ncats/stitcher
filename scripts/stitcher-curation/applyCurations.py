@@ -14,7 +14,7 @@ if sys.version_info[0] < 3:
 args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
 args_p.add_argument('addr',
                     help="""a full Stitcher address OR
-                            a shorthand: 'prod', 'dev', 'test' or 'local'""")
+                            a shorthand: 'prod', 'dev', 'test', 'docker', or 'local'""")
 
 args_p.add_argument('--filename',
                     default="dbCurations.txt",
@@ -27,7 +27,8 @@ switcher = {
     "prod": "https://stitcher.ncats.io/",
     "dev": "https://stitcher-dev.ncats.io/",
     "test": "https://stitcher-test.ncats.io/",
-    "local": "http://localhost:8080/"
+    "local": "http://localhost:8080/",
+    "docker": "http://localhost:9003/"
     }
 
 if site_arg in switcher:
