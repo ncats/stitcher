@@ -3,8 +3,8 @@ FROM openjdk:8-jdk as buildContainer
 RUN mkdir /opt/app
 COPY ./stitcher /opt/app
 
-RUN mkdir /opt/stitcher-rawinputs
-COPY ./stitcher-rawinputs /opt/stitcher-rawinputs
+RUN mkdir /opt/stitcher-data-inxight
+COPY ./stitcher-data-inxight /opt/stitcher-data-inxight
 
 WORKDIR "/opt/app"
 
@@ -22,7 +22,7 @@ RUN apt-get update
 RUN apt-get install sbt
 EXPOSE 9003
 
-RUN echo "-J-Xms1024M -J-Xmx16G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC" > .sbtopts
+RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC -J-XX:+HeapDumpOnOutOfMemoryError -J-XX:HeapDumpPath=./heapdump.hprof" > .sbtopts
 
 RUN ./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
 RUN unzip -o scripts/deployment/*zip

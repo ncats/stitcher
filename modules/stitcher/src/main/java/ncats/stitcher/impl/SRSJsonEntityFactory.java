@@ -62,7 +62,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     }
 
     void register (String line, int total) {
-        System.out.println("+++++ "+(count+1)+"/"+total+" +++++");
+        System.out.println("+gsrs+ "+(count+1)+"/"+total+" +++++");
         String[] toks = line.split("\t");
         if (toks.length < 2) {
             logger.warning(total+": Expecting 3 fields, but instead got "
@@ -211,6 +211,9 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     }
 
     public static void main (String[] argv) throws Exception {
+        Runnable shutdownHookTask = new ShutdownHookExample();
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHookTask));
+        System.out.println("Hook registered!");
         if (argv.length < 2) {
             System.err.println("Usage: "+SRSJsonEntityFactory.class.getName()
                                +" DBDIR [cache=DIR] FILE...");

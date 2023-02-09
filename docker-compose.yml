@@ -3,7 +3,7 @@ services:
   build-api:
     build:
       context: ..
-      dockerfile: stitcher/aDockerfile
+      dockerfile: stitcher/Dockerfile
     volumes:
       - type: bind
         source: ./database/api
@@ -18,7 +18,7 @@ services:
     image: neo4j:3.2.13
     environment:
       - NEO4J_AUTH=none
-      - NEO4J_dbms_read__only=true
+      - NEO4J_dbms_read__only=false
     volumes:
       - type: bind
         source: ./database/browser
