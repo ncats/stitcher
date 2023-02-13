@@ -36,5 +36,5 @@ CMD cp -r $(ls -d /opt/app/stitchv*.db) /opt/app/apiDB/; \
 
 # sudo apt-get install pip
 # sudo pip install requests
-# python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-2023-02-13.txt
-# python3 scripts/stitcher-curation/applyCurations.py dev --filename scripts/stitcher-curation/dbCurations-2023-02-13.txt
+# python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-{date}.txt
+# python3 scripts/stitcher-curation/applyCurations.py dev --filename scripts/stitcher-curation/dbCurations-{date}.txt

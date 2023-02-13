@@ -32,5 +32,5 @@ CMD bash
 
 # sudo apt-get install pip
 # sudo pip install requests
-# python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-2022-01-31.txt
-# python3 scripts/stitcher-curation/applyCurations.py docker --filename scripts/stitcher-curation/dbCurations-2022-01-31.txt
+# python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-2023-02-13.txt
+# python3 scripts/stitcher-curation/applyCurations.py docker --filename scripts/stitcher-curation/dbCurations-2023-02-13.txt
