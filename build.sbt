@@ -65,12 +65,19 @@ lazy val commonDependencies = Seq(
 )
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayJava, PlayEbean)
+  .enablePlugins(PlayJava, PlayEbean, JavaAppPackaging, UniversalPlugin)
   .settings(commonSettings: _*)
   .settings(name := """ncats-stitcher""")
   .settings(
-  libraryDependencies ++= commonDependencies
-).dependsOn(stitcher).aggregate(stitcher, buildinfo)
+      libraryDependencies ++= commonDependencies,
+      mappings in Universal ++= {
+        val dataDir = baseDirectory.value / "data"
+        Seq(
+          dataDir / "combined_withdrawn_shortage_drugs.txt" -> "data/combined_withdrawn_shortage_drugs.txt",
+          dataDir / "dev_status_logic.txt" -> "data/dev_status_logic.txt"
+        )
+      }
+    ).dependsOn(stitcher).aggregate(stitcher, buildinfo)
 
 lazy val buildinfo = (project in file("modules/build"))
   .settings(commonSettings: _*)

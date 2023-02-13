@@ -1,11 +1,4 @@
 FROM openjdk:8-jdk as buildContainer
-
-RUN mkdir /opt/app
-COPY ./stitcher /opt/app
-
-RUN mkdir /opt/stitcher-data-inxight
-COPY ./stitcher-data-inxight /opt/stitcher-data-inxight
-
 WORKDIR "/opt/app"
 
 RUN apt update
@@ -24,17 +17,20 @@ EXPOSE 9003
 
 RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC -J-XX:+HeapDumpOnOutOfMemoryError -J-XX:HeapDumpPath=./heapdump.hprof" > .sbtopts
 
-RUN ./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
-RUN unzip -o scripts/deployment/*zip
+#RUN ./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
+#RUN unzip -o scripts/deployment/*zip
+#
+#RUN chmod +x ./scripts/deployment/restart-stitcher-from-repo.sh
 
-RUN chmod +x ./scripts/deployment/restart-stitcher-from-repo.sh
+CMD bash
+#CMD cp -r $(ls -d /opt/app/stitchv*.db) /opt/app/apiDB/; \
+#    rm -rf /opt/app/browserDB/*; \
+#    cp -r /opt/app/apiDB/$(basename /opt/app/stitchv*.db) /opt/app/browserDB/graph.db; \
+#    ./scripts/deployment/restart-stitcher-from-repo.sh /opt/app/apiDB/$(basename /opt/app/stitchv*.db);
 
-CMD cp -r $(ls -d /opt/app/stitchv*.db) /opt/app/apiDB/; \
-    rm -rf /opt/app/browserDB/*; \
-    cp -r /opt/app/apiDB/$(basename /opt/app/stitchv*.db) /opt/app/browserDB/graph.db; \
-    ./scripts/deployment/restart-stitcher-from-repo.sh /opt/app/apiDB/$(basename /opt/app/stitchv*.db);
+# ./scripts/deployment/restart-stitcher-from-repo.sh ./stitchv20230207-204428.db
 
 # sudo apt-get install pip
 # sudo pip install requests
-# python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-2023-02-13.txt
-# python3 scripts/stitcher-curation/applyCurations.py dev --filename scripts/stitcher-curation/dbCurations-2023-02-13.txt
+# python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-2022-01-31.txt
+# python3 scripts/stitcher-curation/applyCurations.py docker --filename scripts/stitcher-curation/dbCurations-2022-01-31.txt
