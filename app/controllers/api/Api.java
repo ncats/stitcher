@@ -510,17 +510,24 @@ public class Api extends Controller {
     }
 
     private Object editProperty(Object value, ArrayList<String> newVal, ArrayList<String> oldVal) throws Exception {
+        System.out.println(value);
+        System.out.println(newVal);
+        System.out.println(oldVal);
 
         if (!value.getClass().isArray()) {
+            System.out.println("in array");
             String[] value2 = new String[1];
             value2[0] = value.toString();
+            System.out.println(value);
             value = value2;
+            System.out.println(value);
         }
 
         ArrayList<String> vals = new ArrayList();
         int found = 0;
         for (int i = 0; i < Array.getLength(value); ++i) {
             String v = Array.get(value, i).toString();
+            System.out.println(v + " : " + i);
             if (oldVal.contains(v)) // remove or replace
                 found++;
             else if (newVal.contains(v))
@@ -534,8 +541,11 @@ public class Api extends Controller {
         }
         if (vals.size() == 0)
             return null;
-        if (vals.size() == 1)
-            return vals.get(0);
+        if (vals.size() == 1) {
+            System.out.println("WARNING : if this code path is used by something other than the POTASSIUM CATION / in_vivo_use_guide curation, you should check it");
+            System.out.println("Updating: " + oldVal + " to " + newVal);
+            return vals.toArray(new String[0]);
+        }
         else
             return vals.toArray(new String[0]);
 
