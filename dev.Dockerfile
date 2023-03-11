@@ -33,4 +33,4 @@ RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-X
 
 CMD bash
 
-# python3 scripts/stitcher-curation/applyCurations.py docker --filename scripts/stitcher-curation/dbCurations-2023-02-13.txt
+# python3 scripts/stitcher-curation/applyCurations.py dev --filename scripts/stitcher-curation/dbCurations-2023-02-13.txt

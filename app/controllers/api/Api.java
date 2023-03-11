@@ -510,24 +510,16 @@ public class Api extends Controller {
     }
 
     private Object editProperty(Object value, ArrayList<String> newVal, ArrayList<String> oldVal) throws Exception {
-        System.out.println(value);
-        System.out.println(newVal);
-        System.out.println(oldVal);
-
         if (!value.getClass().isArray()) {
-            System.out.println("in array");
             String[] value2 = new String[1];
             value2[0] = value.toString();
-            System.out.println(value);
             value = value2;
-            System.out.println(value);
         }
 
         ArrayList<String> vals = new ArrayList();
         int found = 0;
         for (int i = 0; i < Array.getLength(value); ++i) {
             String v = Array.get(value, i).toString();
-            System.out.println(v + " : " + i);
             if (oldVal.contains(v)) // remove or replace
                 found++;
             else if (newVal.contains(v))
@@ -541,40 +533,10 @@ public class Api extends Controller {
         }
         if (vals.size() == 0)
             return null;
-        if (vals.size() == 1) {
-            System.out.println("WARNING : if this code path is used by something other than the POTASSIUM CATION / in_vivo_use_guide curation, you should check it");
-            System.out.println("Updating: " + oldVal + " to " + newVal);
-            return vals.toArray(new String[0]);
-        }
+        if (vals.size() == 1)
+            return vals.get(0);
         else
             return vals.toArray(new String[0]);
-
-//        if (value.getClass().isArray()) {
-//            boolean found = false;
-//            ArrayList<String> vals = new ArrayList();
-//            for (int i = 0; i < Array.getLength(value); ++i) {
-//                String v = Array.get(value, i).toString();
-//                if (v.equals(oldVal)) { // remove or replace
-//                    found = true;
-//                    if (newVal.size() != 0) // replace
-//                        vals.add(newVal);
-//                } else {
-//                    vals.add(v);
-//                }
-//            }
-//            if (oldVal.size() == 0) // add
-//                vals.add(newVal);
-//            else if (!found) {
-//                throw new Exception("Value to be replaced not found! "+oldVal+": "+newVal);
-//            }
-//            value = vals.toArray(new String[0]);
-//        } else {
-//            if (oldVal.size() == 0) {
-//                throw new Exception("Can't add new value to property - property value already exists: "+value.toString());
-//            }
-//            value = newVal;
-//        }
-//        return value;
     }
 
     private String parseUpdatePropertyJson(String jsonPath, JsonNode oldV, JsonNode newV) throws Exception {
@@ -765,6 +727,7 @@ public class Api extends Controller {
                         } else if ("remove".equals(operation) && newVal.size() != 0) {
                             //throw new Exception("New value must be null if removing"); // TODO maybe fix this in Tongan's side
                             newV = null;
+                            newVal = new ArrayList();
                         } else if (("replace".equals(operation) || "remove".equals(operation)) &&
                                 !updateNode.payload().containsKey(updateProperty)) {
                             throw new Exception("Payload does not contain property: "+updateProperty);
