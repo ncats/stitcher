@@ -1,15 +1,5 @@
 version: '3'
 services:
-  #  dev:
-  #    build:
-  #      context: ..
-  #      dockerfile: stitcher/dev.Dockerfile
-  #    volumes:
-  #      - .:/opt/app
-  #      - ../stitcher-data-inxight:/opt/stitcher-data-inxight
-  #    ports:
-  #      - "9003:9003"
-  #    tty: true
   build-api:
     build:
       context: ..
