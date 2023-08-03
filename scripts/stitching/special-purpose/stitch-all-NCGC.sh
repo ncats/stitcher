@@ -19,7 +19,7 @@ echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/broad.conf"
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, December 2021\" cache=data/hash.db $stitcherDataInxightRepo/files/dump-public-2021-05-02.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2023\" cache=data/hash.db $stitcherDataInxightRepo/files/dump-public-2023-06-29.gsrs"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=Rancho BioSciences, July 2020\" cache=data/hash.db $stitcherDataInxightRepo/files/rancho-export_2019-09-27_13-00.json"
