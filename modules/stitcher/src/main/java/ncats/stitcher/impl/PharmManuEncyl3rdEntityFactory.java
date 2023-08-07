@@ -132,7 +132,7 @@ public class PharmManuEncyl3rdEntityFactory extends EntityRegistry {
     }
     
     void register (JsonNode node, int total) throws Exception {
-        System.out.println("+++++ "+(count+1)+"/"+total+" +++++");
+        System.out.println("+pme+ "+(count+1)+"/"+total+" +++++");
         Map<String, Object> map = new TreeMap<>();
         List<String> products = new ArrayList<>();      
         for (Iterator<Map.Entry<String, JsonNode>> it = node.fields();

@@ -510,7 +510,6 @@ public class Api extends Controller {
     }
 
     private Object editProperty(Object value, ArrayList<String> newVal, ArrayList<String> oldVal) throws Exception {
-
         if (!value.getClass().isArray()) {
             String[] value2 = new String[1];
             value2[0] = value.toString();
@@ -538,33 +537,6 @@ public class Api extends Controller {
             return vals.get(0);
         else
             return vals.toArray(new String[0]);
-
-//        if (value.getClass().isArray()) {
-//            boolean found = false;
-//            ArrayList<String> vals = new ArrayList();
-//            for (int i = 0; i < Array.getLength(value); ++i) {
-//                String v = Array.get(value, i).toString();
-//                if (v.equals(oldVal)) { // remove or replace
-//                    found = true;
-//                    if (newVal.size() != 0) // replace
-//                        vals.add(newVal);
-//                } else {
-//                    vals.add(v);
-//                }
-//            }
-//            if (oldVal.size() == 0) // add
-//                vals.add(newVal);
-//            else if (!found) {
-//                throw new Exception("Value to be replaced not found! "+oldVal+": "+newVal);
-//            }
-//            value = vals.toArray(new String[0]);
-//        } else {
-//            if (oldVal.size() == 0) {
-//                throw new Exception("Can't add new value to property - property value already exists: "+value.toString());
-//            }
-//            value = newVal;
-//        }
-//        return value;
     }
 
     private String parseUpdatePropertyJson(String jsonPath, JsonNode oldV, JsonNode newV) throws Exception {
@@ -755,6 +727,7 @@ public class Api extends Controller {
                         } else if ("remove".equals(operation) && newVal.size() != 0) {
                             //throw new Exception("New value must be null if removing"); // TODO maybe fix this in Tongan's side
                             newV = null;
+                            newVal = new ArrayList();
                         } else if (("replace".equals(operation) || "remove".equals(operation)) &&
                                 !updateNode.payload().containsKey(updateProperty)) {
                             throw new Exception("Payload does not contain property: "+updateProperty);

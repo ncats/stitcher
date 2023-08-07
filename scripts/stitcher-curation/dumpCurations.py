@@ -2,9 +2,8 @@
 
 import os
 import sys
-import cookielib
+from http.cookiejar import CookieJar
 import urllib
-import urllib2
 import json
 import time
 import argparse
@@ -12,15 +11,15 @@ import ssl
 import codecs
 
 # check that the python version is correct (need 2)
-if sys.version_info[0] > 2:
-    raise "Must be using Python 2! Aborting."
+if sys.version_info[0] > 3:
+    raise "Must be using Python 3! Aborting."
 
 # check for arguments
 args_p = argparse.ArgumentParser(description="Run Some Stitcher Tests")
 
 args_p.add_argument('addr',
                     help="""a full Stitcher address OR
-                            a shorthand: 'prod', 'dev', 'test' or 'local'""")
+                            a shorthand: 'prod', 'dev', 'test', 'docker', or 'local'""")
 
 args_p.add_argument('--outfile',
                     default="".join(["dbCurations_",
@@ -35,7 +34,8 @@ switcher = {
     "prod": "https://stitcher.ncats.io/",
     "dev": "https://stitcher-dev.ncats.io/",
     "test": "https://stitcher-test.ncats.io/",
-    "local": "http://localhost:8080/"
+    "local": "http://localhost:8080/",
+    "docker": "http://localhost:9003/"
     }
 
 if site_arg in switcher:
@@ -43,13 +43,13 @@ if site_arg in switcher:
 else:
     site = site_arg
 
-cookies = cookielib.CookieJar()
+cookies = CookieJar()
 
-opener = urllib2.build_opener(
-    urllib2.HTTPRedirectHandler(),
-    urllib2.HTTPHandler(debuglevel=0),
-    urllib2.HTTPSHandler(debuglevel=0),
-    urllib2.HTTPCookieProcessor(cookies))
+opener = urllib.request.build_opener(
+    urllib.request.HTTPRedirectHandler(),
+    urllib.request.HTTPHandler(debuglevel=0),
+    urllib.request.HTTPSHandler(debuglevel=0),
+    urllib.request.HTTPCookieProcessor(cookies))
 opener.addheaders = [
     ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
                     'Windows NT 5.2; .NET CLR 1.1.4322)'))
@@ -75,7 +75,7 @@ def iterateCurations(fp):
     while skip < max:
         uri = site+'api/curations?top='+str(top)+'&skip='+str(skip)
         obj = requestJson(uri)
-        if not obj.has_key('contents'):
+        if 'contents' not in obj:
             newobj = dict()
             newobj['contents'] = []
             newobj['contents'].append(obj)
@@ -93,8 +93,8 @@ def iterateCurations(fp):
                     items.append([obj2['_timestamp'], entry])
                 items.sort()
                 for item in items:
-                    outline = unicode(entity['id'])+"\t"+unicode(entity['source'])+"\t"+unicode(entity['datasource'])
-                    outline = outline+"\t"+unicode(item[-1])+"\n"
+                    outline = str(entity['id'])+"\t"+str(entity['source'])+"\t"+str(entity['datasource'])
+                    outline = outline+"\t"+str(item[-1])+"\n"
                     fp.write(outline)
         sys.stderr.write(uri+"\n")
         sys.stderr.flush()

@@ -86,7 +86,7 @@ public class DrugBankXmlEntityFactory extends MoleculeEntityFactory {
     }
 
     void register (Map<String, Object> payload, int total) {
-        System.out.println("+++++ "+payload.get("drugbank-id")+" "
+        System.out.println("+bank+ "+payload.get("drugbank-id")+" "
                            +(count+1)+"/"+total+" +++++");
         register (payload);
         ++count;

@@ -113,7 +113,7 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
     }
 
     void register (JsonNode node, int total) {
-        System.out.println("+++++ " + (count + 1) + "/" + total + " +++++");
+        System.out.println("+rancho+ " + (count + 1) + "/" + total + " +++++");
         if (node.has("smiles")) {
             String smiles = node.get("smiles").asText();
             try {
@@ -124,7 +124,6 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
                     Map.Entry<String, JsonNode> f = it.next();
                     setProperty (mol, f.getKey(), f.getValue());
                 }
-                
                 //System.out.print(mol.toFormat("sdf"));
                 Entity ent = register (mol);
                 ++count;
@@ -141,6 +140,9 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
     }
     
     public static void main (String[] argv) throws Exception {
+        Runnable shutdownHookTask = new ShutdownHookExample();
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHookTask));
+        System.out.println("Hook registered!");
         if (argv.length < 2) {
             System.err.println("Usage: "+RanchoJsonEntityFactory.class.getName()
                                +" DBDIR [cache=DIR] FILE...");
@@ -166,7 +168,7 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
                     }
                 }
                 else {
-                     File file = new File(argv[i]);
+                    File file = new File(argv[i]);
 
                     if(sourceName != null){
                         mef.register(sourceName, file);
@@ -180,5 +182,10 @@ public class RanchoJsonEntityFactory extends MoleculeEntityFactory {
         finally {
             mef.shutdown();
         }
+    }
+}
+class ShutdownHookExample implements Runnable {
+    public void run() {
+            System.out.println("shutdown hook ran!");
     }
 }

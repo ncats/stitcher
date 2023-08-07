@@ -83,7 +83,7 @@ public class NCGCEntityFactory extends MoleculeEntityFactory {
             while (rset.next()) {
                 String sampleId = instrument (rset, row);
             
-                System.out.println("+++++ "+sampleId+" "+(count+1)+" +++++");
+                System.out.println("+ncgc+ "+sampleId+" "+(count+1)+" +++++");
                 pstm2.setString(1, sampleId);
                 ResultSet rs = pstm2.executeQuery();
                 while (rs.next()) {

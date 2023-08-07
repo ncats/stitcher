@@ -149,6 +149,9 @@ public class LineMoleculeEntityFactory extends MoleculeEntityFactory {
     }
 
     public static void main (String[] argv) throws Exception {
+        Runnable shutdownHookTask = new ShutdownHookExample();
+        Runtime.getRuntime().addShutdownHook(new Thread(shutdownHookTask));
+        System.out.println("Hook registered!");
         GraphDb.addShutdownHook();
         register (argv, LineMoleculeEntityFactory.class);
     }
