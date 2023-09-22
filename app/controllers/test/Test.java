@@ -25,10 +25,6 @@ public class Test extends Controller {
     public Test () {
     }
 
-    public Result slidereveal () {
-        return ok (slidereveal.render(this, "IxCurator"));
-    }
-
     public Result drugbank () {
         try {
             String key = scheduler.submit
