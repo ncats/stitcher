@@ -1,0 +1,14 @@
+version: '3'
+services:
+  neo4j-browser:
+    image: neo4j:3.2.13
+    container_name: stitcher-browser
+    environment:
+      - NEO4J_AUTH=none
+      - NEO4J_dbms_read__only=false
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    tty: true
+    volumes:
+      - ./browserdb/1.1:/data

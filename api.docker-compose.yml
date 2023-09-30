@@ -1,0 +1,12 @@
+version: '3'
+services:
+  stitcher-api:
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    container_name: stitcher-api
+    volumes:
+      - ./stitcherdb/1.1:/opt/app/apiDB
+    ports:
+      - "9003:9003"
+    tty: true

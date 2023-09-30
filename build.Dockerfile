@@ -28,15 +28,23 @@ EXPOSE 9003
 
 RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC -J-XX:+HeapDumpOnOutOfMemoryError -J-XX:HeapDumpPath=./heapdump.hprof" > .sbtopts
 
+RUN chmod +x /opt/app/build.entrypoint.sh
+
 RUN ./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
+
+ENV STITCHER_VERSION=$STITCHER_VERSION
+
 RUN unzip -o scripts/deployment/*zip
 
-RUN chmod +x ./scripts/deployment/restart-stitcher-from-repo.sh
+CMD /opt/app/build.entrypoint.sh \
+    bash
 
-CMD cp -r $(ls -d /opt/app/stitchv*.db) /opt/app/apiDB/; \
-    rm -rf /opt/app/browserDB/*; \
-    cp -r /opt/app/apiDB/$(basename /opt/app/stitchv*.db) /opt/app/browserDB/graph.db; \
-    ./scripts/deployment/restart-stitcher-from-repo.sh /opt/app/apiDB/$(basename /opt/app/stitchv*.db);
+#RUN chmod +x ./scripts/deployment/restart-stitcher-from-repo.sh
+
+#CMD cp -r $(ls -d /opt/app/stitchv*.db) /opt/app/apiDB/; \
+#    rm -rf /opt/app/browserDB/*; \
+#    cp -r /opt/app/apiDB/$(basename /opt/app/stitchv*.db) /opt/app/browserDB/graph.db; \
+#CMD    ./scripts/deployment/restart-stitcher-from-repo.sh /opt/app/apiDB/$(basename /opt/app/stitchv*.db);
 
 # python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-{date}.txt
 # python3 scripts/stitcher-curation/applyCurations.py dev --filename scripts/stitcher-curation/dbCurations-{date}.txt

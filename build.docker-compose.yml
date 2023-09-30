@@ -1,0 +1,13 @@
+version: '3'
+services:
+  build-stitcher:
+    build:
+      context: ..
+      dockerfile: stitcher/build.Dockerfile
+    container_name: build-stitcher
+    volumes:
+      - ./stitcherdb:/opt/app/db
+      - ./browserdb:/opt/app/browsercopy
+    environment:
+      - STITCHER_VERSION=1.1
+    tty: true
