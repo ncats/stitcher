@@ -5,7 +5,7 @@ services:
     container_name: stitcher-browser
     environment:
       - NEO4J_AUTH=none
-      - NEO4J_dbms_read__only=false
+      - NEO4J_dbms_read__only=true
     ports:
       - "7474:7474"
       - "7687:7687"
