@@ -1,5 +1,5 @@
 FROM openjdk:8-jdk as buildContainer
-WORKDIR "/opt/app"
+WORKDIR "/opt/stitcher"
 
 RUN apt update
 RUN apt-get update
@@ -21,6 +21,8 @@ EXPOSE 9003
 
 RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC -J-XX:+HeapDumpOnOutOfMemoryError -J-XX:HeapDumpPath=./heapdump.hprof" > .sbtopts
 
+RUN alias python='python3'
+RUN pip install pandas
 #RUN ./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
 #RUN unzip -o scripts/deployment/*zip
 

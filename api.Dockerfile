@@ -29,7 +29,7 @@ RUN unzip -o scripts/deployment/*zip
 
 RUN chmod +x ./scripts/deployment/restart-stitcher-from-repo.sh
 
-CMD    ./scripts/deployment/restart-stitcher-from-repo.sh /opt/app/apiDB;
+CMD ./scripts/deployment/restart-stitcher-from-repo.sh /opt/app/apiDB;
 
 # python3 scripts/stitcher-curation/dumpCurations.py prod --outfile scripts/stitcher-curation/dbCurations-{date}.txt
 # python3 scripts/stitcher-curation/applyCurations.py dev --filename scripts/stitcher-curation/dbCurations-{date}.txt

@@ -1,4 +1,5 @@
 database/
 stitcherdb/
+browserdb/
 stitchv*.db
 stitchv*.db.zip

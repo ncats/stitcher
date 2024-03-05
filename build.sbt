@@ -71,7 +71,7 @@ lazy val root = (project in file("."))
   .settings(
       libraryDependencies ++= commonDependencies,
       mappings in Universal ++= {
-        val dataDir = baseDirectory.value / "data"
+        val dataDir = baseDirectory.value / "stitcher-inputs"
         Seq(
           dataDir / "combined_withdrawn_shortage_drugs.txt" -> "data/combined_withdrawn_shortage_drugs.txt",
           dataDir / "dev_status_logic.txt" -> "data/dev_status_logic.txt"

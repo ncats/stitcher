@@ -73,7 +73,7 @@ public class WithdrawnEventParser extends EventParser{
     static{
 
         try{
-            withdrawnStatusLookup = new WithdrawnStatusLookup(new BufferedInputStream(new FileInputStream("data/combined_withdrawn_shortage_drugs.txt")));
+            withdrawnStatusLookup = new WithdrawnStatusLookup(new BufferedInputStream(new FileInputStream("stitcher-inputs/combined_withdrawn_shortage_drugs.txt")));
         }catch(IOException e) {
 
             throw new UncheckedIOException(e);
