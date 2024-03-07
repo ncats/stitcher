@@ -73,6 +73,20 @@ public class Util {
     
     private Util () {}
 
+    public static NameAndFileName getNameFromVersionMetadata(String source_key)
+        throws IOException {
+        File file = new File("stitcher-inputs/active/version.metadata.json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(file);
+        JsonNode sourceObj = rootNode.path(source_key);
+        String name = sourceObj.path("name").asText();
+        String fileName = sourceObj.path("file").asText();
+        return new NameAndFileName(name, fileName);
+    }
+
+
+
+
     public static GraphDatabaseService openGraphDb (String file)
         throws IOException {
         return openGraphDb (new File (file));

@@ -710,7 +710,7 @@ if __name__=="__main__":
     if not os.path.exists(purpleBookfile):
         os.system(syscall)
 
-    gsrsDumpfile = maindir + f'/{stitcherDataInxightRepo}/files/dump-public-2023-12-14.gsrs'
+    gsrsDumpfile = maindir + f'/{stitcherDataInxightRepo}/files/gsrs_latest.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
@@ -773,7 +773,6 @@ if __name__=="__main__":
     fp.close()
 
     print("Prods in memory:", len(prods))
-
     # read in marketing status
     fp = io.TextIOWrapper(zfp.open('MarketingStatus.txt', 'r'), encoding='cp1252')
     markt = readTabFP(fp)
@@ -968,12 +967,6 @@ if __name__=="__main__":
     print("read unii dump file")
 
     # write out new approval years file
-    metadatafile = maindir+"/stitcher-inputs/active/version_metadata.txt"
-    fp = open(metadatafile, 'w')
-    fp.writelines("data\tvalue")
-    fp.writelines("approvalYearsTimestamp\t"+getTimeStamp())
-    fp.close()
-
     outfile =  maindir+"/stitcher-inputs/active/approvalYears.txt"
     fp = open(outfile, 'w')
     header = "UNII\tApproval_Year\tDate\tDate_Method\tApp_Type\tApp_No\tSponsor\tProduct\tUrl\tactive\tComment\n"

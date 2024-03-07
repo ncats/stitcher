@@ -289,9 +289,9 @@ public class EntityRegistry extends EntityFactory {
         }
         
         Config source = conf.getConfig("source");
-        if (!source.hasPath("data"))
+        if (!source.hasPath("data") && !source.hasPath("source_key"))
             throw new IllegalArgumentException
-                ("Source has no required \"data\" element defined!");
+                ("Source has no required \"data\" element defined! Nor a source_key by which the \"data\" element could be discovered!");
         
         //System.out.println("source:"+source);
         if (conf.hasPath("cache")) {
@@ -426,13 +426,14 @@ public class EntityRegistry extends EntityFactory {
         
         // references data sources
         if (conf.hasPath("references")) {
-            List<? extends ConfigObject> list =
-                conf.getObjectList("references");
+            List<? extends ConfigObject> list = conf.getObjectList("references");
             for (ConfigObject obj : list) {
                 Config cf = obj.toConfig();
-                if (!cf.hasPath("name")) {
+                System.out.println(cf);
+
+                if (!cf.hasPath("name") && !cf.hasPath("source_key")) {
                     logger.warning
-                        ("Reference doesn't have \"name\" defined!");
+                        ("Reference doesn't have \"name\" defined! and furthermore, there's no \"source_key\" from which the name could be querified");
                     continue;
                 }
                 
@@ -442,7 +443,12 @@ public class EntityRegistry extends EntityFactory {
                 }
 
                 Reference ref = new Reference ();
-                String name = cf.getString("name");
+                String name;
+                if (cf.hasPath("source_key")) {
+                    name = Util.getNameFromVersionMetadata(cf.getString("source_key")).Name;
+                } else {
+                    name = cf.getString("name");
+                }
                 try {
                     ref.key = StitchKey.valueOf(cf.getString("key"));
                 }
@@ -474,33 +480,41 @@ public class EntityRegistry extends EntityFactory {
     
     protected DataSource registerFromConfig (File base, Config conf)
         throws Exception {
-
         parseConfig (conf);
 
         Config source = conf.getConfig("source");
         DataSource ds;
-        String data = source.getString("data");
-        if (data.startsWith("http")) {
-            ds = register(new URL(data));
-        } else {
-            File file;
-            if (data.startsWith("file")) {
-                file = new File (new URI (data));
+
+        if (source.hasPath("source_key")) {
+            NameAndFileName source_obj = Util.getNameFromVersionMetadata(source.getString("source_key"));
+            System.out.println("Registering: " + source_obj.toString());
+            ds = register (source_obj.Name, new File(source_obj.FileName));
+        }
+        else {
+            String data = source.getString("data");
+            if (data.startsWith("http")) {
+                ds = register(new URL(data));
             } else {
-                file = new File (base, data);
-                if (!file.exists()) {
-                    // now let's try current
-                    file = new File (data);
-                    if (!file.exists())
-                        throw new IllegalArgumentException
-                                ("Can't find data: \""+data+"\"");
+                File file;
+                if (data.startsWith("file")) {
+                    file = new File(new URI(data));
+                } else {
+                    file = new File(base, data);
+                    if (!file.exists()) {
+                        // now let's try current
+                        file = new File(data);
+                        if (!file.exists())
+                            throw new IllegalArgumentException
+                                    ("Can't find data: \"" + data + "\"");
+                    }
                 }
-            }
-            if (source.hasPath("name")) {
-                String name = source.getString("name");
-                ds = register (name, file);
-            } else {
-                ds = register(file.getName(), file);
+                if (source.hasPath("name")) {
+
+                    String name = source.getString("name");
+                    ds = register(name, file);
+                } else {
+                    ds = register(file.getName(), file);
+                }
             }
         }
 
