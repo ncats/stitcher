@@ -16,13 +16,13 @@ echo $(date) > $log
 #sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/ruili.conf"
 #echo 'Ruili:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-#sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/withdrawn.conf"
-#echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
+sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/withdrawn.conf"
+echo 'Withdrawn:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.LineMoleculeEntityFactory $db data/conf/broad.conf"
 echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db \"name=G-SRS, July 2023\" cache=data/hash.db $stitcherDataInxightRepo/files/dump-public-2023-06-29.gsrs"
+sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db $stitcherDataInxightRepo/files/frdb_2021-10-19.json"
@@ -57,7 +57,7 @@ echo 'DailyMed-Rx:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 ## sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/dailymed_homeo.conf"
 ## echo 'DailyMed-Homeopathic:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/ob.conf"
+sbt stitcher/"runMain ncats.stitcher.impl.ManufacturingpEntityFactory $db data/conf/ob.conf"
 echo 'OB:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $db data/conf/ct.conf"

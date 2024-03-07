@@ -31,8 +31,8 @@ rule save_gsrs_metadata:
         '../stitcher-inputs/temp/metadata.gsrs.json'
     params:
         source_key='gsrs',
-        gsrs_version="subset"
-        # gsrs_version="latest"
+        # gsrs_version="subset"
+        gsrs_version="latest"
     script:
         'save_metadata.py'
 
