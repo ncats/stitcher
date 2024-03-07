@@ -11,6 +11,7 @@ import zipfile
 import gzip
 import numpy
 import re
+import requests
 
 resolverCache = dict()
 resolverCache["PEMETREXED SODIUM"] = "2PKU919BA9"
@@ -178,7 +179,7 @@ cberReplace['20-VALENT PNEUMOCOCCAL CONJUGATE VACCINE'] = ['ADR2S9OIF2','N47C1SH
 cberReplace['PNEUMOCOCCAL 15-VALENT CONJUGATE VACCINE'] = ['08VC9WC084']
 
 def getStitcherDataInxightRepo():
-    stitcherDataInxightRepo = "../stitcher-data-inxight"
+    stitcherDataInxightRepo = os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] or "../stitcher-data-inxight"
     return stitcherDataInxightRepo
 
 def getTimeStamp():
@@ -188,10 +189,6 @@ def getTimeStamp():
 def getOBZipURL():
     #zipurl = "https://www.fda.gov/downloads/Drugs/InformationOnDrugs/UCM163762.zip"
     zipurl = "https://www.fda.gov/media/76860/download"
-    return zipurl
-
-def getUNIIZipURL():
-    zipurl = "https://fdasis.nlm.nih.gov/srs/download/srs/UNIIs.zip"
     return zipurl
 
 def getDrugsFDAZipURL():
@@ -211,20 +208,24 @@ def getPurpleBookURL():
     purpleBookURL = 'https://purplebooksearch.fda.gov/files/%s/purplebook-search-%s-data-download.csv' % (year, month)
     return purpleBookURL
 
+
 def getMainDir():
     curr = os.getcwd()
-    if curr[-8:] == '/scripts':
-        curr = curr[:-8]
-    if curr[-5:] == '/temp':
-        curr = curr[:-5]
 
-    if not os.path.exists(curr+"/.git") or not os.path.exists(curr+"/data") or not os.path.exists(curr+"/scripts"):
-        raise ValueError('Could not identify repo head from current directory')
+    while curr:
+        print("main directory: " + curr)
+        if (
+            os.path.exists(os.path.join(curr, ".git")) and
+            os.path.exists(os.path.join(curr, "data")) and
+            os.path.exists(os.path.join(curr, "scripts"))
+        ):
+            if not os.path.exists(curr+"/temp"):
+                os.mkdir(curr+"/temp")
+            return curr
+        curr = os.path.dirname(curr)
 
-    if not os.path.exists(curr+"/temp"):
-        os.mkdir(curr+"/temp")
+    raise ValueError('Could not identify repo head from the current directory')
 
-    return curr
 
 def resolveName(name): # returns empty string if resolver can't do anything with this name
     if name in resolverCache.keys():
@@ -255,7 +256,8 @@ def resolveNameTripod(name):
     #        return r[0]['response']
     #else:
 
-    request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib.parse.quote(name)+"$\""
+    request = "https://drugs.ncats.io/api/v1/substances/search?q=root_names_name:\"^"+urllib.parse.quote(name)+"$\""
+    # request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib.parse.quote(name)+"$\""
     response = "{\"total\":0}"
     try:
         response = urllib.request.urlopen(request).read()
@@ -435,34 +437,41 @@ def writeInitApp(outfp, unii, early, earlyDate, myunii):
     outfp.write(outline)
 
 def readUniiFile(maindir):
-    uniifile = maindir+"/temp/UNIIs-"+getTimeStamp()+".zip"
-    syscall = "curl --insecure -o "+uniifile + " " + getUNIIZipURL()
-    print(syscall)
+    uniifile = maindir+"/stitcher-inputs/temp/UNIIs.zip"
 
-    if not os.path.exists(uniifile):
-        os.system(syscall)
-    
     zfp = zipfile.ZipFile(uniifile, 'r')
     names = zfp.namelist()
     fp = io.TextIOWrapper(zfp.open(names[-1], 'r'))
+
     line = fp.readline()
 
     if line[:-1].upper() != "NAME\tTYPE\tUNII\tDISPLAY NAME" and line[:-1].upper() != "NAME\tTYPE\tUNII\tPT":
         raise ValueError('Problem reading UNII file:'+line)
 
     line = fp.readline()
+
     uniiPT = dict()
     uniiALL = dict()
 
     while line != "":
         sline = line[:-1].split("\t")
         if len(sline) < 4:
-            raise ValueError('Problem reading UNII fileline:'+line)
+            line = fp.readline()
+            continue
+            # raise ValueError('Problem reading UNII fileline:'+line)
         uniiPT[sline[3]] = sline[2]
         if sline[0][-14:] == " [ORANGE BOOK]":
             sline[0] = sline[0][:-14]
         uniiALL[sline[0]] = sline[2]
-        line = fp.readline()
+        try:
+            line = fp.readline()
+        except:
+            line = fp.readline()
+            print('retrying with')
+            print(line)
+
+
+
     print("UNIIs in memory:", len(uniiPT), len(uniiALL))
     return uniiPT, uniiALL
 
@@ -482,12 +491,17 @@ def writeCBERBLAs(purpleBookfile, fdaSPLfile, fpout, uniiPT, uniiALL):
     print(purpleBookfile)
     fp = open(purpleBookfile, 'r')
     line = fp.readline()
-    while not line.startswith('Purple Book Database Extract'):
+    while not line.startswith('Newly Approved Products (N)'):
         line = fp.readline()
+        print(line)
     data = readTabFP(fp, True, ',')
     for item in data['table']:
+        if (item[0] == 'N/R/U'):
+            continue
+
         if len(item) < 10:
             print(item)
+            print('problem with purple book entry')
             sys.exit()
         ingred = item[4].upper()
         for phrase in dropphrases:
@@ -558,6 +572,7 @@ def writeCBERBLAs(purpleBookfile, fdaSPLfile, fpout, uniiPT, uniiALL):
     for item in data['table']:
         if len(item) < 10:
             print(item)
+            print('exiting here 1')
             sys.exit()
         for i in range(len(item)):
             if len(item[i]) > 2 and item[i][0] == '"' and item[i][-1] == '"':
@@ -676,26 +691,26 @@ if __name__=="__main__":
     maindir = getMainDir()
     stitcherDataInxightRepo = getStitcherDataInxightRepo()
 
-    drugsAtfdafile = maindir+"/temp/drugsAtfda-"+getTimeStamp()+".zip"
+    drugsAtfdafile = maindir+"/stitcher-inputs/temp/drugsAtfda-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+drugsAtfdafile + " " + getDrugsFDAZipURL()
     print(syscall)
 
     if not os.path.exists(drugsAtfdafile):
         os.system(syscall)
 
-    obfile = maindir+"/temp/orangeBook-"+getTimeStamp()+".zip"
+    obfile = maindir+"/stitcher-inputs/temp/orangeBook-"+getTimeStamp()+".zip"
     syscall = "curl --insecure -o "+obfile + " " + getOBZipURL()
     print(syscall)
     if not os.path.exists(obfile):
         os.system(syscall)
 
-    purpleBookfile = maindir+"/temp/purpleBook-"+getTimeStamp()+".csv"
-    syscall = "curl --insecure -o "+purpleBookfile + " " + getPurpleBookURL()
+    purpleBookfile = maindir+"/stitcher-inputs/temp/purpleBook-"+getTimeStamp()+".csv"
+    syscall = "curl --insecure -o " + purpleBookfile + " " + getPurpleBookURL()
     print(syscall)
     if not os.path.exists(purpleBookfile):
         os.system(syscall)
 
-    gsrsDumpfile = maindir + f'/{stitcherDataInxightRepo}/files/dump-public-2021-12-15.gsrs'
+    gsrsDumpfile = maindir + f'/{stitcherDataInxightRepo}/files/gsrs_latest.gsrs'
     if not os.path.exists(gsrsDumpfile):
         raise ValueError("Can't find GSRS dump file for active moiety lookup: "+gsrsDumpfile)
 
@@ -705,7 +720,7 @@ if __name__=="__main__":
 
     uniiPT, uniiALL = readUniiFile(maindir)
 
-    fdaSPLfile = maindir+'/data/spl_summary.txt'
+    fdaSPLfile = maindir+'/stitcher-inputs/active/spl_summary.txt'
     if not os.path.exists(fdaSPLfile):
         raise ValueError("Can't find FDA SPLs file: "+fdaSPLfile)
 
@@ -743,7 +758,7 @@ if __name__=="__main__":
     fp.close()
 
     # write out ingredients that don't map to UNIIs
-    missingUNIIsfile = maindir+"/temp/missingUNIIs-"+getTimeStamp()+".txt"
+    missingUNIIsfile = maindir+"/stitcher-inputs/temp/missingUNIIs-"+getTimeStamp()+".txt"
     fp = open(missingUNIIsfile, 'w')
     m2 = []
 
@@ -758,7 +773,6 @@ if __name__=="__main__":
     fp.close()
 
     print("Prods in memory:", len(prods))
-
     # read in marketing status
     fp = io.TextIOWrapper(zfp.open('MarketingStatus.txt', 'r'), encoding='cp1252')
     markt = readTabFP(fp)
@@ -768,6 +782,7 @@ if __name__=="__main__":
     sl['2'] = 'Over-the-counter'
     sl['3'] = 'Discontinued'
     sl['4'] = 'None (Tentative Approval)'
+    sl['5'] = 'For Further Manufacturing Use'
 
     #MarketingStatusID	ApplNo	ProductNo
     for entry in markt['table']:
@@ -806,6 +821,8 @@ if __name__=="__main__":
     subm = dict()
 
     for entry in submDates['table']:
+        if (len(entry) != 8):
+            continue
         if entry[0] not in subm:
             subm[entry[0]] = entry[5][0:10]
         elif subm[entry[0]] > entry[5][0:10]:
@@ -950,7 +967,7 @@ if __name__=="__main__":
     print("read unii dump file")
 
     # write out new approval years file
-    outfile =  maindir+"/data/approvalYears-"+getTimeStamp()+".txt"
+    outfile =  maindir+"/stitcher-inputs/active/approvalYears.txt"
     fp = open(outfile, 'w')
     header = "UNII\tApproval_Year\tDate\tDate_Method\tApp_Type\tApp_No\tSponsor\tProduct\tUrl\tactive\tComment\n"
     fp.write(header)
@@ -1011,7 +1028,7 @@ if __name__=="__main__":
     for key in uniiPT.keys():
         UNII2pt[uniiPT[key]] = key
 
-    productsfile = maindir+"/temp/products-"+getTimeStamp()+".txt"
+    productsfile = maindir+"/stitcher-inputs/temp/products-"+getTimeStamp()+".txt"
     fp = open(productsfile, 'w')
 
     header = 'NDA\tProduct\tForm;Route\tStrength\tStatus\tAppl Type\tSponsor\tDate\tDate Ref\tUNIIs\tIngredients\n'
@@ -1026,6 +1043,7 @@ if __name__=="__main__":
         for unii in uniis:
             if unii not in UNII2pt:
                 print(unii, uniilist, prod)
+                print('exiting here 2')
                 sys.exit()
             ingreds.append(UNII2pt[unii])
         ingredlist = '; '.join(ingreds)
@@ -1037,3 +1055,5 @@ if __name__=="__main__":
             outline = outline + item + '\t'
         fp.write(outline+'\n')
     fp.close()
+
+    print("done")

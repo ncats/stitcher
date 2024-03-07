@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-stitcherDataInxightRepo="../stitcher-data-inxight"
+stitcherDataInxightRepo=${STITCHER_DATA_INXIGHT_DIRECTORY}
+alias python='python3'
+
+if [[ ! $stitcherDataInxightRepo ]]; then
+  echo "Please define the STITCHER_DATA_INXIGHT_DIRECTORY variable before running the script. Probably you should use the workflow in \"./workflows/Snakefile\""
+  exit 1
+fi
 
 # run this from the stitcher directory! (due to DailyMedParser dependency)
 if [[ ! `pwd` == */stitcher ]]; then
@@ -29,7 +35,8 @@ files=(
 		dm_spl_release_human_rx_part1.zip 
 		dm_spl_release_human_rx_part2.zip 
 		dm_spl_release_human_rx_part3.zip 
-		dm_spl_release_human_rx_part4.zip 
+		dm_spl_release_human_rx_part4.zip
+		dm_spl_release_human_rx_part5.zip
 		dm_spl_release_human_otc_part1.zip
 		dm_spl_release_human_otc_part2.zip
 		dm_spl_release_human_otc_part3.zip
@@ -79,8 +86,8 @@ for type in ${types[@]}; do
 	echo "Parsing $subset files..."
 	
 	# parse them
-	sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser `echo $subset`" > temp/spl$type.txt
-	
+	sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser `echo $subset`" > stitcher-inputs/temp/spl$type.txt
+
 	wait
 	
 	# leave only active compounds (otherwise stitching later will take too long)
@@ -97,13 +104,13 @@ for type in ${types[@]}; do
 done
 
 # process 'missing' labels
-sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser $stitcherDataInxightRepo/files/spl-ndc/spl-missing-labels.zip" > temp/spl_missing.txt 2> /dev/null
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser $stitcherDataInxightRepo/files/spl-ndc/spl-missing-labels.zip" > stitcher-inputs/temp/spl_missing.txt 2> /dev/null
 
 # create summary spl file
-python $SCRIPT_DIR/dailymed/dailymed_merge_ndc.py # produces data/spl_summary.txt
+python3 $SCRIPT_DIR/dailymed_merge_ndc.py # produces data/spl_summary.txt
 
 # process inactivated labels
-sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > temp/spl_inactivated.txt 2> /dev/null
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser stitcher-inputs/temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip" > stitcher-inputs/temp/spl_inactivated.txt 2> /dev/null
 
 # compare with otc_monograph_final, and remove UNIIs that don't belong
 #echo "Fixing OTC file..."

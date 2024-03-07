@@ -1,11 +1,14 @@
 package ncats.stitcher.calculators.events;
 
+import ncats.stitcher.Util;
+
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Map;
 
 public class GSRSEventParser extends EventParser {
     public GSRSEventParser() {
-        super ("G-SRS, July 2023");
+        super(Util.getNameFromVersionMetadata("gsrs").Name);
     }
 
     public void produceEvents(Map<String, Object> payload) {

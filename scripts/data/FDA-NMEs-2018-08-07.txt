@@ -14,7 +14,7 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1940	Progynon-B	estradiol benzoate	1S4CJB5ZGN				Schering	DeHaen 1940-1975 NMEs		
 1940	Dimenformon Dipropionate	estradiol dipropionate	NIG5418BXB				Roche-Organon (H.La Roche; Organon)	DeHaen 1940-1975 NMEs		
 1940	Ovocylin Dipropionate	estradiol dipropionate	NIG5418BXB		NDA	0-741	Ciba	DeHaen 1940-1975 NMEs		
-1940	Progynon-DP	estradiol dipropionate	NIG5418BXB		NDA	1-802	Schering	DeHaen 1940-1975 NMEs		
+1940	Progynon-DP	estradiol dipropionate	NIG5418BXB		NDA	1-802	Schering	DeHaen 1940-1975 NMEs		Docosanol
 1940	Mannitol Hexanitrate	mannitol hexanitrate	99AU28W1G9				Various Mfrs.	DeHaen 1940-1975 NMEs		
 1940	Kayquinone	menadione	723JX6CXY5				Abbott	DeHaen 1940-1975 NMEs		
 1940	Hykinone	menadione sodium bisulfite	97K34V88SA		NDA	2-694	Abbott	DeHaen 1940-1975 NMEs		
@@ -3825,13 +3825,13 @@ Year	Trademark	Generic Name	UNII	Date [text]	App Type	NDA/BLA No.	Sponsor	Ref
 1959	RETROPAQUE	methiodal sodium	3880P18UBM		NDA	12-010	WINTHROP	https://www.govinfo.gov/content/pkg/FR-1970-01-14/pdf/FR-1970-01-14.pdf
 1964	ALBAMYCIN T NOVOBIOCIN	novobiocin	17EC19951N	09-04-64	NDA	50-339	UPJOHN	https://www.federalregister.gov/documents/2011/01/19/2011-1000/determination-that-albamycin-novobiocin-sodium-capsule-250-milligrams-was-withdrawn-from-sale-for
 1965	Silodrate	silodrate anhydrous	59110L5W24	12-30-65			Mallinckrodt	https://www.google.com/books/edition/American_Journal_of_Hospital_Pharmacy/ub4hAQAAMAAJ?hl=en&gbpv=1&bsq=SILODRATE
-2022	diphenylcyclopropenone	diphenylcyclopropenone	I7G14NW5EC	1/27/2022				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
-2022	glycolic acid	glycolic acid	0WT12SX38S	1/27/2022				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
-2022	squaric acid dibutyl ester	squaric acid dibutyl ester	4RTO57VG65	1/27/2022				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
-2022	trichloroacetic acid	trichloroacetic acid	5V2JDO056X	1/27/2022				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
-2019	Brilliant Blue G	Brilliant Blue G	M1ZRX790SI	2/19/2019				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
-2019	cantharidin	cantharidin	IGL471WQ8P	2/19/2019				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
-2019	diphenylcyclopropenone	diphenylcyclopropenone	I7G14NW5EC	2/19/2019				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
-2019	N-acetyl-D-glucosamine	N-acetyl-D-glucosamine	V956696549	2/19/2019				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
-2019	squaric acid dibutyl ester	squaric acid dibutyl ester	4RTO57VG65	2/19/2019				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
-2019	thymol iodide	thymol iodide	A51HJM3XSU	2/19/2019				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+2022	diphenylcyclopropenone	diphenylcyclopropenone	I7G14NW5EC	1-27-22				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
+2022	glycolic acid	glycolic acid	0WT12SX38S	1-27-22				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
+2022	squaric acid dibutyl ester	squaric acid dibutyl ester	4RTO57VG65	1-27-22				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
+2022	trichloroacetic acid	trichloroacetic acid	5V2JDO056X	1-27-22				https://www.federalregister.gov/documents/2022/01/27/2022-01558/list-of-bulk-drug-substances-for-which-there-is-a-clinical-need-under-section-503b-of-the-federal
+2019	Brilliant Blue G	Brilliant Blue G	M1ZRX790SI	2-19-19				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+2019	cantharidin	cantharidin	IGL471WQ8P	2-19-19				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+2019	diphenylcyclopropenone	diphenylcyclopropenone	I7G14NW5EC	2-19-19				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+2019	N-acetyl-D-glucosamine	N-acetyl-D-glucosamine	V956696549	2-19-19				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+2019	squaric acid dibutyl ester	squaric acid dibutyl ester	4RTO57VG65	2-19-19				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+2019	thymol iodide	thymol iodide	A51HJM3XSU	2-19-19				https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23

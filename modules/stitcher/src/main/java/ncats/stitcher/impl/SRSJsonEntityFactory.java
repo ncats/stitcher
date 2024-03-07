@@ -12,6 +12,7 @@ import ncats.stitcher.*;
 import static ncats.stitcher.StitchKey.*;
 import chemaxon.struc.Molecule;
 import ncats.stitcher.calculators.events.GSRSEventParser;
+import ncats.stitcher.Util;
 
 public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     static final Logger logger =
@@ -62,7 +63,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
     }
 
     void register (String line, int total) {
-        System.out.println("+gsrs+ "+(count+1)+"/"+total+" +++++");
+        System.out.println("+gsrs+ "+(count+1)+" +++++");
         String[] toks = line.split("\t");
         if (toks.length < 2) {
             logger.warning(total+": Expecting 3 fields, but instead got "
@@ -215,7 +216,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         Runtime.getRuntime().addShutdownHook(new Thread(shutdownHookTask));
         System.out.println("Hook registered!");
         if (argv.length < 2) {
-            System.err.println("Usage: "+SRSJsonEntityFactory.class.getName()
+            System.err.println("Usage: " + SRSJsonEntityFactory.class.getName()
                                +" DBDIR [cache=DIR] FILE...");
             System.exit(1);
         }
@@ -223,6 +224,7 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
         SRSJsonEntityFactory mef = new SRSJsonEntityFactory (argv[0]);
         String sourceName = null;
         try {
+            boolean registered = false;
             for (int i = 1; i < argv.length; ++i) {
                 int pos = argv[i].indexOf('=');
                 if (pos > 0) {
@@ -240,14 +242,19 @@ public class SRSJsonEntityFactory extends MoleculeEntityFactory {
                 }
                 else {
                     File file = new File(argv[i]);
+                    System.out.println("reading datafile: " + file);
 
                     if(sourceName != null){
                         mef.register(sourceName, file);
-                    }
-                    else {
-                        mef.register(file.getName(), file);
+                        registered = true;
                     }
                 }
+            }
+            if (!registered) {
+                NameAndFileName name_obj = Util.getNameFromVersionMetadata("gsrs");
+                File file = new File(name_obj.FileName);
+                System.out.println("reading config: " + name_obj.toString());
+                mef.register(name_obj.Name, file);
             }
         }
         finally {

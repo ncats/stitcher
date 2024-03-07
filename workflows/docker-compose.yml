@@ -1,0 +1,11 @@
+version: '3'
+services:
+  get_updated_datafiles:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ../../stitcher-data-inxight:/stitcher-data-inxight
+      - ..:/stitcher
+    tty: true
+    working_dir: /stitcher/workflows

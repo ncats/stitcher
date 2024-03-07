@@ -5,7 +5,86 @@ Software for the ingestion and semantic normalization of datasets. Stitcher empl
 
 A technical description of this approach can be found in https://github.com/ncats/stitcher/tree/master/paper
 
-Building Stitcher
+Stitching Approach
+==================
+
+We propose a graph-based approach to entity stitching and
+resolution. Briefly, our approach uses clique detection to do the
+stitching and resolution as follows:
+
+1. For a given hypergraph (multi-edge) of stitched entities, extract
+   connected components based on stitching keys as defined in
+   ```StitchKey```.
+
+2. For each connected component, perform exhaustive clique enumeration
+   over each stitch key. A clique is a complete subgraph of size 3 or
+   larger.
+
+3. Next we identify a set of high confidence cliques. A high
+   confidence clique is a clique for which its members do not belong to
+   any other clique. All nodes in a clique are merged to become a
+   stitched node.
+
+4. For the leftover cliques, we perform a sort by descending order of
+   the value |V| * |E| where |V| and |E| are the clique size and the
+   cardinality of stitch keys, respectively. Stitched nodes are created
+   as we iterate through this order ignoring any nodes that have already
+   been stitched.
+
+Building and Running Stitcher (new way)
+========
+* make a project directory to hold two git repos
+  * mkdir stitcher-project
+  * cd stitcher-project
+* clone two repositories into it, this one, and stitcher-data-inxight
+  * git clone https://github.com/ncats/stitcher
+  * clone stitcher-data-inxight alongside that folder
+    * install git-lfs
+        * sudo apt-get install -y git-lfs
+        * git lfs install
+    * git clone https://github.com/ncats/stitcher-data-inxight
+* build stitcher - takes 12 hours or so
+    * get to the stitcher folder, open a new screen
+    * UPDATE THE VERSION NUMBER, UNLESS YOU WANT TO OVERWRITE THE EXISTING ONE
+    * docker compose -f build.docker-compose.yml up
+    * you can close this container, after the database is built
+* stand up the app / api
+  * (optional) update the version in api.docker-compose.yml 
+  * docker compose -f api.docker-compose.yml up
+* add the curations
+    * get the container id for the API process
+        * docker ps
+    * docker exec -it {{container}} bash
+    * run the curations
+        * python3 scripts/stitcher-curation/applyCurations.py docker --filename scripts/stitcher-curation/dbCurations-2023-02-13.txt
+* stand up the neo4j browser
+  * (optional) update the version number in neo4j.docker-compose.yml
+  * docker compose -f neo4j.docker-compose.yml up
+  * you might have to update the docker compose file to allow writing the database for the first time you run the container
+    * NEO4J_dbms_read__only=false
+  * make sure you change it back though after, and restart the container
+
+Updating Stitcher (current - 1/25/2024)
+========
+* download new gsrs dump file - 
+  * https://gsrs.ncats.nih.gov/#/release
+  * put it in /stitcher-project/stitcher-data-inxight/files
+  * delete the old one
+  * commit & push changes to the repo
+* delete /temp
+* get updated dailymed files
+  * check that scripts/dailymed/dailymed_get_noel.sh has all the partial files listed here
+    * https://dailymed.nlm.nih.gov/dailymed/spl-resources-all-drug-labels.cfm
+  * run scripts/dailymed/dailymed_get_noel.sh to get all the updated dailymed files
+  * run dailymed_prepare.sh
+    * make sure it says "All done!" at the end
+* run "python scripts/approvalYears.py"
+  * I had to fix the purple book download a few times, because there were some random new lines in the dose field for some reason
+  * run it until it says "done"
+* 
+
+
+Building Stitcher (old way)
 ========
 
 This codebase is based on the latest version of the Play framework
@@ -33,33 +112,8 @@ class in a particular module, use the ```runMain``` syntax, e.g.,
 $ ./activator "project stitcher" "runMain ncats.stitcher.tools.DuctTape"
 ```
 
-Stitching Approach
-==================
 
-We propose a graph-based approach to entity stitching and
-resolution. Briefly, our approach uses clique detection to do the
-stitching and resolution as follows:
-
-1. For a given hypergraph (multi-edge) of stitched entities, extract
-connected components based on stitching keys as defined in
-```StitchKey```.
-
-2. For each connected component, perform exhaustive clique enumeration
-over each stitch key. A clique is a complete subgraph of size 3 or
-larger.
-
-3. Next we identify a set of high confidence cliques. A high
-confidence clique is a clique for which its members do not belong to
-any other clique. All nodes in a clique are merged to become a
-stitched node.
-
-4. For the leftover cliques, we perform a sort by descending order of
-the value |V| * |E| where |V| and |E| are the clique size and the
-cardinality of stitch keys, respectively. Stitched nodes are created
-as we iterate through this order ignoring any nodes that have already
-been stitched.
-
-Detailed Instructions
+Detailed Instructions (old way)
 ==================
 
 ## Preparing the Database and Stitching
@@ -105,7 +159,7 @@ Detailed Instructions
     $ bash scripts/stitch-all-current.sh
     ```
 
-## Testing Locally
+## Testing Locally (old way)
 ### Stitching (Inxight)
 Since the stitching takes a long time, one might want to test a small subset of substances.  
 1) Prepare test data sources by selecting a desired subset of substances in each.  
@@ -120,8 +174,8 @@ Since the stitching takes a long time, one might want to test a small subset of 
     ```console
     $ ./scripts/stitching/test/stitch-all-current.sh
     ```
-
-### App Deployment
+ 
+### App Deployment (old way)
 1) In your `stitcher` directory, run:
     ```console
     $ ./scripts/deployment/restart-stitcher-from-repo.sh YOUR-DATABASE-PATH
@@ -282,5 +336,3 @@ python approvalYears.py   # requires python 3+
 ```
 In the `/data` folder, there should now be a file named according to the following convention: `approvalYears-YYYY-MM-DD.txt`.  
 If acceptable, update the filename reference in `/data/conf/ob.conf` to point to this new file.
-
-

@@ -41,7 +41,7 @@ args_p.add_argument('--unii',
 args_p.add_argument("--appyears",
                     nargs="?",
                     default=os.path.join(sdata,
-                                         "../../data/approvalYears-2022-01-17.txt"),
+                                         "../../stitcher-inputs/active/approvalYears.txt"),
                     help="path to a file with unii names")
 
 args_p.add_argument("--fdanme",

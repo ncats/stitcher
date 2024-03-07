@@ -7,36 +7,31 @@ import traceback
 import subprocess
 import pandas as pd
 import urllib.request
+import requests
 
 def getStitcherDataInxightRepo():
-    stitcherDataInxightRepo = "../stitcher-data-inxight"
+    stitcherDataInxightRepo = os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] or "/opt/stitcher-data-inxight"
     return stitcherDataInxightRepo
 
 def prepUniiDF():
-    if not os.path.exists('temp'):
-        os.makedirs('temp')
+    uniiZip = 'stitcher-inputs/temp/UNIIs.zip'
 
-    uniiZip = 'temp/UNIIs.zip'
-    if not os.path.exists(uniiZip):
-        with urllib.request.urlopen('https://fdasis.nlm.nih.gov/srs/download/srs/UNIIs.zip') as response:
-            with open(uniiZip, 'wb') as out:
-                out.write(response.read())
     with zipfile.ZipFile(uniiZip) as uniizip:
         with uniizip.open(uniizip.namelist()[1]) as uniifile:
-            unii = pd.read_csv(uniifile, sep='\t', index_col='Name')
+            unii = pd.read_csv(uniifile, sep='\t', index_col='Name', encoding='latin-1')
             unii['Locant Name'] = unii.index.copy(deep=True)
             unii.index = unii.index.str.replace(' \[.*\]$', '', regex=True)
     return unii
 
 def prepNDCDF():
-    ndcZip = 'temp/ndctext.zip'
+    ndcZip = 'stitcher-inputs/temp/ndctext.zip'
     if not os.path.exists(ndcZip):
         with urllib.request.urlopen('https://www.accessdata.fda.gov/cder/ndctext.zip') as response:
             with open(ndcZip, 'wb') as out:
                 out.write(response.read())
     with zipfile.ZipFile(ndcZip, 'r') as ndcZipRef:
         with ndcZipRef.open('product.txt') as ndcFile:
-            ndc = pd.read_csv(ndcFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False, dtype=str)
+            ndc = pd.read_csv(ndcFile, sep="\t", encoding = "ISO-8859-1", na_filter=False, dtype=str)
             return ndc
 
 def findUnii(uniiDF, name):
@@ -80,7 +75,7 @@ def getArchiveLabelRequest(url, path, outfile, labelername):
             idx = html.find(b'<a href="/dailymed/archives/fdaDrugInfo.cfm?archiveid=', idx+1)
     return
 
-def getArchiveLabel(product, labelername, path = 'temp/labels/'):
+def getArchiveLabel(product, labelername, path = 'stitcher-inputs/temp/labels/'):
     url = 'https://dailymed.nlm.nih.gov/dailymed/archives/index.cfm?query='+urllib.parse.quote_plus(product)+'&date=&pagesize=20&page=1'
     outfile = path + product + '.zip'
     if not os.path.exists(outfile):
@@ -126,7 +121,7 @@ def searchArchiveMissingNDCs(spl, ndc):
                 row['APPLICATIONNUMBER'] not in spl.ApprovalAppId.values and \
                 row['MARKETINGCATEGORYNAME'] not in ['UNAPPROVED HOMEOPATHIC']:
             print(str(row).encode(sys.stdout.encoding, errors='replace'))
-            archiveLabel = getArchiveLabel(row['PROPRIETARYNAME'], row['LABELERNAME'], 'temp/labels/')  #!!!!
+            archiveLabel = getArchiveLabel(row['PROPRIETARYNAME'], row['LABELERNAME'], 'stitcher-inputs/temp/labels/')  #!!!!
             if archiveLabel is None: # couldn't find an SPL version of this product in the archive
                 entry = {'UNII': unii, \
                          'MarketingStatus': row['MARKETINGCATEGORYNAME'], \
@@ -171,14 +166,14 @@ if __name__ == "__main__":
 
     # get SPLs from the FDA and use old SPLs if no longer available from dailymed dump
     fileTypes = ['rx', 'otc', 'ani', 'rem', 'missing'] #'homeo' homeopathic lables not used
-    splDF = pd.concat([pd.read_csv('temp/spl_'+fileType+'.txt', sep="\t", error_bad_lines=False, na_filter=False, dtype=str) \
+    splDF = pd.concat([pd.read_csv('stitcher-inputs/temp/spl_'+fileType+'.txt', sep="\t", na_filter=False, dtype=str) \
                        for fileType in fileTypes], ignore_index=True)
     for fileType in fileTypes:
         g_old = f'{stitcherDataInxightRepo}/files/spl-ndc/spl_'+fileType+'_old.txt.gz'
         f_old = gzip.open(g_old, 'rb')
-        df_old = pd.read_csv(f_old, sep="\t", error_bad_lines=False, na_filter=False, dtype=str)
+        df_old = pd.read_csv(f_old, sep="\t", na_filter=False, dtype=str)
         df_diff = df_old[~df_old.NDC.isin(splDF.NDC.values)]
-        splDF.append(pd.concat([splDF, df_diff], ignore_index=True))
+        splDF = pd.concat([splDF, df_diff], ignore_index=True)
     print(splDF.info(verbose=True))
 
     # get latest NDC file
@@ -189,7 +184,7 @@ if __name__ == "__main__":
     ndcOldFileGZ = f'{stitcherDataInxightRepo}/files/spl-ndc/Products_all-2018-02-25.txt.gz' # from https://data.nber.org/fda/ndc/
     with gzip.open(ndcOldFileGZ, 'rb') as ndcOldFile:
         entryList = []
-        ndcOldDF = pd.read_csv(ndcOldFile, sep="\t", error_bad_lines=False, encoding = "ISO-8859-1", na_filter=False, dtype=str)
+        ndcOldDF = pd.read_csv(ndcOldFile, sep="\t", encoding = "ISO-8859-1", na_filter=False, dtype=str)
         for index, entry in ndcOldDF[~ndcOldDF.PRODUCTNDC.isin(ndcDF.PRODUCTNDC.values)].iterrows():
             if entry.ENDMARKETINGDATE == '':
                 entry.ENDMARKETINGDATE = entry.LISTING_RECORD_CERTIFIED_THROUGH
@@ -234,5 +229,5 @@ if __name__ == "__main__":
 
     # write out summary list
     summaryDF = pd.concat(summaryList, axis=1).T
-    summaryDF.to_csv("data/spl_summary.txt", sep="\t", index=False, encoding="utf-8")
+    summaryDF.to_csv("stitcher-inputs/active/spl_summary.txt", sep="\t", index=False, encoding="utf-8")
 

@@ -121,7 +121,7 @@ public class DailyMedEventParser extends EventParser {
 
     static{
         try{
-            developmentStatusLookup = DevelopmentStatusLookup.parse(new BufferedInputStream(new FileInputStream("data/dev_status_logic.txt")));
+            developmentStatusLookup = DevelopmentStatusLookup.parse(new BufferedInputStream(new FileInputStream("stitcher-inputs/dev_status_logic.txt")));
         }catch(IOException e){
             throw new UncheckedIOException(e);
         }
