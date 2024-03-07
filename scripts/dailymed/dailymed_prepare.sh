@@ -86,9 +86,9 @@ for type in ${types[@]}; do
 	echo "Parsing $subset files..."
 	
 	# parse them
-#	sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser `echo $subset`" > stitcher-inputs/temp/spl$type.txt
-#
-#	wait
+	sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser `echo $subset`" > stitcher-inputs/temp/spl$type.txt
+
+	wait
 	
 	# leave only active compounds (otherwise stitching later will take too long)
 	# by removing the ones with inactive (IACT) and NOT/MAY contain (CNTM) codes
@@ -104,7 +104,7 @@ for type in ${types[@]}; do
 done
 
 # process 'missing' labels
-#sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser $stitcherDataInxightRepo/files/spl-ndc/spl-missing-labels.zip" > stitcher-inputs/temp/spl_missing.txt 2> /dev/null
+sbt --error dailymed/"runMain ncats.stitcher.dailymed.DailyMedParser $stitcherDataInxightRepo/files/spl-ndc/spl-missing-labels.zip" > stitcher-inputs/temp/spl_missing.txt 2> /dev/null
 
 # create summary spl file
 python3 $SCRIPT_DIR/dailymed_merge_ndc.py # produces data/spl_summary.txt

@@ -73,7 +73,13 @@ public class GeneReviewsEntityFactory extends EntityRegistry {
             ;
         
         try {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+            String FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+            dbf.setFeature(FEATURE, true);
+            dbf.setXIncludeAware(false);
+
+            builder = dbf.newDocumentBuilder();
         }
         catch (Exception ex) {
             logger.log(Level.SEVERE, "Can't construct document factory!", ex);

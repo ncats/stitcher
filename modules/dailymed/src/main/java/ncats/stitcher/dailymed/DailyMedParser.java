@@ -833,7 +833,13 @@ public class DailyMedParser {
     }
     
     protected int parseXml(InputStream is) throws Exception {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        String FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+        dbf.setFeature(FEATURE, true);
+        dbf.setXIncludeAware(false);
+
+        DocumentBuilder builder = dbf.newDocumentBuilder();
 
         Element doc = builder.parse(is).getDocumentElement();
         
