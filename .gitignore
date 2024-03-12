@@ -2,3 +2,4 @@ workflows/venv
 workflows/.snakemake
 stitcher-inputs/temp
 stitchv*
+stitcher-build-logs

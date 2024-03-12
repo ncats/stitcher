@@ -1,0 +1,65 @@
+rule download_clinical_trials_data:
+    output:
+        "../../stitcher-inputs/temp/AllPublicXML.zip"
+    shell:
+        "curl 'https://classic.clinicaltrials.gov/AllPublicXML.zip' -o ../../stitcher-inputs/temp/AllPublicXML.zip"
+
+rule parse_clinical_trials_data:
+    input:
+        "../../stitcher-inputs/usct-trial-to-substance-mapping-public-20210212.xlsx",
+        "../../stitcher-inputs/temp/AllPublicXML.zip"
+    output:
+        "../../stitcher-inputs/temp/ctgovuniis.json.gz",
+        "../../stitcher-inputs/temp/ctdata.json.gz"
+    script:
+        "../../scripts/clinicaltrials/index_clinical_trials.py"
+
+rule download_clinical_trials_publications:
+    output:
+        "../../stitcher-inputs/temp/pubmed/clinical_trials_downloads_are_complete.txt"
+    script:
+        "../../scripts/clinicaltrials/grab_pubmed_trials.py"
+
+rule download_asciimesh_files:
+    output:
+        "../../stitcher-inputs/temp/c.bin",
+        "../../stitcher-inputs/temp/d.bin"
+    shell:
+        """curl 'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/asciimesh/c2024.bin' -o ../../stitcher-inputs/temp/c.bin &&
+        curl 'https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/asciimesh/d2024.bin' -o ../../stitcher-inputs/temp/d.bin"""
+
+
+
+rule parse_pubmed_trial_papers:
+    input:
+        "../../stitcher-inputs/temp/c.bin",
+        "../../stitcher-inputs/temp/d.bin",
+        "../../stitcher-inputs/temp/pubmed/clinical_trials_downloads_are_complete.txt"
+    output:
+        '../../stitcher-inputs/temp/papers.json.gz'
+    script:
+        "../../scripts/clinicaltrials/parse_pubmed_trial.py"
+
+
+rule compile_NCT_REPORT:
+    input:
+        '../../stitcher-inputs/temp/papers.json.gz',
+        "../../stitcher-inputs/temp/ctgovuniis.json.gz",
+        "../../stitcher-inputs/temp/ctdata.json.gz",
+        '../../stitcher-inputs/temp/UNII_data.zip'
+    output:
+        "../../stitcher-inputs/active/NCT_REPORT.txt.gz"
+    script:
+        "../../scripts/clinicaltrials/compile_unii_nct_data.py"
+
+
+rule save_clinical_trials_metadata:
+    input:
+        "../../stitcher-inputs/active/NCT_REPORT.txt.gz"
+    output:
+        '../../stitcher-inputs/temp/metadata.clinical_trials.json'
+    params:
+        source_key='clinical_trials',
+        name_format="ClinicalTrials, @month@ @year@"
+    script:
+        'save_metadata.py'

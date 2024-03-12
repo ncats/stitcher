@@ -29,8 +29,8 @@ if key == 'gsrs':
 else :
     format = snakemake.params.name_format
     data_file: str = snakemake.input[0]
-    if data_file.startswith("../stitcher-inputs"):
-        data_file = data_file.split("../")[1]
+    if data_file.startswith("../../stitcher-inputs"):
+        data_file = data_file.split("../../")[1]
     metadata_object = {
         key: {
             'name': format_name(format, snakemake.input[0]),

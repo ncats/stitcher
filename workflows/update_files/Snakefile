@@ -1,0 +1,51 @@
+import os
+os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] = "../../stitcher-data-inxight"
+
+rule ready_to_build_stitcher:
+    input:
+        "../../stitcher-inputs/active/spl_summary.txt",
+        "../../stitcher-inputs/active/approvalYears.txt",
+        "../../stitcher-inputs/active/NCT_REPORT.txt.gz",
+        "../../stitcher-inputs/active/FDAanimalDrugs.txt",
+        '../../stitcher-inputs/active/FDAexcipients.txt',
+        '../../stitcher-inputs/active/broad_drug_list.txt',
+        '../../stitcher-inputs/active/version.metadata.json'
+
+rule download_unii_data:
+    output:
+        '../../stitcher-inputs/temp/UNII_data.zip',
+        '../../stitcher-inputs/temp/UNIIs.zip'
+    shell:
+        "curl -L 'https://precision.fda.gov/uniisearch/archive/latest/UNII_Data.zip' -o ../../stitcher-inputs/temp/UNII_data.zip && "
+        "curl -L 'https://precision.fda.gov/uniisearch/archive/latest/UNIIs.zip' -o ../../stitcher-inputs/temp/UNIIs.zip"
+
+include: "snakefile.approval_years"
+include: "snakefile.dailymed"
+include: "snakefile.fda_excipients"
+include: "snakefile.fda_animal_drugs"
+include: "snakefile.broad_institute"
+include: "snakefile.clinical_trials"
+
+rule save_gsrs_metadata:
+    output:
+        '../../stitcher-inputs/temp/metadata.gsrs.json'
+    params:
+        source_key='gsrs',
+        # gsrs_version="subset"
+        gsrs_version="latest"
+    script:
+        'save_metadata.py'
+
+rule aggregate_metadata:
+    input:
+        '../../stitcher-inputs/temp/metadata.broad.json',
+        '../../stitcher-inputs/temp/metadata.dailymed.json',
+        '../../stitcher-inputs/temp/metadata.fda_animal_drugs.json',
+        '../../stitcher-inputs/temp/metadata.fda_excipients.json',
+        '../../stitcher-inputs/temp/metadata.clinical_trials.json',
+        '../../stitcher-inputs/temp/metadata.approval_years.json',
+        '../../stitcher-inputs/temp/metadata.gsrs.json'
+    output:
+        '../../stitcher-inputs/active/version.metadata.json'
+    script:
+        'aggregate_metadata.py'

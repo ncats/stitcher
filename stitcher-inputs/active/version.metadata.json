@@ -25,7 +25,7 @@
   },
   "gsrs": {
     "name": "G-SRS, December 2023",
-    "file": "../stitcher-data-inxight/files/gsrs_latest.gsrs",
+    "file": "../../stitcher-data-inxight/files/gsrs_latest.gsrs",
     "original": "dump-public-2023-12-14.gsrs"
   }
 }

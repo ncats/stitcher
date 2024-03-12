@@ -1,0 +1,36 @@
+rule download_animal_drugs_worksheets:
+    output:
+        "../../stitcher-inputs/temp/Section12byApplicationNumber.xls",
+        "../../stitcher-inputs/temp/Section6VoluntaryWithdrawal.xls"
+    shell:
+        """curl --insecure -o ../../stitcher-inputs/temp/Section12byApplicationNumber.xls 'https://animaldrugsatfda.fda.gov/adafda/app/search/public/tradeSponsorExcelByNadaAnada/Section12byApplicationNumber' &&
+        curl --insecure -o ../../stitcher-inputs/temp/Section6VoluntaryWithdrawal.xls 'https://animaldrugsatfda.fda.gov/adafda/app/search/public/voluntaryWithdrawalExcel/Section6VoluntaryWithdrawal'"""
+
+rule scrape_nadas:
+    input:
+        "../../stitcher-inputs/temp/Section12byApplicationNumber.xls",
+        "../../stitcher-inputs/temp/Section6VoluntaryWithdrawal.xls"
+    output:
+        "../../stitcher-inputs/temp/NADAs.json"
+    script:
+        "../../scripts/scrapeNADAs.py"
+
+rule scrape_fda_animal_drugs:
+    input:
+        "../../stitcher-inputs/temp/NADAs.json"
+    output:
+        "../../stitcher-inputs/active/FDAanimalDrugs.txt"
+    script:
+        "../../scripts/scrapeFDAAnimalDrugs.py"
+
+
+rule save_fda_animal_drugs_metadata:
+    input:
+        "../../stitcher-inputs/active/FDAanimalDrugs.txt"
+    output:
+        '../../stitcher-inputs/temp/metadata.fda_animal_drugs.json'
+    params:
+        source_key='fda_animal_drugs',
+        name_format="FDA NADA and ANADAs, @month@ @year@"
+    script:
+        'save_metadata.py'
