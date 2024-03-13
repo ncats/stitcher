@@ -55,7 +55,7 @@ rule load_frdb:
     log:
         "stitcher-build-logs/frdb_complete.log"
     shell:
-        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $DB \"name=FRDB, October 2021\" cache=data/hash.db $stitcherDataInxightRepo/files/frdb_2021-10-19.json" | tee {log}'
+        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $DB \"name=FRDB, October 2021\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/frdb_2021-10-19.json" | tee {log}'
 
 rule load_ncats_pharmaceutical_collection:
     input:
@@ -65,7 +65,7 @@ rule load_ncats_pharmaceutical_collection:
     log:
         "stitcher-build-logs/ncatspc_complete.log"
     shell:
-        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $DB \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db $stitcherDataInxightRepo/files/npc-dump-1.2-04-25-2012_annot.sdf.gz" | tee {log}'
+        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $DB \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/npc-dump-1.2-04-25-2012_annot.sdf.gz" | tee {log}'
 
 rule load_drugbank:
     input:
@@ -75,7 +75,7 @@ rule load_drugbank:
     log:
         "stitcher-build-logs/drugbank_complete.log"
     shell:
-        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $DB \"name=DrugBank, July 2020\" cache=data/hash.db $stitcherDataInxightRepo/files/drugbank_all_full_database.xml.zip" | tee {log}'
+        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.DrugBankXmlEntityFactory $DB \"name=DrugBank, July 2020\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/drugbank_all_full_database.xml.zip" | tee {log}'
 
 rule load_pharm_man_encycl:
     input:
@@ -85,7 +85,7 @@ rule load_pharm_man_encycl:
     log:
         "stitcher-build-logs/pharm_man_encycl_complete.log"
     shell:
-        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $DB \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" $stitcherDataInxightRepo/files/PharmManuEncycl3rdEd.json" | tee {log}'
+        'cd ../.. && sbt stitcher/"runMain ncats.stitcher.impl.PharmManuEncyl3rdEntityFactory $DB \"name=Pharmaceutical Manufacturing Encyclopedia (Third Edition)\" $STITCHER_DATA_INXIGHT_DIRECTORY/files/PharmManuEncycl3rdEd.json" | tee {log}'
 
 # context / events data sources:
 
