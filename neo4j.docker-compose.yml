@@ -1,7 +1,7 @@
 version: '3'
 services:
   neo4j-browser:
-    image: neo4j:3.2.13
+    image: neo4j:3.4.0
     container_name: stitcher-browser
     environment:
       - NEO4J_AUTH=none
