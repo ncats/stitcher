@@ -73,13 +73,6 @@ def faradRoutes():
 
 def resolveNameTripod(name):
     unii = ''
-    # response = urllib2.urlopen("https://tripod.nih.gov/servlet/resolverBeta3/unii", "structure="+name+"&format=json&apikey=5fd5bb2a05eb6195").read()
-    # r = json.loads(response)
-    # if len(r) > 0 and 'response' in r[0]:
-    #    resolverCache[name] = r[0]['response']
-    #    if r[0]['input'] == name and r[0]['source'] == 'FDA-SRS' and len(r[0]['response']) == 10:
-    #        return r[0]['response']
-    # else:
 
     request = "https://drugs.ncats.io/api/v1/substances/search?q=root_names_name:\"^" + urllib.parse.quote(name) + "$\""
     response = "{\"total\":0}"

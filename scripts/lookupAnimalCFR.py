@@ -32,13 +32,6 @@ def requestJson(uri):
 
 def resolveNameTripod(name):
     unii = ''
-    #response = urllib2.urlopen("https://tripod.nih.gov/servlet/resolverBeta3/unii", "structure="+name+"&format=json&apikey=5fd5bb2a05eb6195").read()
-    #r = json.loads(response)
-    #if len(r) > 0 and r[0].has_key('response'):
-    #    resolverCache[name] = r[0]['response']
-    #    if r[0]['input'] == unicode(name) and r[0]['source'] == unicode('FDA-SRS') and len(r[0]['response']) == 10:
-    #        return r[0]['response']
-    #else:
 
     request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib2.quote(name)+"$\""
     response = "{\"total\":0}"
