@@ -4,28 +4,28 @@
     "file": "stitcher-inputs/active/broad_drug_list.txt"
   },
   "dailymed": {
-    "name": "DailyMed Rx, March 2024",
+    "name": "DailyMed Rx, March 2025",
     "file": "stitcher-inputs/active/spl_summary.txt"
   },
   "fda_animal_drugs": {
-    "name": "FDA NADA and ANADAs, March 2024",
+    "name": "FDA NADA and ANADAs, March 2025",
     "file": "stitcher-inputs/active/FDAanimalDrugs.txt"
   },
   "fda_excipients": {
-    "name": "FDA Excipients, March 2024",
+    "name": "FDA Excipients, March 2025",
     "file": "stitcher-inputs/active/FDAexcipients.txt"
   },
   "clinical_trials": {
-    "name": "ClinicalTrials, March 2024",
+    "name": "ClinicalTrials, March 2025",
     "file": "stitcher-inputs/active/NCT_REPORT.txt.gz"
   },
   "approval_years": {
-    "name": "Drugs@FDA & OB, March 2024",
+    "name": "Drugs@FDA & OB, March 2025",
     "file": "stitcher-inputs/active/approvalYears.txt"
   },
   "gsrs": {
-    "name": "G-SRS, December 2023",
-    "file": "../../stitcher-data-inxight/files/gsrs_latest.gsrs",
-    "original": "dump-public-2023-12-14.gsrs"
+    "name": "G-SRS, March 2025",
+    "file": "../stitcher-data-inxight/files/gsrs_latest.gsrs",
+    "original": "dump-public-2025-03-06.gsrs"
   }
 }

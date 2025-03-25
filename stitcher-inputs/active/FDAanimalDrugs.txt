@@ -272,7 +272,6 @@ X8I39OJF4P128-549	X8I39OJF4P	FENPROSTALENE	128-549	RX	Approved	N	Zoetis Inc.	Bov
 92UOD3BMEK128-686	92UOD3BMEK	SALINOMYCIN SODIUM	128-686	OTC	Approved	N	Huvepharma EOOD	Bio-Cox® Type A Medicated Article	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/128-686	Oral	Salinomycin Sodium
 Z97702A5DG128-967	Z97702A5DG	DIBUCAINE HYDROCHLORIDE	128-967	RX	Approved	N	Zoetis Inc.	Repose Euthanasia Solution	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/128-967	Intraperitoneal|Intravenous	Dibucaine Hydrochloride|Secobarbital Sodium
 XBP604F6UM128-967	XBP604F6UM	SECOBARBITAL SODIUM	128-967	RX	Approved	N	Zoetis Inc.	Repose Euthanasia Solution	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/128-967	Intraperitoneal|Intravenous	Dibucaine Hydrochloride|Secobarbital Sodium
-PAU39W3CVB006-475	PAU39W3CVB	BUTACAINE SULFATE	006-475	OTC	Voluntarily Withdrawn	N	SmithKline Beecham Animal Health	Furacin Dusting Powder	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/006-475		Nitrofurazone|Butacaine Sulfate
 PTC2969MV1130-951	PTC2969MV1	HALOFUGINONE HYDROBROMIDE	130-951	OTC	Approved	N	Huvepharma EOOD	Stenorol®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/130-951	Oral	Halofuginone Hydrobromide
 2U0X0JA2NB131-310	2U0X0JA2NB	ALTRENOGEST	131-310	RX	Approved	N	Intervet, Inc.	Regu-Mate®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/131-310	Oral	Altrenogest
 E38WZ4U54R134-644	E38WZ4U54R	TIAMULIN	134-644	OTC	Approved	N	Elanco US Inc.	Denagard® Soluble Antibiotic	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/134-644	Oral	Tiamulin
@@ -314,7 +313,6 @@ GOR5747GWU140-973	GOR5747GWU	CLENBUTEROL HYDROCHLORIDE	140-973	RX	Approved	N	Boe
 E669Z6S1JG140-994	E669Z6S1JG	TOLAZOLINE HYDROCHLORIDE	140-994	RX	Approved	N	Akorn Animal Health, Inc.	Tolazine™ Injection	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/140-994	Intravenous	Tolazoline Hydrochloride
 MR15E85MQM140-999	MR15E85MQM	MEDETOMIDINE	140-999	RX	Approved	N	Orion Corp.	Domitor®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/140-999	Intravenous|Intramuscular	Medetomidine
 076WHW89TW009-505	076WHW89TW	FOLLICLE STIMULATING HORMONE	009-505	RX	Voluntarily Withdrawn	N	Sioux Biochemical, Inc.	F.S.H.-P Injectable	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/009-505	Intramuscular|Subcutaneous|Intravenous	Follicle Stimulating Hormone
-9O25354EPJ141-015	9O25354EPJ	ENALAPRIL MALEATE	141-015	RX	Approved	N	Merial, Inc.	Enacard® Tablets For Dogs	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-015	Oral	Enalapril Maleate
 05TAA9I0Z8141-025	05TAA9I0Z8	LAIDLOMYCIN PROPIONATE POTASSIUM	141-025	OTC	Approved	N	Zoetis Inc.	Cattlyst®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-025	Oral	Laidlomycin Propionate Potassium
 1R754M4918141-026	1R754M4918	LUFENURON	141-026	OTC	Approved	N	Elanco US Inc.	Program™ Suspension	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-026	Oral	Lufenuron
 16665T4A2X141-029	16665T4A2X	DESOXYCORTICOSTERONE PIVALATE	141-029	RX	Approved	N	Elanco US Inc.	Percorten™-V	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-029	Intramuscular	Desoxycorticosterone Pivalate
@@ -335,9 +333,7 @@ Z6375YW9SF141-074	Z6375YW9SF	NALTREXONE HYDROCHLORIDE	141-074	RX	Approved	N	Wild
 6W731X367Q141-080	6W731X367Q	SELEGILINE HYDROCHLORIDE	141-080	OTC	Approved	N	Zoetis Inc.	Anipryl®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-080	Oral	Selegiline Hydrochloride
 660932TPY6141-081	660932TPY6	ORBIFLOXACIN	141-081	RX	Approved	N	Intervet, Inc.	Orbax® Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-081	Oral	Orbifloxacin
 19XTS3T51U141-082	19XTS3T51U	DOXYCYCLINE HYCLATE	141-082	RX	Approved	N	Zoetis Inc.	Doxirobe™ Gel	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-082	Subgingival	Doxycycline Hyclate
-XJ0260HJ0O141-096	XJ0260HJ0O	DIFLOXACIN HYDROCHLORIDE	141-096	RX	Approved	N	Boehringer Ingelheim Vetmedica, Inc.	Dicural® Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-096	Oral	Difloxacin Hydrochloride
 38LVP0K73A141-103	38LVP0K73A	SEVOFLURANE	141-103	RX	Approved	N	Zoetis Inc.	SevoFlo®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-103	Inhalation	Sevoflurane
-2M36281008141-108	2M36281008	ETODOLAC	141-108	RX	Approved	N	Boehringer Ingelheim Vetmedica, Inc.	EtoGesic® Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-108	Oral	Etodolac
 2LXW0L6GWJ141-120	2LXW0L6GWJ	CLOMIPRAMINE HYDROCHLORIDE	141-120	RX	Approved	N	Elanco US Inc.	Clomicalm™ Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-120	Oral	Clomipramine Hydrochloride
 KG60484QX9141-123	KG60484QX9	OMEPRAZOLE	141-123	RX	Approved	N	Merial, Inc.	GastroGard®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-123	Oral	Omeprazole
 8X09WU898T141-151	8X09WU898T	MARBOFLOXACIN	141-151	RX	Approved	N	Zoetis Inc.	Zeniquin®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-151	Oral	Marbofloxacin
@@ -418,6 +414,7 @@ J9F5ZPH7NB141-455	J9F5ZPH7NB	GRAPIPRANT	141-455	RX	Approved	N	Elanco US Inc.	GAL
 9T02S42WQO141-460	9T02S42WQO	TYLVALOSIN	141-460	VFD	Approved	N	ECO LLC	Aivlosin® 17%	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-460	Oral	Tylvalosin
 Y8335394RO141-461	Y8335394RO	BUPIVACAINE	141-461	RX	Approved	N	Aratana Therapeutics, Inc.	NOCITA®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-461	Infiltration|Perineural	Bupivacaine
 304NUG5GF4141-474	304NUG5GF4	ITRACONAZOLE	141-474	RX	Approved	N	Elanco US Inc.	Itrafungol™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-474	Oral	Itraconazole
+141-350		NITROUS OXIDE, USP	141-350		Approved	N	Air Liquide America Specialty Gases	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-350		Nitrous Oxide, USP
 A051Q2099Q141-481	A051Q2099Q	MIRTAZAPINE	141-481	RX	Approved	N	Kindred Biosciences, Inc.	Mirataz™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-481	Topical (transdermal)	Mirtazapine
 HEH4938D7K141-494	HEH4938D7K	LOTILANER	141-494	RX	Approved	N	Elanco US Inc.	Credelio™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-494	Oral	Lotilaner
 U5SYW473RQ141-501	U5SYW473RQ	TELMISARTAN	141-501	RX	Approved	N	Boehringer Ingelheim Vetmedica, Inc.	Semintra®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-501	Oral	Telmisartan
@@ -425,6 +422,7 @@ U5SYW473RQ141-501	U5SYW473RQ	TELMISARTAN	141-501	RX	Approved	N	Boehringer Ingelh
 19V39682LI141-509	19V39682LI	IMEPITOIN	141-509	RX	Approved	N	Boehringer lngelheim Animal Health USA Inc.	Pexion™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-509	Oral	Imepitoin
 141-511		BC2371 RDNA CONSTRUCT	141-511		Approved	N	LFB USA, Inc.	Bc2371 rDNA construct in R69 New Zealand white rabbits	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-511		Bc2371 rDNA construct
 6429L0L52Y141-513	6429L0L52Y	DIPYRONE	141-513	RX	Approved	N	Dechra, Ltd.	Zimeta®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-513	Intravenous	Dipyrone
+141-383		HELIUM, USP	141-383		Approved	N	Airgas USA, LLC	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-383		Helium, USP
 85Q03215IW141-526	85Q03215IW	VERDINEXOR	141-526	RX	Approved	N	Anivive Lifesciences, Inc.	LAVERDIA™-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-526	Oral	Verdinexor
 58H6RWO52I141-529	58H6RWO52I	BACITRACIN	141-529	OTC	Approved	N	Pharmgate Inc.	Pennitracin MD® and Maxiban™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-529	Oral	Narasin|Nicarbazin|Bacitracin
 S59502J185141-533	S59502J185	CICLESONIDE	141-533	RX	Approved	N	Boehringer lngelheim Animal Health USA Inc.	Aservo® EquiHaler®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-533	Intranasal inhalation	Ciclesonide
@@ -438,7 +436,7 @@ M39BO43J9W141-475	M39BO43J9W	RABACFOSADINE	141-475	RX	Approved	N	VetDC	TANOVEA�
 77O28MCS79141-546	77O28MCS79	FRUNEVETMAB	141-546	RX	Approved	N	Zoetis Inc.	Solensia™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-546	Subcutaneous	Frunevetmab
 BH210P244U141-551	BH210P244U	MEDETOMIDINE HYDROCHLORIDE	141-551	RX	Approved	N	Dechra, Ltd.	Zenalpha®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-551	Intramuscular	Medetomidine hydrochloride|Vatinoxan hydrochloride
 66932R910R141-551	66932R910R	VATINOXAN HYDROCHLORIDE	141-551	RX	Approved	N	Dechra, Ltd.	Zenalpha®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-551	Intramuscular	Medetomidine hydrochloride|Vatinoxan hydrochloride
-PY79D6C8RX141-552	PY79D6C8RX	CROFELEMER	141-552	RX	Approved	N	Jaguar Animal Health	CANALEVIA™-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-552	Oral	Crofelemer
+PY79D6C8RX141-552	PY79D6C8RX	CROFELEMER	141-552	RX	Approved	N	Jaguar Animal Health	CANALEVIA®-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-552	Oral	Crofelemer
 914032762Y141-559	914032762Y	PENTOSAN POLYSULFATE SODIUM	141-559	RX	Approved	N	Dechra, Ltd.	Zycosan®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-559	Intramuscular	Pentosan polysulfate sodium
 1AY63T2BE2141-562	1AY63T2BE2	BEDINVETMAB	141-562	RX	Approved	N	Zoetis Inc.	Librela™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-562	Subcutaneous	Bedinvetmab
 EY00JF42FV141-566	EY00JF42FV	BEXAGLIFLOZIN	141-566	RX	Approved	N	Elanco US Inc.	Bexacat™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-566	Oral	Bexagliflozin
@@ -447,8 +445,14 @@ FV2YU8SL0P141-568	FV2YU8SL0P	VELAGLIFLOZIN	141-568	RX	Approved	N	Boehringer lnge
 46658IQN7V141-570	46658IQN7V	ESAFOXOLANER	141-570	RX	Approved	N	Boehringer lngelheim Animal Health USA Inc.	NexGard® COMBO	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-570	Topical	Praziquantel|Eprinomectin|Esafoxolaner
 9JH486CZ13141-571	9JH486CZ13	MOLIDUSTAT	141-571	RX	Approved	C	Elanco US Inc.	Varenzin™-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-571	Oral	Molidustat
 140QMO216E141-572	140QMO216E	METRONIDAZOLE	141-572	RX	Approved	N	Virbac AH, Inc.	AYRADIA™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-572	Oral	Metronidazole
+W31X2H97FB141-577	W31X2H97FB	TORSEMIDE	141-577	RX	Approved	C	Vetoquinol USA, Inc.	UpCard®-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-577	Oral	Torsemide
 YQE403BP4D141-578	YQE403BP4D	PHENOBARBITAL	141-578	RX	Approved	C	Genus Lifesciences Inc.	FIDOQUEL™-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-578	Oral	Phenobarbital
 55JG375S6M141-580	55JG375S6M	PREGABALIN	141-580	RX	Approved	N	Orion Corp.	Bonqat®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-580	Oral	Pregabalin
+SOI2LOH54Z141-582	SOI2LOH54Z	ZINC OXIDE	141-582	RX	Approved	N	Warburton Technology Ltd.	MULTIMIN® 90	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-582	Subcutaneous	Sodium Selenite|Zinc oxide|Copper carbonate|Manganese carbonate
+9AOA5F11GJ141-582	9AOA5F11GJ	COPPER CARBONATE	141-582	RX	Approved	N	Warburton Technology Ltd.	MULTIMIN® 90	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-582	Subcutaneous	Sodium Selenite|Zinc oxide|Copper carbonate|Manganese carbonate
+9ZV57512ZM141-582	9ZV57512ZM	MANGANESE CARBONATE	141-582	RX	Approved	N	Warburton Technology Ltd.	MULTIMIN® 90	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-582	Subcutaneous	Sodium Selenite|Zinc oxide|Copper carbonate|Manganese carbonate
+N3TB5AH8B9141-585	N3TB5AH8B9	ILUNOCITINIB	141-585	RX	Approved	N	Elanco US Inc.	Zenrelia™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-585	Oral	Ilunocitinib
+W36ZG6FT64141-604	W36ZG6FT64	SIROLIMUS	141-604	RX	Approved	C	TriviumVet	felycin®-CA1	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-604	Oral	Sirolimus
 CYS9AKD70P135-773	CYS9AKD70P	ISOFLURANE	135-773	RX	Voluntarily Withdrawn	N	Baxter Healthcare Corp.	Aerrane®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/135-773	Inhalation	Isoflurane
 2RG1XQ1NYJ200-134	2RG1XQ1NYJ	GONADORELIN ACETATE	200-134	RX	Approved	A	Intervet, Inc.	Fertagyl®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/200-134	Intramuscular|Intravenous	Gonadorelin acetate
 971ZM8IPK1042-427	971ZM8IPK1	TRICAINE METHANESULFONATE	042-427	OTC	Voluntarily Withdrawn	N	Argent Laboratories	Finquel	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/042-427	Immersion	Tricaine Methanesulfonate
@@ -457,8 +461,10 @@ HWT06H303Z200-345	HWT06H303Z	SPECTINOMYCIN DIHYDROCHLORIDE PENTAHYDRATE	200-345	
 3U02EL437C200-538	3U02EL437C	CLINDAMYCIN	200-538	RX	Approved	A	Bimeda Animal Health Limited	ClindaMed™ Oral Drops	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/200-538	Oral	Clindamycin
 1018WH7F9I200-573	1018WH7F9I	DEXMEDETOMIDINE HCL	200-573	RX	Approved	A	Putney, Inc.	Dexmedetomidine HCl	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/200-573	Intravenous|Intramuscular	Dexmedetomidine HCl
 804826J2HU200-749	804826J2HU	AMOXICILLIN	200-749	RX	Approved	A	Ceva Sante Animale	Kesium®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/200-749	Oral	Clavulanate Potassium|Amoxicillin
+554Z48XN5E200-771	554Z48XN5E	METHIMAZOLE	200-771	RX	Approved	A	Norbrook Laboratories, Ltd.	Felanorm®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/200-771	Oral	Methimazole
 H5GU9YQL7L005-414	H5GU9YQL7L	ROXARSONE	005-414	OTC	Voluntarily Withdrawn	N	Zoetis Inc.	Ren-O-Sal® Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/005-414	Oral	Roxarsone
 4182431BJH006-032	4182431BJH	DIPHENYLHYDANTOIN SODIUM	006-032	RX	Voluntarily Withdrawn	N	Parke-Davis Div. Warner-Lambert Co.	Dilantin Kapseals	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/006-032		Diphenylhydantoin Sodium
+PAU39W3CVB006-475	PAU39W3CVB	BUTACAINE SULFATE	006-475	OTC	Voluntarily Withdrawn	N	SmithKline Beecham Animal Health	Furacin Dusting Powder	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/006-475		Nitrofurazone|Butacaine Sulfate
 KW75J7708X006-623	KW75J7708X	ARSENAMIDE SODIUM	006-623	RX	Voluntarily Withdrawn	N	Merial, Inc.	Caparsolate Sodium	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/006-623	Intravenous	Arsenamide Sodium
 JP2EN8WORU007-616	JP2EN8WORU	NITARSONE	007-616	OTC	Voluntarily Withdrawn	N	Zoetis Inc.	Histostat®-50 Type A Medicated Article	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/007-616	Oral	Nitarsone
 UDX9AKS7GM008-019	UDX9AKS7GM	ARSANILIC ACID	008-019	OTC	Voluntarily Withdrawn	N	Fleming Laboratories	Pro-Gen Plus Feed Supplement	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/008-019	Oral	Arsanilic Acid
@@ -551,8 +557,11 @@ N72LMW566G136-214	N72LMW566G	POLYOXYETHYLENE 23 LAURYL ETHER	136-214	OTC	Volunta
 7LG286J8GV139-633	7LG286J8GV	CARFENTANIL CITRATE	139-633	RX	Voluntarily Withdrawn	N	Wildlife Laboratories, Inc.	Wildnil®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/139-633	Intramuscular	Carfentanil Citrate
 Q3JTX2Q7TU140-848	Q3JTX2Q7TU	DIAZEPAM	140-848	RX	Voluntarily Withdrawn	N	Roche Vitamins, Inc.	Veteeze® Injection	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/140-848	Intravenous	Diazepam
 6V475AX06U140-904	6V475AX06U	COPPER DISODIUM EDETATE	140-904	OTC	Voluntarily Withdrawn	N	Veterinary Research & Development, Inc.	Bovi-Cu	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/140-904		Copper Disodium Edetate
+9O25354EPJ141-015	9O25354EPJ	ENALAPRIL MALEATE	141-015	RX	Voluntarily Withdrawn	N	Merial, Inc.	Enacard® Tablets For Dogs	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-015	Oral	Enalapril Maleate
 I36JP4Q9DF141-017	I36JP4Q9DF	SARAFLOXACIN HYDROCHLORIDE	141-017	RX	Voluntarily Withdrawn	N	Abbott Laboratories	SaraFlox® WSP	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-017		Sarafloxacin Hydrochloride
 83LCM6L2BY141-075	83LCM6L2BY	FOMEPIZOLE	141-075	RX	Voluntarily Withdrawn	N	Paladin Labs (USA), Inc.	Antizol-Vet®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-075	Intravenous	Fomepizole
+XJ0260HJ0O141-096	XJ0260HJ0O	DIFLOXACIN HYDROCHLORIDE	141-096	RX	Voluntarily Withdrawn	N	Boehringer Ingelheim Vetmedica, Inc.	Dicural® Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-096	Oral	Difloxacin Hydrochloride
+2M36281008141-108	2M36281008	ETODOLAC	141-108	RX	Voluntarily Withdrawn	N	Boehringer Ingelheim Vetmedica, Inc.	EtoGesic® Tablets	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-108	Oral	Etodolac
 4YIQ0A94UR141-162	4YIQ0A94UR	(S) - METHOPRENE	141-162	OTC	Voluntarily Withdrawn	N	Wellmark International	Hartz® Flea Control Capsules™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-162	Oral	(S) - methoprene
 SOA12P041N141-178	SOA12P041N	NITAZOXANIDE	141-178	RX	Voluntarily Withdrawn	N	IDEXX Pharmaceuticals, Inc.	Navigator®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-178	Oral	Nitazoxanide
 021SEF3731141-180	021SEF3731	ALBUTEROL SULFATE	141-180	RX	Voluntarily Withdrawn	N	Boehringer Ingelheim Vetmedica, Inc.	Torpex™	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-180	Inhalation	Albuterol Sulfate
@@ -560,12 +569,10 @@ SOA12P041N141-178	SOA12P041N	NITAZOXANIDE	141-178	RX	Voluntarily Withdrawn	N	IDE
 UF599785JZ141-337	UF599785JZ	FENTANYL	141-337	RX	Voluntarily Withdrawn	N	Elanco US Inc.	Recuvyra®	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-337	Topical	Fentanyl
 0W72P6E6EY009-252	0W72P6E6EY	BICYCLOHEXYLAMMONIUM FUMAGILLIN	009-252	RX	Withdrawn	N	Mid-Continent Agrimarketing, Inc.	FUMIDIL B	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/009-252		Bicyclohexylammonium fumagillin
 38D5LJ4KH2141-107	38D5LJ4KH2	BETA-AMINOPROPIONITRILE	141-107	RX	Approved	N	Alaco, Inc.	Bapten® For Injection	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-107	Intralesional	Beta-aminopropionitrile
-141-350		NITROUS OXIDE, USP	141-350		Approved	N	Air Liquide America Specialty Gases	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-350		Nitrous Oxide, USP
 141-351		MEDICAL AIR, USP	141-351		Approved	N	Air Liquide America Specialty Gases	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-351		Medical Air, USP
 141-354		OXYGEN, USP	141-354		Approved	N	Air Liquide Industrial U.S. L.P.	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-354		Oxygen, USP
 141-357		NITROGEN, NF	141-357		Approved	N	Air Liquide Industrial U.S. L.P.	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-357		Nitrogen, NF
 141-362		CARBON DIOXIDE, USP	141-362		Approved	N	Linde LLC	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-362		Carbon Dioxide, USP
-141-383		HELIUM, USP	141-383		Approved	N	Airgas USA, LLC	None	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/141-383		Helium, USP
 X60881643X034-601	X60881643X	FLUROGESTONE ACETATE	034-601	RX	Withdrawn	N	G. D. Searle LLC	SYNCHRO-MATE	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/034-601		Flurogestone acetate
 PKE82W49V1045-863	PKE82W49V1	ORGOTEIN	045-863	RX	Approved	N	OXIS International, Inc.	Palosein	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/045-863	Subcutaneous|Intramuscular	Orgotein
 4XKL2JJ08I130-092	4XKL2JJ08I	ALFAPROSTOL	130-092	RX	Withdrawn	N	Vetem, S.p.A.	ALFAVET	https://animaldrugsatfda.fda.gov/adafda/views/#/home/previewsearch/130-092		Alfaprostol

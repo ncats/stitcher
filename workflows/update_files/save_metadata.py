@@ -16,7 +16,7 @@ key = snakemake.params.source_key
 if key == 'gsrs':
     gsrs_version = snakemake.params.gsrs_version
     stitcher_inxight_directory = os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"]
-    metadata_file = f"../{stitcher_inxight_directory}/files/gsrs_{gsrs_version}_metadata.json"
+    metadata_file = f"/{stitcher_inxight_directory}/files/gsrs_{gsrs_version}_metadata.json"
     with open(metadata_file, 'r') as f:
         metadata = json.load(f)
         metadata_object = {
@@ -29,8 +29,8 @@ if key == 'gsrs':
 else :
     format = snakemake.params.name_format
     data_file: str = snakemake.input[0]
-    if data_file.startswith("../../stitcher-inputs"):
-        data_file = data_file.split("../../")[1]
+    if data_file.startswith("../stitcher-inputs"):
+        data_file = data_file.split("../")[1]
     metadata_object = {
         key: {
             'name': format_name(format, snakemake.input[0]),

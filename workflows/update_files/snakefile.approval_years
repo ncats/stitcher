@@ -1,18 +1,18 @@
 
 rule run_approvalYears:
     input:
-        '../../stitcher-inputs/temp/UNIIs.zip',
-        "../../stitcher-inputs/active/spl_summary.txt"
+        '../stitcher-inputs/temp/UNIIs.zip',
+        "../stitcher-inputs/active/spl_summary.txt"
     output:
-        "../../stitcher-inputs/active/approvalYears.txt"
+        "../stitcher-inputs/active/approvalYears.txt"
     script:
         "../../scripts/approvalYears.py"
 
 rule save_approval_years_metadata:
     input:
-        "../../stitcher-inputs/active/approvalYears.txt"
+        "../stitcher-inputs/active/approvalYears.txt"
     output:
-        '../../stitcher-inputs/temp/metadata.approval_years.json'
+        '../stitcher-inputs/temp/metadata.approval_years.json'
     params:
         source_key='approval_years',
         name_format="Drugs@FDA & OB, @month@ @year@"

@@ -2,12 +2,11 @@ version: '3'
 services:
   build-stitcher:
     build:
-      context: ..
-      dockerfile: stitcher/build.Dockerfile
+      context: .
+      dockerfile: build.Dockerfile
     container_name: build-stitcher
     volumes:
-      - ./stitcherdb:/opt/app/db
-      - ./browserdb:/opt/app/browsercopy
+      - ../stitcher-data-inxight-clean:/opt/stitcher-data-inxight
     environment:
-      - STITCHER_VERSION=1.1
+      - STITCHER_VERSION=1.3
     tty: true

@@ -1,4 +1,4 @@
-FROM ubuntu:latest as buildContainer
+FROM ubuntu:latest as buildcontainer
 WORKDIR "/opt/stitcher"
 
 RUN apt update
@@ -15,23 +15,23 @@ RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E4
 RUN chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg
 
 RUN sudo apt-get install pip -y
-RUN sudo pip install requests
-RUN sudo pip install openpyxl
+RUN sudo apt install -y python3-requests
+RUN sudo apt install -y python3-openpyxl
 
 RUN sh -c "$(curl -fsSL https://ftp.ncbi.nlm.nih.gov/entrez/entrezdirect/install-edirect.sh) | sh -s y"
 
 RUN apt-get update
-RUN apt-get install sbt
+RUN apt-get install -y sbt
 EXPOSE 9003
 
 RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC -J-XX:+HeapDumpOnOutOfMemoryError -J-XX:HeapDumpPath=./heapdump.hprof" > .sbtopts
 
 RUN alias python='python3'
 
-RUN pip install pandas
-RUN pip install snakemake
-RUN pip install pulp==2.7
-RUN pip install xlrd
+RUN apt install -y python3-pandas
+RUN pip install --break-system-packages snakemake
+RUN pip install --break-system-packages pulp==2.7
+RUN pip install --break-system-packages xlrd
 
 ENV SBT_OPTS="-Dsbt.rootdir=true"
 CMD export PATH=${HOME}/edirect:${PATH} && bash

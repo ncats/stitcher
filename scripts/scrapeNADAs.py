@@ -74,7 +74,7 @@ def scrapeNADAs():
                 print("Oops!")
                 print(app)
                 print(item)
-                sys.exit()
+                # sys.exit()
             else:
                 for entry in item.keys():
                     if not entry in apps[app] or apps[app][entry] != item[entry]:

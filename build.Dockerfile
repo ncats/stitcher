@@ -1,10 +1,7 @@
 FROM ubuntu:latest
 
 RUN mkdir /opt/app
-COPY ./stitcher /opt/app
-
-RUN mkdir /opt/stitcher-data-inxight
-COPY ./stitcher-data-inxight /opt/stitcher-data-inxight
+COPY . /opt/app
 
 WORKDIR "/opt/app"
 
@@ -29,16 +26,13 @@ EXPOSE 9003
 
 RUN echo "-J-Xms2048M -J-Xmx32G -J-Xss1024M -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC -J-XX:+HeapDumpOnOutOfMemoryError -J-XX:HeapDumpPath=./heapdump.hprof" > .sbtopts
 
-RUN chmod +x /opt/app/build.entrypoint.sh
-
-RUN #./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
 
 ENV STITCHER_VERSION=$STITCHER_VERSION
 
 RUN unzip -o scripts/deployment/*zip
 
-CMD /opt/app/build.entrypoint.sh \
-    bash
+CMD bash
+RUN #./scripts/stitching/stitch-all-current.sh | sudo tee /opt/app/stitch.log
 
 #RUN chmod +x ./scripts/deployment/restart-stitcher-from-repo.sh
 

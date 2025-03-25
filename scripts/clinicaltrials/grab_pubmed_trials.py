@@ -38,23 +38,26 @@ def grabPubMedTrials():
         os.mkdir('../stitcher-inputs/temp/pubmed')
     chunk_size = 100000
     for start in range(0, max_pmid, chunk_size):
-        try:
-            search_range = f"{start}-{start + chunk_size - 1}"
-            if not os.path.exists(f"../stitcher-inputs/temp/pubmed/pmds{search_range}.xml.gz"):
-                webenv, query_key, count = get_esearch_meta_keys(start, start + chunk_size - 1)
-                print(f"found {count} clinical trial publications in {search_range}")
-                if (count > 9998):
-                    raise Exception("Your chunk size is too big, efetch won't return more than 9998 at a time")
-                url = efetch_base+"&WebEnv="+webenv+"&query_key="+query_key
-                print(url)
-                r2 = requests.get(url)
-                fp = gzip.open(f"../stitcher-inputs/temp/pubmed/pmds{search_range}.xml.gz", "wb")
-                fp.write(r2.content)
-                fp.close()
-                time.sleep(3)
-        except Exception as e:
-            print(e)
-            raise e
+        for attempt in range(3):
+            try:
+                search_range = f"{start}-{start + chunk_size - 1}"
+                if not os.path.exists(f"../stitcher-inputs/temp/pubmed/pmds{search_range}.xml.gz"):
+                    webenv, query_key, count = get_esearch_meta_keys(start, start + chunk_size - 1)
+                    print(f"found {count} clinical trial publications in {search_range}")
+                    if (count > 9998):
+                        raise Exception("Your chunk size is too big, efetch won't return more than 9998 at a time")
+                    url = efetch_base+"&WebEnv="+webenv+"&query_key="+query_key
+                    print(url)
+                    r2 = requests.get(url)
+                    fp = gzip.open(f"../stitcher-inputs/temp/pubmed/pmds{search_range}.xml.gz", "wb")
+                    fp.write(r2.content)
+                    fp.close()
+                    time.sleep(3)
+                break
+            except Exception as e:
+                print(e)
+                if attempt == 2:
+                    raise e
 
     with open(f"../stitcher-inputs/temp/pubmed/clinical_trials_downloads_are_complete.txt", 'wt') as f:
         f.write('done')

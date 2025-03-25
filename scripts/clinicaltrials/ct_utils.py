@@ -47,6 +47,8 @@ def prepMeSH():
                         record[sline[0]] = []
                     record[sline[0]].append(sline[1])
                 line = fp.readline()
+            if 'UI' not in record:
+                print(record)
             _mesh_sup[record['UI']] = record
             line = fp.readline()
         fp.close()

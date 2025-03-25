@@ -54,10 +54,13 @@ def indexCTzip():
     ctdata = dict()
     for filename in files[1:]: # ['Contents.txt', 'NCT0000xxxx/NCT00000102.xml', 'NCT0000xxxx/NCT00000104.xml', 'NCT0000xxxx/NCT00000105.xml', 'NCT0000xxxx/NCT00000106.xml', 'NCT0000xxxx/NCT00000107.xml', 'NCT0000xxxx/NCT00000108.xml' ...
         ctnum = filename[12:-4]
-        print(ctnum)
-        ctdata[ctnum], alias = parseCT(zf, filename)
-        if alias != '':
-            ctdata[alias] = ctdata[ctnum]
+        try:
+            print(filename)
+            ctdata[ctnum], alias = parseCT(zf, filename)
+            if alias != '':
+                ctdata[alias] = ctdata[ctnum]
+        except:
+            print('parse CT failed: ', filename)
     zf.close()
 
     with gzip.open('../stitcher-inputs/temp/ctdata.json.gz', 'wt') as f:
@@ -84,7 +87,7 @@ def readGSRSworkbook(workbook_file_name):
     output = []
     for item in data[header+1:]:
         output.append(item[0:2])
-
+    print('saving that one thing')
     with gzip.open('../stitcher-inputs/temp/ctgovuniis.json.gz', 'wt') as f:
         json.dump(output, f, ensure_ascii=False, indent=4)
 
@@ -92,6 +95,7 @@ def readGSRSworkbook(workbook_file_name):
 
 
 if __name__=="__main__":
+    print(snakemake.input[0])
     readGSRSworkbook(snakemake.input[0])
     indexCTzip()
 

@@ -47,10 +47,6 @@ if __name__ == "__main__":
         {
             'base': 'https://www.fda.gov',
             'page': '/Drugs/InformationOnDrugs/ucm113978.htm'
-        },
-        {
-            'base': 'http://wayback.archive-it.org',
-            'page': '/7993/20170112022245/http:/www.fda.gov/Drugs/InformationOnDrugs/ucm113978.htm'
         }
     ]
 
@@ -59,13 +55,17 @@ if __name__ == "__main__":
 
         with urllib.request.urlopen(uri_obj['base'] + uri_obj['page']) as response:
             html = response.read()
-            pattern = r'<a.*?href=["\'](.*?)["\'].*?>(.*(?:Inactive )?Ingredients? Database(?: Download)? File.*)<\/a>'
+            pattern = r'<a [^<>]*href=[\'\"]([^<>\'\"]+)[\'\"][^<>]*>([^<>]+(?:Inactive )?Ingredient?s? Database(?: Download)? File)</a>'
             matches = re.findall(pattern, html.decode('utf-8'))
 
             for link_index, link in enumerate(matches):
-                dbURL = uri_obj['base'] + link[0]
+                if link[0].startswith('http'):
+                    dbURL = link[0]
+                else:
+                    dbURL = uri_obj['base'] + link[0]
                 print(f"{uri_index}-{link_index}-{link[1]}")
                 iigfile = f"../stitcher-inputs/temp/current-iig-{uri_index}-{link_index}.zip"
+                print(f"\n\n{dbURL}\n\n")
                 syscall = "curl -sL --insecure -o " + iigfile + " " + dbURL
                 if not os.path.exists(iigfile):
                     print(syscall)

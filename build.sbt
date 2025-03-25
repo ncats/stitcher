@@ -7,7 +7,7 @@ lazy val buildDate = (new java.text.SimpleDateFormat("yyyyMMdd"))
 lazy val appVersion = "%s-%s-%s".format(branch, buildDate, commit)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.11.11",
+  scalaVersion := "2.13.12",
   version := appVersion
 )
 
@@ -18,11 +18,12 @@ lazy val javaBuildOptions = Seq(
 )
 
 lazy val commonDependencies = Seq(
-  guice,
   javaJdbc,
   ehcache,
   javaWs,
-  "com.typesafe.play" %% "play-json" % "2.6.0",
+  "com.typesafe.play" %% "play-json" % "2.10.6",
+  "com.typesafe.play" %% "play-guice" % "2.9.4",
+  "org.playframework" %% "play-java-jdbc" % "3.0.5",
   "com.h2database" % "h2" % "1.4.193",
   "org.neo4j" % "neo4j" % "3.4.0",
   "org.neo4j" % "neo4j-bolt" % "3.4.0",
@@ -43,7 +44,7 @@ lazy val commonDependencies = Seq(
   "org.testng" % "testng" % "7.1.0" % "test",
   "org.apache.logging.log4j" % "log4j-api" % "2.16.0",
   "org.apache.logging.log4j" % "log4j-core" % "2.16.0",
-  "org.webjars" %% "webjars-play" % "2.6.1",
+  "org.webjars" %% "webjars-play" % "3.0.2",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "handlebars" % "4.0.2",

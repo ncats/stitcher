@@ -1,61 +1,79 @@
 
 rule download_daily_med_files:
     output:
-        "../../stitcher-inputs/temp/dm_spl_release_animal.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_homeopathic.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part1.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part2.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part3.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part4.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part5.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part6.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part7.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part8.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part9.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part10.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part1.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part2.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part3.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part4.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part5.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_remainder.zip",
-        "../../stitcher-inputs/temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip"
+        "../stitcher-inputs/temp/dm_spl_release_animal.zip",
+        "../stitcher-inputs/temp/dm_spl_release_homeopathic.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part1.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part2.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part3.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part4.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part5.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part6.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part7.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part8.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part9.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part10.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part1.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part2.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part3.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part4.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part5.zip",
+        "../stitcher-inputs/temp/dm_spl_release_remainder.zip",
+        "../stitcher-inputs/temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip"
     shell:
-        "../../scripts/dailymed/dailymed_get_noel.sh"
+        "../scripts/dailymed/dailymed_get_noel.sh"
 
 rule prepare_daily_med_summary:
     input:
-        '../../stitcher-inputs/temp/UNIIs.zip',
-        "../../stitcher-inputs/temp/dm_spl_release_animal.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_homeopathic.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part1.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part2.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part3.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part4.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part5.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part6.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part7.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part8.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part9.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_otc_part10.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part1.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part2.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part3.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part4.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_human_rx_part5.zip",
-        "../../stitcher-inputs/temp/dm_spl_release_remainder.zip",
-        "../../stitcher-inputs/temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip"
+        '../stitcher-inputs/temp/UNIIs.zip',
+        "../stitcher-inputs/temp/dm_spl_release_animal.zip",
+        "../stitcher-inputs/temp/dm_spl_release_homeopathic.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part1.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part2.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part3.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part4.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part5.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part6.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part7.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part8.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part9.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_otc_part10.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part1.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part2.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part3.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part4.zip",
+        "../stitcher-inputs/temp/dm_spl_release_human_rx_part5.zip",
+        "../stitcher-inputs/temp/dm_spl_release_remainder.zip",
     output:
-        "../../stitcher-inputs/active/spl_summary.txt"
+        '../stitcher-inputs/temp/spl_ani.txt',
+        "../stitcher-inputs/temp/spl_homeo.txt",
+        "../stitcher-inputs/temp/spl_otc.txt",
+        "../stitcher-inputs/temp/spl_rem.txt",
+        "../stitcher-inputs/temp/spl_rx.txt"
     shell:
-        "cd ../.. && scripts/dailymed/dailymed_prepare.sh stitcher-inputs/temp/"
+        "cd .. && scripts/dailymed/dailymed_prepare.sh stitcher-inputs/temp/"
+
+rule prepare_daily_med_summary_2:
+    input:
+        '../stitcher-inputs/temp/spl_ani.txt',
+        "../stitcher-inputs/temp/spl_homeo.txt",
+        "../stitcher-inputs/temp/spl_otc.txt",
+        "../stitcher-inputs/temp/spl_rem.txt",
+        "../stitcher-inputs/temp/spl_rx.txt",
+        "../stitcher-inputs/temp/fda_initiated_inactive_ndcs_indexing_spl_files.zip"
+    output:
+        "../stitcher-inputs/active/spl_summary.txt",
+        "../stitcher-inputs/temp/spl_inactivated.txt",
+        "../stitcher-inputs/temp/spl_missing.txt"
+    shell:
+        "cd .. && scripts/dailymed/dailymed_prepare_2.sh stitcher-inputs/temp/"
 
 
 rule save_dailymed_metadata:
     input:
-        "../../stitcher-inputs/active/spl_summary.txt"
+        "../stitcher-inputs/active/spl_summary.txt"
     output:
-        '../../stitcher-inputs/temp/metadata.dailymed.json'
+        '../stitcher-inputs/temp/metadata.dailymed.json'
     params:
         source_key='dailymed',
         name_format="DailyMed Rx, @month@ @year@"

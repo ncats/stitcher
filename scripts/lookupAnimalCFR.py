@@ -2,7 +2,6 @@ import os
 import io
 import sys
 import cookielib
-import urllib
 import urllib2
 import json
 import time
@@ -33,7 +32,7 @@ def requestJson(uri):
 def resolveNameTripod(name):
     unii = ''
 
-    request = "https://tripod.nih.gov/ginas/app/api/v1/substances/search?q=root_names_name:\"^"+urllib2.quote(name)+"$\""
+    request = "https://drugs.ncats.io/api/v1/substances/search?q=root_names_name:\"^"+urllib2.quote(name)+"$\""
     response = "{\"total\":0}"
     try:
         response = urllib2.urlopen(request).read()
