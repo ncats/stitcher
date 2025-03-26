@@ -1,17 +1,17 @@
 import os
-os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] = "../../stitcher-data-inxight"
-os.environ["DB"] = "stitchv1.5"
+os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] = "../../stitcher-data-inxight-clean"
+os.environ["DB"] = "stitchv1.6"
 
 rule ready_to_build_stitcher:
     input:
-        "../../stitcher-build-logs/stitch_all_complete.log",
+        "../stitcher-build-logs/stitch_all_complete.log",
 
 rule create_dir:
     output:
-        "../../stitcher-build-logs/flag"
+        "../stitcher-build-logs/flag"
     shell:
         """
-        mkdir -p "../../stitcher-build-logs"
+        mkdir -p "../stitcher-build-logs"
         touch {output}
         """
 
@@ -19,9 +19,9 @@ rule create_dir:
 
 rule load_withdrawn_drugs:
     input:
-        "../../stitcher-build-logs/flag"
+        "../stitcher-build-logs/flag"
     output:
-        "../../stitcher-build-logs/withdrawn_complete.log"
+        "../stitcher-build-logs/withdrawn_complete.log"
     log:
         "stitcher-build-logs/withdrawn_complete.log"
     shell:
@@ -29,9 +29,9 @@ rule load_withdrawn_drugs:
 
 rule load_broad_drugs:
     input:
-        "../../stitcher-build-logs/withdrawn_complete.log"
+        "../stitcher-build-logs/withdrawn_complete.log"
     output:
-        "../../stitcher-build-logs/broad_complete.log"
+        "../stitcher-build-logs/broad_complete.log"
     log:
         "stitcher-build-logs/broad_complete.log"
     shell:
@@ -39,9 +39,9 @@ rule load_broad_drugs:
 
 rule load_gsrs:
     input:
-        "../../stitcher-build-logs/broad_complete.log"
+        "../stitcher-build-logs/broad_complete.log"
     output:
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/gsrs_complete.log"
     log:
         "stitcher-build-logs/gsrs_complete.log"
     shell:
@@ -49,19 +49,19 @@ rule load_gsrs:
 
 rule load_frdb:
     input:
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/frdb_complete.log"
+        "../stitcher-build-logs/frdb_complete.log"
     log:
         "stitcher-build-logs/frdb_complete.log"
     shell:
-        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $DB \\"name=FRDB, October 2021\\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/frdb_2021-10-19.json" | tee {log}'
+        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $DB \\"name=FRDB, December 2024\\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/frdb_2024-12-30.json" | tee {log}'
 
 rule load_ncats_pharmaceutical_collection:
     input:
-        "../../stitcher-build-logs/frdb_complete.log"
+        "../stitcher-build-logs/frdb_complete.log"
     output:
-        "../../stitcher-build-logs/ncatspc_complete.log"
+        "../stitcher-build-logs/ncatspc_complete.log"
     log:
         "stitcher-build-logs/ncatspc_complete.log"
     shell:
@@ -69,9 +69,9 @@ rule load_ncats_pharmaceutical_collection:
 
 rule load_drugbank:
     input:
-        "../../stitcher-build-logs/ncatspc_complete.log"
+        "../stitcher-build-logs/ncatspc_complete.log"
     output:
-        "../../stitcher-build-logs/drugbank_complete.log"
+        "../stitcher-build-logs/drugbank_complete.log"
     log:
         "stitcher-build-logs/drugbank_complete.log"
     shell:
@@ -79,9 +79,9 @@ rule load_drugbank:
 
 rule load_pharm_man_encycl:
     input:
-        "../../stitcher-build-logs/drugbank_complete.log"
+        "../stitcher-build-logs/drugbank_complete.log"
     output:
-        "../../stitcher-build-logs/pharm_man_encycl_complete.log"
+        "../stitcher-build-logs/pharm_man_encycl_complete.log"
     log:
         "stitcher-build-logs/pharm_man_encycl_complete.log"
     shell:
@@ -91,10 +91,10 @@ rule load_pharm_man_encycl:
 
 rule load_dailymed_summary:
     input:
-        "../../stitcher-build-logs/pharm_man_encycl_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/pharm_man_encycl_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/dailymed_complete.log"
+        "../stitcher-build-logs/dailymed_complete.log"
     log:
         "stitcher-build-logs/dailymed_complete.log"
     shell:
@@ -102,10 +102,10 @@ rule load_dailymed_summary:
 
 rule load_approval_years:
     input:
-        "../../stitcher-build-logs/dailymed_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/dailymed_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/approval_years_complete.log"
+        "../stitcher-build-logs/approval_years_complete.log"
     log:
         "stitcher-build-logs/approval_years_complete.log"
     shell:
@@ -113,10 +113,10 @@ rule load_approval_years:
 
 rule load_clinical_trials:
     input:
-        "../../stitcher-build-logs/approval_years_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/approval_years_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/clinical_trials_complete.log"
+        "../stitcher-build-logs/clinical_trials_complete.log"
     log:
         "stitcher-build-logs/clinical_trials_complete.log"
     shell:
@@ -124,10 +124,10 @@ rule load_clinical_trials:
 
 rule load_otc:
     input:
-        "../../stitcher-build-logs/clinical_trials_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/clinical_trials_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/otc_complete.log"
+        "../stitcher-build-logs/otc_complete.log"
     log:
         "stitcher-build-logs/otc_complete.log"
     shell:
@@ -135,10 +135,10 @@ rule load_otc:
 
 rule load_animal_drugs:
     input:
-        "../../stitcher-build-logs/otc_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/otc_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/animal_drugs_complete.log"
+        "../stitcher-build-logs/animal_drugs_complete.log"
     log:
         "stitcher-build-logs/animal_drugs_complete.log"
     shell:
@@ -146,10 +146,10 @@ rule load_animal_drugs:
 
 rule load_excipients:
     input:
-        "../../stitcher-build-logs/animal_drugs_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log"
+        "../stitcher-build-logs/animal_drugs_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log"
     output:
-        "../../stitcher-build-logs/excipients_complete.log"
+        "../stitcher-build-logs/excipients_complete.log"
     log:
         "stitcher-build-logs/excipients_complete.log"
     shell:
@@ -159,22 +159,22 @@ rule load_excipients:
 
 rule stitch_data_sources:
     input:
-        "../../stitcher-build-logs/withdrawn_complete.log",
-        "../../stitcher-build-logs/broad_complete.log",
-        "../../stitcher-build-logs/gsrs_complete.log",
-        "../../stitcher-build-logs/frdb_complete.log",
-        "../../stitcher-build-logs/ncatspc_complete.log",
-        "../../stitcher-build-logs/pharm_man_encycl_complete.log",
-        "../../stitcher-build-logs/drugbank_complete.log",
+        "../stitcher-build-logs/withdrawn_complete.log",
+        "../stitcher-build-logs/broad_complete.log",
+        "../stitcher-build-logs/gsrs_complete.log",
+        "../stitcher-build-logs/frdb_complete.log",
+        "../stitcher-build-logs/ncatspc_complete.log",
+        "../stitcher-build-logs/pharm_man_encycl_complete.log",
+        "../stitcher-build-logs/drugbank_complete.log",
 
-        "../../stitcher-build-logs/dailymed_complete.log",
-        "../../stitcher-build-logs/approval_years_complete.log",
-        "../../stitcher-build-logs/clinical_trials_complete.log",
-        "../../stitcher-build-logs/otc_complete.log",
-        "../../stitcher-build-logs/animal_drugs_complete.log",
-        "../../stitcher-build-logs/excipients_complete.log"
+        "../stitcher-build-logs/dailymed_complete.log",
+        "../stitcher-build-logs/approval_years_complete.log",
+        "../stitcher-build-logs/clinical_trials_complete.log",
+        "../stitcher-build-logs/otc_complete.log",
+        "../stitcher-build-logs/animal_drugs_complete.log",
+        "../stitcher-build-logs/excipients_complete.log"
     output:
-        "../../stitcher-build-logs/stitch_all_complete.log",
+        "../stitcher-build-logs/stitch_all_complete.log",
     log:
         "stitcher-build-logs/stitch_all_complete.log"
     shell:

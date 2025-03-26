@@ -25,7 +25,7 @@ echo 'Broad:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 sbt stitcher/"runMain ncats.stitcher.impl.SRSJsonEntityFactory $db cache=data/hash.db"
 echo 'gsrs:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
-sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db $stitcherDataInxightRepo/files/frdb_2021-10-19.json"
+sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $db \"name=FRDB, October 2021\" cache=data/hash.db $stitcherDataInxightRepo/files/frdb_2024-12-30.json"
 echo 'rancho:' $(( ($(date +%s) - $curr_time )/60 )) 'min' >> $log
 
 sbt stitcher/"runMain ncats.stitcher.impl.NPCEntityFactory $db \"name=NCATS Pharmaceutical Collection, April 2012\" cache=data/hash.db $stitcherDataInxightRepo/files/npc-dump-1.2-04-25-2012_annot.sdf.gz"

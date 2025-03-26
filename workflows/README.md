@@ -11,4 +11,4 @@ run these workflow
 
 Other tools for your toolbox
 * Save a png of the workflow
-  * snakemake -s update_files/Snakefile --dag | dot -T png > workflow.png
+  * snakemake -s build_stitcher/Snakefile --dag | dot -T png > workflow.png
