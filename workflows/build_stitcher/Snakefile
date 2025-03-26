@@ -4,7 +4,7 @@ os.environ["DB"] = "stitchv1.6"
 
 rule ready_to_build_stitcher:
     input:
-        "../stitcher-build-logs/stitch_all_complete.log",
+        "../stitcher-build-logs/stitch_all_complete.log"
 
 rule create_dir:
     output:
@@ -174,7 +174,7 @@ rule stitch_data_sources:
         "../stitcher-build-logs/animal_drugs_complete.log",
         "../stitcher-build-logs/excipients_complete.log"
     output:
-        "../stitcher-build-logs/stitch_all_complete.log",
+        "../stitcher-build-logs/stitch_all_complete.log"
     log:
         "stitcher-build-logs/stitch_all_complete.log"
     shell:
