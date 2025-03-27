@@ -1,5 +1,5 @@
 import os
-os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] = "../../stitcher-data-inxight-clean"
+os.environ["STITCHER_DATA_INXIGHT_DIRECTORY"] = "../../stitcher-data-inxight"
 os.environ["DB"] = "stitchv1.6"
 
 rule ready_to_build_stitcher:
@@ -55,7 +55,7 @@ rule load_frdb:
     log:
         "stitcher-build-logs/frdb_complete.log"
     shell:
-        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $DB \\"name=FRDB, December 2024\\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/frdb_2024-12-30.json" | tee {log}'
+        'cd .. && sbt -mem 32000 stitcher/"runMain ncats.stitcher.impl.RanchoJsonEntityFactory $DB \\"name=FRDB, December 2024\\" cache=data/hash.db $STITCHER_DATA_INXIGHT_DIRECTORY/files/frdb_2024-12-30.json" | tee {log} | tee rancho.log'
 
 rule load_ncats_pharmaceutical_collection:
     input:
@@ -109,7 +109,7 @@ rule load_approval_years:
     log:
         "stitcher-build-logs/approval_years_complete.log"
     shell:
-        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.ManufacturingpEntityFactory $DB data/conf/ob.conf" | tee {log}'
+        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $DB data/conf/ob.conf" | tee {log} | tee approval_years.log'
 
 rule load_clinical_trials:
     input:
@@ -120,7 +120,7 @@ rule load_clinical_trials:
     log:
         "stitcher-build-logs/clinical_trials_complete.log"
     shell:
-        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $DB data/conf/ct.conf" | tee {log}'
+        'cd .. && sbt stitcher/"runMain ncats.stitcher.impl.MapEntityFactory $DB data/conf/ct.conf" | tee {log} | tee clinical_trials.log'
 
 rule load_otc:
     input:

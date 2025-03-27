@@ -1,7 +1,7 @@
 version: '3'
 services:
   neo4j-browser:
-    image: neo4j:3.4.0
+    image: neo4j:3.2.13
     container_name: stitcher-browser
     environment:
       - NEO4J_AUTH=none
@@ -11,4 +11,4 @@ services:
       - "7687:7687"
     tty: true
     volumes:
-      - ./browserdb/1.1:/data
+      - ./stitchv1.6b:/data

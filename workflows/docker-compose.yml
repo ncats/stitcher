@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       context: .
     volumes:
-      - ../../stitcher-data-inxight-clean:/stitcher-data-inxight
+      - ../../stitcher-data-inxight:/stitcher-data-inxight
       - ..:/stitcher
       - ./stitcher-build-logs:/stitcher-build-logs
     tty: true
